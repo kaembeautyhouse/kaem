@@ -1,0 +1,67 @@
+/* KAÉM · Base común de los catálogos (Detal, Mayorista y Distribuidor): paleta, tipografía, cinta, categorías, avisos y campos.
+   Cada catálogo solo agrega lo suyo. Archivo servido desde el mismo sitio (GitHub Pages) junto a catalogo.html / catalogo-detal.html. */
+@font-face{font-family:'TAN Pearl';src:url('TAN-Pearl-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+:root{
+  --crema:#F7F4EE;--arena:#E5DDD0;--piedra:#C2B6A6;--espresso:#2C211E;--blanco:#FFFFFF;
+  --salvia:#8FA08E;--salvia-txt:#5E7160;--terracota:#B86B53;--terracota-txt:#9E5842;--suave:#6B5B52;--rojo:#A94B36;--gris:#ECE8E1;
+  /* Jost para leer (como la marca) y TAN Pearl solo en títulos grandes */
+  --sans:'Jost',-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:'TAN Pearl','Playfair Display',Georgia,'Times New Roman',serif;
+  --ease:cubic-bezier(.32,.72,0,1);--ease-out:cubic-bezier(.2,.8,.2,1);
+  --sombra-s:0 1px 2px rgba(44,33,30,.05),0 6px 22px rgba(44,33,30,.07);
+  --sombra:0 10px 40px rgba(44,33,30,.10)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+html,body{margin:0;background:var(--crema);color:var(--espresso);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--terracota);outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.trampa{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
+/* Cinta superior con las reglas reales del nivel */
+.cinta{background:rgba(44,33,30,.96);color:var(--crema);font-size:12.5px;text-align:center;padding:9px 14px;line-height:1.4;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+.cinta b{font-weight:500;color:#E8C29E}
+
+/* Marca en texto (si el logo no carga) */
+.wm{display:block;font:600 1.25rem/1 var(--sans);letter-spacing:.16em;text-transform:uppercase}
+.wm i{display:block;font-size:.5em;letter-spacing:.3em;font-weight:400;margin-top:4px;font-style:normal}
+
+/* Categorías / marcas: barra deslizable con flechas en computador */
+.chips-w{position:relative}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab}
+.chips:active{cursor:grabbing}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;padding:8px 15px;border-radius:999px;border:0;background:var(--gris);font-size:14px;font-weight:500;white-space:nowrap;min-height:38px;transition:background .18s,color .18s,transform .15s var(--ease-out)}
+.chip:active{transform:scale(.96)}
+.chip.on{background:var(--espresso);color:#fff}
+.ch-f{display:none;position:absolute;top:50%;margin-top:-4px;transform:translateY(-50%);z-index:2;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.92);box-shadow:0 1px 4px rgba(0,0,0,.18);color:var(--espresso);cursor:pointer;transition:transform .15s}
+.ch-f:hover{transform:translateY(-50%) scale(1.08)}
+.ch-f:active{transform:translateY(-50%) scale(.94)}
+.ch-f svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ch-f.i{left:-6px}.ch-f.d{right:-6px}
+@media (hover:hover) and (pointer:fine){
+  .chips-w.mas-i .ch-f.i,.chips-w.mas-d .ch-f.d{display:flex}
+  .chips-w.mas-i .chips{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 44px);mask-image:linear-gradient(90deg,transparent 0,#000 44px)}
+  .chips-w.mas-d .chips{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent)}
+  .chips-w.mas-i.mas-d .chips{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 44px,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 44px,#000 calc(100% - 44px),transparent)}
+}
+
+/* Avisos, campos de formulario y esqueletos */
+.aviso{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-24px);z-index:80;max-width:92vw;opacity:0;pointer-events:none;background:var(--espresso);color:var(--crema);padding:12px 18px;border-radius:16px;font-size:14.5px;line-height:1.4;box-shadow:0 8px 30px rgba(0,0,0,.2);transition:all .3s var(--ease);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.aviso.on{opacity:1;transform:translate(-50%,0)}
+.campo{margin:10px 0}
+.campo label{display:block;font-size:12.5px;color:var(--suave);margin:0 0 5px 4px}
+.campo input,.campo textarea,.campo select{width:100%;font-size:16px;padding:13px 15px;border-radius:14px;border:0;background:var(--gris);outline:none;-webkit-appearance:none;transition:background .2s,box-shadow .2s}
+.campo input:focus,.campo textarea:focus,.campo select:focus{background:#fff;box-shadow:0 0 0 3px rgba(184,107,83,.22)}
+.campo input.mal,.campo textarea.mal{box-shadow:0 0 0 2px var(--rojo);animation:sacude .35s}
+.campo input.mayus{text-transform:uppercase}
+.campo input.mayus::placeholder{text-transform:none}
+.campo .ayuda{font-size:12px;color:var(--suave);margin:4px 4px 0}
+@keyframes sacude{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes brillo{to{background-position:-200% 0}}
+@keyframes trazo{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
