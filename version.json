@@ -1,0 +1,16 @@
+{
+  "app": "2026-10-17-01",
+  "servidor": "2026.10.19",
+  "fecha": "2026-10-12",
+  "novedades": [
+    "Aviso de versión nueva con las novedades y botón para actualizar.",
+    "Ajustes → Versión y mantenimiento: ves si la app y el servidor van acordes.",
+    "Catálogo Detal: envío gratis en Bucaramanga y área metropolitana desde $100.000.",
+    "Mensajes de WhatsApp del catálogo: cercanos para Detal y más formales para Mayorista y Distribuidor.",
+    "Ganchos comerciales con IA: descargas los productos con su descripción real, la IA escribe los ganchos y los cargas todos de una vez.",
+    "Packing: la fecha de entrega ahora es un botón grande con la fecha en letras.",
+    "Ajustes más ordenados y revisión del inventario y las reservas.",
+    "Inventario más seguro: al subir la cantidad de un pedido ya empacado, la app respeta lo reservado para otros pedidos.",
+    "Ajustes: nuevo botón para ordenar y revisar la base de datos (KAEM_BASE_APP)."
+  ]
+}
