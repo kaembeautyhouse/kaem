@@ -1,0 +1,12 @@
+{
+  "app": "2026-10-20-01",
+  "servidor": "2026.10.20",
+  "fecha": "2026-10-20",
+  "novedades": [
+    "PDF de la remisión con encabezado nuevo y medios de pago en una tarjeta más ancha (QR del mismo tamaño, llaves en una columna).",
+    "Recibo de pago con diseño más claro: estado, monto destacado y resumen de cuentas.",
+    "Devoluciones: botón «Devolver toda la factura» o elegir solo algunos productos; todo queda contabilizado (inventario, cartera, totales y lo que se le debe devolver al cliente).",
+    "Packing: botón ancho «Fechas de entrega» y se quitó el botón de recargar repetido.",
+    "Consultar: filtro «Disponible» para ver solo lo que tiene unidades."
+  ]
+}
