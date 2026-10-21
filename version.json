@@ -1,16 +1,12 @@
 {
-  "app": "2026-10-22-03",
-  "servidor": "2026.10.22",
+  "app": "2026-10-22-04",
+  "servidor": "2026.10.23",
   "fecha": "2026-10-22",
   "novedades": [
-    "Pagos con 3 categorías: Proveedores (eliges la marca y el % de descuento de la factura: ese ahorro cuenta como ganancia), Préstamos y Personal.",
-    "Nuevo módulo Gastos y viáticos: ruta por ciudad (transporte, alojamiento, comidas, extras) con presupuesto semanal, gastos personales, operación y compras de mercancía.",
-    "Nuevo módulo Cupos de crédito: tope por cliente que sube si paga a tiempo y baja o se pausa si se atrasa, con mensaje de WhatsApp. El pedido a crédito no pasa del cupo.",
-    "Packing: la fecha de entrega ahora es aproximada y la app te recuerda confirmar cuándo le llegó al cliente (la remisión y el crédito se ajustan).",
-    "Estadísticas rediseñadas: Resumen, Ventas, Dinero, Gastos, Inventario, Clientes y Ranking, con caja real y recomendaciones del asesor.",
-    "Inicio: ventas de hoy, semana y mes sin pedir nada extra. En Salud del sistema: botón para instalar la app y ver las novedades.",
-    "Clientes ahora es un módulo completo: lista con búsqueda y filtros (con saldo, sin comprar, incompletos), y una ficha con lo que ha comprado, lo que debe, su cupo, últimos pedidos y datos editables (tipo de cliente, correo, contacto y notas).",
-    "Toda la app se ajusta mejor a cada pantalla: los bloques quedan alineados, la barra lateral ya no se corta y Ajustes y Estadísticas se cierran al cambiar de módulo.",
-    "Inicio más ordenado: tarjetas del mismo tamaño y las notificaciones en la esquina, sin tapar el icono. La ventana de Salud es más compacta."
+    "Ajustes con otro look: categorías con icono, buscador y una barra fija de guardado que avisa si hay cambios sin guardar. Todo queda alineado en celular y escritorio.",
+    "Mensajes de WhatsApp a tu manera: edita el texto de cada mensaje (remisión, cobro, cupo, catálogo…) con variables como {nombre} o {total}, con vista previa y botón para probarlo. Los enlaces ahora abren bien aunque el número venga de otro país o el texto sea largo.",
+    "Historial y Clientes son módulos de pantalla completa, con totales, filtros y una ficha completa de cada cliente. Solo la píldora de estado queda como ventana flotante.",
+    "Estadísticas más claras: Estrellas, Exceso y Dormidos ya muestran sus productos (antes salían en 0), nueva pestaña Rentabilidad y se quitó lo que se repetía.",
+    "Diseño más cómodo: letras y botones más grandes y fáciles de tocar, mejor contraste, y animaciones de carga."
   ]
 }

@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-03';
+    const APP_VERSION = '2026-10-22-04';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -381,7 +381,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.22', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.23', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -772,7 +772,7 @@
       /* Mismos tonos, más oscuros SOLO para texto (legibles: contraste ≥ 4,5 : 1) */
       --salvia-txt:#5E7160; --terracota-txt:#9E5842;
       --linea:#E4DACE; --texto-suave:#726559; /* antes #8A7A6C: 3,4:1 de contraste sobre crema (mín. 4,5:1) */ --rojo:#A04632; /* antes #B4553F: 4,1:1 sobre rosa · ahora 5,4:1 */ --rojo-txt:#A04632; --sobre-acento:#fff;
-      --rosa:#F7E9E4; --rosa-linea:#EAD3C8; --crema-3:#FBF1EC; --placeholder:#B7A99B;
+      --rosa:#F7E9E4; --rosa-linea:#EAD3C8; --crema-3:#FBF1EC; --placeholder:#74675B;
       --wa:#6E8B74; --wa-hover:#7A9A80;
       --led-ok:#4CAF50; --led-sync:#FFC107; --led-off:#F44336;
       --sombra:0 8px 24px rgba(44,33,30,.08);
@@ -830,13 +830,13 @@
     .card-meta .sku{font-family:'Playfair Display',serif;letter-spacing:.04em}
     .stock-badge{flex:0 0 auto;text-align:center;background:var(--crema-2);border-radius:11px;padding:6px 10px;min-width:56px}
     .stock-badge b{display:block;font-family:'Playfair Display',serif;font-size:18px;line-height:1}
-    .stock-badge span{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--texto-suave)}
+    .stock-badge span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--texto-suave)}
     .stock-badge.low{background:var(--rosa)}
     .stock-badge.low b{color:var(--rojo-txt)}
 
     .price-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;margin:13px 0 4px}
     .price{background:var(--crema-2);border-radius:10px;padding:8px 6px;text-align:center}
-    .price small{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:3px}
+    .price small{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:3px}
     .price b{font-family:'Playfair Display',serif;font-size:13px;font-weight:500}
     .price.detal{background:var(--espresso)}
     .price.detal small{color:var(--arena)}
@@ -940,11 +940,11 @@
     .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--texto-suave);position:relative;font-family:'Jost',sans-serif}
     .nav-footer{display:none}
     .nav-item svg{width:23px;height:23px;stroke:currentColor;fill:none;transition:transform .15s}
-    .nav-item span{font-size:10.5px;letter-spacing:.04em}
+    .nav-item span{font-size:11px;letter-spacing:.04em}
     .nav-item.active{color:var(--espresso)}
     .nav-item.active svg{transform:translateY(-1px)}
     .nav-item.active:before{content:"";position:absolute;top:0;width:30px;height:3px;border-radius:3px;background:var(--espresso)}
-    .nav-badge{position:absolute;top:8px;right:calc(50% - 24px);min-width:17px;height:17px;padding:0 4px;background:var(--rojo);color:#fff;border-radius:20px;font-size:10px;display:none;align-items:center;justify-content:center;font-family:'Jost',sans-serif}
+    .nav-badge{position:absolute;top:8px;right:calc(50% - 24px);min-width:17px;height:17px;padding:0 4px;background:var(--rojo);color:#fff;border-radius:20px;font-size:11px;display:none;align-items:center;justify-content:center;font-family:'Jost',sans-serif}
     .nav-badge.show{display:flex}
 
     /* Toasts / overlay / modales */
@@ -979,8 +979,8 @@
     .aud-body{flex:1;min-width:0}
     .aud-tit{margin:0;font-size:12.5px;color:var(--espresso);line-height:1.35}
     .aud-det{margin:2px 0 0;font-size:11px;color:var(--texto-suave);line-height:1.4;word-break:break-word}
-    .aud-meta{flex-shrink:0;text-align:right;font-size:10.5px;color:var(--texto-suave);line-height:1.3}
-    .aud-meta small{display:block;font-size:9.5px;opacity:.8}
+    .aud-meta{flex-shrink:0;text-align:right;font-size:11px;color:var(--texto-suave);line-height:1.3}
+    .aud-meta small{display:block;font-size:11px;opacity:.8}
     .se-total{display:flex;justify-content:space-between;align-items:center;background:var(--crema-2);
               border-radius:var(--r-lg);padding:14px 16px;margin-bottom:12px}
     .se-total .lbl2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
@@ -991,7 +991,7 @@
     .se-card .cli{font-size:14px;font-weight:600;color:var(--espresso)}
     .se-card .met{font-size:11px;color:var(--texto-suave);margin-top:2px}
     .se-card .tot{font-family:'Playfair Display',serif;font-size:17px;color:var(--espresso);white-space:nowrap}
-    .se-card .badge{display:inline-block;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+    .se-card .badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
                      padding:2px 8px;border-radius:999px;margin-top:4px}
     .se-card .badge.cr{background:var(--st-soon-bg);color:var(--st-soon-text)}
     .se-card .badge.ct{background:var(--crema-2);color:var(--texto-suave)}
@@ -1006,7 +1006,7 @@
     .draft-chip{flex-shrink:0;display:flex;align-items:center;gap:7px;background:var(--blanco);
                 border:1px solid var(--linea);border-radius:12px;padding:7px 9px 7px 11px;cursor:pointer}
     .draft-chip .nm{font-size:12px;color:var(--espresso);white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis}
-    .draft-chip .mt{font-size:10px;color:var(--texto-suave);white-space:nowrap}
+    .draft-chip .mt{font-size:11px;color:var(--texto-suave);white-space:nowrap}
     .draft-chip .x{border:none;background:transparent;color:var(--texto-suave);font-size:15px;line-height:1;padding:0 2px;cursor:pointer}
     .draft-chip:active{transform:scale(.97)}
     .marca-chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 9px;-webkit-overflow-scrolling:touch}
@@ -1018,7 +1018,7 @@
     .marca-chip.marca-disp{border-color:#9FC393;color:#3D6B34;font-weight:700}
     .marca-chip.marca-disp.active{background:#3D6B34;border-color:#3D6B34;color:#fff}
     .marca-chip.marca-disp::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px}
-    .card-quieto{display:inline-block;margin-top:3px;font-size:10px;color:var(--terracota-txt);letter-spacing:.02em}
+    .card-quieto{display:inline-block;margin-top:3px;font-size:11px;color:var(--terracota-txt);letter-spacing:.02em}
     .desc-inline:focus{outline:none;border-color:var(--salvia)}
     #tDescRow span:last-child{color:var(--salvia-txt)}
     .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
@@ -1061,7 +1061,7 @@
     .ped-head{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 14px}
     .ped-id{font-family:'Playfair Display',serif;font-size:22px;letter-spacing:.06em;color:var(--espresso)}
     .ped-date{display:block;font-size:11.5px;color:var(--texto-suave);margin-top:2px}
-    .ped-edit-badge{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;
+    .ped-edit-badge{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;letter-spacing:.03em;
                      color:#fff;background:var(--terracota);border-radius:20px;padding:3px 10px;vertical-align:middle}
     .ped-new{background:var(--blanco);border:1px solid var(--linea);border-radius:10px;padding:8px 14px;font-family:'Jost',sans-serif;font-size:13px;color:var(--espresso);cursor:pointer}
 
@@ -1080,7 +1080,7 @@
     .cart-info{min-width:0}
     .cart-name{font-family:'Playfair Display',serif;font-size:14px;margin:0;line-height:1.25}
     .cart-sku{font-size:11px;color:var(--texto-suave);margin:2px 0 0;letter-spacing:.03em}
-    .stock-warn{display:inline-block;margin-top:6px;background:var(--rosa);color:var(--rojo-txt);font-size:10.5px;padding:3px 8px;border-radius:20px}
+    .stock-warn{display:inline-block;margin-top:6px;background:var(--rosa);color:var(--rojo-txt);font-size:11px;padding:3px 8px;border-radius:20px}
     .cart-trash{flex:0 0 auto;background:none;border:none;cursor:pointer;padding:2px;min-width:40px;min-height:40px;display:inline-grid;place-items:center;margin:-6px -8px -6px 0}
     .cart-trash svg{width:18px;height:18px;stroke:var(--rojo);fill:none}
     .cart-ctrl{display:flex;align-items:center;gap:8px;margin-top:11px}
@@ -1100,7 +1100,7 @@
     .tone-sheet{width:100%;max-width:520px;background:var(--crema);border-radius:22px 22px 0 0;padding:12px 18px 20px;box-shadow:0 -12px 40px rgba(44,33,30,.22);animation:toneUp .24s cubic-bezier(.22,1,.36,1);max-height:82vh;overflow-y:auto}
     @keyframes toneUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .tone-grip{width:38px;height:4px;border-radius:4px;background:var(--linea);margin:0 auto 12px}
-    .tone-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--terracota-txt);margin:0 0 2px}
+    .tone-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--terracota-txt);margin:0 0 2px}
     .tone-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--espresso);margin:0 0 3px;line-height:1.25}
     .tone-sub{font-size:12px;color:var(--texto-suave);margin:0 0 14px;line-height:1.45}
     .tone-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
@@ -1108,7 +1108,7 @@
     .tone-item:active{transform:scale(.985)}
     .tone-item.out{opacity:.55}
     .tone-item-name{font-size:14px;color:var(--espresso);font-weight:600;line-height:1.3}
-    .tone-item-sku{font-size:10.5px;color:var(--texto-suave);margin-top:2px;letter-spacing:.02em}
+    .tone-item-sku{font-size:11px;color:var(--texto-suave);margin-top:2px;letter-spacing:.02em}
     .tone-chip{flex-shrink:0;font-size:11px;font-weight:600;padding:5px 11px;border-radius:20px;background:var(--salvia);color:#fff;white-space:nowrap}
     .tone-chip.low{background:var(--terracota)}
     .tone-add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
@@ -1135,7 +1135,7 @@
     .cart-ext:active{transform:scale(.97)}
     .cart-ext.on{background:var(--salvia);border-color:var(--salvia);color:#fff}
     .cart-ext.on.half{background:var(--terracota);border-color:var(--terracota)}
-    .cart-ext-info{font-size:10.5px;color:var(--terracota-txt);letter-spacing:.02em;margin-left:auto}
+    .cart-ext-info{font-size:11px;color:var(--terracota-txt);letter-spacing:.02em;margin-left:auto}
 
     .totals{margin-top:6px}
     .order-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
@@ -1149,7 +1149,7 @@
     .hist-cli{font-size:17px;font-weight:600;line-height:1.25;margin:5px 0 2px;color:var(--espresso);overflow-wrap:anywhere}
     .hist-id small{color:var(--texto-suave)}.hist-pend{color:var(--terracota-txt);font-style:normal;font-size:11px}
     .hist-total{font-size:13px;color:var(--espresso);margin-top:4px}
-    .badge-pago{flex:0 0 auto;font-size:10px;letter-spacing:.03em;padding:4px 9px;border-radius:20px;font-family:'Jost',sans-serif;text-align:center;max-width:150px}
+    .badge-pago{flex:0 0 auto;font-size:11px;letter-spacing:.03em;padding:4px 9px;border-radius:20px;font-family:'Jost',sans-serif;text-align:center;max-width:150px}
     .badge-pago.pagado{background:var(--st-wa-bg);color:var(--st-wa-text)}
     .badge-pago.pendiente{background:var(--rosa);color:#B86B53}
     .hist-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
@@ -1353,7 +1353,7 @@
     .devol-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid rgba(44,33,30,.10)}
     .devol-item:last-child{border-bottom:none}
     .devol-nom{flex:1;min-width:0;font-size:13px;color:var(--espresso)}
-    .devol-nom small{display:block;font-size:10.5px;color:var(--texto-suave)}
+    .devol-nom small{display:block;font-size:11px;color:var(--texto-suave)}
     .devol-qty{display:flex;align-items:center;gap:6px;flex:0 0 auto}
     .devol-qty button{width:30px;height:30px;border-radius:9px;border:1px solid var(--linea);
                       background:var(--crema);color:var(--texto-suave);font-size:17px;line-height:1;cursor:pointer}
@@ -1364,7 +1364,7 @@
     .devol-total{margin-top:14px;padding:12px 14px;background:var(--rosa);border-radius:var(--r-md);
                  font-family:'Playfair Display',serif;font-size:16px;color:var(--rojo-txt);text-align:center}
 
-    .badge-res{display:block;font-style:normal;font-size:9px;letter-spacing:.03em;
+    .badge-res{display:block;font-style:normal;font-size:10px;letter-spacing:.03em;
                color:var(--terracota-txt);margin-top:2px;font-weight:600}
 
     /* Remisión a crédito aún no entregada: el plazo no ha empezado */
@@ -1381,17 +1381,17 @@
       .swipe-item{margin-bottom:9px}
       .card-top{gap:9px;margin-bottom:9px}
       .card-name{font-size:14.5px;line-height:1.28}
-      .card-meta{font-size:10.5px;margin-top:1px}
+      .card-meta{font-size:11px;margin-top:1px}
       .card-tono{font-size:11px;padding:2px 8px;margin-left:5px}
       /* Insignia de stock más estrecha y en una línea */
       .stock-badge{min-width:60px;padding:6px 8px;border-radius:12px}
       .stock-badge b{font-size:17px}
-      .stock-badge span{font-size:7.5px;letter-spacing:.06em}
-      .badge-res{font-size:8px;margin-top:1px}
+      .stock-badge span{font-size:10px;letter-spacing:.06em}
+      .badge-res{font-size:10px;margin-top:1px}
       /* Precios: 4 columnas apretadas en vez de bloques altos */
       .price-grid{gap:5px}
       .price{padding:7px 4px;border-radius:10px}
-      .price small{font-size:7.5px;letter-spacing:.05em}
+      .price small{font-size:10px;letter-spacing:.05em}
       .price b{font-size:12.5px}
       /* Menos aire perdido arriba y abajo */
       .search-wrap{padding:8px var(--pad-x) 9px}
@@ -1402,9 +1402,9 @@
     /* ═══════ ALERTAS INTELIGENTES ═══════ */
     .al-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:0 0 14px}
     .al-kpi{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-md);padding:11px 10px;text-align:center}
-    .al-kpi span{display:block;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave)}
+    .al-kpi span{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave)}
     .al-kpi b{display:block;font-family:'Playfair Display',serif;font-size:17px;color:var(--espresso);margin:4px 0 2px;word-break:break-word}
-    .al-kpi small{display:block;font-size:9px;color:var(--texto-suave);line-height:1.3}
+    .al-kpi small{display:block;font-size:10px;color:var(--texto-suave);line-height:1.3}
     .al-kpi.urg{background:var(--rosa);border-color:#E3C9BD}
     .al-kpi.urg b{color:var(--rojo-txt)}
     .al-card{display:flex;align-items:stretch;gap:14px;background:var(--blanco);border:1px solid var(--linea);
@@ -1416,17 +1416,17 @@
     .al-nom{font-size:14px;font-weight:600;color:var(--espresso);margin:1px 0 0;line-height:1.32;
             display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .al-nota{font-size:11.5px;color:var(--texto-suave);margin:3px 0 0;line-height:1.4}
-    .al-meta{font-size:9.5px;color:var(--texto-suave);margin:4px 0 0;opacity:.8;
+    .al-meta{font-size:11px;color:var(--texto-suave);margin:4px 0 0;opacity:.8;
              overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .al-tag{flex-shrink:0;display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    .al-tag{flex-shrink:0;display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
             padding:3px 8px;border-radius:8px;background:var(--crema-2);color:var(--espresso)}
     .al-num{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
             min-width:60px;text-align:center;border-left:1px solid var(--linea);padding-left:13px}
     .al-num b{display:block;font-family:'Playfair Display',serif;font-size:21px;color:var(--espresso);line-height:1.1}
-    .al-num span{display:block;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-top:1px}
-    .al-pedir{display:block;margin-top:6px;font-size:9.5px;font-weight:700;color:#fff;background:var(--terracota-txt);
+    .al-num span{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-top:1px}
+    .al-pedir{display:block;margin-top:6px;font-size:11px;font-weight:700;color:#fff;background:var(--terracota-txt);
               border-radius:8px;padding:3px 8px;white-space:nowrap}
-    .al-plata{display:block;margin-top:6px;font-size:9.5px;color:var(--texto-suave);white-space:nowrap}
+    .al-plata{display:block;margin-top:6px;font-size:11px;color:var(--texto-suave);white-space:nowrap}
     .al-tend{font-weight:700}
     .al-tend.up{color:var(--st-late-text, var(--rojo))}
     .al-tend.down{color:var(--salvia-txt)}
@@ -1558,7 +1558,7 @@
     @media (min-width:1024px) and (max-width:1200px){
       .shell{grid-template-columns:74px minmax(0,1fr)}
       .nav-item{flex-direction:column;gap:4px;padding:10px 6px;justify-content:center}
-      .nav-item span{font-size:9.5px;letter-spacing:0}
+      .nav-item span{font-size:11px;letter-spacing:0}
       .nav-badge{position:absolute;top:2px;right:12px;margin:0}
       .topbar, .screen{padding-left:20px;padding-right:20px}
     }
@@ -1567,7 +1567,7 @@
     /* La insignia de stock ya no aplasta el texto: ancho mínimo y centrada */
     .stock-badge{min-width:76px;text-align:center;padding:8px 10px;border-radius:var(--r-md)}
     .stock-badge b{font-size:19px;line-height:1.1}
-    .stock-badge span{font-size:8.5px;letter-spacing:.09em}
+    .stock-badge span{font-size:10px;letter-spacing:.09em}
     /* Los nombres largos ya no desbordan la tarjeta */
     .card-name{line-height:1.35;word-break:break-word;overflow-wrap:anywhere}
     .card-top{align-items:flex-start;gap:12px}
@@ -1609,18 +1609,18 @@
     .ent-item .ab-recibo{font-size:16px;padding:6px 10px}
     .rec-row .rec-info{flex:1;min-width:0}
     .rec-row .rec-cli{display:block;font-weight:600;color:var(--espresso);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .rec-row .rec-meta{display:block;font-size:10.5px;color:var(--texto-suave);margin-top:1px}
+    .rec-row .rec-meta{display:block;font-size:11px;color:var(--texto-suave);margin-top:1px}
     .rec-row .rec-monto{font-weight:600;color:var(--salvia-txt);white-space:nowrap;flex-shrink:0}
-    .ab-hist-t{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terracota-txt);margin:0 0 8px}
+    .ab-hist-t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--terracota-txt);margin:0 0 8px}
     .ab-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;
             padding:7px 0;border-bottom:.5px solid rgba(44,33,30,.08)}
     .ab-row:last-child{border-bottom:none}
-    .ab-row small{display:block;font-size:10.5px;color:var(--texto-suave)}
+    .ab-row small{display:block;font-size:11px;color:var(--texto-suave)}
     .ab-monto{font-weight:600;color:var(--salvia-txt);white-space:nowrap}
-    .ab-recibo{flex-shrink:0;font-family:'Jost',sans-serif;font-size:10.5px;font-weight:600;color:var(--terracota-txt);
+    .ab-recibo{flex-shrink:0;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;color:var(--terracota-txt);
                background:transparent;border:1px solid var(--terracota);border-radius:20px;padding:4px 11px;cursor:pointer}
     .ab-recibo:active{background:var(--terracota);color:#fff}
-    .car-abonado{font-size:10.5px;color:var(--salvia-txt);font-weight:600}
+    .car-abonado{font-size:11px;color:var(--salvia-txt);font-weight:600}
 
     /* ═══════ ESTADÍSTICAS ═══════ */
     .stats-sheet{max-width:640px}
@@ -1641,7 +1641,7 @@
     .st-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
     .st-card{background:var(--blanco);border:1px solid var(--linea);border-radius:16px;padding:16px 15px}
     .st-card.wide{grid-column:1 / -1}
-    .st-lbl{display:block;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:7px}
+    .st-lbl{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:7px}
     .st-val{display:block;font-family:'Playfair Display',serif;font-size:23px;line-height:1.15;color:var(--espresso);word-break:break-word}
     .st-val.sm{font-size:18px}
     .st-sub{display:block;font-size:11px;color:var(--texto-suave);margin-top:5px;line-height:1.45}
@@ -1655,7 +1655,7 @@
     .st-rank{flex:0 0 22px;height:22px;border-radius:7px;background:var(--crema-2);color:var(--texto-suave);
              font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:600}
     .st-nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--espresso)}
-    .st-nom small{display:block;font-size:10.5px;color:var(--texto-suave)}
+    .st-nom small{display:block;font-size:11px;color:var(--texto-suave)}
     .st-num{flex:0 0 auto;font-weight:600;color:var(--espresso);white-space:nowrap}
     .st-bar{height:5px;border-radius:5px;background:var(--crema-2);overflow:hidden;margin-top:5px}
     .st-bar span{display:block;height:100%;background:var(--terracota);border-radius:5px}
@@ -1764,7 +1764,7 @@
 
     /* ═══════ BIENVENIDA · OPERADOR EN TURNO ═══════ */
     .op-sheet{text-align:center;padding-top:26px}
-    .op-eyebrow{font-size:9.5px;letter-spacing:.26em;color:var(--terracota-txt);margin:0 0 10px}
+    .op-eyebrow{font-size:11px;letter-spacing:.26em;color:var(--terracota-txt);margin:0 0 10px}
     .op-title{font-family:'Playfair Display',serif;font-size:23px;color:var(--espresso);margin:0 0 6px}
     .op-sub{font-size:12.5px;color:var(--texto-suave);margin:0 0 20px;line-height:1.5}
     .op-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -1774,13 +1774,13 @@
     .op-ini{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:var(--espresso);color:var(--crema);font-size:22px;letter-spacing:.02em}
 
     /* ═══════ MÓDULO 8 · CARTERA Y CUENTAS POR COBRAR ═══════ */
-    .nav-badge{position:absolute;top:-2px;right:calc(50% - 20px);min-width:16px;height:16px;border-radius:9px;background:var(--terracota);color:#fff;font-size:9.5px;font-style:normal;line-height:16px;text-align:center;padding:0 4px;display:none}
+    .nav-badge{position:absolute;top:-2px;right:calc(50% - 20px);min-width:16px;height:16px;border-radius:9px;background:var(--terracota);color:#fff;font-size:11px;font-style:normal;line-height:16px;text-align:center;padding:0 4px;display:none}
     .nav-badge.show{display:block}
     .car-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
     .car-kpi{background:var(--blanco);border:1px solid var(--linea);border-radius:16px;padding:12px 9px;text-align:center}
-    .car-kpi-lbl{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:5px;line-height:1.3}
+    .car-kpi-lbl{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:5px;line-height:1.3}
     .car-kpi b{display:block;font-family:'Playfair Display',serif;font-size:19px;line-height:1.15;color:var(--espresso);word-break:break-all}
-    .car-kpi small{display:block;font-size:9px;color:var(--texto-suave);margin-top:3px;line-height:1.3}
+    .car-kpi small{display:block;font-size:10px;color:var(--texto-suave);margin-top:3px;line-height:1.3}
     .car-kpi.total{grid-column:1 / -1;padding:16px 15px}
     .car-kpi.total b{font-size:27px;color:var(--terracota-txt)}
     .car-kpi.warn b{color:var(--st-soon-text)}
@@ -1791,12 +1791,12 @@
     .car-rem{font-size:11px;color:var(--texto-suave);letter-spacing:.03em;margin-top:2px}
     .car-saldo{flex-shrink:0;text-align:right}
     .car-saldo b{display:block;font-family:'Playfair Display',serif;font-size:19px;color:var(--espresso);white-space:nowrap}
-    .car-saldo span{display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
+    .car-saldo span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
     .car-bar{height:7px;border-radius:7px;background:var(--crema-2);overflow:hidden;margin:12px 0 6px}
     .car-bar-fill{height:100%;border-radius:7px;transition:width .35s ease}
     .car-meta{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11.5px}
     .car-dias{font-weight:600}
-    .car-venc{color:var(--texto-suave);font-size:10.5px}
+    .car-venc{color:var(--texto-suave);font-size:11px}
     .car-card.ok .car-bar-fill{background:var(--salvia)}
     .car-card.ok .car-dias{color:var(--salvia-txt)}
     .car-card.soon{border-color:var(--st-soon-border);background:var(--st-soon-bg)}
@@ -1831,7 +1831,7 @@
        y el texto se monta encima de los botones +/− (bug visto en móvil). */
     /* Hasta 2 líneas: en el alistamiento hay que leer el nombre completo para no confundir productos parecidos */
     .chk-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:14px;color:var(--espresso);font-weight:600;line-height:1.3;overflow:hidden;overflow-wrap:anywhere}
-    .chk-sub{display:block;font-size:10.5px;color:var(--texto-suave);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .chk-sub{display:block;font-size:11px;color:var(--texto-suave);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .chk-tono{color:var(--terracota-txt);font-weight:600}
     .chk-qty{flex:0 0 auto;flex-shrink:0;display:flex;align-items:center;gap:5px;position:relative;z-index:1}
     .chk-step{width:29px;height:29px;border-radius:9px;border:1px solid var(--linea);background:var(--crema);color:var(--texto-suave);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -1847,7 +1847,7 @@
     .chk-row.part{background:var(--st-soon-bg);border-color:var(--terracota)}
     .chk-row.part .chk-box{background:var(--terracota);border-color:var(--terracota)}
     .chk-row.part .chk-box svg{opacity:1}
-    .chk-falta{font-size:10.5px;color:var(--terracota-txt);font-weight:600;margin-top:2px}
+    .chk-falta{font-size:11px;color:var(--terracota-txt);font-weight:600;margin-top:2px}
     .chk-hit{animation:chkHit .3s ease}
     @keyframes chkHit{0%{background:var(--st-wa-border)}100%{background:var(--st-wa-bg)}}
     .pack-bar{height:8px;border-radius:8px;background:var(--crema-2);overflow:hidden}
@@ -1876,10 +1876,10 @@
     #screen-pagos .car-kpi:last-child{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;text-align:left;padding:10px 14px}
     #screen-pagos .car-kpi:last-child b{font-size:16px}
     #screen-pagos .car-kpi:last-child .car-kpi-lbl{margin:0}
-    .pg-grupo{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);margin:16px 2px 8px;display:flex;justify-content:space-between}
+    .pg-grupo{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);margin:16px 2px 8px;display:flex;justify-content:space-between}
     .pg-grupo.late{color:var(--st-late-text)}
     .pg-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-    .pg-tag{font-size:10.5px;padding:3px 9px;border-radius:20px;background:var(--crema-2);color:var(--espresso);letter-spacing:.02em}
+    .pg-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--crema-2);color:var(--espresso);letter-spacing:.02em}
     .pg-tag.cat{background:transparent;border:1px solid var(--linea);color:var(--texto-suave)}
     .pg-card .car-bar{margin:10px 0 4px}
     .pg-card.archivo{opacity:.72}
@@ -1891,12 +1891,12 @@
     .pg-cal-head b{font-family:'Playfair Display',serif;font-size:18px;color:var(--espresso);text-transform:capitalize}
     .pg-cal-head .icon-btn{font-size:22px;line-height:1}
     .pg-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-    .pg-cal-dias span{text-align:center;font-size:10px;letter-spacing:.08em;color:var(--texto-suave);padding:2px 0 4px}
+    .pg-cal-dias span{text-align:center;font-size:11px;letter-spacing:.08em;color:var(--texto-suave);padding:2px 0 4px}
     .pg-dia{min-height:54px;border-radius:10px;background:var(--blanco);border:1px solid var(--linea);padding:4px 2px 3px;
             display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-family:inherit;color:var(--espresso)}
     .pg-dia.vacio{background:transparent;border-color:transparent;cursor:default}
     .pg-dia .n{font-size:12px;line-height:1.2}
-    .pg-dia .m{font-size:9.5px;font-weight:600;line-height:1.1;white-space:nowrap}
+    .pg-dia .m{font-size:11px;font-weight:600;line-height:1.1;white-space:nowrap}
     .pg-dia .pts{display:flex;gap:2px;height:6px}
     .pg-dia .pt{width:5px;height:5px;border-radius:50%;background:var(--terracota)}
     .pg-dia .pt.late{background:var(--rojo)} .pg-dia .pt.soon{background:var(--st-soon-border)} .pg-dia .pt.paid{background:var(--salvia)}
@@ -1913,7 +1913,7 @@
     .pg-dia-item .car-btn{flex:0 0 auto;padding:8px 12px}
     .pg-hist-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:.5px solid rgba(44,33,30,.08);font-size:12.5px}
     .pg-hist-row:last-child{border-bottom:none}
-    .pg-hist-row small{display:block;font-size:10.5px;color:var(--texto-suave);margin-top:1px}
+    .pg-hist-row small{display:block;font-size:11px;color:var(--texto-suave);margin-top:1px}
     .pg-hist-row b{white-space:nowrap;color:var(--salvia-txt)}
     @media (min-width:700px){ .pg-dia{min-height:72px} .pg-dia .m{font-size:11px} }
 
@@ -1962,15 +1962,15 @@
 
     /* 4 · Alertas: la etiqueta bajo el número heredaba de ".al-num span"
        (más específica) el gris de 8px → texto gris sobre terracota, ilegible. */
-    .al-num .al-pedir{color:#fff;font-size:10px;letter-spacing:.02em;text-transform:none;font-weight:700}
-    .al-num .al-plata{font-size:10px;letter-spacing:0;text-transform:none}
+    .al-num .al-pedir{color:#fff;font-size:11px;letter-spacing:.02em;text-transform:none;font-weight:700}
+    .al-num .al-plata{font-size:11px;letter-spacing:0;text-transform:none}
 
     /* 5 · Legibilidad en celular: nada informativo por debajo de 10px */
-    .car-kpi-lbl{font-size:10px}
-    .car-kpi small{font-size:10px}
-    .al-tag{font-size:9.5px}
-    .al-num span{font-size:9px}
-    .al-meta{font-size:10.5px}
+    .car-kpi-lbl{font-size:11px}
+    .car-kpi small{font-size:11px}
+    .al-tag{font-size:11px}
+    .al-num span{font-size:10px}
+    .al-meta{font-size:11px}
 
     /* 6 · Indicadores (Cartera, Pagos): se reparten el ancho según cuántos estén
        VISIBLES. Con columnas fijas, al ocultarse uno (ej. "Por entregar" sin
@@ -1996,7 +1996,7 @@
     .lock-in{width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;text-align:center}
     .lock-in.shake{animation:lockShake .38s}
     @keyframes lockShake{20%,80%{transform:translateX(-4px)}40%,60%{transform:translateX(7px)}50%{transform:translateX(-7px)}}
-    .lock-eyebrow{font-size:10.5px;letter-spacing:.32em;color:var(--texto-suave);margin:0 0 22px}
+    .lock-eyebrow{font-size:11px;letter-spacing:.32em;color:var(--texto-suave);margin:0 0 22px}
     .lock-perfiles{display:flex;gap:14px;justify-content:center;margin-bottom:22px}
     .lock-perfil{display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:none;cursor:pointer;
                  font-family:'Jost',sans-serif;font-size:13.5px;color:var(--texto-suave);padding:4px 8px;border-radius:14px}
@@ -2107,12 +2107,12 @@
     .catp-acts{display:grid;grid-template-columns:1fr 1.6fr;gap:8px}
     .catp-acts button{padding:10px 6px;font-size:13px}
     .catr-row{display:flex;flex-direction:column;gap:5px;padding:9px 0;border-bottom:.5px solid var(--linea)}
-    .catr-lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--texto-suave)}
+    .catr-lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--texto-suave)}
     .catr-unico{font-size:13.5px} .catr-unico small{color:var(--texto-suave)}
     .catr-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     .catr-opt{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--linea);border-radius:12px;padding:9px 10px;cursor:pointer;font-size:13px;background:var(--blanco)}
     .catr-opt:has(input:checked){border-color:var(--terracota);background:rgba(184,107,83,.07)}
-    .catr-opt small{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave)}
+    .catr-opt small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave)}
     /* El estilo general de campos (ancho completo) no aplica a casillas ni opciones */
     .catr-opt input,.catr-item input,.catr-check input{width:18px!important;height:18px;min-width:0;flex:0 0 18px;padding:0;margin:2px 0 0;accent-color:var(--terracota);box-shadow:none}
     .catr-check{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;margin:12px 0 0;padding:10px 12px;background:var(--crema-2);border-radius:12px;cursor:pointer}
@@ -2141,14 +2141,14 @@
     .inv-marca-bar{height:5px;border-radius:5px;background:var(--crema-2);margin:8px 0 10px;overflow:hidden}
     .inv-marca-bar i{display:block;height:100%;background:var(--terracota)}
     .inv-marca-vals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-    .inv-marca-vals small{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
+    .inv-marca-vals small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
     .inv-marca-vals b{display:block;font-size:13.5px;font-weight:600;margin-top:2px;white-space:nowrap}
     .inv-marca-mg{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
     .inv-marca-mg span{font-size:11.5px;background:var(--crema-2);border-radius:10px;padding:4px 9px;color:var(--espresso)}
     .inv-marca-mg em{font-style:normal;color:var(--texto-suave)}
     .inv-tot{background:var(--crema-2);border-radius:14px;padding:11px 14px;margin:0 0 12px;font-size:12.5px;line-height:1.55;color:var(--texto-suave)}
     .inv-tot b{color:var(--espresso)}
-    .st-sec-tit{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);margin:4px 2px 8px}
+    .st-sec-tit{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);margin:4px 2px 8px}
     .st-ins .tx{flex:1;min-width:0}
     .st-ins-oportunidad{background:rgba(143,160,142,.12);border-color:rgba(143,160,142,.35);color:var(--espresso)}
     .st-ins-acc{display:block;margin-top:2px;background:transparent;border:none;padding:8px 0;min-height:32px;font-family:inherit;font-size:12.5px;
@@ -2162,7 +2162,7 @@
     .st-meta-sub{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:var(--texto-suave)}
     .st-flujo-tit{font-size:12px;color:var(--texto-suave);margin:0 0 8px}
     .st-flujo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
-    .st-flujo-grid small{display:block;font-size:10.5px;color:var(--texto-suave)}
+    .st-flujo-grid small{display:block;font-size:11px;color:var(--texto-suave)}
     .st-flujo-grid b{display:block;font-family:'Playfair Display',serif;font-size:16px;margin:2px 0;white-space:nowrap}
     .st-flujo-grid b.ok{color:var(--salvia-txt)} .st-flujo-grid b.late{color:var(--rojo-txt)}
 
@@ -2196,7 +2196,7 @@
        Pasa a su propia línea bajo el título y se contrae al desvanecerse. */
     @media (max-width:699px){
       .brand-wrap{flex-wrap:wrap;row-gap:0}
-      .led-txt{flex-basis:100%;order:3;margin:1px 0 0;max-width:none;font-size:10.5px;line-height:15px;max-height:15px;
+      .led-txt{flex-basis:100%;order:3;margin:1px 0 0;max-width:none;font-size:11px;line-height:15px;max-height:15px;
                transition:opacity .5s ease,max-height .4s ease .3s}
       .led-txt.fade{max-height:0}
     }
@@ -2206,13 +2206,13 @@
     .devol-previas{background:var(--crema-2);border-radius:12px;padding:10px 12px;margin:0 0 12px}
     .devol-previas-tit{font-size:12px;font-weight:600;color:var(--st-soon-text);margin:0 0 6px}
     .devol-prev-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:5px 0;border-top:.5px solid var(--linea)}
-    .devol-prev-row small{display:block;font-size:10.5px;color:var(--texto-suave)}
+    .devol-prev-row small{display:block;font-size:11px;color:var(--texto-suave)}
     .devol-prev-row b{white-space:nowrap;color:var(--espresso)}
 
     /* 8 · Menú inferior con 7 módulos en celulares angostos: que ninguna
        etiqueta se corte ni se monte sobre la vecina */
     @media (max-width:420px){
-      .bottom-nav .nav-item span{font-size:9px;letter-spacing:0}
+      .bottom-nav .nav-item span{font-size:10px;letter-spacing:0}
       .bottom-nav .nav-item svg{width:21px;height:21px}
       .bottom-nav .nav-badge{right:calc(50% - 19px)}
     }
@@ -2332,34 +2332,34 @@
     .asesor-sub{margin:1px 0 0;font-size:11px;color:var(--texto-suave);line-height:1.35}
     .asesor-res{margin:12px 0 4px;font-size:14px;line-height:1.5;color:var(--espresso)}
     .asesor-g{margin-top:12px}
-    .asesor-gt{margin:0 0 6px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);font-weight:600}
+    .asesor-gt{margin:0 0 6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);font-weight:600}
     .asesor .st-ins + .st-ins{margin-top:6px}
     .rent-st{border:1px solid var(--linea);border-radius:16px;background:var(--blanco);padding:12px 14px;margin-bottom:18px}
     .rent-st-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin-bottom:8px}
     .rent-st-kpis > div{background:var(--crema-2);border-radius:12px;padding:9px 4px;min-width:0}
-    .rent-st-kpis small{display:block;font-size:10px;color:var(--texto-suave);line-height:1.3}
+    .rent-st-kpis small{display:block;font-size:11px;color:var(--texto-suave);line-height:1.3}
     .rent-st-kpis b{display:block;font-family:'Playfair Display',serif;font-size:clamp(14px,4vw,19px);color:var(--espresso);white-space:nowrap;margin:2px 0}
     .rent-st-kpis .ok b{color:var(--salvia-txt)} .rent-st-kpis .late b{color:var(--rojo-txt)}
     .rent-st-lineas > div{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--linea);color:var(--texto-suave)}
     .rent-st-lineas > div:last-child{border-bottom:0}
     .rent-st-lineas b{color:var(--espresso);white-space:nowrap;font-weight:600} .rent-st-lineas b.late{color:var(--rojo-txt)} .rent-st-lineas b.soon{color:var(--st-soon-text)}
     .rent-st-lineas small{font-size:11px}
-    .rent-st-sub{margin:12px 0 2px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);font-weight:600}
+    .rent-st-sub{margin:12px 0 2px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);font-weight:600}
     .rent-st-nota{margin:10px 0 0;font-size:11px;color:var(--texto-suave);line-height:1.4}
     .rent-serie{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:96px;padding:6px 2px 0;margin:6px 0 2px}
     .rs-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}
     .rs-bar{width:70%;max-width:34px;border-radius:6px 6px 2px 2px;background:var(--piedra,#C2B6A6)}
     .rs-col.hoy .rs-bar{background:var(--salvia-txt)} .rs-col.neg .rs-bar{background:var(--rojo-txt)}
-    .rs-v{font-size:9.5px;color:var(--texto-suave);margin-bottom:3px;white-space:nowrap}
-    .rs-m{font-size:10px;color:var(--texto-suave);margin-top:4px;text-transform:capitalize}
+    .rs-v{font-size:11px;color:var(--texto-suave);margin-bottom:3px;white-space:nowrap}
+    .rs-m{font-size:11px;color:var(--texto-suave);margin-top:4px;text-transform:capitalize}
 
     /* Dentro de Estadísticas hay reglas genéricas para <p>: se fija la tipografía del Asesor */
-    #statsBody .asesor-sub{font-size:11px;line-height:1.35;margin:1px 0 0}
-    #statsBody .asesor-tit{font-size:17px;margin:0}
-    #statsBody .asesor-res{font-size:14px;margin:12px 0 4px}
-    #statsBody .asesor-gt, #statsBody .rent-st-sub{font-size:10.5px;letter-spacing:.1em;font-weight:600;line-height:1.3}
-    #statsBody .asesor-gt{margin:0 0 6px} #statsBody .rent-st-sub{margin:12px 0 2px}
-    #statsBody .rent-st-nota{font-size:11px;line-height:1.4;margin:10px 0 0}
+    #biBody .asesor-sub{font-size:11px;line-height:1.35;margin:1px 0 0}
+    #biBody .asesor-tit{font-size:17px;margin:0}
+    #biBody .asesor-res{font-size:14px;margin:12px 0 4px}
+    #biBody .asesor-gt, #biBody .rent-st-sub{font-size:11px;letter-spacing:.1em;font-weight:600;line-height:1.3}
+    #biBody .asesor-gt{margin:0 0 6px} #biBody .rent-st-sub{margin:12px 0 2px}
+    #biBody .rent-st-nota{font-size:11px;line-height:1.4;margin:10px 0 0}
     /* Rentabilidad en vivo (Pedidos) */
     .rent-box{border:1px solid var(--linea);border-radius:16px;background:var(--blanco);margin-top:10px;margin-bottom:14px;overflow:hidden}
     .rent-head{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;background:none;border:0;font-family:inherit;cursor:pointer;color:var(--espresso);text-align:left}
@@ -2510,7 +2510,7 @@
       .stock-badge b{font-size:17px}
       .price-grid{margin:9px 0 2px;gap:5px}
       .price{padding:6px 3px;border-radius:9px}
-      .price small{font-size:8.5px;margin-bottom:2px}
+      .price small{font-size:10px;margin-bottom:2px}
       .price b{font-size:12.5px}
       .card-actions{margin-top:8px}
       .card-actions .act{padding:7px 6px}
@@ -2578,7 +2578,7 @@
     .bi-hz-c{background:var(--blanco);border:1px solid var(--linea);border-radius:14px;padding:10px 8px;text-align:center;min-width:0}
     .bi-hz-c span{display:block;font-size:11px;color:var(--texto-suave)}
     .bi-hz-c b{display:block;font:500 18px/1.2 'Playfair Display',serif;color:var(--espresso);margin:3px 0}
-    .bi-hz-c small{display:block;font-size:10.5px;color:var(--texto-suave)}
+    .bi-hz-c small{display:block;font-size:11px;color:var(--texto-suave)}
     .bi-hz-c em{display:block;font-style:normal;font-size:11px;color:var(--salvia-txt);margin-top:3px}
     .bi-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
     .bi-chip{font-size:12px;padding:6px 11px;border-radius:999px;background:var(--crema-2);color:var(--espresso)}
@@ -2589,7 +2589,7 @@
     .bi-caja input{width:100%}
     .bi-tabla{margin-top:8px;font-size:12.5px}
     .bi-tr{display:grid;grid-template-columns:.8fr 1fr 1fr 1.1fr;gap:6px;padding:6px 2px;border-bottom:.5px solid var(--linea);font-variant-numeric:tabular-nums}
-    .bi-tr:last-child{border-bottom:none}.bi-th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-suave)}
+    .bi-tr:last-child{border-bottom:none}.bi-th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-suave)}
     .bi-tr span:not(:first-child){text-align:right}
     .bi-tr .pos{color:#4C7A43;font-weight:600}.bi-tr .neg{color:var(--terracota-txt);font-weight:600}
     .bi-nota{margin:8px 2px;font-size:12.5px;line-height:1.45;color:var(--texto-suave)}.bi-nota b{color:var(--espresso)}.bi-nota.late{color:var(--terracota-txt)}
@@ -2812,7 +2812,7 @@
     /* — Estadísticas: Dinero, Gastos, Crédito — */
     .fin-hero{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}
     .fin-kpi{border:1px solid var(--linea);background:var(--blanco);border-radius:16px;padding:12px}
-    .fin-kpi span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);font-weight:700}
+    .fin-kpi span{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);font-weight:700}
     .fin-kpi b{display:block;font-family:'Playfair Display',serif;font-weight:500;font-size:21px;margin:3px 0 1px}
     .fin-kpi b.neg{color:var(--rojo)} .fin-kpi b.pos{color:var(--salvia-txt)}
     .fin-kpi small{font-size:11.5px;color:var(--texto-suave);line-height:1.3;display:block}
@@ -2822,7 +2822,7 @@
     .fin-col .pares{display:flex;align-items:flex-end;gap:2px;height:78px;width:100%;justify-content:center}
     .fin-col i{display:block;width:42%;max-width:14px;border-radius:5px 5px 2px 2px;min-height:2px;transition:height .5s var(--hub-ease,ease)}
     .fin-col i.in{background:var(--salvia)} .fin-col i.out{background:var(--terracota)}
-    .fin-col small{font-size:10px;color:var(--texto-suave)}
+    .fin-col small{font-size:11px;color:var(--texto-suave)}
     .fin-leyenda{display:flex;gap:14px;font-size:11.5px;color:var(--texto-suave);margin-bottom:6px}
     .fin-leyenda i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
     .fin-rec{border:1px solid var(--linea);border-left:4px solid var(--salvia);background:var(--blanco);border-radius:14px;padding:11px 13px;margin-bottom:8px;display:block;width:100%;text-align:left;font-family:inherit;color:inherit}
@@ -2833,7 +2833,7 @@
     .fin-tabla{width:100%;border-collapse:collapse;font-size:13px}
     .fin-tabla td,.fin-tabla th{padding:8px 4px;border-bottom:1px solid var(--linea);text-align:right}
     .fin-tabla td:first-child,.fin-tabla th:first-child{text-align:left}
-    .fin-tabla th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);font-weight:700}
+    .fin-tabla th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);font-weight:700}
     .fin-tabla td.neg{color:var(--rojo)} .fin-tabla td.pos{color:var(--salvia-txt)}
     @media (min-width:700px){ .fin-hero{grid-template-columns:repeat(4,minmax(0,1fr))} }
 
@@ -2891,7 +2891,7 @@
     .pg-cat{border:1px solid var(--linea);background:var(--blanco);border-radius:16px;padding:11px 10px;text-align:left;cursor:pointer;font-family:inherit;color:var(--espresso);min-height:84px;transition:transform .2s var(--hub-ease,ease),box-shadow .2s,border-color .2s}
     .pg-cat:active{transform:scale(.97)}
     .pg-cat.on{border-color:var(--terracota);box-shadow:0 6px 18px -10px rgba(184,107,83,.6)}
-    .pg-cat small{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);font-weight:700}
+    .pg-cat small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);font-weight:700}
     .pg-cat b{display:block;font-family:'Playfair Display',serif;font-weight:500;font-size:19px;margin:3px 0 2px;overflow-wrap:anywhere}
     .pg-cat span{display:block;font-size:11.5px;color:var(--texto-suave);line-height:1.3}
     .pg-cat span.ahorro{color:var(--salvia-txt);font-weight:600}
@@ -2911,7 +2911,7 @@
     .sl-row i{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:var(--led-ok)}
     .sl-row.aviso i{background:var(--led-sync)} .sl-row.error i{background:var(--led-off)}
     .sl-row div{min-width:0;flex:1}
-    .sl-row small{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
+    .sl-row small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
     .sl-row b{display:block;font-size:13.5px;font-weight:600;line-height:1.25;overflow-wrap:anywhere}
     .sl-acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
     .sl-acts .btn-ghost,.sl-acts .btn-solid{width:100%;font-size:13px;padding:10px 8px;min-height:44px}
@@ -3058,7 +3058,7 @@
     .cd-sec h4{margin:0 0 8px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--texto-suave)}
     .cd-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
     .cd-stat{min-width:0;padding:10px 12px;border:1px solid var(--linea);background:var(--crema);border-radius:14px}
-    .cd-stat span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--texto-suave)}
+    .cd-stat span{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--texto-suave)}
     .cd-stat b{display:block;margin:2px 0 1px;font:500 19px/1.2 'Playfair Display',serif;overflow-wrap:anywhere}
     .cd-stat small{display:block;font-size:11.5px;line-height:1.3;color:var(--texto-suave)}
     .cd-stat.mal b{color:var(--rojo)} .cd-stat.aviso b{color:var(--terracota-txt)} .cd-stat.bien b{color:var(--salvia-txt)}
@@ -3079,6 +3079,154 @@
     @media (prefers-reduced-motion:reduce){
       #hubGrid .hub-card,.cli-item{animation:none !important;opacity:1 !important;transform:none !important}
     }
+    /* ═══ Historial · módulo de pantalla completa ═══ */
+    .his-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:4px 0 12px}
+    .his-kpi{display:flex;flex-direction:column;gap:1px;padding:12px 14px;min-height:78px;border:1px solid var(--linea);background:var(--blanco);border-radius:16px}
+    .his-kpi span{font-size:12.5px;font-weight:600}
+    .his-kpi b{font:500 24px/1.1 'Playfair Display',serif}
+    .his-kpi small{font-size:11.5px;line-height:1.3;color:var(--texto-suave)}
+    .his-kpi.tono-deuda b{color:var(--terracota-txt)} .his-kpi.tono-mal b{color:var(--rojo)}
+    .modo-cliente .his-gan{display:none !important}
+    @media (min-width:700px){ .his-kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px} }
+    .his-filtros{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+    .his-filtros .segmented{display:flex;flex-wrap:wrap;width:100%}
+    .his-filtros .seg{flex:1 1 auto;text-align:center;padding-left:10px;padding-right:10px}
+    @media (min-width:700px){
+      .his-filtros{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px}
+      .his-filtros .segmented{width:auto;background:transparent;padding:0;gap:8px}
+      .his-filtros .seg{flex:0 0 auto;padding:8px 18px;border-radius:20px;background:var(--crema-2);font-size:13.5px}
+      .his-filtros .seg.active{background:var(--espresso)}
+    }
+    #screen-historial .cfg-hint{margin:2px 2px 10px}
+    .his-grid{max-height:none;overflow:visible;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:0}
+    @media (min-width:900px){ .his-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+    @media (min-width:1500px){ .his-grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+    .his-grid .hist-empty{grid-column:1/-1}
+    .his-grid .hist-row{display:flex;flex-direction:column;gap:2px;margin:0;padding:14px 14px 12px;background:var(--blanco);border:1px solid var(--linea);border-radius:20px;box-shadow:var(--hub-sh);transition:transform .2s var(--hub-ease),box-shadow .2s}
+    @media (hover:hover) and (pointer:fine){ .his-grid .hist-row:hover{transform:translateY(-2px);box-shadow:var(--hub-sh-up)} }
+    .his-grid .hist-id{display:flex;flex-direction:column;gap:1px}
+    .his-grid .hist-id b{font-size:16px}
+    .his-grid .hist-id span{font-size:12px;color:var(--texto-suave)}
+    .his-grid .hist-cli{font-size:16px;margin:6px 0 0;overflow-wrap:anywhere}
+    .hist-meta{font-size:12.5px;color:var(--texto-suave)}
+    .hist-money{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:10px 0 4px}
+    .hist-money .hist-total{margin:0}
+    .hist-money .hist-total small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave)}
+    .hist-money .hist-total b{font:500 22px/1.1 'Playfair Display',serif}
+    .hist-money .hist-gan{margin:0;text-align:right}
+    .his-grid .hist-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+    .his-grid .hist-actions button{min-width:0;min-height:44px;flex:none;font-size:12.5px}
+    .his-grid .hist-actions button.hact-wa{order:-1}
+    .his-grid .hist-detail{margin-top:10px}
+
+    /* ═══ Ajustes → Mensajes de WhatsApp ═══ */
+    #waMensajes{display:grid;gap:12px}
+    .wa-msg{border:1px solid var(--linea);background:var(--blanco);border-radius:18px;padding:14px}
+    .wa-msg-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+    .wa-msg-h h4{margin:0;font-size:15.5px;font-weight:600}
+    .wa-msg-h p{margin:3px 0 0;font-size:12.5px;line-height:1.4;color:var(--texto-suave)}
+    .wa-tag{flex:0 0 auto;font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--crema-2);color:var(--texto-suave);white-space:nowrap}
+    .wa-tag.propio{background:var(--st-wa-bg);color:var(--st-wa-text)}
+    .wa-prev{margin:0 0 10px;padding:12px 14px;border-radius:14px;background:var(--crema);border:1px solid var(--linea);font:13.5px/1.5 'Jost',sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto}
+    .wa-msg.abierto .wa-prev{max-height:160px}
+    .wa-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .wa-acts .btn-ghost,.wa-acts .btn-solid{width:100%;min-height:46px;font-size:13.5px}
+    .wa-partes{margin:0 0 4px} .wa-partes summary{cursor:pointer;font-size:13px;color:var(--texto-suave);padding:8px 2px;min-height:44px;display:flex;align-items:center}
+    .wa-lbl{margin:0 0 8px;font-size:13px;color:var(--texto-suave)}
+    .wa-vars{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    .wa-var{border:1px solid var(--linea);background:var(--crema);color:var(--espresso);border-radius:99px;padding:7px 11px;min-height:34px;font:600 12.5px 'Jost',sans-serif;cursor:pointer;transition:transform .15s var(--hub-ease)}
+    .wa-var:active{transform:scale(.95)}
+    .wa-ta{min-height:210px;font-size:14.5px;line-height:1.5}
+    .wa-aviso{margin:6px 2px 0;min-height:1em;font-size:12.5px;color:var(--terracota-txt)}
+    @media (max-width:420px){ .wa-acts{grid-template-columns:1fr} }
+    /* ═══ Ajustes · categorías + sección, con barra de guardado fija ═══ */
+    .screens > #configModal .cfg-sheet > *{max-width:1120px !important;margin-left:auto !important;margin-right:auto !important;width:100%;box-sizing:border-box}
+    .cfg-sheet{padding-bottom:0 !important}
+    .cfg-head{display:flex;flex-direction:column;gap:12px;margin:6px auto 16px}
+    .cfg-head h3{margin:0;font:500 clamp(26px,4vw,34px)/1.1 'Playfair Display',serif}
+    .cfg-head p{margin:4px 0 0;font-size:13.5px;line-height:1.4;color:var(--texto-suave)}
+    .cfg-buscar{margin:0}
+    .cfg-layout{display:block}
+    .cfg-nav-g{margin:26px 4px 8px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--texto-suave)}
+    .cfg-nav-bloque:first-child .cfg-nav-g{margin-top:0}
+    .cfg-nav-grp{background:var(--blanco);border:1px solid var(--linea);border-radius:18px;overflow:hidden}
+    .cfg-nav-grp.tono-0{--tone:var(--terracota);--tone-txt:var(--terracota-txt)}
+    .cfg-nav-grp.tono-1{--tone:var(--salvia);--tone-txt:var(--salvia-txt)}
+    .cfg-nav-grp.tono-2{--tone:var(--espresso);--tone-txt:var(--espresso)}
+    .cfg-nav-grp.tono-3{--tone:var(--piedra);--tone-txt:var(--texto-suave)}
+    .cfg-nav-i{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:10px 14px;border:0;border-bottom:1px solid var(--linea);background:transparent;text-align:left;cursor:pointer;font-family:inherit;color:var(--espresso);position:relative;transition:background .15s}
+    .cfg-nav-grp .cfg-nav-i:last-child{border-bottom:0}
+    .cfg-nav-i[hidden]{display:none}
+    .cfg-nav-i .ic{flex:0 0 36px;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--tone,var(--terracota)) 16%,var(--blanco))}
+    .cfg-nav-i .ic svg{width:20px;height:20px;stroke:var(--tone-txt,var(--terracota-txt));fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    .cfg-nav-i .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+    .cfg-nav-i b{font-size:14.5px;font-weight:600}
+    .cfg-nav-i small{font-size:12px;line-height:1.3;color:var(--texto-suave);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .cfg-nav-i .chev{flex:0 0 16px;width:16px;height:16px;stroke:var(--piedra);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    @media (hover:hover) and (pointer:fine){ .cfg-nav-i:hover{background:var(--crema)} }
+    .cfg-nav-i:active{background:var(--crema-2)}
+    .cfg-nav-i.on{background:var(--crema-2)}
+    .cfg-nav-bloque[hidden]{display:none}
+    .cfg-vacio{margin:18px 4px;font-size:13.5px;color:var(--texto-suave);text-align:center}
+    .cfg-panel{display:none}
+    .cfg-en-sec .cfg-nav,.cfg-en-sec .cfg-buscar,.cfg-en-sec .cfg-head-t{display:none}
+    .cfg-en-sec .cfg-panel{display:block}
+    .cfg-back{display:inline-flex;align-items:center;gap:4px;min-height:44px;margin:0 0 6px -4px;padding:0 12px 0 4px;border:0;background:none;color:var(--texto-suave);font:600 14px 'Jost',sans-serif;cursor:pointer}
+    .cfg-back svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .cfg-card{display:none;margin:0 !important;padding:18px;border:1px solid var(--linea);background:var(--blanco);border-radius:22px;box-shadow:var(--hub-sh)}
+    .cfg-card.on{display:block}
+    .cfg-card > summary{display:none}
+    .cfg-sec-head h4{margin:0;font:500 24px/1.15 'Playfair Display',serif}
+    .cfg-sec-head p{margin:4px 0 16px;font-size:13.5px;line-height:1.4;color:var(--texto-suave)}
+    .cfg-card .cfg-sec-body{padding:0;border:0;background:transparent}
+    .cfg-card .field{margin-bottom:16px}
+    .cfg-card .cfg-hint{margin:6px 2px 14px;font-size:12.5px;line-height:1.5}
+    .cfg-bar{position:sticky;bottom:0;z-index:6;display:flex;align-items:center;gap:12px;margin-top:20px !important;padding:12px 14px calc(env(safe-area-inset-bottom,0px) + 12px);border:1px solid var(--linea);border-bottom:0;border-radius:18px 18px 0 0;
+      background:color-mix(in srgb,var(--crema) 90%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);box-shadow:0 -8px 24px -16px rgba(44,33,30,.25)}
+    .cfg-bar .modal-actions{display:flex;gap:8px;margin:0 0 0 auto;padding:0;flex:0 0 auto}
+    .cfg-bar .btn-ghost,.cfg-bar .btn-solid{width:auto;min-width:96px;min-height:46px;padding:0 20px}
+    .cfg-estado{font-size:12.5px;color:var(--texto-suave);min-width:0}
+    .cfg-estado.sucio{color:var(--terracota-txt);font-weight:700}
+    @media (max-width:520px){ .cfg-estado{display:none} .cfg-bar .modal-actions{width:100%} .cfg-bar .btn-ghost,.cfg-bar .btn-solid{flex:1} }
+    @media (min-width:900px){
+      .cfg-head{flex-direction:row;align-items:flex-end;justify-content:space-between}
+      .cfg-buscar{width:340px;flex:0 0 340px}
+      .cfg-layout{display:grid;grid-template-columns:304px minmax(0,1fr);gap:24px;align-items:start}
+      .cfg-nav{position:sticky;top:0;max-height:calc(100dvh - 230px);overflow-y:auto;padding-bottom:8px}
+      .cfg-panel{display:block}
+      .cfg-back{display:none}
+      .cfg-en-sec .cfg-nav,.cfg-en-sec .cfg-head-t{display:block}
+      .cfg-en-sec .cfg-buscar{display:flex}
+      .cfg-card{padding:26px 28px}
+    }
+    /* ═══ Pulido v4 · criterios de las guías de Apple (HIG) y de UX ═══
+       Toques cómodos (≥ 44 px), foco visible, respuesta al toque, cargas con esqueleto en lugar de texto y filas de fichas sin barras. */
+    .search-voz,.search-scan{width:44px;height:44px}
+    .chip{min-height:44px}
+    .ped-new{min-height:44px}
+    .car-acts .car-btn,.car-btn{min-height:44px}
+    #descInput{min-height:40px}
+    #marcaChips,.bi-tabs,.hub-chips,.stk-chips{scrollbar-width:none;-ms-overflow-style:none}
+    #marcaChips::-webkit-scrollbar,.bi-tabs::-webkit-scrollbar,.hub-chips::-webkit-scrollbar{display:none}
+    .cfg-nav-i .chev{stroke:var(--texto-suave);opacity:.55}
+    /* campos: el foco se ve (anillo suave del color de la marca) */
+    input:not([type=checkbox]):not([type=radio]):focus,select:focus,textarea:focus{border-color:var(--terracota);box-shadow:0 0 0 3px color-mix(in srgb,var(--terracota) 18%,transparent);outline:none}
+    /* respuesta al toque unificada: el control se hunde un poco al pulsarlo */
+    .btn-solid:active,.btn-ghost:active,.btn-primary:active,.car-btn:active,.act:active,.chip:active,.seg:active,.ped-new:active,.hist-actions button:active,.cd-act:active{transform:scale(.97)}
+    /* esqueleto de carga: se ve de inmediato la forma de lo que viene */
+    .skel-list{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+    @media (min-width:900px){ .skel-list.dos{grid-template-columns:repeat(2,minmax(0,1fr))} }
+    .skel-card{height:128px;border-radius:20px;border:1px solid var(--linea);background:linear-gradient(100deg,var(--crema-2) 30%,color-mix(in srgb,var(--crema-2) 55%,var(--blanco)) 50%,var(--crema-2) 70%);background-size:220% 100%;animation:skel 1.4s linear infinite}
+    .skel-card.fila{height:76px;border-radius:18px}
+    @keyframes skel{to{background-position:-220% 0}}
+    @media (prefers-reduced-motion:reduce){ .skel-card{animation:none} }
+    /* vacíos: invitan a seguir */
+    .hist-empty,.cart-empty{padding:28px 16px;font-size:14px;line-height:1.55}
+    .bi-badges{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;flex:0 0 auto}
+    .seg{min-width:44px}
+    .ios-num input,.ios-row input{min-height:44px}
+    .wa-chip{min-height:44px;display:inline-flex;align-items:center}
+    .cfg-enl b small,.cfg-card small{font-size:max(11px,.9em)}
   </style>
 </head>
 <body>
@@ -3509,6 +3657,36 @@
           <aside class="cli-detalle" id="cliDetalle" aria-live="polite" aria-label="Ficha del cliente"></aside>
         </div>
       </section>
+      <!-- ————— HISTORIAL ————— -->
+      <section class="screen" id="screen-historial" aria-label="Historial de pedidos">
+        <div class="his-kpis" id="hisKpis" role="group" aria-label="Resumen del historial"></div>
+        <div class="cli-toolbar">
+          <div class="search-bar hist-busca"><svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="histBuscar" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Buscar por cliente, remisión, producto, fecha…" aria-label="Buscar en el historial"></div>
+          <select id="hisOrden" class="cli-orden" aria-label="Ordenar pedidos">
+            <option value="reciente">Más recientes</option>
+            <option value="valor">Mayor valor</option>
+            <option value="ganancia">Mayor ganancia</option>
+            <option value="cobrar">Por cobrar primero</option>
+          </select>
+        </div>
+        <div class="his-filtros">
+          <div class="segmented" id="hisFiltro" role="group" aria-label="Filtro del historial">
+            <button type="button" class="seg active" data-f="todos">Todos</button>
+            <button type="button" class="seg" data-f="cobrar">Por cobrar</button>
+            <button type="button" class="seg" data-f="pagado">Pagados</button>
+            <button type="button" class="seg" data-f="sync">Sin sincronizar</button>
+          </div>
+          <div class="segmented" id="hisPeriodo" role="group" aria-label="Periodo">
+            <button type="button" class="seg" data-p="mes">Este mes</button>
+            <button type="button" class="seg" data-p="30">30 días</button>
+            <button type="button" class="seg" data-p="90">90 días</button>
+            <button type="button" class="seg active" data-p="todo">Todo</button>
+          </div>
+        </div>
+        <p class="cfg-hint" id="histConteo" style="display:none"></p>
+        <div id="historyList" class="history-list his-grid"></div>
+      </section>
       <!-- ————— PEDIDOS ————— -->
       <section class="screen" id="screen-pedidos">
         <button type="button" id="catBanner" class="cat-banner" style="display:none"></button>
@@ -3683,7 +3861,7 @@
 
       <div class="nav-sep" aria-hidden="true"></div>
       <button class="nav-item nav-extra" id="nav-bi" type="button"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Estadísticas</span></button>
-      <button class="nav-item nav-extra" id="nav-hist" type="button"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg><span>Historial</span></button>
+      <button class="nav-item nav-extra" id="nav-historial" type="button" data-tab="historial"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg><span>Historial</span></button>
       <button class="nav-item nav-extra" id="nav-clientes" type="button" data-tab="clientes"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Clientes</span></button>
       <button class="nav-item nav-extra" id="nav-cfg" type="button"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg><span>Ajustes</span></button>
 
@@ -3906,7 +4084,6 @@
       </div>
       <div class="bi-tabs" id="biTabs" role="tablist" aria-label="Secciones del panel"></div>
       <div id="biBody"></div>
-      <div id="statsBody" style="display:none"><p class="hist-empty">Calculando…</p></div>
       <div class="modal-actions single"><button class="btn-ghost" id="statsClose" type="button">Cerrar</button></div>
     </div>
   </div>
@@ -4551,20 +4728,14 @@
         </div>
       </details>
       <p class="cfg-grupo">Comunicación</p>
-      <details class="cfg-sec">
-        <summary><span><b>Plantillas de WhatsApp</b><small>Qué información lleva cada mensaje</small></span></summary>
+      <details class="cfg-sec" id="cfgWaSec">
+        <summary><span><b>Mensajes de WhatsApp</b><small>Escribe a tu gusto cada mensaje que envía la app</small></span></summary>
         <div class="cfg-sec-body">
-      <p class="cfg-hint" style="margin-top:0">Toca cada parte para incluirla o quitarla. La vista previa muestra cómo queda con datos de ejemplo. Se comparte con todos los equipos al tocar <b>Guardar</b>.</p>
-      <div id="waPlantillas"></div>
-      <details class="wa-libre">
-        <summary>Texto libre (opcional · reemplaza el mensaje por partes)</summary>
-      <div class="field"><label class="lbl" for="cfgWaCobro">Recordatorio de cobro</label>
-        <textarea id="cfgWaCobro" rows="4" placeholder="Deja vacío para usar el mensaje por partes"></textarea>
-        <p class="cfg-hint">Usa <b>{cliente}</b>, <b>{remision}</b>, <b>{saldo}</b>, <b>{vence}</b>, <b>{abonado}</b>.</p></div>
-      <div class="field"><label class="lbl" for="cfgWaPedido">Envío de remisión</label>
-        <textarea id="cfgWaPedido" rows="4" placeholder="Deja vacío para usar el mensaje por partes"></textarea>
-        <p class="cfg-hint">Usa <b>{cliente}</b>, <b>{remision}</b>, <b>{total}</b>.</p></div>
-      </details>
+      <p class="cfg-hint" style="margin-top:0">Aquí ves los mensajes que la app arma por ti (remisión, cobro, cupo, catálogo…). Para cada uno puedes <b>elegir qué partes lleva</b> o <b>escribirlo completo a tu manera</b> con variables como <b>{nombre}</b> o <b>{total}</b> que se llenan solas. Se comparte con todos los equipos al tocar <b>Guardar</b>.</p>
+      <div class="field"><label class="lbl" for="waNumPrueba">Tu número para probar (opcional)</label>
+        <input id="waNumPrueba" type="tel" inputmode="tel" autocomplete="off" placeholder="Ej. 300 123 4567">
+        <p class="cfg-hint">«Probar en WhatsApp» abre el mensaje con datos de ejemplo hacia este número (o te deja elegir el contacto). Sirve para comprobar que el enlace abre bien.</p></div>
+      <div id="waMensajes"></div>
         </div>
       </details>
       <details class="cfg-sec">
@@ -4692,8 +4863,8 @@
       <details class="cfg-sec">
         <summary><span><b>Herramientas</b><small>Clientes, movimientos recientes y respaldo</small></span></summary>
         <div class="cfg-sec-body">
-      <button class="btn-ghost" id="cfgClientesBtn" type="button" style="width:100%">Gestionar clientes</button>
-      <p class="cfg-hint">Edita o completa el nombre, teléfono, NIT y dirección de un cliente — se actualiza en todos sus pedidos y en cartera, sin esperar a un pedido nuevo.</p>
+      <button class="btn-ghost" id="cfgClientesBtn" type="button" style="width:100%">Ir al módulo Clientes</button>
+      <p class="cfg-hint">Ahora los clientes tienen su propio módulo: búscalos, mira lo que han comprado y lo que deben, y edita su nombre, teléfono, NIT, dirección, tipo, correo y notas. El cambio se aplica a todos sus pedidos y a la cartera.</p>
       <button class="btn-ghost" id="cfgAuditoriaBtn" type="button" style="width:100%">Ver movimientos recientes</button>
       <p class="cfg-hint">Quién registró, editó, empacó, anuló o cobró cada cosa, y cuándo. Útil cuando dos personas trabajan a la vez.</p>
       <button class="btn-ghost" id="cfgSkuLoteBtn" type="button" style="width:100%">🏷️ Cambiar SKU en lote</button>
@@ -4758,18 +4929,6 @@
       <div class="modal-actions single">
         <button class="btn-ghost" id="packFaltCerrarBtn" type="button">Seguir alistando</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Modal Historial -->
-  <div class="modal" id="historyModal">
-    <div class="sheet">
-      <h3>Historial de pedidos</h3>
-      <div class="search-bar hist-busca"><svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="histBuscar" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Buscar por cliente, remisión, producto, fecha…" aria-label="Buscar en el historial"></div>
-      <p class="cfg-hint" id="histConteo" style="margin:6px 2px 8px;display:none"></p>
-      <div id="historyList" class="history-list"></div>
-      <div class="modal-actions single" style="margin-top:8px"><button class="btn-ghost" id="historyCloseBtn" type="button">Cerrar</button></div>
     </div>
   </div>
 
@@ -5110,7 +5269,7 @@
     });
 
     /* ——————— navegación ——————— */
-    ['consultar','registrar','pedidos','packing','cartera','pagos','gastos','cupos','alertas','clientes'].forEach(function(tab){
+    ['consultar','registrar','pedidos','packing','cartera','pagos','gastos','cupos','alertas','clientes','historial'].forEach(function(tab){
       $('nav-'+tab).addEventListener('click', function(){ switchTab(tab); haptic(10); });
     });
     function switchTab(tab){
@@ -5118,17 +5277,18 @@
       try{ hubCerrarPantallas(); }catch(e){}
       // Lo que este módulo necesita pasa al frente de la fila
       try{ var ACC_MOD={ consultar:['getInitialData','listProducts'], pedidos:['listarPedidosPendientes','listarPedidosCatalogo','obtenerClientes'],
-        packing:['listarPedidosPendientes','obtenerHistorial'], cartera:['obtenerCarteraPendiente'], pagos:['listarObligaciones'], gastos:['listarGastos'], cupos:['obtenerCupos'], alertas:['obtenerAlertas','sugerenciaReposicion'], clientes:['listarClientes'] };
+        packing:['listarPedidosPendientes','obtenerHistorial'], cartera:['obtenerCarteraPendiente'], pagos:['listarObligaciones'], gastos:['listarGastos'], cupos:['obtenerCupos'], alertas:['obtenerAlertas','sugerenciaReposicion'], clientes:['listarClientes'], historial:['obtenerHistorial'] };
         if(window.__kaemPromover) window.__kaemPromover(ACC_MOD[tab]||[]); }catch(e){}
       STATE.tab=tab;
       try{ if(window.kaemReconectarYa) window.kaemReconectarYa(); }catch(e){}
-      ['hub','consultar','registrar','pedidos','packing','cartera','pagos','gastos','cupos','alertas','clientes'].forEach(function(t){
+      ['hub','consultar','registrar','pedidos','packing','cartera','pagos','gastos','cupos','alertas','clientes','historial'].forEach(function(t){
         $('screen-'+t).classList.toggle('active', t===tab);
         $('nav-'+t).classList.toggle('active', t===tab);
       });
-      ['nav-bi','nav-hist','nav-cfg'].forEach(function(id){ var b=$(id); if(b) b.classList.remove('active'); });
+      ['nav-bi','nav-cfg'].forEach(function(id){ var b=$(id); if(b) b.classList.remove('active'); });
       hubAlCambiar(tab);
       if(tab==='clientes') onEnterClientes();
+      if(tab==='historial') onEnterHistorial();
       if(tab==='pedidos') onEnterPedidos();
       if(tab==='packing') onEnterPacking();
       if(tab==='cartera') onEnterCartera();
@@ -5176,7 +5336,7 @@
           if(res.margenes){ STATE.margenes=res.margenes; try{ localStorage.setItem('kaem_margenes', JSON.stringify(STATE.margenes)); }catch(e){} }
           renderConsult(); renderAlerts();
           try{ AUTOCARGA.renovar(); }catch(e){}                       // Packing, Cartera, Pagos y Alertas se renuevan solos, escalonados
-          if($('historyModal').classList.contains('show')) renderHistory();
+          if(STATE.tab==='historial') renderHistory();
           fin(true);
         } else fin(false, (res && res.message) ? ('No se pudo actualizar: '+res.message) : null);
       }).withFailureHandler(function(){ fin(false); }).refrescarTodo();
@@ -5214,7 +5374,7 @@
 
     var AJUSTES_DEF = { shopifyDominio:'', shopifyWebhook:'', shopifyActivo:false, descuentoDefecto:0,
                         inventarioEstricto:false, operador:'', notaPDF:'', sonidos:true,
-                        plazoCredito:30, alertaDias:5, coberturaDias:14, waCobro:'', waPedido:'', waCampos:'',
+                        plazoCredito:30, alertaDias:5, coberturaDias:14, waCobro:'', waPedido:'', waCampos:'', waTextos:'',
                         metaVentas:0, costoEnvioNac:21200, costoEnvioAm:0, llavesPago:'', avisoPagos:true, finanzasCfg:'' };
     /* Parámetros de finanzas (cupos, presupuesto de viáticos, caja): un solo ajuste JSON, con valores por defecto */
     var FIN_DEF_LOCAL = { cupo:{ activo:true, inicial:1000000, aumento:200000, prontoExtra:100000, reduccion:200000, graciaDias:3, bloqueoDias:15, topeInicial:3000000, maximo:0 },
@@ -5274,9 +5434,7 @@
       $('cfgPlazoCredito').value = AJUSTES.plazoCredito || 30;
       $('cfgAlertaDias').value   = AJUSTES.alertaDias   || 5;
       $('cfgCobertura').value    = AJUSTES.coberturaDias|| 14;
-      $('cfgWaCobro').value      = AJUSTES.waCobro  || '';
-      $('cfgWaPedido').value     = AJUSTES.waPedido || '';
-      waEditarDesde(AJUSTES.waCampos); pintarWaPlantillas();
+      waEditarDesde(AJUSTES.waCampos, AJUSTES.waTextos); pintarWaMensajes();
       $('cfgVerCosto').checked   = VER_COSTO;
       $('cfgNotaPDF').value     = AJUSTES.notaPDF||'';
       $('cfgShopDominio').value = AJUSTES.shopifyDominio||'';
@@ -5330,6 +5488,7 @@
     });
     function abrirConfig(){
       pintarAjustes(); $('configModal').classList.add('show'); haptic(10);
+      try{ cfgShellReset(); }catch(e){}
       pintarSeguridad(); pintarRespaldo(); cargarCatalogoCfg(); pintarVersiones();
       cargarEstadoShopify();
       _cfgBase = null;
@@ -5376,9 +5535,10 @@
         plazoCredito:       parseInt(String($('cfgPlazoCredito').value).replace(/[^0-9]/g,''),10)||30,
         alertaDias:         parseInt(String($('cfgAlertaDias').value).replace(/[^0-9]/g,''),10)||5,
         coberturaDias:      parseInt(String($('cfgCobertura').value).replace(/[^0-9]/g,''),10)||14,
-        waCobro:            String($('cfgWaCobro').value||'').trim(),
-        waPedido:           String($('cfgWaPedido').value||'').trim(),
+        waCobro:            '',   // los textos libres anteriores pasaron a «Mensajes de WhatsApp» (waTextos)
+        waPedido:           '',
         waCampos:           waCanonico(WA_EDIT),
+        waTextos:           waTextosCanonico(),
         notaPDF:            textoDe('cfgNotaPDF'),
         sonidos:            segValor('cfgSonidosSeg','sonidos'),
         shopifyDominio:     textoDe('cfgShopDominio'),
@@ -5577,7 +5737,10 @@
       setTimeout(seguir, 4000);
     }
     $('settingsBtn').addEventListener('click', abrirConfig);
-    $('cfgCloseBtn').addEventListener('click', function(){ $('configModal').classList.remove('show'); });
+    $('cfgCloseBtn').addEventListener('click', function(){
+      if(cfgHayCambios() && !window.confirm('Tienes cambios sin guardar. ¿Salir sin guardarlos?')) return;
+      $('configModal').classList.remove('show');
+    });
     $('configModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
     $('cfgSaveBtn').addEventListener('click', function(){ guardarConfiguracion(); });
     $('cfgTestBtn').addEventListener('click', probarShopifyUI);
@@ -5886,7 +6049,7 @@
 
     function cargarClientes(){
       if(CLIENTES.cargando) return; CLIENTES.cargando = true;
-      if(!CLIENTES.cargado){ $('cliList').innerHTML = ''; cliVacio('Consultando clientes…'); }
+      if(!CLIENTES.cargado){ $('cliList').innerHTML = '<div class="skel-list" aria-busy="true" aria-label="Cargando clientes">' + '<div class="skel-card fila"></div>'.repeat(5) + '</div>'; $('cliEmpty').style.display = 'none'; }
       google.script.run.withSuccessHandler(function(res){
         CLIENTES.cargando = false;
         if(res && res.ok){ CLIENTES.lista = res.clientes || []; CLIENTES.enriquecido = res.enriquecido !== false; CLIENTES.cargado = true; clientesRender(); }
@@ -6080,7 +6243,7 @@
       var a = b.getAttribute('data-a'), c = cliSeleccionado(); if(!c) return;
       haptic(8);
       if(a === 'atras'){ CLIENTES.sel = ''; clientesRender(); }
-      else if(a === 'wa') waAbrir(c.telefono, 'Hola ' + (String(c.nombre || '').trim().split(/\s+/)[0] || '') + ', te escribimos de KAÉM Beauty House.');
+      else if(a === 'wa') waAbrir(c.telefono, waMensaje('cliente', c));
       else if(a === 'cartera') switchTab('cartera');
       else if(a === 'cupo') switchTab('cupos');
       else if(a === 'guardar') guardarCliente();
@@ -7857,7 +8020,7 @@
       var o=findHistByRef(ref); if(!o){ toast('No se encontró ese pedido. Actualiza e intenta de nuevo.','error'); return; }
       var abrir=function(x, local){
         cargarPedidoEnFormulario(x);
-        $('historyModal').classList.remove('show'); switchTab('pedidos');
+        switchTab('pedidos');
         try{ window.scrollTo({ top:0, behavior:'smooth' }); }catch(e){ window.scrollTo(0,0); }
         haptic(12);
         var empacado = String(x.estado||'').toUpperCase()==='EMPACADO' || !!x.packingFecha;
@@ -7992,10 +8155,11 @@
       var det=items.map(function(it){ return '<div class="hd-item"><span>'+it.cantidad+'× '+safe(it.nombre||it.sku)+'</span><span>'+cop(it.subtotal!=null?it.subtotal:it.precio*it.cantidad)+'</span></div>'; }).join('');
       var ref=safe(o.clientRef||o.remision||'');
       return '<div class="hist-row" data-ref="'+ref+'">'
-        +'<div class="hist-top"><div class="hist-id"><b>'+safe(o.remision||o.id||'—')+'</b> · '+safe(o.fecha||'')+(o.synced===false?' <em class="hist-pend">(sin sincronizar)</em>':'')+'</div>'+pagoBadge(o.metodoPago,o.saldo)+'</div>'
+        +'<div class="hist-top"><div class="hist-id"><b>'+safe(o.remision||o.id||'—')+'</b><span>'+safe(o.fecha||'')+(o.synced===false?' <em class="hist-pend">(sin sincronizar)</em>':'')+'</span></div>'+pagoBadge(o.metodoPago,o.saldo)+'</div>'
         +'<div class="hist-cli">'+safe((o.cliente&&o.cliente.nombre)||'Sin nombre')+'</div>'
-        +'<div class="hist-total">Total: '+cop(o.total)+'</div>'
-        +(function(){ try{ return gananciaChipHTML(gananciaPedido(o)); }catch(e){ return ''; } })()
+        +(function(){ var c=o.cliente||{}, u=0; items.forEach(function(it){ u+=Math.floor(toNum(it.cantidad))||0; }); var m=[c.ciudad,o.nivel,u?(u+(u===1?' unidad':' unidades')):''].filter(Boolean).join(' · '); return m?'<div class="hist-meta">'+safe(m)+'</div>':''; })()
+        +'<div class="hist-money"><div class="hist-total"><small>Total</small><b>'+cop(o.total)+'</b></div>'
+        +(function(){ try{ return gananciaChipHTML(gananciaPedido(o)); }catch(e){ return ''; } })()+'</div>'
         +'<div class="hist-actions">'
         +  '<button data-hact="pdf" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Reimprimir</button>'
         +  '<button class="hact-wa" data-hact="wa" data-ref="'+ref+'">'+WA_ICON+'WhatsApp</button>'
@@ -8025,14 +8189,61 @@
       return histNorm([o.remision,o.id,o.fecha,c.nombre,c.telefono,c.nit,c.ciudad,o.metodoPago,o.estado,o.total,String(o.total||'').replace(/\B(?=(\d{3})+(?!\d))/g,'.'),o.notas,
         (o.items||[]).map(function(it){ return (it.nombre||'')+' '+(it.sku||''); }).join(' ')].join(' '));
     }
+    /* Historial · filtros, orden y totales (todo se calcula de los pedidos ya cargados: no pide nada al servidor) */
+    var HISV = { filtro:'todos', orden:'reciente', periodo:'todo' };
+    function histPendiente(o){ return o.metodoPago==='Crédito' && (Number(o.saldo)||0)>0; }
+    function histFechaMs(o){ var d=kaemParseFecha(o.fecha); return d?d.getTime():0; }
+    function histEnPeriodo(o){
+      if(HISV.periodo==='todo') return true;
+      var ms=histFechaMs(o); if(!ms) return true;
+      var h=new Date(), hoy=new Date(h.getFullYear(),h.getMonth(),h.getDate()).getTime();
+      if(HISV.periodo==='mes'){ var d=new Date(ms); return d.getFullYear()===h.getFullYear() && d.getMonth()===h.getMonth(); }
+      return (hoy-ms)/864e5 <= (HISV.periodo==='30'?30:90);
+    }
+    function histGanNeta(o){ try{ return gananciaPedido(o).neta; }catch(e){ return 0; } }
+    function histKpiHtml(res){
+      var vend=0, cobrar=0, gan=0, nCob=0;
+      res.forEach(function(o){ vend+=Number(o.total)||0; if(histPendiente(o)){ cobrar+=Number(o.saldo)||0; nCob++; } gan+=histGanNeta(o); });
+      var k=function(cls, lbl, val, sub){ return '<div class="his-kpi'+(cls?' '+cls:'')+'"><span>'+lbl+'</span><b>'+val+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</div>'; };
+      return k('', 'Pedidos', res.length, res.length? 'ticket '+abrevCop(vend/res.length) : '')
+        + k('', 'Vendido', abrevCop(vend), 'en el filtro actual')
+        + k(cobrar>0?'tono-deuda':'', 'Por cobrar', abrevCop(cobrar), nCob?(nCob+(nCob===1?' pedido a crédito':' pedidos a crédito')):'todo pagado')
+        + k('his-gan'+(gan<0?' tono-mal':''), 'Ganancia', (gan<0?'− ':'')+abrevCop(Math.abs(gan)), 'neta, con envíos');
+    }
     function histFiltrar(){
       var q=histNorm($('histBuscar').value).trim().split(/\s+/).filter(Boolean), list=$('historyList'), cont=$('histConteo');
-      if(!HIST_VIEW.length) return;
-      var res = q.length ? HIST_VIEW.filter(function(o){ var tx=histTexto(o); return q.every(function(w){ return tx.indexOf(w)>=0; }); }) : HIST_VIEW;
-      list.innerHTML = res.length ? res.map(histRowHTML).join('') : '<p class="hist-empty">Ningún pedido coincide con “'+safe($('histBuscar').value.trim())+'”.</p>';
-      cont.style.display = q.length ? '' : 'none'; cont.textContent = res.length+' de '+HIST_VIEW.length+' pedidos';
+      if(!HIST_VIEW.length){ $('hisKpis').innerHTML=''; return; }
+      var base=HIST_VIEW.filter(histEnPeriodo);
+      var res=base.filter(function(o){
+        if(HISV.filtro==='cobrar' && !histPendiente(o)) return false;
+        if(HISV.filtro==='pagado' && histPendiente(o)) return false;
+        if(HISV.filtro==='sync' && o.synced!==false) return false;
+        if(q.length){ var tx=histTexto(o); return q.every(function(w){ return tx.indexOf(w)>=0; }); }
+        return true;
+      });
+      var por={ reciente:function(a,b){ return (histFechaMs(b)-histFechaMs(a)) || String(b.remision||b.id||'').localeCompare(String(a.remision||a.id||'')); },
+                valor:function(a,b){ return (Number(b.total)||0)-(Number(a.total)||0); },
+                ganancia:function(a,b){ return histGanNeta(b)-histGanNeta(a); },
+                cobrar:function(a,b){ return (histPendiente(b)?Number(b.saldo)||0:-1)-(histPendiente(a)?Number(a.saldo)||0:-1); } };
+      res=res.slice().sort(por[HISV.orden]||por.reciente);
+      $('hisKpis').innerHTML=histKpiHtml(res);
+      list.innerHTML = res.length ? res.map(histRowHTML).join('')
+        : '<p class="hist-empty">'+(q.length?('Ningún pedido coincide con “'+safe($('histBuscar').value.trim())+'”.'):'No hay pedidos con este filtro.')+'</p>';
+      var filtrado = q.length || HISV.filtro!=='todos' || HISV.periodo!=='todo';
+      cont.style.display = filtrado ? '' : 'none'; cont.textContent = res.length+' de '+HIST_VIEW.length+' pedidos';
     }
     $('histBuscar').addEventListener('input', histFiltrar);
+    $('hisOrden').addEventListener('change', function(e){ HISV.orden=e.target.value; histFiltrar(); });
+    $('hisFiltro').addEventListener('click', function(e){
+      var b=e.target.closest?e.target.closest('[data-f]'):null; if(!b) return;
+      HISV.filtro=b.getAttribute('data-f');
+      Array.prototype.forEach.call($('hisFiltro').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x===b); }); haptic(8); histFiltrar();
+    });
+    $('hisPeriodo').addEventListener('click', function(e){
+      var b=e.target.closest?e.target.closest('[data-p]'):null; if(!b) return;
+      HISV.periodo=b.getAttribute('data-p');
+      Array.prototype.forEach.call($('hisPeriodo').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x===b); }); haptic(8); histFiltrar();
+    });
     function paintHistory(arr, fallo){
       HIST_VIEW = arr || [];
       var list=$('historyList');
@@ -8042,10 +8253,11 @@
       list.innerHTML = fallo
         ? '<p class="hist-empty">No se pudo consultar KAEM_BASE_APP.<br><br>'
           + '<button class="btn-ghost" id="histRetry" type="button" style="width:100%">Reintentar</button></p>'
-        : '<p class="hist-empty">Aún no hay pedidos registrados.</p>';
+        : '<p class="hist-empty">Todavía no hay pedidos. Cuando guardes el primero aparecerá aquí.</p>';
       var rb=$('histRetry'); if(rb) rb.addEventListener('click', renderHistory);
     }
-    function openHistory(){ $('historyModal').classList.add('show'); $('histBuscar').value=''; renderHistory(); haptic(10); }
+    function openHistory(){ switchTab('historial'); }
+    function onEnterHistorial(){ renderHistory(); }
     // Purga de la cola local todo lo que ya existe en la hoja (evita pedidos fantasma)
     function purgarColaSincronizada(nube){
       var q=loadPending(); if(!q.length) return;
@@ -8062,7 +8274,7 @@
 
     // KAEM_BASE_APP es la única fuente de verdad: lo que llega del backend SOBRESCRIBE la memoria local.
     function renderHistory(){
-      $('historyList').innerHTML='<p class="hist-empty">Consultando KAEM_BASE_APP…</p>';
+      if(!HIST_VIEW.length) $('historyList').innerHTML='<div class="skel-list dos" aria-busy="true" aria-label="Cargando el historial">'+'<div class="skel-card"></div>'.repeat(4)+'</div>';
       if(navigator.onLine===false){ paintHistory(mergeOrders(loadHistory(), loadPending())); return; }
       google.script.run.withSuccessHandler(function(res){
         if(res&&(res.ok||res.success)&&res.orders){
@@ -8966,14 +9178,6 @@
                      .filter(function(p){ return String(p).trim(); }).join('\n\n');
     }
     function waLlavesTexto(){ return llavesPagoActuales().map(function(l){ return '• '+l.banco+': '+l.valor; }).join('\n'); }
-    function waAbrir(telefono, texto){
-      var t = String(telefono||'').replace(/\D/g,''); if(t.length===10) t='57'+t;
-      // Un número que no tiene 12 dígitos (57 + celular) no sirve: se abre WhatsApp sin destinatario para elegir el contacto,
-      // en vez de escribirle a un número equivocado.
-      if(t.length!==12 || t.indexOf('57')!==0){ if(t){ try{ toast('El teléfono no parece un celular válido: elige el contacto en WhatsApp.','info'); }catch(e){} } t=''; }
-      // api.whatsapp.com/send (no wa.me): wa.me daña los emojis en WhatsApp de escritorio
-      window.open('https://api.whatsapp.com/send?'+(t?('phone='+t+'&'):'')+'text='+encodeURIComponent(String(texto).replace(/\uFE0F/g,'')), '_blank', 'noopener');
-    }
     var CAT_NIVEL_INFO = {
       DETAL:   { nombre:'Detal',        minimo:0,      porRef:1, nacional:200000, local:100000 },
       DISTRIB: { nombre:'Distribuidor', minimo:250000, porRef:2, nacional:750000 },
@@ -8994,11 +9198,7 @@
       var cli = o.cliente || {}, id = String(o.remision || o.id || '').trim();
       var esCred = /cr[eé]dito/i.test(String(o.metodoPago||''));
       // Los probadores viajan como líneas aparte: se rotulan para que el cliente entienda por qué no suman en el total
-      var items = (o.items||[]).map(function(it){
-        var pr = toNum(it.precio), esFull = it.esProbador==='full' || (!it.esProbador && pr===0 && toNum(it.cantidad)===1 && (o.items||[]).some(function(x){ return x!==it && x.sku===it.sku && toNum(x.precio)>0; }));
-        var rot = esFull ? ' (probador de cortesía 🎁)' : (it.esProbador==='half' ? ' (probador a mitad de precio)' : '');
-        return '• ' + (Number(it.cantidad)||0) + 'x ' + (it.nombre || it.sku || '') + rot;
-      }).join('\n');
+      var items = waItemsPedido(o);
       var abono = toNum(o.abono), saldo = toNum(o.saldo);
       var plazoReal = plazoDePedido(o);
       return waUnir([
@@ -9016,7 +9216,7 @@
     }
     function waTextoCobro(c, fuente){
       var on = function(k){ return waOn('cobro', k, fuente); };
-      var nombre = (c.cliente||'').trim().split(/\s+/)[0] || 'Hola';
+      var nombre = waPrimerNombre(c.cliente) || 'Hola';
       var fraseFecha = c.vencido ? ('ya está vencido desde el ' + carteraFechaLarga(c.fechaVencimiento))
                                  : ('está próximo a vencer, el ' + carteraFechaLarga(c.fechaVencimiento));
       var p1 = [];
@@ -9071,48 +9271,245 @@
         on('confianza') ? 'Enlace oficial: su pedido llega directamente a nuestro equipo y confirmamos disponibilidad y pago antes de despachar.' : '' ]);
     }
 
-    /* ——— Ajustes → Plantillas de WhatsApp (elección de campos + vista previa) ——— */
-    var WA_EDIT = {};
-    var WA_MUESTRA = {
-      pedido: { remision:'RV-010', cliente:{ nombre:'MARÍA GÓMEZ' }, metodoPago:'Crédito', flete:15000, total:265000, abono:100000, saldo:165000,
-                items:[ { cantidad:3, nombre:'Base líquida · Arena' }, { cantidad:2, nombre:'Lip gloss · Rose' } ] },
-      cobro:  { cliente:'MARÍA GÓMEZ', idRemision:'RV-010', abonado:100000, saldoPendiente:165000, vencido:false,
-                fechaVencimiento:'2026-10-30', proximoAbono:'2026-10-15' }
-    };
-    function waEditarDesde(txt){ WA_EDIT = waCamposDe(txt); }
-    function waVistaPrevia(pl){
-      var f = waCanonico(WA_EDIT);
-      if(pl==='pedido') return waTextoPedido(WA_MUESTRA.pedido, f);
-      if(pl==='cobro') return waTextoCobro(WA_MUESTRA.cobro, f);
-      if(pl==='catalogo') return waTextoCatalogo('DISTRIB', f) + '\n' + 'https://…/catalogo.html?k=…';
-      return waTextoCatalogoBreve('DISTRIB', 'https://…/catalogo.html?k=…', f);
+    /* ═══ MENSAJES DE WHATSAPP · texto propio con {variables} ═══
+       Cada mensaje trae su texto predeterminado (el de siempre, con partes que se activan o se quitan). Si se quiere, se escribe uno
+       propio con {variables}: ese manda; si se borra, vuelve el predeterminado. Se comparte entre equipos (AJUSTES_GLOBALES → WA_TEXTOS). */
+    function waPrimerNombre(n){ var p = String(n||'').trim().split(/\s+/)[0] || ''; return p ? p.charAt(0).toUpperCase()+p.slice(1).toLowerCase() : ''; }
+    function waTextosDe(txt){ var o = waCamposDe(txt), out = {}; Object.keys(o).forEach(function(k){ if(typeof o[k]==='string' && o[k].trim()) out[k] = o[k]; }); return out; }
+    /** Textos libres de versiones anteriores (solo remisión y cobro): se siguen respetando hasta que se guarden como mensaje propio. */
+    function waLegado(key){
+      var t = key==='pedido' ? String((AJUSTES&&AJUSTES.waPedido)||'').trim() : (key==='cobro' ? String((AJUSTES&&AJUSTES.waCobro)||'').trim() : '');
+      return key==='cobro' ? t.replace(/\{cliente\}/g, '{nombre}') : t;
     }
-    function pintarWaPlantillas(){
-      var box = $('waPlantillas'); if(!box) return;
-      var f = waCanonico(WA_EDIT);
-      box.innerHTML = Object.keys(WA_PLANTILLAS).map(function(pl){
-        var P = WA_PLANTILLAS[pl];
-        return '<div class="wa-pl" data-pl="'+pl+'"><p class="wa-pl-t">'+safe(P.titulo)+'</p><div class="wa-chips">'
-          + P.campos.map(function(c){ var on = waOn(pl, c.k, f);
-              return '<button type="button" class="wa-chip'+(on?' on':'')+'" data-pl="'+pl+'" data-k="'+c.k+'" aria-pressed="'+on+'">'+(on?'✓ ':'')+safe(c.t)+'</button>'; }).join('')
-          + '</div><pre class="wa-prev">'+safe(waVistaPrevia(pl))+'</pre></div>';
+    function waCustom(key, fuente){
+      var propio = (fuente && fuente.textos) ? fuente.textos : waTextosDe(AJUSTES && AJUSTES.waTextos);
+      if(propio[key]) return propio[key];
+      return (fuente && fuente.textos) ? '' : waLegado(key);
+    }
+    /** Rellena un texto con sus {variables}. Una línea que solo tenía variables y quedó vacía se quita, y no quedan renglones ni espacios de más. */
+    function waLlenar(tpl, V){
+      var out = [];
+      String(tpl||'').replace(/\r/g,'').split('\n').forEach(function(l){
+        var soloVars = /\{[A-Za-z_]+\}/.test(l) && l.replace(/\{[A-Za-z_]+\}/g,'').trim()==='';
+        var r = l.replace(/\{([A-Za-z_]+)\}/g, function(m, k){ var v = V[String(k).toLowerCase()]; return v==null ? '' : String(v); });
+        if(soloVars && r.trim()==='') return;
+        out.push(r.replace(/[ \t]{2,}/g,' ').replace(/[ \t]+$/,''));
+      });
+      return out.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+    }
+    function waItemsPedido(o){
+      return (o.items||[]).map(function(it){
+        var pr = toNum(it.precio), esFull = it.esProbador==='full' || (!it.esProbador && pr===0 && toNum(it.cantidad)===1 && (o.items||[]).some(function(x){ return x!==it && x.sku===it.sku && toNum(x.precio)>0; }));
+        var rot = esFull ? ' (probador de cortesía 🎁)' : (it.esProbador==='half' ? ' (probador a mitad de precio)' : '');
+        return '• ' + (Number(it.cantidad)||0) + 'x ' + (it.nombre || it.sku || '') + rot;
+      }).join('\n');
+    }
+    function waBloquePago(){ return ['💳 *Datos de pago*', waLlavesTexto()].join('\n'); }
+
+    var WA_MSGS = {
+      pedido: { titulo:'Envío de remisión', campos:'pedido',
+        uso:'Al tocar WhatsApp en un pedido (Historial, Pedidos y Packing).',
+        vars:[['cliente','Nombre completo'],['nombre','Primer nombre'],['remision','N.º de remisión'],['fecha','Fecha del pedido'],['ciudad','Ciudad'],['productos','Lista de productos'],['flete','Flete'],
+              ['credito','Línea «Crédito a N días» (solo si es a crédito)'],['total','Total'],['abono','Abono'],['saldo','Línea de abono y saldo (solo a crédito)'],['plazo','Días de crédito'],['vence','Fecha de vencimiento'],['bloque_pago','Bloque con los datos de pago']],
+        valores:function(o){
+          var cli = o.cliente||{}, esCred = /cr[eé]dito/i.test(String(o.metodoPago||'')), abono = toNum(o.abono), saldo = toNum(o.saldo), plazo = plazoDePedido(o);
+          return { cliente:cli.nombre||'', nombre:waPrimerNombre(cli.nombre), remision:String(o.remision||o.id||'').trim(), fecha:o.fecha||'', ciudad:cli.ciudad||'', productos:waItemsPedido(o),
+                   flete:fleteTexto(o.flete), credito:esCred?('• *Crédito a '+plazo+' días*'):'', total:cop(o.total), abono:cop(abono),
+                   saldo:esCred?('• Abono: '+cop(abono)+' · *Saldo: '+cop(saldo || Math.max(0, toNum(o.total)-abono))+'*'):'', plazo:String(plazo), vence:o.fechaVencimiento||'', bloque_pago:waBloquePago() };
+        },
+        defecto:function(o, c){ return waTextoPedido(o, c); },
+        plantilla:function(c){ var on = function(k){ return waOn('pedido', k, c); };
+          return waUnir([
+            [ on('saludo')?'¡Hola *{cliente}*! ✨':'', on('gracias')?'Gracias por tu compra en *KAÉM Beauty House*.':'' ],
+            [ on('resumen')?'Resumen de tu pedido *{remision}*:':'', on('productos')?'{productos}':'', on('flete')?'• *Flete:* {flete}':'', on('credito')?'{credito}':'', on('total')?'• *Total: {total}*':'', on('saldo')?'{saldo}':'' ],
+            on('pago')?'{bloque_pago}':'', on('cierre')?'Cualquier novedad escríbenos por aquí. 🤍':'' ]); },
+        muestra:{ remision:'RV-010', fecha:'20/10/2026', cliente:{ nombre:'MARÍA GÓMEZ', ciudad:'Bogotá' }, metodoPago:'Crédito', flete:15000, total:265000, abono:100000, saldo:165000, fechaVencimiento:'19/11/2026',
+                  items:[ { cantidad:3, nombre:'Base líquida · Arena' }, { cantidad:2, nombre:'Lip gloss · Rose' } ] } },
+      cobro: { titulo:'Recordatorio de cobro', campos:'cobro',
+        uso:'Al recordar un cobro desde Cartera (uno por uno o en lote).',
+        vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['remision','N.º de remisión'],['saldo','Saldo pendiente'],['abonado','Lo abonado hasta hoy'],['vence','Fecha de vencimiento'],['estado_pago','«ya está vencido desde…» o «está próximo a vencer…»'],
+              ['frase_abono','Frase de agradecimiento del abono (si hubo)'],['frase_saldo','Frase completa del saldo'],['frase_acuerdo','Frase del abono acordado (si hay)'],['proximo_abono','Fecha del próximo abono acordado'],['bloque_pago','Bloque con los datos de pago']],
+        valores:function(c){
+          var nombre = waPrimerNombre(c.cliente) || 'Hola', id = c.idRemision;
+          var est = c.vencido ? ('ya está vencido desde el ' + carteraFechaLarga(c.fechaVencimiento)) : ('está próximo a vencer, el ' + carteraFechaLarga(c.fechaVencimiento));
+          var fSaldo = c.abonado>0 ? ('El saldo restante de tu remisión #'+id+' es de '+cop(c.saldoPendiente)+' y '+est+'.') : ('Te escribimos para recordarte amablemente que el saldo pendiente de tu remisión #'+id+' por un valor de '+cop(c.saldoPendiente)+' '+est+'.');
+          return { nombre:nombre, cliente:c.cliente||'', remision:id, saldo:cop(c.saldoPendiente), abonado:cop(c.abonado||0), vence:carteraFechaLarga(c.fechaVencimiento), estado_pago:est,
+                   frase_abono:c.abonado>0 ? ('Te escribimos para agradecerte el abono de '+cop(c.abonado)+' en tu remisión #'+id+' 🌸.') : '',
+                   frase_saldo:fSaldo, frase_saldo_corta:c.abonado>0 ? ('El saldo restante es de '+cop(c.saldoPendiente)+' y '+est+'.') : fSaldo,
+                   frase_acuerdo:c.proximoAbono ? ('Habíamos acordado un abono para el '+carteraFechaLarga(c.proximoAbono)+'.') : '', proximo_abono:c.proximoAbono ? carteraFechaLarga(c.proximoAbono) : '', bloque_pago:waBloquePago() };
+        },
+        defecto:function(c, cp){ return waTextoCobro(c, cp); },
+        plantilla:function(c){ var on = function(k){ return waOn('cobro', k, c); };
+          var p1 = [ on('saludo')?'¡Hola, {nombre}! ✨ Espero que estés teniendo un excelente día. Te saludamos de KAÉM Beauty House 🌸.':'', on('abono')?'{frase_abono}':'',
+                     on('saldo')?(on('abono')?'{frase_saldo_corta}':'{frase_saldo}'):'', on('acuerdo')?'{frase_acuerdo}':'' ].filter(Boolean).join(' ');
+          return waUnir([ p1, on('pago')?'{bloque_pago}':'', on('cierre')?'Si ya realizaste la transferencia o pago, por favor ignora este mensaje o envíanos el comprobante por este medio. ¡Agradecemos mucho tu confianza y preferencia! 💕':'' ]); },
+        muestra:{ cliente:'MARÍA GÓMEZ', idRemision:'RV-010', abonado:100000, saldoPendiente:165000, vencido:false, fechaVencimiento:'2026-10-30', proximoAbono:'2026-10-15' } },
+      cupo: { titulo:'Cupo de crédito', campos:null,
+        uso:'Al tocar WhatsApp en un cliente de Cupos.',
+        vars:[['nombre','Primer nombre'],['cupo','Cupo total'],['usado','Lo que está usando'],['disponible','Lo que le queda'],['estado','Estado del cupo'],['aviso_mora','Aviso de mora (solo si está atrasado)'],['plazo','Días de crédito'],['aumento','Lo que sube al pagar a tiempo'],['aumento_pronto','Lo que sube si paga rápido'],['bloque_pago','Bloque con los datos de pago']],
+        valores:function(f){
+          var c = CP.cfg||finCfgLocal().cupo, plazo = CP.plazo||30, mora = (f.estado==='mora'||f.estado==='bloqueado');
+          var est = f.manualBloqueado?'Crédito pausado':(mora?'En mora, ponte al día para reactivarlo':(f.estado==='atencion'?'Tienes un pago por regularizar':'Al día ✅'));
+          return { nombre:waPrimerNombre(f.nombre)||'Hola', cupo:cop(f.cupo), usado:cop(f.usado), disponible:cop(f.disponible), estado:est, plazo:String(plazo), aumento:cop(c.aumento), aumento_pronto:cop(c.aumento+c.prontoExtra), bloque_pago:waBloquePago(),
+                   aviso_mora:mora ? ('Tienes remisiones vencidas'+(f.moraDias?(' ('+f.moraDias+' días)'):'')+'. En cuanto te pongas al día, tu cupo vuelve a estar disponible 💕.\n'+waLlavesTexto()) : '' };
+        },
+        defecto:function(f){ return waTextoCupo(f); },
+        plantilla:function(){ return waUnir([ '¡Hola, {nombre}! ✨ Te cuento cómo va tu cupo de crédito en KAÉM Beauty House 🌸.', ['💳 *Tu cupo*','Cupo: {cupo}','En uso: {usado}','Disponible: {disponible}','Estado: {estado}'], '{aviso_mora}',
+            ['📌 *Cómo funciona*','• Tu cupo es el tope para armar pedidos a crédito, con {plazo} días desde que recibes.','• Si pagas a tiempo, tu cupo sube {aumento}; si pagas rápido, sube {aumento_pronto}.','• Si te atrasas, el cupo baja o se pausa hasta que te pongas al día.'],
+            'Es una dinámica interna de confianza de KAÉM, no un crédito financiero. ¡Gracias por tu confianza y por crecer con nosotros! 💕' ]); },
+        muestra:{ nombre:'MARÍA GÓMEZ', cupo:1200000, usado:450000, disponible:750000, estado:'ok', manualBloqueado:false, moraDias:0 } },
+      reactivar: { titulo:'Cliente que dejó de comprar', campos:null,
+        uso:'Al escribirle a un cliente que se alejó (Estadísticas → Clientes).',
+        vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['dias','Días sin comprar']],
+        valores:function(x){ return { nombre:waPrimerNombre(x.nombre), cliente:x.nombre||'', dias:String(x.diasSinComprar||'') }; },
+        defecto:function(x){ return waLlenar(WA_MSGS.reactivar.plantilla(), WA_MSGS.reactivar.valores(x)); },
+        plantilla:function(){ return 'Hola {nombre} 💛 ¿Cómo estás? Hace un tiempo no te vemos por KAÉM Beauty House y queremos que conozcas las novedades antes que nadie. ¿Te cuento cuáles llegaron?'; },
+        muestra:{ nombre:'MARÍA GÓMEZ', diasSinComprar:55 } },
+      cliente: { titulo:'Saludo a un cliente', campos:null,
+        uso:'Al tocar WhatsApp en la ficha de un cliente (módulo Clientes).',
+        vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['ciudad','Ciudad']],
+        valores:function(c){ return { nombre:waPrimerNombre(c.nombre), cliente:c.nombre||'', ciudad:c.ciudad||'' }; },
+        defecto:function(c){ return waLlenar(WA_MSGS.cliente.plantilla(), WA_MSGS.cliente.valores(c)); },
+        plantilla:function(){ return 'Hola {nombre}, te escribimos de KAÉM Beauty House.'; },
+        muestra:{ nombre:'MARÍA GÓMEZ', ciudad:'Bogotá' } },
+      catalogo: { titulo:'Catálogo · Compartir (bienvenida)', campos:'catalogo',
+        uso:'Al tocar «Compartir» en un enlace de catálogo (Ajustes → Catálogo virtual). El mismo texto sirve para los tres catálogos: usa {nivel} para que cambie.',
+        vars:[['nivel','Detal, Distribuidor o Mayorista'],['nivel_minusculas','El nivel en minúsculas'],['link','Enlace del catálogo'],['minimo','Pedido mínimo del nivel'],['envio','Condiciones de envío del nivel']],
+        valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n) }; },
+        defecto:function(d, c){ return waTextoCatalogo(d.nivel, c); },
+        plantilla:function(){ return waUnir([ '*Catálogo KAÉM Beauty House* · {nivel}',
+            'Cordial saludo. Ponemos a su disposición nuestro catálogo con sus precios de *{nivel_minusculas}*, para que arme su pedido de forma ágil y con el inventario al día.',
+            ['*Cómo funciona:*','1. Ingrese y consulte las referencias disponibles.','2. Seleccione tonos y cantidades (con carga rápida de 6 y 12 unidades).','3. Envíe su pedido: confirmamos disponibilidad, pago y despacho por este medio.'],
+            '• Inventario actualizado en tiempo real\n• Información de cada producto para su punto de venta\n• Despachos a todo el país', ['{minimo}','{envio}'],
+            'Este enlace es personal y oficial de su cuenta con KAÉM.', ['Acceda aquí:','{link}'] ]); },
+        muestra:{ nivel:'DISTRIB', url:'https://kaembeautyhouse.github.io/kaem/catalogo.html?k=…' } },
+      catalogoBreve: { titulo:'Catálogo · WhatsApp breve', campos:'catalogoBreve',
+        uso:'Al tocar «WhatsApp breve» en un enlace de catálogo.',
+        vars:[['nivel','Detal, Distribuidor o Mayorista'],['nivel_minusculas','El nivel en minúsculas'],['link','Enlace del catálogo'],['minimo','Pedido mínimo del nivel'],['envio','Condiciones de envío del nivel']],
+        valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n) }; },
+        defecto:function(d, c){ return waTextoCatalogoBreve(d.nivel, d.url, c); },
+        plantilla:function(){ return waUnir([ ['Cordial saludo. Le compartimos el catálogo de KAÉM Beauty House con sus precios de {nivel_minusculas}:','{link}'], ['{minimo}','{envio}'],
+            'Enlace oficial: su pedido llega directamente a nuestro equipo y confirmamos disponibilidad y pago antes de despachar.' ]); },
+        muestra:{ nivel:'DISTRIB', url:'https://kaembeautyhouse.github.io/kaem/catalogo.html?k=…' } }
+    };
+    /** El mensaje listo para enviar: el texto propio (si lo hay) con sus variables, o el predeterminado de siempre. */
+    function waMensaje(key, datos, fuente){
+      var M = WA_MSGS[key], custom = waCustom(key, fuente);
+      if(custom) return waLlenar(custom, M.valores(datos));
+      return M.defecto(datos, fuente ? fuente.campos : undefined);
+    }
+    /** ¿El texto propio ya trae el enlace? (entonces quien comparte no debe añadirlo otra vez) */
+    function waUsaLink(key){ var t = waCustom(key); return !!t && /\{link\}/i.test(t); }
+
+    /* ——— Enlace a WhatsApp: el número bien armado y el texto sin que se rompa ——— */
+    function waNumero(tel){
+      var d = String(tel||'').replace(/\D/g,''); if(d.indexOf('00')===0) d = d.slice(2);
+      if(d.length===10) return d.charAt(0)==='3' ? '57'+d : '';                         // celular colombiano sin indicativo
+      if(d.length===12 && d.indexOf('57')===0) return d.charAt(2)==='3' ? d : '';       // con indicativo de Colombia
+      if(d.length>=11 && d.length<=15 && d.indexOf('57')!==0) return d;                // número de otro país, ya con su indicativo
+      return '';
+    }
+    function waAbrir(telefono, texto){
+      var crudo = String(telefono||'').replace(/\D/g,''), t = waNumero(telefono);
+      if(crudo && !t){ try{ toast('El teléfono no parece un celular válido: elige el contacto en WhatsApp.','info'); }catch(e){} }
+      var txt = String(texto||'').replace(/️/g,'');   // sin el selector de variación: daña algunos emojis en WhatsApp de escritorio
+      var base = 'https://api.whatsapp.com/send' + (t ? ('?phone='+t) : ''), url = base + (t?'&':'?') + 'text=' + encodeURIComponent(txt);
+      // Un enlace larguísimo puede ser rechazado: el texto se copia y se abre el chat para pegarlo
+      if(url.length > 6500){ copiarTexto(txt, function(){ toast('El mensaje es muy largo para el enlace: ya está copiado, pégalo en el chat.','info',5200); }); url = base; }
+      // api.whatsapp.com/send (no wa.me): wa.me daña los emojis en WhatsApp de escritorio
+      var w = null; try{ w = window.open(url, '_blank'); }catch(e){}
+      if(w){ try{ w.opener = null; }catch(e){} } else { try{ window.location.href = url; }catch(e){} }   // ventana bloqueada: se abre en esta misma
+    }
+
+    /* ——— Ajustes → Mensajes de WhatsApp ——— */
+    var WA_EDIT = {}, WA_TXT = {}, WA_ABIERTO = '';
+    function waEditarDesde(campos, textos){
+      WA_EDIT = waCamposDe(campos); WA_TXT = waTextosDe(textos);
+      ['pedido','cobro'].forEach(function(k){ if(!WA_TXT[k]){ var l = waLegado(k); if(l) WA_TXT[k] = l; } });   // un texto libre anterior pasa a ser el mensaje propio
+    }
+    function waFuente(){ return { campos: waCanonico(WA_EDIT), textos: WA_TXT }; }
+    function waEsPropio(k){ var t = String(WA_TXT[k]||'').trim(); return !!t && t !== WA_MSGS[k].plantilla(waCanonico(WA_EDIT)).trim(); }
+    function waTextosCanonico(){
+      var out = {}; Object.keys(WA_MSGS).forEach(function(k){ if(waEsPropio(k)) out[k] = String(WA_TXT[k]).replace(/\r/g,'').trim(); });
+      return Object.keys(out).length ? JSON.stringify(out) : '';
+    }
+    function waVistaPrevia(k){ try{ return waMensaje(k, WA_MSGS[k].muestra, waFuente()); }catch(e){ return '(no se pudo armar la vista previa)'; } }
+    function waAvisoTexto(k){
+      var t = String(WA_TXT[k]||''), conocidas = {}, malas = [];
+      WA_MSGS[k].vars.forEach(function(v){ conocidas[v[0]] = 1; }); conocidas.frase_saldo_corta = 1;
+      (t.match(/\{[A-Za-z_]+\}/g)||[]).forEach(function(x){ var n = x.slice(1,-1).toLowerCase(); if(!conocidas[n] && malas.indexOf(x)<0) malas.push(x); });
+      var av = [];
+      if(malas.length) av.push('⚠️ No conozco '+malas.join(', ')+': esa parte se quitará del mensaje.');
+      if(t.length > 1200) av.push('Es un mensaje largo ('+t.length+' letras): en WhatsApp se lee mejor corto.');
+      return av.join(' ');
+    }
+    function pintarWaMensajes(){
+      var box = $('waMensajes'); if(!box) return;
+      var F = waFuente();
+      box.innerHTML = Object.keys(WA_MSGS).map(function(k){
+        var M = WA_MSGS[k], propio = waEsPropio(k), abierto = WA_ABIERTO===k;
+        var h = '<article class="wa-msg'+(abierto?' abierto':'')+'" data-k="'+k+'"><header class="wa-msg-h"><div><h4>'+safe(M.titulo)+'</h4><p>'+safe(M.uso)+'</p></div>'
+          +'<span class="wa-tag'+(propio?' propio':'')+'">'+(propio?'Personalizado':'Predeterminado')+'</span></header>'
+          +'<pre class="wa-prev" aria-label="Vista previa con datos de ejemplo">'+safe(waVistaPrevia(k))+'</pre>';
+        if(abierto){
+          h += '<div class="wa-editor"><p class="wa-lbl">Escribe tu mensaje. Toca una variable para ponerla donde está el cursor:</p><div class="wa-vars">'
+            + M.vars.map(function(v){ return '<button type="button" class="wa-var" data-v="'+v[0]+'" title="'+safe(v[1])+'">{'+v[0]+'}</button>'; }).join('')
+            + '</div><textarea class="wa-ta" data-k="'+k+'" rows="10" spellcheck="true" aria-label="Texto del mensaje: '+safe(M.titulo)+'">'+safe(WA_TXT[k]||'')+'</textarea>'
+            + '<p class="wa-aviso" data-av="'+k+'">'+safe(waAvisoTexto(k))+'</p>'
+            + '<p class="cfg-hint">En WhatsApp: <b>*así*</b> pone negrita y <b>_así_</b> cursiva. Las variables se reemplazan solas con los datos reales; una línea que solo tenía una variable vacía se quita sola.</p>'
+            + '<div class="wa-acts"><button type="button" class="btn-ghost wa-reset" data-k="'+k+'">Volver al predeterminado</button><button type="button" class="btn-solid wa-done" data-k="'+k+'">Listo</button></div></div>';
+        } else {
+          if(M.campos && !propio) h += '<details class="wa-partes"><summary>Elegir qué partes lleva</summary><div class="wa-chips">'
+            + WA_PLANTILLAS[M.campos].campos.map(function(c){ var on = waOn(M.campos, c.k, F.campos);
+                return '<button type="button" class="wa-chip'+(on?' on':'')+'" data-pl="'+M.campos+'" data-k="'+c.k+'" aria-pressed="'+on+'">'+(on?'✓ ':'')+safe(c.t)+'</button>'; }).join('')
+            + '</div></details>';
+          h += '<div class="wa-acts"><button type="button" class="btn-ghost wa-edit" data-k="'+k+'">Editar mensaje</button><button type="button" class="btn-ghost wa-prueba" data-k="'+k+'">Probar en WhatsApp</button></div>';
+        }
+        return h + '</article>';
       }).join('');
     }
+    function waRefrescarVista(k){
+      var art = $('waMensajes').querySelector('.wa-msg[data-k="'+k+'"]'); if(!art) return;
+      var pre = art.querySelector('.wa-prev'); if(pre) pre.textContent = waVistaPrevia(k);
+      var tag = art.querySelector('.wa-tag'); if(tag){ var p = waEsPropio(k); tag.textContent = p?'Personalizado':'Predeterminado'; tag.classList.toggle('propio', p); }
+      var av = art.querySelector('.wa-aviso'); if(av) av.textContent = waAvisoTexto(k);
+    }
+    function waProbar(k){
+      var num = ($('waNumPrueba') && $('waNumPrueba').value) || ''; try{ localStorage.setItem('kaem_wa_prueba', num); }catch(e){}
+      var txt = waVistaPrevia(k);
+      if(num && !waNumero(num)) toast('Ese número no parece un celular válido: se abrirá WhatsApp para que elijas el contacto.','info');
+      waAbrir(num, txt); haptic(10);
+    }
+    (function(){
+      var box = $('waMensajes'); if(!box) return;
+      try{ var n = localStorage.getItem('kaem_wa_prueba'); if(n && $('waNumPrueba')) $('waNumPrueba').value = n; }catch(e){}
+      box.addEventListener('click', function(e){
+        var t = e.target.closest ? e.target.closest('button') : null; if(!t) return;
+        var k = t.getAttribute('data-k');
+        if(t.classList.contains('wa-chip')){
+          var pl = t.getAttribute('data-pl'), campo = t.getAttribute('data-k'); WA_EDIT[pl] = WA_EDIT[pl] || {};
+          WA_EDIT[pl][campo] = !waOn(pl, campo, waCanonico(WA_EDIT)); haptic(8); pintarWaMensajes(); if(typeof cfgMarcarSucio==='function') cfgMarcarSucio(); return;
+        }
+        if(t.classList.contains('wa-edit')){ if(!WA_TXT[k]) WA_TXT[k] = WA_MSGS[k].plantilla(waCanonico(WA_EDIT)); WA_ABIERTO = k; haptic(8); pintarWaMensajes();
+          var ta = box.querySelector('.wa-ta'); if(ta){ try{ ta.focus({ preventScroll:true }); }catch(er){ ta.focus(); } } return; }
+        if(t.classList.contains('wa-done')){ WA_ABIERTO = ''; pintarWaMensajes(); return; }
+        if(t.classList.contains('wa-reset')){ delete WA_TXT[k]; WA_ABIERTO = ''; haptic(10); pintarWaMensajes(); if(typeof cfgMarcarSucio==='function') cfgMarcarSucio(); toast('Volvió el mensaje predeterminado','info'); return; }
+        if(t.classList.contains('wa-prueba')){ waProbar(k); return; }
+        if(t.classList.contains('wa-var')){
+          var ta2 = box.querySelector('.wa-ta'); if(!ta2) return; var v = '{'+t.getAttribute('data-v')+'}', a = ta2.selectionStart==null ? ta2.value.length : ta2.selectionStart, b = ta2.selectionEnd==null ? a : ta2.selectionEnd;
+          ta2.value = ta2.value.slice(0,a) + v + ta2.value.slice(b); var pos = a + v.length; try{ ta2.setSelectionRange(pos,pos); ta2.focus({ preventScroll:true }); }catch(er){}
+          WA_TXT[ta2.getAttribute('data-k')] = ta2.value; waRefrescarVista(ta2.getAttribute('data-k')); haptic(6); if(typeof cfgMarcarSucio==='function') cfgMarcarSucio(); return;
+        }
+      });
+      box.addEventListener('input', function(e){
+        var ta = e.target; if(!ta || !ta.classList || !ta.classList.contains('wa-ta')) return;
+        WA_TXT[ta.getAttribute('data-k')] = ta.value; waRefrescarVista(ta.getAttribute('data-k')); if(typeof cfgMarcarSucio==='function') cfgMarcarSucio();
+      });
+    })();
 
     function whatsappFor(o){
       if(!o || !o.items || !o.items.length){ toast('El pedido no tiene productos.','error'); return; }
-      var cli = o.cliente || {}, id = String(o.remision || o.id || '').trim();
-      var esCred = /cr[eé]dito/i.test(String(o.metodoPago||''));
-      // Texto libre de Ajustes (si lo hay) manda; si no, el mensaje por campos elegidos
-      var plt = String((AJUSTES && AJUSTES.waPedido) || '').trim();
-      var texto = plt
-        ? plt.replace(/\{cliente\}/g, cli.nombre || '')
-             .replace(/\{remision\}/g, id)
-             .replace(/\{total\}/g,   cop(o.total))
-             .replace(/\{saldo\}/g,   cop(toNum(o.saldo) || Math.max(0, toNum(o.total) - toNum(o.abono))))
-             .replace(/\{vence\}/g,   esCred ? ('Crédito a ' + plazoDePedido(o) + ' días') : '')
-        : waTextoPedido(o);
-      waAbrir(cli.telefono, texto);
+      waAbrir((o.cliente||{}).telefono, waMensaje('pedido', o));
       haptic(15);
     }
     function downloadOrderPDF(){ pdfFor(orderForOutput()); }
@@ -9226,8 +9623,6 @@
     });
     $('syncBtn').addEventListener('click', function(){ haptic(12); syncPending(); });
     $('historyBtn').addEventListener('click', openHistory);
-    $('historyCloseBtn').addEventListener('click', function(){ $('historyModal').classList.remove('show'); });
-    $('historyModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
     $('orderDeleteCancelBtn').addEventListener('click', function(){ pendingDeleteRef=null; pendingDeleteOrder=null; $('orderDeleteModal').classList.remove('show'); });
     $('orderDeleteConfirmBtn').addEventListener('click', function(){ confirmOrderDelete(); });
     $('orderDeleteModal').addEventListener('click', function(e){ if(e.target===this){ pendingDeleteRef=null; pendingDeleteOrder=null; this.classList.remove('show'); } });
@@ -9998,17 +10393,7 @@
       var tel = String(c.telefono||'').replace(/[^\d]/g,'');
       if(!tel){ toast('Esta remisión no tiene teléfono registrado.','error'); return; }
       if(tel.length===10) tel='57'+tel;
-      var nombre = (c.cliente||'').trim().split(/\s+/)[0] || 'Hola';
-      // Texto libre de Ajustes (si lo hay) manda; si no, el mensaje por campos elegidos.
-      // Marcadores del texto libre: {cliente} {remision} {saldo} {vence} {abonado}
-      var plantilla = String((AJUSTES && AJUSTES.waCobro) || '').trim();
-      var msg = plantilla
-        ? plantilla.replace(/\{cliente\}/g, nombre)
-                   .replace(/\{remision\}/g, c.idRemision)
-                   .replace(/\{saldo\}/g,   cop(c.saldoPendiente))
-                   .replace(/\{vence\}/g,   carteraFechaLarga(c.fechaVencimiento))
-                   .replace(/\{abonado\}/g, cop(c.abonado||0))
-        : waTextoCobro(c);
+      var msg = waMensaje('cobro', c);
       waAbrir(tel, msg);
       haptic(15);
     }
@@ -11190,7 +11575,8 @@
       pedidos:   { historial:loadHistory, pendientes:loadPending, sincronizar:syncPending, nuevo:newOrder,
                    nivel:setNivel, agregar:addToCart, render:renderCart, flete:getFlete, politicaEnvio:fletePolitica,
                    payload:currentOrderPayload, rentabilidad:function(){ return rentabilidadCarrito(computeTotals()); } },
-      whatsapp:  { pedido:waTextoPedido, cobro:waTextoCobro, catalogo:waTextoCatalogo, catalogoBreve:waTextoCatalogoBreve, abrir:waAbrir },
+      whatsapp:  { pedido:waTextoPedido, cobro:waTextoCobro, catalogo:waTextoCatalogo, catalogoBreve:waTextoCatalogoBreve, abrir:waAbrir,
+                   mensajes:WA_MSGS, mensaje:waMensaje, llenar:waLlenar, numero:waNumero },
       documentos:{ remision:descargarPDFRemision, recibo:function(id,i){ prepararRecibo(id, i==null?-1:i, generarReciboPago); } },
       ui:        { tab:switchTab, toast:toast, vibrar:haptic, beep:beep },
       packing:   { estado:PACK, cargar:packCargarPendientes, seleccionar:packSeleccionar,
@@ -11474,10 +11860,10 @@
       var url=catEnlace(nivel); if(!url){ toast('Aún no se cargan los enlaces. Intenta en un momento.','error'); return; }
       var nombre = CAT_NIVEL_INFO[nivel].nombre;
       if(modo==='enlace'){ copiarTexto(url, function(){ toast('Enlace '+nombre+' copiado ✓','success'); haptic(12); }); return; }
-      if(modo==='breve'){ waAbrir('', waTextoCatalogoBreve(nivel, url)); haptic(12); return; }
-      var texto = waTextoCatalogo(nivel);
-      if(navigator.share){ navigator.share({ title:'Catálogo KAÉM · '+nombre, text:texto, url:url }).catch(function(){}); return; }
-      copiarTexto(texto+'\n'+url, function(){ toast('Mensaje con el enlace '+nombre+' copiado ✓ Pégalo en WhatsApp.','success'); haptic(12); });
+      if(modo==='breve'){ var tb = waMensaje('catalogoBreve', { nivel:nivel, url:url }); if(waCustom('catalogoBreve') && !waUsaLink('catalogoBreve')) tb += '\n' + url; waAbrir('', tb); haptic(12); return; }
+      var texto = waMensaje('catalogo', { nivel:nivel, url:url }), conLink = waUsaLink('catalogo');
+      if(navigator.share){ navigator.share(conLink ? { title:'Catálogo KAÉM · '+nombre, text:texto } : { title:'Catálogo KAÉM · '+nombre, text:texto, url:url }).catch(function(){}); return; }
+      copiarTexto(conLink ? texto : (texto+'\n'+url), function(){ toast('Mensaje con el enlace '+nombre+' copiado ✓ Pégalo en WhatsApp.','success'); haptic(12); });
     }
     function catConfigurar(datos, msg){
       datos.operador=String((AJUSTES&&AJUSTES.operador)||'').trim();
@@ -11497,13 +11883,6 @@
     $('cfgCatCompMay').addEventListener('click', function(){ catCompartir('MAYOR', 'completo'); });
     $('cfgCatBreveMay').addEventListener('click', function(){ catCompartir('MAYOR', 'breve'); });
     $('cfgCatCopMay').addEventListener('click', function(){ catCompartir('MAYOR', 'enlace'); });
-    $('waPlantillas').addEventListener('click', function(e){
-      var b = e.target.closest && e.target.closest('.wa-chip'); if(!b) return;
-      var pl=b.getAttribute('data-pl'), k=b.getAttribute('data-k');
-      var actual = waOn(pl, k, waCanonico(WA_EDIT));
-      WA_EDIT[pl] = WA_EDIT[pl] || {}; WA_EDIT[pl][k] = !actual;
-      haptic(8); pintarWaPlantillas();
-    });
     Array.prototype.forEach.call($('cfgDescSeg').querySelectorAll('.seg'), function(b){
       b.addEventListener('click', function(){
         var on=b.dataset.desc==='on';
@@ -11910,30 +12289,20 @@
     /* ═══════ ESTADÍSTICAS DEL NEGOCIO ═══════ */
     function abrirStats(){
       $('statsModal').classList.add('show');
-      $('statsBody').innerHTML='<p class="hist-empty">Calculando…</p>';
+      ST_R = null;
       $('statsFecha').textContent='';
       BI.tab='resumen'; biTabsPintar(); biPintar(); biCargar(false); finCargar(false);
       abrirStatsSoloDetalle();
     }
     function abrirStatsSoloDetalle(){
       google.script.run.withSuccessHandler(function(r){
-        if(!r || !r.ok){ $('statsBody').innerHTML='<p class="hist-empty">'+safe((r&&r.message)||'No se pudieron calcular.')+'</p>'; return; }
+        if(!r || !r.ok){ ST_R = false; if(({ ventas:1, rent:1, inv:1 })[BI.tab]) biPintar(true); return; }
         $('statsFecha').textContent=r.generado||'';
         pintarStats(r);
       }).withFailureHandler(function(){
-        $('statsBody').innerHTML='<p class="hist-empty">Sin conexión · no se pudieron calcular las estadísticas.</p>';
+        ST_R = false; if(({ ventas:1, rent:1, inv:1 })[BI.tab]) biPintar(true);
       }).obtenerEstadisticas({});
     }
-    // Botón de acción de cada conclusión: cierra Estadísticas y abre el módulo donde se resuelve
-    $('statsBody').addEventListener('click', function(e){
-      var chip=e.target.closest?e.target.closest('[data-per]'):null;
-      if(chip && ST_R){ ST_PERIODO=chip.getAttribute('data-per'); $('stRank').innerHTML=stRankHtml(ST_R); haptic(8); return; }
-      if(e.target && e.target.id==='invMarcasCsv'){ invMarcasCSV(); return; }
-      var b=e.target.closest?e.target.closest('[data-ir]'):null; if(!b) return;
-      $('statsModal').classList.remove('show');
-      var nav=$('nav-'+b.getAttribute('data-ir')); if(nav) nav.click();
-      haptic(10);
-    });
     function stFila(i, nombre, sub, num, pct){
       return '<div class="st-row"><span class="st-rank">'+(i+1)+'</span>'
         +'<span class="st-nom">'+safe(nombre)+(sub?('<small>'+safe(sub)+'</small>'):'')
@@ -11945,7 +12314,7 @@
        Las cifras vienen del servidor (obtenerBI): proyección, flujo de caja, rotación, clientes y alertas.
        Aquí solo se pintan, en pestañas dentro de Estadísticas. */
     var BI = { datos:null, tab:'resumen', cargando:false, filtro:'reponer', cajaUsada:null };
-    var BI_TABS = [['resumen','Resumen'],['ventas','Ventas'],['dinero','Dinero'],['gastos','Gastos'],['inv','Inventario'],['cli','Clientes'],['det','Ranking']];
+    var BI_TABS = [['resumen','Resumen'],['ventas','Ventas'],['rent','Rentabilidad'],['dinero','Dinero'],['gastos','Gastos'],['inv','Inventario'],['cli','Clientes']];
     function biCaja(){ try{ var v=localStorage.getItem('kaem_caja_hoy'); return (v===null||v==='')?null:Math.round(Number(v)||0); }catch(e){ return null; } }
     function biSig(n){ return (n<0?'− ':'')+cop(Math.abs(n)); }
     function biTabsPintar(){
@@ -11957,28 +12326,27 @@
     }
     function biCargar(forzar){
       if(BI.cargando) return; BI.cargando = true;
-      if(!BI.datos && BI.tab!=='det' && !FIN.datos) $('biBody').innerHTML = '<p class="hist-empty">Analizando tu negocio…</p>';
+      if(!BI.datos && !FIN.datos) $('biBody').innerHTML = '<p class="hist-empty">Analizando tu negocio…</p>';
       var arg = {}, caja = (FIN.datos && FIN.datos.caja && FIN.datos.caja.configurada) ? FIN.datos.caja.saldo : biCaja(); if(caja!==null) arg.cajaHoy = caja; BI.cajaUsada = caja; if(forzar) arg.sinCache = true;
       google.script.run.withSuccessHandler(function(r){
         BI.cargando = false;
         if(r && r.ok){ BI.datos = r; biTabsPintar(); biPintar(); }
-        else if(BI.tab!=='det') $('biBody').innerHTML = '<p class="hist-empty">'+safe((r&&r.message)||'No se pudo analizar el negocio.')+'</p>';
+        else $('biBody').innerHTML = '<p class="hist-empty">'+safe((r&&r.message)||'No se pudo analizar el negocio.')+'</p>';
       }).withFailureHandler(function(){
         BI.cargando = false;
-        if(!BI.datos && BI.tab!=='det') $('biBody').innerHTML = '<p class="hist-empty">Sin conexión · no se pudo analizar el negocio.<br><br><button class="btn-ghost" type="button" data-biretry="1" style="width:100%">Reintentar</button></p>';
+        if(!BI.datos) $('biBody').innerHTML = '<p class="hist-empty">Sin conexión · no se pudo analizar el negocio.<br><br><button class="btn-ghost" type="button" data-biretry="1" style="width:100%">Reintentar</button></p>';
       }).obtenerBI(arg);
     }
-    function biPintar(){
-      var det = BI.tab==='det';
-      $('statsBody').style.display = det ? '' : 'none';
-      $('biBody').style.display = det ? 'none' : '';
-      if(det) return;
+    function biPintar(mantener){
+      if(BI.tab==='rent'){ $('biBody').innerHTML = biVistaRent(); if(!mantener) try{ $('statsModal').querySelector('.stats-sheet').scrollTop = 0; }catch(e){} return; }
       var solo = ({ ventas:1, inv:1, cli:1 })[BI.tab];
       if(solo && !BI.datos) return;
       if(!BI.datos && !FIN.datos) return;
-      var v = { resumen:biVistaResumen, ventas:biVistaProy, dinero:biVistaDinero, gastos:biVistaGastos, inv:biVistaInv, cli:biVistaCli }[BI.tab];
+      var v = { resumen:biVistaResumen, ventas:biVistaProy, dinero:biVistaDinero, gastos:biVistaGastos, inv:biVistaInv, cli:biVistaCli }[BI.tab], hoja = null;
+      try{ hoja = $('statsModal').querySelector('.stats-sheet'); }catch(e){}
+      var y = (mantener && hoja) ? hoja.scrollTop : 0;
       $('biBody').innerHTML = v ? v(BI.datos, FIN.datos) : '';
-      try{ $('statsModal').querySelector('.stats-sheet').scrollTop = 0; }catch(e){}
+      if(hoja) hoja.scrollTop = y;
     }
     function biSemaforo(p){ return p>=75?'ok':(p>=55?'bien':(p>=35?'soon':'late')); }
     function biGauge(p, nivel){
@@ -12045,6 +12413,11 @@
         if(i.nivel==='ok' && L.length>0 && i.titulo==='Todo en orden por ahora') return;
         L.push({ nivel:i.nivel, titulo:i.titulo, detalle:i.detalle, ir:i.ir, area:i.area });
       });
+      ((ST_R&&ST_R.insights)||[]).forEach(function(x){
+        if(x.categoria!=='rentabilidad' && x.categoria!=='ventas') return;
+        if(x.tipo!=='urgente' && x.tipo!=='alerta' && x.tipo!=='oportunidad') return;
+        L.push({ nivel:x.tipo==='urgente'?'alta':(x.tipo==='alerta'?'media':'info'), titulo:x.categoria==='ventas'?'Ventas y despachos':'Rentabilidad', detalle:x.texto, ir:x.accion||'', area:'detalle' });
+      });
       L.sort(function(a,b){ return orden[a.nivel]-orden[b.nivel]; });
       return L;
     }
@@ -12059,8 +12432,9 @@
         h+='<div class="bi-hero">'+biGauge(F.salud.puntaje, F.salud.nivel).replace('Salud del negocio:','Salud financiera:')
           +'<div class="bi-comp">'+F.salud.componentes.map(function(c){ return '<div class="bi-comp-r" title="'+safe(c.d)+'"><span>'+safe(c.n)+'</span><span class="bi-comp-b"><i class="bi-'+biSemaforo(c.p)+'" style="width:'+Math.max(3,c.p)+'%"></i></span><em>'+c.p+'</em></div>'; }).join('')+'</div></div>';
       } else h+='<p class="bi-nota">Calculando las finanzas…</p>';
-      var ej=[(d&&d.ejecutivo)||'', (F&&F.ejecutivo)||''].filter(Boolean).join(' ');
-      if(ej) h+='<div class="asesor bi-exec"><div class="asesor-top"><span class="asesor-ic">✦</span><div><p class="asesor-tit">Resumen del asesor KAÉM</p><p class="asesor-sub">Análisis automático de ventas, dinero, gastos, deudas e inventario'+(d?(' · confianza '+safe(d.confianza)):'')+'</p></div></div><p class="asesor-res">'+safe(ej)+'</p></div>';
+      // Lectura corta del asesor: solo las dos primeras frases (el resto de cifras ya está en las tarjetas de abajo)
+      var ejT=((d&&d.ejecutivo)||'').replace(/\.\s+([A-ZÁÉÍÓÚ])/g, '.\u0001$1').split('\u0001').slice(0,2).join(' ');
+      if(ejT) h+='<div class="asesor bi-exec"><div class="asesor-top"><span class="asesor-ic">✦</span><div><p class="asesor-tit">Lectura del asesor KAÉM</p><p class="asesor-sub">Análisis automático de tus ventas, dinero, gastos, deudas e inventario'+(d?(' · confianza '+safe(d.confianza)):'')+'</p></div></div><p class="asesor-res">'+safe(ejT)+'</p></div>';
       var M=F&&F.mesActual;
       h+='<div class="fin-hero">'
         + finKpi('Vendido este mes', rv?abrevCop(rv.mes.v):(d?abrevCop(d.proyeccion.mes.vendido):'—'), rv?('hoy '+abrevCop(rv.hoy.v)+' · semana '+abrevCop(rv.semana.v)):(d?(d.proyeccion.mes.pedidos+' pedidos'):''))
@@ -12184,6 +12558,11 @@
         + biKpi('Vendido este mes', abrevCop(M.vendido), M.pedidos+' pedidos · faltan '+M.diasRestantes+' días')
         + biKpi('Cierre proyectado', abrevCop(M.cierre), 'Rango '+abrevCop(M.bajo)+' – '+abrevCop(M.alto))
         +'</div>';
+      var V=ST_R&&ST_R.ventas;
+      if(V) h+='<div class="bi-kpis">'
+        + biKpi('Ticket promedio', cop(V.ticket), (V.pedidosMes||0)+' pedidos este mes')
+        + biKpi('Últimos 7 días', abrevCop(V.semana), V.semanaAnterior?('<span class="st-delta '+(V.variacionSemana>=0?'up':'down')+'">'+(V.variacionSemana>=0?'▲ +':'▼ ')+V.variacionSemana+' %</span> vs. semana anterior'):('hoy '+abrevCop(V.hoy)))
+        +'</div>';
       if(M.meta>0){ var pc=Math.min(100,Math.round(100*M.vendido/M.meta)), pp=Math.min(100,M.metaPct);
         h+='<div class="st-meta"><div class="st-meta-top"><span>Proyección vs. meta</span><b>'+M.metaPct+' %</b></div><div class="st-meta-bar"><div class="st-meta-fill" style="width:'+pc+'%"></div><div class="st-meta-proy" style="left:'+pp+'%"></div></div>'
           +'<div class="st-meta-sub"><span>Meta '+cop(M.meta)+'</span><span>'+(M.cierre>=M.meta?'En camino de cumplirla':'Faltarían '+cop(M.meta-M.cierre))+'</span></div></div>'; }
@@ -12194,6 +12573,7 @@
       var DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], mejor=0, peor=0; P.estacionalidad.forEach(function(f,i){ if(f>P.estacionalidad[mejor]) mejor=i; if(f<P.estacionalidad[peor]) peor=i; });
       h+='<div class="bi-chips"><span class="bi-chip '+(P.tendencia.etiqueta==='creciendo'?'ok':(P.tendencia.etiqueta==='cayendo'?'late':''))+'">Tendencia: '+P.tendencia.etiqueta+' ('+(P.tendencia.semanalPct>=0?'+':'')+P.tendencia.semanalPct+' % por semana)</span>'
         +'<span class="bi-chip">Mejor día: '+DIAS[mejor]+'</span><span class="bi-chip">Día más flojo: '+DIAS[peor]+'</span><span class="bi-chip">Confianza: '+safe(P.confianza)+'</span></div>';
+      h+=ST_R ? ('<div id="stRank">'+stRankHtml(ST_R)+'</div>') : stEspera();
       h+='<details class="bi-sup"><summary>¿Cómo se calcula?</summary><ul>'+d.supuestos.map(function(x){ return '<li>'+safe(x)+'</li>'; }).join('')+'</ul></details>';
       return h;
     }
@@ -12227,26 +12607,29 @@
       h+='<p class="st-sec-tit">Quién te da la ganancia (últimos 90 días)</p><div class="bi-card"><div class="bi-abc">'
         +['A','B','C'].map(function(k){ return '<i class="abc-'+k+'" style="flex:'+Math.max(1,R.abc[k].ganancia)+'" title="Clase '+k+' · '+Math.round(100*R.abc[k].ganancia/tg)+' %">'+k+(100*R.abc[k].ganancia/tg>=9?(' · '+Math.round(100*R.abc[k].ganancia/tg)+' %'):'')+'</i>'; }).join('')+'</div>'
         +'<p class="bi-nota"><b>A</b>: '+R.abc.A.n+' productos dejan el 80 % de la ganancia · <b>B</b>: '+R.abc.B.n+' el 15 % · <b>C</b>: '+R.abc.C.n+' el 5 % · <b>sin ventas</b>: '+R.abc.sinVentas+'. Nunca dejes que se agoten los A.</p></div>';
-      var cnt=function(f){ return R.productos.filter(f).length; };
-      var F={ reponer:function(p){ return p.estado==='quiebre'||p.estado==='critico'||p.estado==='bajo'; }, estrella:function(p){ return p.estado==='estrella'; }, exceso:function(p){ return p.estado==='exceso'; }, dormido:function(p){ return p.estado==='dormido'; }, todos:function(){ return true; } };
+      var cnt=function(f,k){ return (R.conteos && R.conteos[k]!=null) ? R.conteos[k] : R.productos.filter(f).length; };
+      var F={ reponer:function(p){ return p.estado==='quiebre'||p.estado==='critico'||p.estado==='bajo'; }, estrella:function(p){ return !!p.top; }, exceso:function(p){ return p.estado==='exceso'; }, dormido:function(p){ return p.estado==='dormido'; }, todos:function(){ return true; } };
       var chips=[['reponer','Reponer'],['estrella','Estrellas'],['exceso','Exceso'],['dormido','Dormidos'],['todos','Todos']];
-      h+='<div class="bi-fil">'+chips.map(function(c){ return '<button type="button" class="chip'+(BI.filtro===c[0]?' on':'')+'" data-bifil="'+c[0]+'">'+c[1]+' <small>'+cnt(F[c[0]])+'</small></button>'; }).join('')+'</div>';
+      h+='<div class="bi-fil">'+chips.map(function(c){ return '<button type="button" class="chip'+(BI.filtro===c[0]?' on':'')+'" data-bifil="'+c[0]+'">'+c[1]+' <small>'+cnt(F[c[0]], c[0])+'</small></button>'; }).join('')+'</div>';
       var lista=R.productos.filter(F[BI.filtro]||F.todos);
       if(BI.filtro==='reponer' && S.reponerTotal>0) h+='<p class="bi-nota">Reponer lo que se acaba cuesta <b>'+cop(S.reponerTotal)+'</b> y protege <b>'+cop(S.riesgo30)+'</b> de ganancia de los próximos 30 días (cobertura objetivo '+S.coberturaObjetivo+' días + 7 de entrega).</p>';
       if(BI.filtro==='dormido' && S.capitalDormido>0) h+='<p class="bi-nota">Hay <b>'+cop(S.capitalDormido)+'</b> parados. Sugerencia: combos con productos estrella, o un descuento de liquidación solo en estos.</p>';
       if(BI.filtro==='exceso' && S.capitalExceso>0) h+='<p class="bi-nota">Tienes unos <b>'+cop(S.capitalExceso)+'</b> por encima de 90 días de ventas. No los repongas todavía.</p>';
       h+= lista.length ? lista.map(function(p){
         var e=BI_EST[p.estado]||['',''];
-        return '<div class="bi-prod"><div class="bi-prod-t"><b>'+safe(p.nombre)+'</b><span class="bi-badge '+e[1]+'">'+e[0]+'</span></div>'
+        return '<div class="bi-prod"><div class="bi-prod-t"><b>'+safe(p.nombre)+'</b><span class="bi-badges"><span class="bi-badge '+e[1]+'">'+e[0]+'</span>'+(p.top && p.estado!=='estrella' ? '<span class="bi-badge ok">★ Estrella</span>' : '')+'</span></div>'
           +'<div class="bi-prod-m"><span>'+safe(p.marca)+'</span><span>Clase '+p.clase+'</span><span>Stock '+p.disp+'</span><span>'+(p.cobertura==null?'sin ventas':'alcanza '+p.cobertura+' d')+'</span><span>Ganancia 90 d: '+abrevCop(p.ganancia90)+'</span>'+(p.margenPct!=null?'<span>Margen '+p.margenPct+' %</span>':'')+'</div>'
           +(p.accion?'<p class="bi-prod-a">'+safe(p.accion)+(p.pedir>0?' <b>Pide '+p.pedir+' u. · '+cop(p.costoPedir)+'</b>':'')+'</p>':'')+'</div>';
       }).join('') : '<p class="bi-vacio">Nada en esta categoría. 👏</p>';
-      if(R.total>R.productos.length) h+='<p class="bi-nota">Se muestran los '+R.productos.length+' más relevantes de '+R.total+'.</p>';
+      var totFil=(R.conteos && R.conteos[BI.filtro]!=null) ? R.conteos[BI.filtro] : lista.length;
+      if(totFil>lista.length) h+='<p class="bi-nota">Se muestran los '+lista.length+' más relevantes de '+totFil+'.</p>';
+      h+=ST_R ? stInvMarcasHtml(ST_R) : stEspera();
       return h;
     }
     var BI_SEG = { campeon:['Campeones','Compran seguido y reciente. Cuídalos y avísales primero de las novedades.','ok'], leal:['Leales','Vuelven con regularidad. Un detalle o beneficio los mantiene.','ok'],
                    nuevo:['Nuevos','Primera compra reciente. Haz seguimiento para lograr la segunda.','bien'], riesgo:['En riesgo','Compraban seguido y se están alejando. Escríbeles esta semana.','late'],
                    dormido:['Dormidos','Más de 90 días sin comprar. Una campaña de reactivación.','soon'], ocasional:['Ocasionales','Compran de vez en cuando.','dorm'] };
+    function biVistaRent(){ return ST_R ? ((ST_R.rentabilidad && ST_R.rentabilidad.mes) ? stRentHtml(ST_R) : '<p class="hist-empty">Aún no hay ventas suficientes para calcular la rentabilidad.</p>') : stEspera(); }
     function biVistaCli(d){
       var C=d.clientes, h='', mx=1; C.segmentos.forEach(function(s){ mx=Math.max(mx,s.n); });
       h+='<div class="bi-kpis">'
@@ -12269,25 +12652,27 @@
       return h;
     }
     $('biRefresh').addEventListener('click', function(){
-      haptic(10); BI.datos=null; FIN.datos=null; window.__finTs=0; ST_R=null; $('statsBody').innerHTML='<p class="hist-empty">Calculando…</p>';
+      haptic(10); BI.datos=null; FIN.datos=null; window.__finTs=0; ST_R=null;
       google.script.run.withSuccessHandler(function(){ biCargar(true); finCargar(true); abrirStatsSoloDetalle(); }).withFailureHandler(function(){ biCargar(true); finCargar(true); }).refrescarCache();
     });
     $('biTabs').addEventListener('click', function(e){
       var b=e.target.closest?e.target.closest('[data-bitab]'):null; if(!b) return;
       BI.tab=b.getAttribute('data-bitab'); biTabsPintar(); biPintar(); haptic(8);
-      if(BI.tab!=='det' && !BI.datos) biCargar(false);
+      if(!BI.datos) biCargar(false);
       finCargar(false);
     });
     $('biBody').addEventListener('click', function(e){
       var t=e.target; if(!t.closest) return;
+      var per=t.closest('[data-per]'); if(per && ST_R){ ST_PERIODO=per.getAttribute('data-per'); var rk=$('stRank'); if(rk) rk.innerHTML=stRankHtml(ST_R); haptic(8); return; }
+      if(t.id==='invMarcasCsv'){ invMarcasCSV(); return; }
+      if(t.closest('[data-stretry]')){ ST_R=null; biPintar(true); abrirStatsSoloDetalle(); return; }
       var tab=t.closest('[data-bitab]'); if(tab){ BI.tab=tab.getAttribute('data-bitab'); biTabsPintar(); biPintar(); haptic(8); return; }
       var fil=t.closest('[data-bifil]'); if(fil){ BI.filtro=fil.getAttribute('data-bifil'); biPintar(); haptic(8); return; }
       if(t.closest('[data-biretry]')){ biCargar(false); finCargar(true); return; }
-      if(t.closest('[data-bicfg]')){ $('statsModal').classList.remove('show'); abrirConfig(); setTimeout(function(){ var e=$('cfgFinSec'); if(e){ e.open=true; if(e.scrollIntoView) e.scrollIntoView({block:'start',behavior:'smooth'}); } }, 350); return; }
+      if(t.closest('[data-bicfg]')){ $('statsModal').classList.remove('show'); abrirConfig(); setTimeout(function(){ cfgIrA('cfgFinSec'); }, 150); return; }
       var wa=t.closest('[data-biwa]');
       if(wa && BI.datos){ var x=BI.datos.clientes.enRiesgo[parseInt(wa.getAttribute('data-biwa'),10)]; if(x){
-        var nom=String(x.nombre||'').split(/\s+/)[0]; nom = nom ? (nom.charAt(0).toUpperCase()+nom.slice(1).toLowerCase()) : '';
-        waAbrir(x.tel, 'Hola '+nom+' 💛 ¿Cómo estás? Hace un tiempo no te vemos por KAÉM Beauty House y queremos que conozcas las novedades antes que nadie. ¿Te cuento cuáles llegaron?'); haptic(10); } return; }
+        waAbrir(x.tel, waMensaje('reactivar', x)); haptic(10); } return; }
       var ir=t.closest('[data-ir]'); if(ir){ $('statsModal').classList.remove('show'); var nav=$('nav-'+ir.getAttribute('data-ir')); if(nav) nav.click(); haptic(10); }
     });
     // Caja de hoy: se guarda en este equipo y recalcula el flujo
@@ -12325,10 +12710,6 @@
           h+=stFila(i, m.marca, m.unidades+' unidades'+(m.margenPct!=null?(' · margen '+m.margenPct+'%'):''), cop(m.valor), Math.round((m.valor/maxM)*100));
         });
       }
-      if(P.topClientes && P.topClientes.length){
-        h+='<p class="st-sec">Mejores clientes</p>';
-        P.topClientes.forEach(function(cl,i){ h+=stFila(i, cl.cliente, cl.pedidos+' pedido'+(cl.pedidos!==1?'s':''), cop(cl.total)); });
-      }
       return h;
     }
     function invMarcasCSV(){
@@ -12343,34 +12724,17 @@
       document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){ URL.revokeObjectURL(url); },1000);
       toast('Inventario por marca descargado','success'); haptic(15);
     }
+    /* Datos del detalle (obtenerEstadisticas): alimentan Ventas, Rentabilidad e Inventario. Ya no hay una página aparte
+       con un segundo «asesor»: lo que era útil se repartió en la pestaña que le corresponde y lo repetido se quitó. */
     function pintarStats(r){
-      ST_R=r;
-      var v=r.ventas||{}, c=r.cartera||{}, inv=r.inventario||{};
-      var h='';
-
-      // ——— ASESOR KAÉM: resumen + recomendaciones agrupadas por tema, de la más urgente a la menos ———
-      if(r.resumen || (r.insights && r.insights.length)){
-        var ACC={ cartera:'Ir a Cartera', pagos:'Ver Pagos', alertas:'Ver Alertas', pedidos:'Ir a Pedidos', packing:'Ir a Packing' };
-        var CAT={ rentabilidad:'Rentabilidad', caja:'Caja y cobros', ventas:'Ventas', clientes:'Clientes', inventario:'Inventario' };
-        var ins=(r.insights||[]).slice();
-        h+='<div class="asesor"><div class="asesor-top"><span class="asesor-ic">✦</span><div><p class="asesor-tit">Asesor KAÉM</p>'
-          +'<p class="asesor-sub">Análisis automático de ventas, costos, cartera, pagos e inventario · '+safe(r.generado||'')+'</p></div></div>'
-          +(r.resumen?'<p class="asesor-res">'+safe(r.resumen)+'</p>':'');
-        if(ins.length){
-          // Prioridad 1: lo urgente arriba; luego por tema
-          var grupos={}, orden=[];
-          ins.forEach(function(x){ var k=x.categoria||'ventas'; if(!grupos[k]){ grupos[k]=[]; orden.push(k); } grupos[k].push(x); });
-          h+='<div class="asesor-grupos">'+orden.map(function(k){
-            return '<div class="asesor-g"><p class="asesor-gt">'+(CAT[k]||k)+'</p>'+grupos[k].map(function(x){
-              var ic = x.tipo==='bien'?'✓' : x.tipo==='urgente'?'⚠' : x.tipo==='alerta'?'●' : x.tipo==='oportunidad'?'✦' : '·';
-              return '<div class="st-ins st-ins-'+x.tipo+'"><span class="ic">'+ic+'</span><span class="tx">'+safe(x.texto)
-                +(x.accion&&ACC[x.accion]?'<button type="button" class="st-ins-acc" data-ir="'+x.accion+'">'+ACC[x.accion]+' →</button>':'')+'</span></div>';
-            }).join('')+'</div>';
-          }).join('')+'</div>';
-        }
-        h+='</div>';
-      }
-
+      ST_R = r;
+      var f = $('statsFecha'); if(f) f.textContent = r.generado || '';
+      if(({ resumen:1, ventas:1, rent:1, inv:1 })[BI.tab]) biPintar(true);
+    }
+    function stEspera(){ return ST_R === false ? '<p class="hist-empty">Sin conexión · no se pudieron calcular estos datos.<br><br><button class="btn-ghost" type="button" data-stretry="1" style="width:100%">Reintentar</button></p>' : '<p class="hist-empty">Calculando…</p>'; }
+    /* Rentabilidad: lo que de verdad queda después de costos y envíos */
+    function stRentHtml(r){
+      var h = '';
       // ——— RENTABILIDAD: lo que de verdad queda después de costos y envíos ———
       var RN=r.rentabilidad;
       if(RN && RN.mes){
@@ -12407,92 +12771,14 @@
         // Pedidos que menos dejaron
         if(Mo.bajos && Mo.bajos.length) h+='<p class="rent-st-sub">Pedidos con ganancia baja este mes (menos del 10 %)</p><div class="rent-st-lineas">'+Mo.bajos.map(function(b){
           return '<div><span>'+safe(b.remision)+' · '+safe(b.cliente)+'<small> · venta '+cop(b.venta)+(b.envio>0?' · envío asumido '+cop(b.envio):'')+'</small></span><b class="'+(b.neta<0?'late':'soon')+'">'+(b.neta<0?'− ':'')+cop(Math.abs(b.neta))+' · '+b.margen+' %</b></div>'; }).join('')+'</div>';
-        h+='<p class="rent-st-nota">Envío nacional calculado a '+cop(RN.costoEnvioNac)+' y entrega local a '+cop(RN.costoEnvioAm)+' (se ajusta en Configuración → Reglas comerciales).'
+        h+='<p class="rent-st-nota">Envío nacional calculado a '+cop(RN.costoEnvioNac)+' y entrega local a '+cop(RN.costoEnvioAm)+' (se ajusta en Ajustes → Metas y costos).'
           +(RN.sinCosto?' '+RN.sinCosto+' líneas sin costo registrado.':'')+'</p></div>';
       }
-
-      // Meta del mes: barra de progreso con ritmo necesario (si hay meta en Ajustes)
-      if(r.meta && r.meta.meta>0){
-        var m=r.meta, pct=Math.min(100,m.pct), proyPct=Math.min(100,Math.round(100*(m.proyeccion||0)/m.meta));
-        h+='<div class="st-meta"><div class="st-meta-top"><span>Meta del mes</span><b>'+m.pct+' %</b></div>'
-          +'<div class="st-meta-bar"><div class="st-meta-fill" style="width:'+pct+'%"></div>'
-          +(m.proyeccion&&proyPct>pct?'<div class="st-meta-proy" style="left:'+proyPct+'%" title="Proyección de cierre"></div>':'')+'</div>'
-          +'<div class="st-meta-sub"><span>'+cop(m.vendido)+' de '+cop(m.meta)+'</span><span>'
-          +(m.falta>0?('Faltan '+cop(m.falta)+' · '+cop(m.diarioNecesario)+'/día'):'¡Cumplida!')+'</span></div></div>';
-      }
-      // Caja de la semana: pagos que vencen vs cobros que vencen (Pagos × Cartera)
-      if(r.flujo && (r.flujo.pagos7>0 || r.flujo.cobrar7>0)){
-        var fl=r.flujo, neto=fl.cobrar7-fl.pagos7;
-        h+='<div class="st-flujo"><p class="st-flujo-tit">Caja de los próximos 7 días</p><div class="st-flujo-grid">'
-          +'<div><small>Por cobrar</small><b class="ok">'+cop(fl.cobrar7)+'</b><small>'+fl.cobrarN+' remisión'+(fl.cobrarN===1?'':'es')+'</small></div>'
-          +'<div><small>Por pagar</small><b class="late">'+cop(fl.pagos7)+'</b><small>'+fl.pagosN+' pago'+(fl.pagosN===1?'':'s')+(fl.pagosVencidos?' · incluye vencidos':'')+'</small></div>'
-          +'<div><small>Diferencia</small><b class="'+(neto>=0?'ok':'late')+'">'+(neto>=0?'+':'−')+cop(Math.abs(neto))+'</b><small>'+(neto>=0?'alcanza':'hace falta')+'</small></div>'
-          +'</div></div>';
-      }
-      // El resumen del día ya vive dentro de la grilla de Ventas (tarjeta "Hoy"),
-      // así que aquí no se repite — antes aparecía dos veces.
-
-      // ——— Ventas ———
-      var deltaTxt = v.mesAnteriorParcial
-        ? ('<span class="st-delta '+(v.variacionParcial>=0?'up':'down')+'">'+(v.variacionParcial>=0?'▲ +':'▼ ')+v.variacionParcial+'%</span> vs. mismo tramo del mes pasado')
-        : (v.mesAnterior
-            ? ('<span class="st-delta '+(v.variacion>=0?'up':'down')+'">'+(v.variacion>=0?'▲ +':'▼ ')+v.variacion+'%</span> vs. mes anterior')
-            : 'Sin datos del mes anterior');
-      h+='<p class="st-sec">Ventas</p><div class="st-grid">'
-        +'<div class="st-card wide"><span class="st-lbl">Ventas del mes</span><b class="st-val">'+cop(v.mes)+'</b>'
-        +'<small class="st-sub">'+deltaTxt+'</small></div>'
-        +'<div class="st-card"><span class="st-lbl">Hoy</span><b class="st-val sm">'+cop(v.hoy)+'</b>'
-        +'<small class="st-sub">Últimos 7 días: '+cop(v.semana)+(v.semanaAnterior?(' · <span class="st-delta '+(v.variacionSemana>=0?'up':'down')+'">'+(v.variacionSemana>=0?'▲ +':'▼ ')+v.variacionSemana+'%</span>'):'')+'</small></div>'
-        +'<div class="st-card"><span class="st-lbl">Ticket promedio</span><b class="st-val sm">'+cop(v.ticket)+'</b>'
-        +'<small class="st-sub">'+(v.pedidosMes||0)+' pedidos este mes</small></div>'
-        // Lo que de verdad queda: no basta con cuánto se vendió
-        +'<div class="st-card"><span class="st-lbl">Ganancia en productos · mes</span><b class="st-val sm">'+cop(v.utilidad||0)+'</b>'
-        +'<small class="st-sub">Margen '+(v.margenPct||0)+'% · costo '+cop(v.costoVendido||0)+'</small></div>'
-        +'<div class="st-card"><span class="st-lbl">Proyección de cierre</span><b class="st-val sm">'+cop(v.proyeccionMes||0)+'</b>'
-        +'<small class="st-sub">Al ritmo de '+cop(v.promedioDiario||0)+'/día</small></div>'
-        +'</div>';
-
-      // ——— Dinero en la calle ———
-      h+='<p class="st-sec">Cartera</p><div class="st-grid">'
-        +'<div class="st-card"><span class="st-lbl">Por cobrar</span><b class="st-val sm">'+cop(c.pendiente)+'</b>'
-        +'<small class="st-sub">'+(c.remisiones||0)+' remisiones</small></div>'
-        +'<div class="st-card"><span class="st-lbl">Vencida</span><b class="st-val sm'+(c.vencida>0?' st-alerta':'')+'">'+cop(c.vencida)+'</b>'
-        +'<small class="st-sub">'+(c.vencida>0?'Requiere gestión':'Todo al día')+'</small></div>'
-        +'</div>';
-
-      // ——— Operación: lo vendido que aún no sale y lo que espera aprobación ———
-      var OP=r.operacion||{}, pe=OP.porEmpacar||{}, cp=OP.catalogoPorAprobar||{};
-      if(pe.pedidos>0 || cp.n>0){
-        h+='<p class="st-sec">Operación</p><div class="st-grid">'
-          +(pe.pedidos>0?'<div class="st-card"><span class="st-lbl">Por empacar</span><b class="st-val sm'+(pe.masAntiguoDias>=2?' st-alerta':'')+'">'+pe.pedidos+(pe.pedidos===1?' pedido':' pedidos')+'</b>'
-            +'<small class="st-sub">'+cop(pe.valor)+' · '+pe.unidades+' un. · el más antiguo hace '+pe.masAntiguoDias+' d</small></div>':'')
-          +(cp.n>0?'<div class="st-card"><span class="st-lbl">Catálogo por aprobar</span><b class="st-val sm st-alerta">'+cp.n+(cp.n===1?' pedido':' pedidos')+'</b>'
-            +'<small class="st-sub">'+cop(cp.valor)+' esperando respuesta</small></div>':'')
-          +'</div>';
-      }
-
-      // ——— Inventario ———
-      h+='<p class="st-sec">Inventario</p><div class="st-grid">'
-        +'<div class="st-card"><span class="st-lbl">Invertido (costo)</span><b class="st-val sm">'+cop(inv.valorCosto)+'</b>'
-        +'<small class="st-sub">'+(inv.unidades||0)+' unidades · '+(inv.referencias||0)+' referencias'+(inv.reservadas?(' · '+inv.reservadas+' reservadas'):'')+'</small></div>'
-        +'<div class="st-card"><span class="st-lbl">A precio distribuidor</span><b class="st-val sm">'+cop(inv.valorDistribuidor)+'</b>'
-        +'<small class="st-sub">Ganancia potencial '+cop(inv.margenDistribuidor)+' · margen '+(inv.margenDistribuidorPct||0)+'%</small></div>'
-        +'<div class="st-card"><span class="st-lbl">A precio detal</span><b class="st-val sm">'+cop(inv.valorVenta)+'</b>'
-        +'<small class="st-sub">Ganancia potencial '+cop(inv.margenPotencial)+' · margen '+(inv.margenDetalPct||0)+'%</small></div>'
-        +(inv.historialCorto
-          ? '<div class="st-card"><span class="st-lbl">Sin venta en 90 días</span><b class="st-val sm">—</b><small class="st-sub">Aún no hay 90 días de ventas ('+(inv.historialDias||0)+' d): se podrá medir pronto'+(inv.diasInventario!=null?(' · alcanza ~'+inv.diasInventario+' días'):'')+'</small></div>'
-          : '<div class="st-card"><span class="st-lbl">Sin venta en 90 días</span><b class="st-val sm'+(inv.capitalDormido>0?' st-alerta':'')+'">'+cop(inv.capitalDormido||0)+'</b>'
-            +'<small class="st-sub">'+(inv.dormidos90||0)+' referencias · a costo'+(inv.diasInventario!=null?(' · alcanza ~'+inv.diasInventario+' días'):'')+'</small></div>')
-        +'<div class="st-card"><span class="st-lbl">Agotados</span><b class="st-val sm'+(inv.agotados>0?' st-alerta':'')+'">'+(inv.agotados||0)+'</b>'
-        +'<small class="st-sub">Sin unidades disponibles</small></div>'
-        +'<div class="st-card"><span class="st-lbl">Stock crítico</span><b class="st-val sm">'+(inv.criticos||0)+'</b>'
-        +'<small class="st-sub">3 unidades o menos</small></div>'
-        +'</div>';
-      if(inv.sinPrecioDistribuidor>0 || inv.sinCosto>0){
-        h+='<p class="st-vacio">⚠️ '+(inv.sinPrecioDistribuidor>0?inv.sinPrecioDistribuidor+' con stock sin precio distribuidor':'')+(inv.sinPrecioDistribuidor>0&&inv.sinCosto>0?' · ':'')
-          +(inv.sinCosto>0?inv.sinCosto+' con stock sin costo':'')+': esos valores aparecen por debajo del real.</p>';
-      }
-
+      return h || '<p class="hist-empty">Aún no hay ventas suficientes este mes para calcular la rentabilidad.</p>';
+    }
+    /* Inventario por marca, con sus márgenes */
+    function stInvMarcasHtml(r){
+      var inv = r.inventario || {}, h = '';
       // ——— Inventario por marca, con sus márgenes ———
       if(r.inventarioPorMarca && r.inventarioPorMarca.length){
         h+='<p class="st-sec">Inventario por marca</p>'
@@ -12514,64 +12800,9 @@
         });
         h+='<button type="button" class="btn-ghost" id="invMarcasCsv" style="width:100%;margin:2px 0 8px">Descargar inventario por marca (CSV)</button>';
       }
-
-      // ——— Rankings por período: este mes · últimos 90 días · todo el historial ———
-      h+='<div id="stRank">'+stRankHtml(r)+'</div>';
-
-      // ——— Clientes que se enfriaron ———
-      // Compraban con cierto ritmo y llevan más del doble sin volver: plata ya
-      // ganada que se está yendo en silencio.
-      if(r.clientesDormidos && r.clientesDormidos.length){
-        h+='<p class="st-sec">Dejaron de comprar</p>'
-          +'<p class="st-vacio">Compraban seguido y llevan tiempo sin volver. Vale una llamada.</p>';
-        r.clientesDormidos.forEach(function(cl,i){
-          h+=stFila(i, cl.cliente,
-                    'Compraba cada ~'+cl.intervaloTipico+' días · última: '+cl.ultimaCompra,
-                    '<span class="st-alerta">'+cl.diasSinComprar+' días</span>');
-        });
-      }
-
-      // ——— Stock crítico ———
-      if(r.stockCritico && r.stockCritico.length){
-        h+='<p class="st-sec">Reponer pronto</p>';
-        r.stockCritico.slice(0,10).forEach(function(p,i){
-          h+=stFila(i, p.nombre, p.marca, '<span class="st-alerta">'+p.stock+' un.</span>');
-        });
-      }
-
-      // ——— Capital dormido: con stock y sin venta en 90 días ———
-      if(r.sinRotacion && r.sinRotacion.length){
-        h+='<p class="st-sec">Sin venta en 90 días ('+(inv.sinRotacionTotal||r.sinRotacion.length)+')</p>'
-          +'<p class="st-vacio">Dinero parado en bodega: '+cop(inv.capitalDormido||0)+' a costo. Una promoción o un combo lo vuelve caja.</p>';
-        r.sinRotacion.slice(0,10).forEach(function(p,i){
-          h+=stFila(i, p.nombre, p.marca+' · '+p.stock+' un. · '+(p.diasSinVender==null?'nunca vendido':('última venta hace '+p.diasSinVender+' d')), cop(p.capital));
-        });
-      }
-
-      $('statsBody').innerHTML=h;
-      cargarReposicion();           // se añade abajo cuando llega el cálculo
+      return h;
     }
 
-    /* ——— Qué reponer esta semana ——— */
-    function cargarReposicion(){
-      google.script.run.withSuccessHandler(function(r){
-        if(!r || !r.ok || !r.productos || !r.productos.length) return;
-        var h='<p class="st-sec">Reponer esta semana</p>'
-          +'<p class="st-vacio">Según la velocidad de venta de los últimos '+r.ventanaDias
-          +' días. Inversión estimada: <b>'+cop(r.inversionTotal)+'</b></p>';
-        r.productos.slice(0,15).forEach(function(p,i){
-          var urg = p.urgencia==='agotado' ? 'AGOTADO'
-                  : (p.urgencia==='critico' ? ('~'+p.diasRestantes+' días') : ('~'+p.diasRestantes+' días'));
-          var cls = (p.urgencia==='agotado'||p.urgencia==='critico') ? ' class="st-alerta"' : '';
-          h+='<div class="st-row"><span class="st-rank">'+(i+1)+'</span>'
-            +'<span class="st-nom">'+safe(p.nombre)
-            +'<small>'+safe(p.marca)+' · quedan '+p.stock+' · vende '+p.porDia+'/día · <span'+cls+'>'+urg+'</span></small>'
-            +'</span>'
-            +'<span class="st-num">pedir '+p.sugerido+'</span></div>';
-        });
-        var body=$('statsBody'); if(body) body.insertAdjacentHTML('beforeend', h);
-      }).withFailureHandler(function(){}).sugerenciaReposicion({});
-    }
     $('statsBtn').addEventListener('click', function(){ haptic(12); abrirStats(); });
     $('statsClose').addEventListener('click', function(){ $('statsModal').classList.remove('show'); });
     $('statsModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
@@ -12929,7 +13160,7 @@
     }
     function cpWhatsApp(f){
       if(!f.telefono){ toast('Este cliente no tiene teléfono guardado.','error'); return; }
-      waAbrir(f.telefono, waTextoCupo(f)); haptic(12);
+      waAbrir(f.telefono, waMensaje('cupo', f)); haptic(12);
       google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){}).guardarCupo({ clave:f.clave, marcarMensaje:true });
     }
 
@@ -12982,7 +13213,7 @@
       $('cpInicialAplicar').addEventListener('click', cpAplicarInicial);
       $('cpReglasBtn').addEventListener('click', cpAbrirReglas);
       $('cpReglasCerrar').addEventListener('click', function(){ $('cpReglasModal').classList.remove('show'); });
-      $('cpReglasAjustes').addEventListener('click', function(){ $('cpReglasModal').classList.remove('show'); abrirConfig(); setTimeout(function(){ var e=$('cfgFinSec'); if(e){ e.open=true; if(e.scrollIntoView) e.scrollIntoView({block:'start',behavior:'smooth'}); } }, 350); });
+      $('cpReglasAjustes').addEventListener('click', function(){ $('cpReglasModal').classList.remove('show'); abrirConfig(); setTimeout(function(){ cfgIrA('cfgFinSec'); }, 150); });
       ['cpEditModal','cpHistModal','cpInicialModal','cpReglasModal'].forEach(function(id){ $(id).addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); }); });
       ['cliNombre','cliTel','clientNit'].forEach(function(id){ var el=$(id); if(el){ el.addEventListener('input', cupoConsultarCliente); el.addEventListener('change', cupoConsultarCliente); } });
       cpLeerCache();
@@ -13024,11 +13255,11 @@
       { k:'bi',        tone:'salvia',          priv:1, go:'fn:bi',         t:'Estadísticas' },
       { k:'registrar', tone:'esp',             priv:1, go:'tab:registrar', t:'Registrar' },
       { k:'catweb',    tone:'esp',             priv:1, go:'fn:catweb',     t:'Catálogos web' },
-      { k:'historial', tone:'arena',           priv:1, go:'fn:hist',       t:'Historial' },
+      { k:'historial', tone:'arena',           priv:1, go:'tab:historial',  t:'Historial' },
       { k:'clientes',  tone:'arena',           priv:1, go:'tab:clientes',  t:'Clientes' },
       { k:'ajustes',   tone:'arena',           priv:1, go:'fn:cfg',        t:'Ajustes' }
     ];
-    var HUB_MOD = { hub:'', consultar:'Catálogo', registrar:'Registrar', pedidos:'Ventas', packing:'Packing', cartera:'Cartera', pagos:'Pagos', gastos:'Gastos', cupos:'Cupos', alertas:'Alertas', clientes:'Clientes' };
+    var HUB_MOD = { historial:'Historial', hub:'', consultar:'Catálogo', registrar:'Registrar', pedidos:'Ventas', packing:'Packing', cartera:'Cartera', pagos:'Pagos', gastos:'Gastos', cupos:'Cupos', alertas:'Alertas', clientes:'Clientes' };
 
     // Botón «Fechas de entrega» de Packing: cuántas entregas están por confirmar
     function packPintarPorConfirmar(){
@@ -13237,7 +13468,7 @@
       else if(a==='hist') openHistory();
       else if(a==='cli') abrirClientes();
       else if(a==='cfg') abrirConfig();
-      else if(a==='catweb'){ abrirConfig(); setTimeout(function(){ var e=$('cfgCatEstado'); if(e&&e.scrollIntoView) e.scrollIntoView({block:'start',behavior:'smooth'}); }, 350); }
+      else if(a==='catweb'){ abrirConfig(); setTimeout(function(){ cfgIrA('cfgCatEstado'); }, 150); }
     }
     function hubGoDe(k){ var g=''; HUB_DEF.forEach(function(c){ if(c.k===k) g=c.go; }); return g; }
     function hubIr(){
@@ -13300,7 +13531,7 @@
       g.addEventListener('pointerleave', function(){ HUB.hover=''; hubPrevPintar(''); });
       // Barra lateral (escritorio): Inicio, Estadísticas, Historial, Clientes y Ajustes
       $('nav-hub').addEventListener('click', function(){ haptic(10); hubIr(); });
-      [['nav-bi','fn:bi'],['nav-hist','fn:hist'],['nav-cfg','fn:cfg']].forEach(function(x){ var b=$(x[0]); if(b) b.addEventListener('click', function(){ hubAccion(x[1]); }); });
+      [['nav-bi','fn:bi'],['nav-cfg','fn:cfg']].forEach(function(x){ var b=$(x[0]); if(b) b.addEventListener('click', function(){ hubAccion(x[1]); }); });
       try{
         if(!window.RESUMEN_VENTAS){ var rv=JSON.parse(localStorage.getItem('kaem_resumen_ventas')||'null'); if(rv && rv.ts && new Date(rv.ts).toDateString()===new Date().toDateString()) window.RESUMEN_VENTAS=rv; }
         if(!window.POR_CONFIRMAR){ window.POR_CONFIRMAR=JSON.parse(localStorage.getItem('kaem_por_confirmar')||'[]')||[]; }
@@ -13309,6 +13540,130 @@
       try{ if(MODO_CLIENTE){ switchTab('consultar'); } else { hubAlCambiar('hub'); } }catch(e){ hubAlCambiar('hub'); }
     })();
 
+    /* ═══ AJUSTES · pantalla organizada ═══
+       Las secciones (que ya existían, con todos sus campos) se muestran de una en una: a la izquierda las categorías con su icono
+       (en el celular es la primera pantalla, y al elegir una se abre la sección con «‹ Ajustes» para volver), arriba un buscador,
+       y abajo una barra fija con Guardar que avisa si hay cambios sin guardar. */
+    var CFG_ICONOS = {
+      operacion:   '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+      pantalla:    '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+      ventas:      '<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+      credito:     '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+      metas:       '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+      finanzas:    '<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+      marcas:      '<path d="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>',
+      whatsapp:    '<path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5z"/>',
+      catalogo:    '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+      shopify:     '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+      seguridad:   '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+      herramientas:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+      version:     '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>'
+    };
+    function cfgIconoDe(titulo){
+      var s = fnorm(titulo), mapa = [['operacion','operacion'],['pantalla','pantalla'],['ventas','ventas'],['credito','credito'],['metas','metas'],['finanzas','finanzas'],['marcas','marcas'],['whatsapp','whatsapp'],
+                                      ['catalogo','catalogo'],['shopify','shopify'],['seguridad','seguridad'],['herramientas','herramientas'],['version','version']];
+      for(var i=0;i<mapa.length;i++) if(s.indexOf(mapa[i][0])>=0) return CFG_ICONOS[mapa[i][1]];
+      return CFG_ICONOS.version;
+    }
+    var CFG_SEC = [], CFG_ACTUAL = -1;
+    function cfgEscritorio(){ return !!(window.matchMedia && window.matchMedia('(min-width:900px)').matches); }
+    function cfgHoja(){ return document.querySelector('#configModal .cfg-sheet'); }
+    (function cfgShellInit(){
+      var hoja = cfgHoja(); if(!hoja) return;
+      var grupos = [], cur = null, acciones = null;
+      [].slice.call(hoja.children).forEach(function(el){
+        if(el.classList.contains('cfg-grupo')){ cur = { t:el.textContent.trim(), secs:[] }; grupos.push(cur); el.remove(); }
+        else if(el.tagName==='DETAILS' && el.classList.contains('cfg-sec')){ if(!cur){ cur = { t:'', secs:[] }; grupos.push(cur); } cur.secs.push(el); }
+        else if(el.classList.contains('modal-actions')){ acciones = el; }
+        else if(el.tagName==='H3' || el.classList.contains('cfg-hint')){ el.remove(); }
+      });
+      var cab = document.createElement('header'); cab.className = 'cfg-head';
+      cab.innerHTML = '<div class="cfg-head-t"><h3>Ajustes</h3><p>Configura la app a tu manera. Los cambios se aplican al tocar <b>Guardar</b>.</p></div>'
+        + '<div class="search-bar cfg-buscar"><svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+        + '<input id="cfgBuscar" type="search" autocomplete="off" placeholder="Buscar un ajuste (plazo, WhatsApp, PIN…)" aria-label="Buscar un ajuste"></div>';
+      var lay = document.createElement('div'); lay.className = 'cfg-layout';
+      var nav = document.createElement('nav'); nav.className = 'cfg-nav'; nav.id = 'cfgNav'; nav.setAttribute('aria-label','Secciones de ajustes');
+      var panel = document.createElement('div'); panel.className = 'cfg-panel'; panel.id = 'cfgPanel';
+      panel.insertAdjacentHTML('afterbegin', '<button type="button" class="cfg-back" id="cfgBack"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Ajustes</button>');
+      var vacio = document.createElement('p'); vacio.className = 'cfg-vacio'; vacio.id = 'cfgNavVacio'; vacio.hidden = true; vacio.textContent = 'Ningún ajuste coincide con tu búsqueda.';
+      var idx = 0;
+      grupos.forEach(function(g, gi){
+        var caja = document.createElement('div'); caja.className = 'cfg-nav-bloque'; caja.setAttribute('data-g', gi);
+        if(g.t){ var gt = document.createElement('p'); gt.className = 'cfg-nav-g'; gt.textContent = g.t; caja.appendChild(gt); }
+        var lista = document.createElement('div'); lista.className = 'cfg-nav-grp tono-' + (gi % 4); caja.appendChild(lista);
+        g.secs.forEach(function(sec){
+          var sm = sec.querySelector('summary'), b = sm && sm.querySelector('b'), s2 = sm && sm.querySelector('small');
+          var titulo = b ? b.textContent : '', sub = s2 ? s2.textContent : '', i = idx++;
+          sec.classList.add('cfg-card'); sec.open = true; sec.setAttribute('data-i', i);
+          var sh = document.createElement('div'); sh.className = 'cfg-sec-head'; sh.innerHTML = '<h4>' + safe(titulo) + '</h4><p>' + safe(sub) + '</p>';
+          sec.insertBefore(sh, sec.querySelector('.cfg-sec-body')); panel.appendChild(sec);
+          var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'cfg-nav-i'; btn.setAttribute('data-i', i);
+          btn.innerHTML = '<span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">' + cfgIconoDe(titulo) + '</svg></span><span class="tx"><b>' + safe(titulo) + '</b><small>' + safe(sub) + '</small></span>'
+            + '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
+          lista.appendChild(btn);
+          CFG_SEC.push({ el:sec, btn:btn, caja:caja, titulo:titulo, texto:fnorm(titulo + ' ' + sub + ' ' + sec.textContent) });
+        });
+        nav.appendChild(caja);
+      });
+      nav.appendChild(vacio);
+      lay.appendChild(nav); lay.appendChild(panel);
+      var barra = document.createElement('div'); barra.className = 'cfg-bar'; barra.innerHTML = '<span class="cfg-estado" id="cfgEstado" role="status">Todo guardado</span>';
+      if(acciones) barra.appendChild(acciones);
+      hoja.appendChild(cab); hoja.appendChild(lay); hoja.appendChild(barra);
+      nav.addEventListener('click', function(e){ var b = e.target.closest ? e.target.closest('.cfg-nav-i') : null; if(b){ haptic(8); cfgIr(+b.getAttribute('data-i')); } });
+      $('cfgBack').addEventListener('click', function(){ haptic(8); cfgVolver(); });
+      $('cfgBuscar').addEventListener('input', cfgBuscar);
+      var m = $('configModal');
+      ['input','change','click'].forEach(function(ev){ m.addEventListener(ev, cfgMarcarSucio); });
+    })();
+    function cfgIr(i){
+      if(i<0 || i>=CFG_SEC.length) return;
+      CFG_ACTUAL = i;
+      CFG_SEC.forEach(function(s, k){ s.el.classList.toggle('on', k===i); s.btn.classList.toggle('on', k===i); s.btn.setAttribute('aria-current', k===i ? 'true' : 'false'); });
+      var h = cfgHoja(); if(h){ h.classList.add('cfg-en-sec'); h.scrollTop = 0; }
+    }
+    function cfgVolver(){ var h = cfgHoja(); if(h){ h.classList.remove('cfg-en-sec'); h.scrollTop = 0; } }
+    /** Abre la sección que contiene el elemento con ese id y lo deja a la vista (la usan Estadísticas, Cupos y el Inicio). */
+    function cfgIrA(id){
+      var el = $(id), sec = el && el.closest ? el.closest('.cfg-card') : null; if(!sec) return;
+      cfgIr(+sec.getAttribute('data-i'));
+      setTimeout(function(){ try{ el.scrollIntoView({ block:'start', behavior:'smooth' }); }catch(e){} }, 60);
+    }
+    function cfgBuscar(){
+      var q = fnorm($('cfgBuscar').value), visibles = 0, bloques = {};
+      CFG_SEC.forEach(function(s){ var ok = !q || s.texto.indexOf(q) >= 0; s.btn.hidden = !ok; if(ok){ visibles++; bloques[s.caja.getAttribute('data-g')] = 1; } });
+      [].forEach.call(document.querySelectorAll('#cfgNav .cfg-nav-bloque'), function(b){ b.hidden = !bloques[b.getAttribute('data-g')]; });
+      $('cfgNavVacio').hidden = visibles > 0;
+      if(q && visibles){ var primero = CFG_SEC.filter(function(s){ return !s.btn.hidden; })[0]; if(primero && cfgEscritorio()) cfgIr(+primero.btn.getAttribute('data-i')); }
+    }
+    /** Al abrir Ajustes: escritorio → primera sección a la vista; celular → la lista de categorías. */
+    function cfgShellReset(){
+      if(!$('cfgBuscar')) return;
+      $('cfgBuscar').value = ''; cfgBuscar();
+      if(cfgEscritorio()) cfgIr(CFG_ACTUAL >= 0 ? CFG_ACTUAL : 0); else cfgVolver();
+      var h = cfgHoja(); if(h) h.scrollTop = 0;
+      cfgMarcarSucio(true);
+    }
+    function cfgHayCambios(){
+      if(!_cfgBase) return false;
+      var d = recogerAjustes(), s = false;
+      Object.keys(d).forEach(function(k){
+        if(/^shopify(ClientId|ClientSecret|Token)$/.test(k)){ if(d[k]) s = true; return; }
+        if(JSON.stringify(d[k]) !== JSON.stringify(_cfgBase[k])) s = true;
+      });
+      return s;
+    }
+    var _cfgSucioT = null;
+    function cfgMarcarSucio(ya){
+      clearTimeout(_cfgSucioT);
+      _cfgSucioT = setTimeout(function(){
+        var el = $('cfgEstado'); if(!el) return;
+        var s = cfgHayCambios();
+        el.textContent = s ? 'Tienes cambios sin guardar' : 'Todo guardado'; el.classList.toggle('sucio', s);
+      }, ya === true ? 0 : 160);
+    }
+    // En escritorio la página no se desplaza (cada pantalla tiene su propio scroll): si algún scrollIntoView la mueve, vuelve a su sitio
+    window.addEventListener('scroll', function(){ if(window.scrollY || window.scrollX) window.scrollTo(0, 0); }, { passive:true });
     /* ═══════ SALUD DEL SISTEMA · se abre al tocar el estado (🟢 Al día · hora) ═══════ */
     var SAL = { t:null, prueba:'' };
     function saludFila(nivel, k, v){ return '<div class="sl-row '+nivel+(String(v).length>24?' ancho':'')+'"><i></i><div><small>'+safe(k)+'</small><b>'+safe(v)+'</b></div></div>'; }
