@@ -1,6 +1,6 @@
 {
-  "app": "2026-10-22-02",
-  "servidor": "2026.10.21",
+  "app": "2026-10-22-03",
+  "servidor": "2026.10.22",
   "fecha": "2026-10-22",
   "novedades": [
     "Pagos con 3 categorías: Proveedores (eliges la marca y el % de descuento de la factura: ese ahorro cuenta como ganancia), Préstamos y Personal.",
@@ -9,6 +9,8 @@
     "Packing: la fecha de entrega ahora es aproximada y la app te recuerda confirmar cuándo le llegó al cliente (la remisión y el crédito se ajustan).",
     "Estadísticas rediseñadas: Resumen, Ventas, Dinero, Gastos, Inventario, Clientes y Ranking, con caja real y recomendaciones del asesor.",
     "Inicio: ventas de hoy, semana y mes sin pedir nada extra. En Salud del sistema: botón para instalar la app y ver las novedades.",
-    "Barra superior nueva: el módulo a la izquierda, el logo al centro (te lleva al Inicio) y el estado a la derecha. La ventana de Salud ahora es más compacta y cabe sin desplazarte."
+    "Clientes ahora es un módulo completo: lista con búsqueda y filtros (con saldo, sin comprar, incompletos), y una ficha con lo que ha comprado, lo que debe, su cupo, últimos pedidos y datos editables (tipo de cliente, correo, contacto y notas).",
+    "Toda la app se ajusta mejor a cada pantalla: los bloques quedan alineados, la barra lateral ya no se corta y Ajustes y Estadísticas se cierran al cambiar de módulo.",
+    "Inicio más ordenado: tarjetas del mismo tamaño y las notificaciones en la esquina, sin tapar el icono. La ventana de Salud es más compacta."
   ]
 }
