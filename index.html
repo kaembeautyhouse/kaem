@@ -4008,6 +4008,7 @@
           <button class="btn-ghost" id="orderPdfBtn" type="button" disabled>Descargar PDF</button>
           <button class="btn-solid wa" id="orderWaBtn" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enviar WhatsApp</span></button>
         </div>
+        <div class="order-actions"><button class="btn-solid" id="orderSendBtn" type="button" disabled style="width:100%;min-height:48px">Enviar PDF al cliente</button></div>
         <div class="order-actions">
           <button class="btn-ghost" id="orderPauseBtn" type="button">Pausar este pedido</button>
           <button class="btn-ghost" id="historyBtn" type="button">Ver historial</button>
@@ -7402,6 +7403,8 @@
       $('editSku').textContent='SKU · '+p.sku+(p.tono?('  ·  '+p.tono):'');
       $('editProducto').value=p.producto||''; $('editTono').value=p.tono||''; EDIT_TONO_ORIG=String(p.tono||'').trim();
       fillBrandSelect($('editMarca')); $('editMarca').value=p.marca||'';
+      // Una marca que ya no está en la lista de marcas (producto antiguo) se conserva: antes quedaba vacía y obligaba a elegir otra
+      if(p.marca && $('editMarca').value!==p.marca){ var op=document.createElement('option'); op.value=p.marca; op.textContent=p.marca; $('editMarca').appendChild(op); $('editMarca').value=p.marca; }
       editCostRaw=Math.round(Number(p.costo)||0); $('editCosto').value= editCostRaw?String(editCostRaw).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):'';
       EDIT_PRECIOS={};
       ['distribuidor','mayorista','detal'].forEach(function(k){
@@ -7876,7 +7879,7 @@
     }
 
     // ——— Estado de acciones (PDF/WhatsApp bloqueados hasta guardar) ———
-    function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; }
+    function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; if($('orderSendBtn')) $('orderSendBtn').disabled=!on; }
     function markDirty(){ if(orderCommitted){ orderCommitted=false; $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText(); setActionsEnabled(false); } }
 
     // ——— Carrito ———
@@ -8595,6 +8598,7 @@
         +'<div class="hist-actions">'
         +  '<button data-hact="pdf" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Reimprimir</button>'
         +  '<button class="hact-wa" data-hact="wa" data-ref="'+ref+'">'+WA_ICON+'WhatsApp</button>'
+        +  '<button data-hact="send" data-ref="'+ref+'">Enviar PDF</button>'
         +  '<button data-hact="detail" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Detalle</button>'
         +  '<button data-hact="edit" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar</button>'
         +  '<button data-hact="devol" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>Devolución</button>'
@@ -9133,7 +9137,7 @@
           width:1050, height:700, windowWidth:1090, windowHeight:740,
           scrollX:0, scrollY:0
         });
-        var nombreArchivo = 'Recibo_KAEM_'+(d.idRemision||'pago')+'.png';
+        var nombreArchivo = nombreDoc_('Recibo', d.idRemision||'pago', d.cliente, 'png');
 
         var blobRec = await new Promise(function(res){ canvas.toBlob(res,'image/png'); });
         await entregarArchivo_(blobRec, nombreArchivo, 'Recibo de pago');
@@ -9183,12 +9187,12 @@
     }
 
     // Garantiza que las tipografías estén cargadas antes de capturar (crítico en móvil)
-    function pdfFor(o){
+    function pdfFor(o, opc){
       if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
-        return document.fonts.ready.then(function(){ return descargarPDFRemision(o); })
-                                   .catch(function(){ return descargarPDFRemision(o); });
+        return document.fonts.ready.then(function(){ return descargarPDFRemision(o, opc); })
+                                   .catch(function(){ return descargarPDFRemision(o, opc); });
       }
-      return descargarPDFRemision(o);
+      return descargarPDFRemision(o, opc);
     }
     /* ═══════════════════════════════════════════════════════════════════
        REMISIÓN EN PDF (v12) · diseño KAÉM completo, armado HOJA POR HOJA.
@@ -9435,7 +9439,7 @@
       return h + '</div></div>';
     }
 
-    async function descargarPDFRemision(datosPedido){
+    async function descargarPDFRemision(datosPedido, opc){
       var d = datosPedido || {};
       if (!d.items || !d.items.length){ toast('El pedido no tiene productos.','error'); return; }
       var Ctor = obtenerJsPDF_(), H2C = window.html2canvas;
@@ -9466,7 +9470,7 @@
           pdf.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG', 0, 0, 215.9, 279.4, undefined, 'FAST');
           canvas.width = canvas.height = 0; stage.removeChild(hoja);
         }
-        await entregarArchivo_(pdf.output('blob'), 'Remision_KAEM_' + R.id + '.pdf', 'Remisión ' + R.id);
+        await entregarArchivo_(pdf.output('blob'), nombreDoc_('', R.id, R.cliente.nombre, 'pdf'), 'Remisión ' + R.id, opc);
       }catch(err){
         console.error('Error al generar la remisión de venta PDF:', err);
         toast('No se pudo crear el PDF. Intenta de nuevo.','error');
@@ -9479,8 +9483,14 @@
        En computador: descarga directa. En celular: se abre la hoja de compartir (WhatsApp, Archivos, AirPrint…).
        iPhone/Safari exige un toque reciente para compartir y bloquea las descargas automáticas: si el aviso expiró mientras se
        armaba el archivo, aparece una ventana con un botón (toque nuevo) para Compartir/Guardar, más «Abrir» y «Descargar». */
+    /** Nombre de archivo legible: RV-126_Diana_Bolivar.pdf (sin tildes ni signos, para que WhatsApp y el equipo lo reconozcan). */
+    function nombreDoc_(prefijo, id, cliente, ext){
+      var slug = String(cliente || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9 ]+/g, ' ').trim().split(/\s+/).filter(Boolean).slice(0, 4)
+        .map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join('_').slice(0, 36);
+      return [prefijo, String(id || '').replace(/[^A-Za-z0-9-]+/g, ''), slug].filter(Boolean).join('_') + '.' + ext;
+    }
     function esMovil_(){ return /iP(hone|ad|od)|Android/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
-    var ENTREGA = { blob:null, file:null, nombre:'', titulo:'', url:'' };
+    var ENTREGA = { blob:null, file:null, nombre:'', titulo:'', url:'', texto:'' };
     function entregaCerrar_(){ $('entregaModal').classList.remove('show'); }
     function entregaMostrar_(){
       $('entregaTitulo').textContent = ENTREGA.titulo;
@@ -9488,12 +9498,25 @@
       $('entregaCompartir').style.display = ENTREGA.file && navigator.share && navigator.canShare && navigator.canShare({ files:[ENTREGA.file] }) ? '' : 'none';
       $('entregaModal').classList.add('show');
     }
-    async function entregarArchivo_(blob, nombre, titulo){
+    async function entregarArchivo_(blob, nombre, titulo, opc){
+      opc = opc || {};
       var file = null; try{ file = new File([blob], nombre, { type:blob.type }); }catch(e){}
       try{ if (ENTREGA.url) URL.revokeObjectURL(ENTREGA.url); }catch(e){}
-      ENTREGA = { blob:blob, file:file, nombre:nombre, titulo:titulo, url:URL.createObjectURL(blob) };
+      ENTREGA = { blob:blob, file:file, nombre:nombre, titulo:titulo, url:URL.createObjectURL(blob), texto:opc.texto || '' };
       var puede = !!(file && navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
       var descargar = function(){ var a = document.createElement('a'); a.href = ENTREGA.url; a.download = nombre; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
+      // «Enviar al cliente»: en el celular abre la hoja de compartir con el PDF y el mensaje (se elige WhatsApp y el chat); en computador se descarga y se abre el chat con el mensaje para adjuntarlo
+      if (opc.enviar){
+        if (esMovil_() && puede){
+          try{ await navigator.share({ files:[file], title:titulo, text:opc.texto || '' }); toast('Listo','success'); return; }
+          catch(e){ if (e && e.name === 'AbortError') return; }
+          entregaMostrar_(); return;
+        }
+        descargar();
+        try{ waAbrir(opc.telefono, opc.texto || ''); }catch(eW){}
+        toast(titulo + ' descargado · adjúntalo en el chat de WhatsApp','success', 8000);
+        return;
+      }
       // Android y computador: se descarga sola (como siempre); en celular además queda el botón «Compartir» para mandarlo al cliente
       if (/Android/i.test(navigator.userAgent) || !esMovil_()){
         descargar();
@@ -9511,7 +9534,7 @@
     $('entregaModal').addEventListener('click', function(e){ if (e.target === this) entregaCerrar_(); });
     $('entregaCompartir').addEventListener('click', function(){
       if (!ENTREGA.file) return;
-      navigator.share({ files:[ENTREGA.file], title:ENTREGA.titulo }).then(function(){ entregaCerrar_(); toast('Listo','success'); }).catch(function(e){ if (!e || e.name !== 'AbortError') toast('No se pudo abrir compartir. Usa «Abrir» o «Descargar».','error'); });
+      navigator.share({ files:[ENTREGA.file], title:ENTREGA.titulo, text:ENTREGA.texto || '' }).then(function(){ entregaCerrar_(); toast('Listo','success'); }).catch(function(e){ if (!e || e.name !== 'AbortError') toast('No se pudo abrir compartir. Usa «Abrir» o «Descargar».','error'); });
     });
 
     /* ═══════ PLANTILLAS DE WHATSAPP · campos elegibles desde Ajustes ═══════
@@ -9912,6 +9935,12 @@
     }
     function downloadOrderPDF(){ pdfFor(orderForOutput()); }
     function sendWhatsApp(){ whatsappFor(orderForOutput()); }
+    // Remisión en PDF + el mismo mensaje del pedido, lista para mandar (celular: hoja de compartir · computador: descarga + chat de WhatsApp)
+    function enviarPDFCliente(o){
+      if(!o || !o.items || !o.items.length){ toast('El pedido no tiene productos.','error'); return; }
+      pdfFor(o, { enviar:true, texto:waMensaje('pedido', o), telefono:(o.cliente||{}).telefono });
+    }
+    function sendPDFClient(){ enviarPDFCliente(orderForOutput()); }
 
     // ——— Nuevo pedido ———
     function newOrder(){
@@ -10007,6 +10036,7 @@
     $('orderSaveBtn').addEventListener('click', function(){ haptic(15); submitOrder(); });
     $('orderPdfBtn').addEventListener('click', downloadOrderPDF);
     $('orderWaBtn').addEventListener('click', sendWhatsApp);
+    $('orderSendBtn').addEventListener('click', sendPDFClient);
     $('orderNewBtn').addEventListener('click', function(){
       // Si hay una edición en curso o un carrito con productos sin guardar,
       // no se descarta en silencio — antes 'Nuevo Pedido' borraba todo sin
@@ -10033,7 +10063,7 @@
       if(act==='del'){ openOrderDelete(ref); return; }
       if(act==='devol'){ abrirDevolucion(ref); return; }
       var o=findHistByRef(ref); if(!o){ toast('No se encontró ese pedido. Actualiza e intenta de nuevo.','error'); return; }
-      if(act==='pdf') pdfFor(o); else if(act==='wa') whatsappFor(o);
+      if(act==='pdf') pdfFor(o); else if(act==='wa') whatsappFor(o); else if(act==='send') enviarPDFCliente(o);
     });
     window.addEventListener('online', function(){ if(loadPending().length) syncPending(); });
 
@@ -12005,7 +12035,7 @@
                    payload:currentOrderPayload, rentabilidad:function(){ return rentabilidadCarrito(computeTotals()); } },
       whatsapp:  { pedido:waTextoPedido, cobro:waTextoCobro, catalogo:waTextoCatalogo, catalogoBreve:waTextoCatalogoBreve, abrir:waAbrir,
                    mensajes:WA_MSGS, mensaje:waMensaje, llenar:waLlenar, numero:waNumero },
-      documentos:{ remision:descargarPDFRemision, recibo:function(id,i){ prepararRecibo(id, i==null?-1:i, generarReciboPago); } },
+      documentos:{ remision:descargarPDFRemision, enviar:enviarPDFCliente, recibo:function(id,i){ prepararRecibo(id, i==null?-1:i, generarReciboPago); } },
       ui:        { tab:switchTab, toast:toast, vibrar:haptic, beep:beep },
       packing:   { estado:PACK, cargar:packCargarPendientes, seleccionar:packSeleccionar,
                    procesar:packProcesar, resumen:packResumen, finalizar:packFinalizar,
