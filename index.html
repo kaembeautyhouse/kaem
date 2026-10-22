@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-09';
+    const APP_VERSION = '2026-10-22-10';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3391,6 +3391,12 @@
     .fvg-bar .btn-solid{min-width:110px;min-height:48px}
     @media (max-width:700px){ .fv-gal{padding:0;align-items:flex-end} .fvg-sheet{height:94vh;border-radius:22px 22px 0 0} }
     @media (prefers-reduced-motion:reduce){ .cart-foto:active,.gal-btn:active,.fvg-ctl button:active{transform:none} }
+
+    /* Panel Crear en Shopify */
+    .shop-prev{margin-top:8px;display:flex;align-items:center;gap:12px}
+    .shop-prev img{width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--linea)}
+    .shop-link{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin:8px 0;text-decoration:none}
+    #shopPanel{margin-top:10px}
   </style>
 </head>
 <body>
@@ -4118,6 +4124,21 @@
         <div class="ep-row" id="ep-mayorista"><label class="lbl" for="editP-mayorista">Mayorista</label><div class="cost-wrap cost-compact"><span class="sign">$</span><input id="editP-mayorista" type="text" inputmode="numeric" autocomplete="off" data-k="mayorista"></div><span class="ep-est" id="epEst-mayorista"></span><button type="button" class="ep-reset" id="epReset-mayorista" data-k="mayorista" hidden>Volver a la marca</button></div>
         <div class="ep-row" id="ep-detal"><label class="lbl" for="editP-detal">Detal</label><div class="cost-wrap cost-compact"><span class="sign">$</span><input id="editP-detal" type="text" inputmode="numeric" autocomplete="off" data-k="detal"></div><span class="ep-est" id="epEst-detal"></span><button type="button" class="ep-reset" id="epReset-detal" data-k="detal" hidden>Volver a la marca</button></div>
         <p class="cfg-hint">Siguen el margen de la marca. Si escribes otro valor, ese precio queda fijo SOLO en este producto y la marca no cambia.</p>
+      </div>
+      <div class="field" id="fe-shopify">
+        <button type="button" class="btn-ghost" id="shopBtn" style="width:100%;min-height:44px">Shopify · ver estado o crear</button>
+        <div id="shopPanel" hidden>
+          <p class="cfg-hint" id="shopEstado" aria-live="polite"></p>
+          <a class="btn-ghost shop-link" id="shopEnlace" href="#" target="_blank" rel="noopener" hidden>Abrir en Shopify</a>
+          <div id="shopForm" hidden>
+            <div id="shopDescWrap"><label class="lbl" for="shopDesc">Descripción <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional: puedes completarla en Shopify)</span></label>
+            <textarea id="shopDesc" rows="3" maxlength="4000" placeholder="Para qué sirve, beneficios, modo de uso…"></textarea></div>
+            <input type="file" id="shopFoto" accept="image/*" hidden>
+            <button type="button" class="btn-ghost" id="shopFotoBtn" style="width:100%;min-height:44px;margin-top:8px">Tomar o elegir foto</button>
+            <div id="shopPrev" class="shop-prev"></div>
+            <button type="button" class="btn-solid" id="shopCrear" style="width:100%;min-height:48px;margin-top:8px">Crear en Shopify (borrador)</button>
+          </div>
+        </div>
       </div>
       <div class="field" id="fe-stock">
         <div class="stk-now"><span>Stock actual en bodega</span><b id="editStockNow">0</b><small>unidades</small></div>
@@ -7332,7 +7353,7 @@
       beep('success'); haptic(20);
       if(res.creados!==undefined){
         // Alta con esquema de variantes (1 producto o N tonos)
-        toast(res.message||((res.creados)+' registro(s) guardado(s).'),'success');
+        toast(res.message||((res.creados)+' registro(s) guardado(s).'),'success'); shopOfrecerTrasRegistro(res);
       } else {
         toast((res.status==='created'?'Registrado · ':'Stock actualizado · ')+res.sku+' · Total '+res.stock,'success');
       }
@@ -7351,7 +7372,7 @@
     var editSkuKey='';
     function openEdit(sku, modoInicial){
       var p=findProduct(sku); if(!p){ toast('No se encontró ese producto. Actualiza el catálogo e intenta de nuevo.','error'); return; }
-      editSkuKey=p.sku;
+      editSkuKey=p.sku; try{ shopReiniciar(); }catch(e){}
       $('editSku').textContent='SKU · '+p.sku+(p.tono?('  ·  '+p.tono):'');
       $('editProducto').value=p.producto||''; $('editTono').value=p.tono||''; EDIT_TONO_ORIG=String(p.tono||'').trim();
       fillBrandSelect($('editMarca')); $('editMarca').value=p.marca||'';
@@ -14334,6 +14355,93 @@
       if($('fotoModal').classList.contains('show')) fotoCerrar();
       else if($('galModal').classList.contains('show')) galCerrar();
     });
+    /* ═══════ CREAR EN SHOPIFY · panel dentro de «Editar producto» ═══════
+       El producto se registra en la App y de aquí se manda a Shopify como BORRADOR (nombre, SKU, tonos, precio, proveedor, stock) con la foto
+       tomada o elegida en el celular. Es opcional y no toca nada de la App: si falla, solo avisa. El servidor revisa los permisos del token. */
+    var SHOP = { foto:null, estado:null, enviando:false };
+    function shopReiniciar(){
+      SHOP.foto=null; SHOP.estado=null; SHOP.enviando=false;
+      var p=$('shopPanel'); if(!p) return;
+      p.hidden=true; $('shopForm').hidden=true; $('shopEstado').textContent=''; $('shopDesc').value=''; $('shopPrev').innerHTML=''; $('shopEnlace').hidden=true;
+      $('fe-shopify').style.display = AJUSTES.shopifyActivo ? '' : 'none';
+    }
+    function shopAbrirPanel(){
+      var sku=editSkuKey; if(!sku) return;
+      $('shopPanel').hidden=false; $('shopForm').hidden=true; $('shopEnlace').hidden=true; $('shopEstado').textContent='Consultando Shopify…';
+      google.script.run.withSuccessHandler(function(r){
+        if(sku!==editSkuKey) return;
+        if(!r||!r.ok){ $('shopEstado').textContent=(r&&r.message)||'No se pudo consultar Shopify.'; return; }
+        SHOP.estado=r;
+        if(r.faltanPermisos && r.faltanPermisos.length){ $('shopEstado').textContent='Al token de Shopify le faltan permisos: '+r.faltanPermisos.join(', ')+'. Agrégalos en el Dev Dashboard de Shopify y vuelve a abrir este panel.'; return; }
+        var t=r.tonos?(' (con '+r.tonos+' tonos)'):'';
+        if(r.completo){
+          $('shopEstado').textContent='Ya está en Shopify'+(r.estado==='ACTIVE'?' y activo':' como borrador')+(r.foto?' y tiene foto ✓':', pero sin foto. Súbela aquí.');
+          if(r.urlAdmin){ $('shopEnlace').href=r.urlAdmin; $('shopEnlace').hidden=false; }
+          if(!r.foto){ $('shopForm').hidden=false; $('shopDescWrap').hidden=true; $('shopCrear').textContent='Subir foto a Shopify'; }
+        } else {
+          $('shopEstado').textContent=(r.enShopify?('Solo '+r.enShopify+' de '+r.total+' tonos están en Shopify. '):'Todavía no está en Shopify'+t+'. ')+'Se crea como borrador: después solo completas la descripción y los metadatos y lo activas.';
+          $('shopForm').hidden=false; $('shopDescWrap').hidden=false; $('shopCrear').textContent=r.enShopify?'Agregar lo que falta en Shopify':'Crear en Shopify (borrador)';
+        }
+      }).withFailureHandler(function(){ $('shopEstado').textContent='Sin conexión con el servidor.'; }).shopifyEstadoProducto({ sku:sku });
+    }
+    // La foto se reduce en el celular (máx. 1400 px, JPEG): sube rápido y no gasta datos de más
+    function shopPrepararFoto(file){
+      return new Promise(function(res, rej){
+        var fr=new FileReader();
+        fr.onerror=function(){ rej(); };
+        fr.onload=function(){
+          var im=new Image();
+          im.onerror=function(){ rej(); };
+          im.onload=function(){
+            var m=1400, k=Math.min(1, m/Math.max(im.width, im.height)), c=document.createElement('canvas');
+            c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
+            var g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(im,0,0,c.width,c.height);
+            var url=c.toDataURL('image/jpeg', 0.84); res({ base64:url.split(',')[1], mime:'image/jpeg', vista:url });
+          };
+          im.src=fr.result;
+        };
+        fr.readAsDataURL(file);
+      });
+    }
+    $('shopBtn').addEventListener('click', function(){ haptic(8); shopAbrirPanel(); });
+    $('shopFotoBtn').addEventListener('click', function(){ $('shopFoto').click(); });
+    $('shopFoto').addEventListener('change', function(e){
+      var f=e.target.files && e.target.files[0]; e.target.value=''; if(!f) return;
+      $('shopPrev').innerHTML='<span class="cfg-hint">Preparando la foto…</span>';
+      shopPrepararFoto(f).then(function(x){
+        SHOP.foto={ base64:x.base64, mime:x.mime };
+        $('shopPrev').innerHTML='<img src="'+x.vista+'" alt="Foto elegida"><button type="button" class="btn-ghost" id="shopQuitar">Quitar foto</button>';
+      }).catch(function(){ SHOP.foto=null; $('shopPrev').innerHTML=''; toast('No se pudo leer esa foto. Prueba con otra.','error'); });
+    });
+    $('shopPrev').addEventListener('click', function(e){ if(e.target.id==='shopQuitar'){ SHOP.foto=null; $('shopPrev').innerHTML=''; } });
+    $('shopCrear').addEventListener('click', function(){
+      if(SHOP.enviando) return;
+      var soloFoto=SHOP.estado && SHOP.estado.completo;
+      if(soloFoto && !SHOP.foto){ toast('Elige o toma la foto primero.','error'); beep('error'); return; }
+      SHOP.enviando=true; var b=$('shopCrear'), txt=b.textContent; b.disabled=true; b.textContent='Enviando a Shopify…';
+      var datos={ sku:editSkuKey, descripcion:$('shopDesc').value.trim(), operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
+      if(SHOP.foto) datos.foto=SHOP.foto;
+      var fin=function(){ SHOP.enviando=false; b.disabled=false; b.textContent=txt; };
+      google.script.run.withSuccessHandler(function(r){
+        fin();
+        if(!r||!r.ok){ toast((r&&r.message)||'No se pudo enviar a Shopify.','error',7000); beep('error'); return; }
+        beep('success'); haptic(20);
+        $('shopForm').hidden=true; $('shopEstado').textContent=r.message||'Listo.';
+        if(r.urlAdmin){ $('shopEnlace').href=r.urlAdmin; $('shopEnlace').hidden=false; }
+        toast(r.message||'Listo en Shopify','success',7000, r.urlAdmin?{ accion:'Abrir en Shopify', fn:function(){ window.open(r.urlAdmin,'_blank','noopener'); } }:null);
+      }).withFailureHandler(function(){ fin(); toast('Se cortó la conexión. Abre el panel de nuevo para ver si alcanzó a crearse antes de repetir.','error',7000); }).crearEnShopify(datos);
+    });
+    // Después de registrar un producto nuevo: aviso con botón directo
+    function shopOfrecerTrasRegistro(res){
+      try{
+        if(!AJUSTES.shopifyActivo || !res || !res.variantes || !res.variantes.length) return;
+        var sku=res.variantes[0].skuInterno;
+        toast((res.message||'Producto guardado')+' · ¿Lo mandas a Shopify?','success',9000,{ accion:'Crear en Shopify', fn:function(){
+          if(!findProduct(sku)){ toast('Un momento: el producto aún se está cargando. Búscalo en Consultar → Editar → Shopify.','info',6000); return; }
+          openEdit(sku); shopAbrirPanel();
+        } });
+      }catch(e){}
+    }
     /* ═══════ SALUD DEL SISTEMA · se abre al tocar el estado (🟢 Al día · hora) ═══════ */
     var SAL = { t:null, prueba:'' };
     function saludFila(nivel, k, v){ return '<div class="sl-row '+nivel+(String(v).length>24?' ancho':'')+'"><i></i><div><small>'+safe(k)+'</small><b>'+safe(v)+'</b></div></div>'; }

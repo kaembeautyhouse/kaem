@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-22-09",
-  "servidor": "2026.10.26",
+  "app": "2026-10-22-10",
+  "servidor": "2026.10.27",
   "fecha": "2026-10-22",
   "novedades": [
+    "Crear en Shopify: desde Editar producto (o justo después de registrar uno) mandas el producto a Shopify como borrador, con sus tonos, precio, proveedor, stock y la foto tomada con el celular. Solo falta la descripción, los metadatos y activarlo.",
     "Auditoría Shopify más clara: la hoja ahora tiene una columna por cada cosa que revisar (foto, descripción, precio, proveedor, activo y metadatos) con ✅ o ❌, y una columna «Qué hacer» que dice exactamente qué falta en cada producto.",
     "Fotos en el pedido: cada producto del carrito y de la búsqueda muestra su foto; al tocarla se abre una ventana con la foto, el nombre y el precio. Nuevo botón «Mostrar productos al cliente» con una vitrina de fotos y botón +2 (Distribuidor) para armar el pedido cara a cara.",
     "Pedidos guiados: eliges con un toque si el cliente es nuevo o existente, el flete (gratis o con valor), contado o crédito, abono y descuento. El pedido no sale si falta alguno. El cliente existente entra con su nivel; al crear uno nuevo el nivel es obligatorio.",
