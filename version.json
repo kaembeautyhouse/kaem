@@ -1,8 +1,10 @@
 {
-  "app": "2026-10-22-11",
+  "app": "2026-10-22-12",
   "servidor": "2026.10.28",
   "fecha": "2026-10-22",
   "novedades": [
+    "Remisión PDF nueva: tamaño Carta, texto vectorial nítido para la impresora (pesa ~100 KB en vez de 2 MB), encabezado en blanco que gasta menos tinta, píldoras y campos que se ajustan solos y pago, totales y firmas juntos en la última hoja. Recibo de pago sin esquinas blancas. Si el iPhone bloquea la descarga, sale una ventana con Compartir, Abrir y Descargar.",
+    "Pantalla de bloqueo con nuevo diseño oscuro con el logo. Botones rápidos de stock +6, +12, +24, +48. Los catálogos ya no muestran «Ver más». Las categorías del Inicio pasaron al final.",
     "Más rápida: la app abre más pronto (las herramientas de escáner, PDF y códigos se cargan en segundo plano) y las consultas de clientes y cupos leen la hoja de pedidos una sola vez.",
     "Crear en Shopify: desde Editar producto (o justo después de registrar uno) mandas el producto a Shopify como borrador, con sus tonos, precio, proveedor, stock y la foto tomada con el celular. Solo falta la descripción, los metadatos y activarlo.",
     "Auditoría Shopify más clara: la hoja ahora tiene una columna por cada cosa que revisar (foto, descripción, precio, proveedor, activo y metadatos) con ✅ o ❌, y una columna «Qué hacer» que dice exactamente qué falta en cada producto.",

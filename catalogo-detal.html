@@ -90,7 +90,7 @@
   .skel{aspect-ratio:4/5;border-radius:var(--r);background:linear-gradient(90deg,var(--arena) 0%,#EFE9DF 50%,var(--arena) 100%);background-size:200% 100%;animation:brillo 1.3s infinite}
   .estado{text-align:center;color:var(--suave);padding:56px 12px;font-size:15px}
   .estado b{display:block;font-family:var(--sans);font-weight:400;font-size:20px;color:var(--espresso);margin-bottom:6px}
-  .mas{display:flex;justify-content:center;padding:26px 0 0}
+  .mas{min-height:24px}
   .mas button{padding:12px 28px;border-radius:999px;border:1px solid var(--piedra);font-size:14px}
   footer.pie{margin:46px 0 0;padding:26px 0 calc(130px + env(safe-area-inset-bottom));border-top:1px solid var(--arena);text-align:center;font-size:12.5px;color:var(--suave)}
   footer.pie p{margin:4px 0}
@@ -390,7 +390,7 @@
 
   <div class="resumen" id="resumen" hidden><span id="resTxt"></span><button id="limpiar" type="button" hidden>Quitar filtros</button></div>
   <div id="grid" class="grid" aria-live="polite"></div>
-  <div class="mas" id="mas" hidden><button type="button" id="verMas">Ver más productos</button></div>
+  <div class="mas" id="mas" hidden aria-hidden="true"></div>
   <div id="estado" class="estado">Preparando tu tienda… ✨</div>
 
   <footer class="pie">
@@ -956,9 +956,8 @@
   $('bBolsa').addEventListener('click', abrirBolsa);
   $('sonido').addEventListener('click', function(){ SON.alternar(); pintarSonido(); vibrar(8); });
   pintarSonido();
-  $('verMas').addEventListener('click', function(){ MOSTRADOS+=PAGINA; pintar(false); });
   window.addEventListener('scroll', function(){ $('barraTop').classList.toggle('sombra', window.scrollY>90); }, { passive:true });
-  // "Ver más" automático al llegar al final de la lista
+  // Carga automática de más productos (sin botón) al llegar al final de la lista
   if('IntersectionObserver' in window){ new IntersectionObserver(function(es){ if(es[0].isIntersecting && !$('mas').hidden) { MOSTRADOS+=PAGINA; pintar(false); } }, { rootMargin:'600px' }).observe($('mas')); }
 
   document.addEventListener('click', function(e){
