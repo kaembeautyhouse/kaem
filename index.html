@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-18';
+    const APP_VERSION = '2026-10-22-19';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -9206,7 +9206,7 @@
          background:#ffffff !important; position:relative; display:flex !important; flex-direction:column; overflow:hidden; font-size:12.5px; }
     .rp.rpm{ height:auto !important; overflow:visible !important; display:block !important; }
     .rp .rp-body{ flex:1; display:flex; flex-direction:column; min-height:0; width:740px; }
-    .rp .rem-header{ margin:0 !important; border-radius:18px; padding:18px 28px 16px; border-bottom:4px solid #C9985F !important; }
+    .rp .rem-header{ margin:0 !important; border-radius:18px; padding:26px 28px 16px; border-bottom:4px solid #C9985F !important; }
     .rp .rem-logo{ min-height:0; } .rp .rem-logo-img{ max-height:78px; max-width:320px; }
     .rp .rem-city{ margin-top:6px; }
     .rp .rem-docid{ font-size:27px; } .rp .rem-docline{ margin-top:5px; }
@@ -9325,7 +9325,7 @@
       R.whatsapp = remEsDetalOMayor_(R.nivel) ? '318 130 5060' : '311 207 9880';
       R.politica = remEsDetalOMayor_(R.nivel) ? POLITICA_PDF_DETAL : POLITICA_PDF;
       var ef = String(kaemFirst(d.fechaEntrega, '')).trim();
-      R.entrega = (ef && !d.entregaConfirmada) ? ('Entrega estimada: ' + (kaemFmtFecha(ef) || ef)) : '';   // la fecha CONFIRMADA es interna (cartera): no se imprime
+      R.entrega = '';   // ninguna fecha de entrega se imprime (son datos internos de empaque y cartera)
       R.notas = notasParaCliente(String(kaemFirst(d.notas, d.notes, d.observaciones, '')).trim());
       R.notaPie = String(kaemFirst(d.notaPieRemision, d.notaPDF, (typeof AJUSTES !== 'undefined' && AJUSTES ? (AJUSTES.notaPieRemision || AJUSTES.notaPDF) : ''), '')).trim();
       R.llaves = llavesPagoActuales();
