@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-17';
+    const APP_VERSION = '2026-10-22-18';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -9220,7 +9220,7 @@
     .rp .rem-cardtitle, .rp .rem-paytitle, .rp .rem-vence-lbl{ font-family:'Jost','Helvetica Neue',Arial,sans-serif; font-weight:600; font-size:10.5px; letter-spacing:.16em; color:#A85F48; }
     .rp .rem-paytitle{ color:#6B5B52; } .rp .rem-vence-lbl{ white-space:nowrap; }
     .rp .rem-table thead th{ font-family:'Jost','Helvetica Neue',Arial,sans-serif; font-weight:600; letter-spacing:.1em; }
-    .rp .rem-grand > span:first-child{ font-family:'TAN Pearl','Fraunces',Georgia,serif; font-weight:400; letter-spacing:.04em; font-size:19px; }
+    .rp .rem-grand > span:first-child{ font-family:'Fraunces',Georgia,serif; font-weight:600; letter-spacing:.1em; font-size:14px; }
     .rp .rem-logo-text{ font-family:'Fraunces',Georgia,serif; }
     .rp .rem-header{ flex-direction:column; align-items:stretch; }
     .rp .rem-hrow{ display:flex; justify-content:space-between; align-items:center; }
@@ -9325,7 +9325,7 @@
       R.whatsapp = remEsDetalOMayor_(R.nivel) ? '318 130 5060' : '311 207 9880';
       R.politica = remEsDetalOMayor_(R.nivel) ? POLITICA_PDF_DETAL : POLITICA_PDF;
       var ef = String(kaemFirst(d.fechaEntrega, '')).trim();
-      R.entrega = ef ? ('Entrega ' + (d.entregaConfirmada ? 'confirmada: ' : 'estimada: ') + (kaemFmtFecha(ef) || ef)) : '';
+      R.entrega = (ef && !d.entregaConfirmada) ? ('Entrega estimada: ' + (kaemFmtFecha(ef) || ef)) : '';   // la fecha CONFIRMADA es interna (cartera): no se imprime
       R.notas = notasParaCliente(String(kaemFirst(d.notas, d.notes, d.observaciones, '')).trim());
       R.notaPie = String(kaemFirst(d.notaPieRemision, d.notaPDF, (typeof AJUSTES !== 'undefined' && AJUSTES ? (AJUSTES.notaPieRemision || AJUSTES.notaPDF) : ''), '')).trim();
       R.llaves = llavesPagoActuales();
