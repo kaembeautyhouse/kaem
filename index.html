@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-20';
+    const APP_VERSION = '2026-10-22-21';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -12302,7 +12302,9 @@
       segEstado('cfgCatSeg','cat', CATCFG.activo);
       $('cfgCatEstado').innerHTML = (CATCFG.activo ? '🟢 Catálogo activo' : '⚪ Catálogo apagado · los enlaces muestran un aviso')
         + '<br>Fotos de Shopify: <b>'+(CATCFG.fotos||0)+'</b> · Fichas: <b>'+(CATCFG.fichas||0)+'</b>'+(CATCFG.fotosFecha?' · actualizadas '+safe(CATCFG.fotosFecha):' · aún no se han traído')
-        + '<br>Ganchos cargados: <b>'+(CATCFG.ganchos||0)+'</b>'
+        + '<br>Ganchos (Mayorista y Distribuidor): <b>'+(CATCFG.ganchosProductos!=null?CATCFG.ganchosProductos:(CATCFG.ganchos||0))+' con gancho</b>'
+        + (CATCFG.sinGancho!=null ? (CATCFG.sinGancho ? ' · <b style="color:var(--rojo-txt)">'+CATCFG.sinGancho+' sin gancho</b>' : ' · <b style="color:var(--salvia-txt)">todos tienen ✓</b>') : '')
+        + (CATCFG.sinGancho && CATCFG.sinGanchoEjemplos && CATCFG.sinGanchoEjemplos.length ? '<br><small>Faltan: '+safe(CATCFG.sinGanchoEjemplos.join(' · '))+(CATCFG.sinGancho>CATCFG.sinGanchoEjemplos.length?' · y '+(CATCFG.sinGancho-CATCFG.sinGanchoEjemplos.length)+' más':'')+'. Repite el ciclo del CSV para que los incluya.</small>' : '')
         + '<br>Pedidos del catálogo por aprobar: <b>'+(CATCFG.porAprobar||0)+'</b>';
     }
     function cargarCatalogoCfg(){
