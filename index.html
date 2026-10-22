@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-12';
+    const APP_VERSION = '2026-10-22-13';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -9182,43 +9182,74 @@
       return descargarPDFRemision(o);
     }
     /* ═══════════════════════════════════════════════════════════════════
-       REMISIÓN EN PDF · VECTORIAL (v11) — se dibuja con jsPDF directamente, sin pasar por imagen.
-       · Texto y líneas son vectores: salen nítidos en la HP Smart Tank (y en cualquier impresora) y el archivo pesa ~50 KB, no ~2 MB.
-       · Tamaño CARTA (la hoja que se imprime). Márgenes ≥ 12 mm: nada queda en el borde no imprimible.
-       · Poca tinta: encabezado en blanco con el logo oscuro y una sola línea cobre; sin bloques oscuros ni fondos de color.
-       · Todo se mide antes de dibujar (textos que se parten, filas de alto variable, píldoras según su texto): nada se corre ni se corta.
-       · La cola (pago, totales y firmas) siempre va junta en la última hoja y se compacta sola para no pasar a una hoja nueva si cabe.
-       · Las políticas van en la franja inferior de la última hoja; el resto de hojas solo lleva el número de página.
-       Fuentes estándar del PDF (Helvetica/Times): se ven igual en cualquier lector y no pesan. */
-    var PDFV = { W:215.9, H:279.4, mL:14, mR:14, mT:12, mB:14 };
-    var PDFV_C = { tinta:[44,33,30], cobre:[201,152,95], terra:[168,95,72], gris:[108,94,84], linea:[210,194,178], suave:[228,216,200], rojo:[178,58,46], verde:[61,107,52] };
+       REMISIÓN EN PDF (v12) · diseño KAÉM completo, armado HOJA POR HOJA.
+       · Se mantiene el diseño de siempre (encabezado oscuro con logo, tarjetas, tipografías Jost/Playfair, colores de marca), pero cada hoja
+         se compone aparte en tamaño CARTA y se fotografía a alta resolución (~290 ppp): nada se corta, nada queda corrido.
+       · El encabezado va como tarjeta redondeada DENTRO de los márgenes (la impresora no puede imprimir hasta el borde y antes se notaba).
+       · Todo se MIDE antes de armar las hojas (alto real de cada fila y bloque): la cola (pago, totales y firmas) siempre va junta en la
+         última hoja; si no cabe se compacta sola y, si aún no, se prueba con filas más juntas; se elige el arreglo con MENOS hojas.
+       · Si hay que pasar a otra hoja, la cola nunca viaja sola: se lleva consigo las últimas filas de la tabla.
+       · El número de página va en todas; las políticas, en la franja inferior de la última. */
+    var RP = { W:816, H:1056, pt:34, pb:46, px:38, ancho:740 };                 // Carta a 96 ppp y márgenes (≥ 12 mm abajo, 10 mm a los lados)
+    var RP_ALTO = RP.H - RP.pt - RP.pb, RP_PIE = 26;                              // alto útil y espacio del folio
+    var RP_CSS = REM_CSS.replace(/@page[^\n]*\n/, '').replace(/html,body\{[^\n]*\n/, '').replace(/#kaem-remision-root/g, '.rp') + `
+    .rp{ width:816px !important; min-width:816px !important; max-width:816px !important; height:1056px !important; padding:34px 38px 46px 38px !important;
+         background:#ffffff !important; position:relative; display:flex !important; flex-direction:column; overflow:hidden; font-size:12.5px; }
+    .rp.rpm{ height:auto !important; overflow:visible !important; display:block !important; }
+    .rp .rp-body{ flex:1; display:flex; flex-direction:column; min-height:0; width:740px; }
+    .rp .rem-header{ margin:0 !important; border-radius:18px; padding:18px 28px 16px; border-bottom:4px solid #C9985F !important; }
+    .rp .rem-logo{ min-height:0; } .rp .rem-logo-img{ max-height:56px; max-width:240px; }
+    .rp .rem-city{ margin-top:6px; }
+    .rp .rem-docid{ font-size:27px; } .rp .rem-docline{ margin-top:5px; }
+    .rp .rem-meta{ padding:12px 2px 0; align-items:flex-start; }
+    .rp .rem-chips{ flex:1; align-items:center; }
+    .rp .rem-doccond, .rp .rem-docnivel{ white-space:nowrap; line-height:1.3; padding:4px 12px; font-size:11.5px; }
+    .rp .rem-contact{ flex:0 0 auto; flex-direction:column; align-items:flex-end; gap:2px; font-size:11.5px; }
+    .rp .rem-card{ border-radius:16px; }
+    .rp .cliente-box{ margin:12px 0 12px; padding:10px 16px 11px; }
+    .rp .rem-cli-grid{ gap:6px 18px; }
+    .rp .rem-table thead th{ padding:8px 10px; font-size:11px; }
+    .rp .rem-table tbody td{ padding:6px 10px; font-size:12.5px; }
+    .rp .rem-psku{ font-size:10.5px; }
+    .rp .rp-uni{ text-align:right; font-size:11px; letter-spacing:.03em; color:#8A7A6C; margin:6px 3px 0; }
+    .rp .rp-gap{ margin-top:12px; }
+    .rp .rem-summary{ margin-top:0; }
+    .rp .rem-paybox{ padding:11px 16px 12px; }
+    .rp .rem-qr-img{ width:150px; height:150px; }
+    .rp .rem-firmas{ margin-top:0; gap:60px; }
+    .rp .rem-firma-sign{ height:44px; } .rp .rem-firma-img{ max-height:40px; max-width:180px; }
+    .rp .rem-firma-label{ font-size:12px; margin-top:5px; } .rp .rem-firma-sub{ font-size:10px; }
+    .rp .pdf-nota-final{ margin:8px 0 0; padding-top:7px; font-size:11px; }
+    .rp .rp-cont{ display:flex; justify-content:space-between; align-items:center; padding:2px 4px 9px; border-bottom:3px solid #C9985F; margin-bottom:12px; }
+    .rp .rp-cont b{ font-family:'Playfair Display',Georgia,serif; font-size:15px; letter-spacing:.14em; color:#2C211E; font-weight:600; }
+    .rp .rp-cont span{ font-size:12px; color:#8A7A6C; letter-spacing:.03em; }
+    .rp .rp-folio{ text-align:right; font-size:11px; color:#8A7A6C; letter-spacing:.03em; margin-top:auto; padding-top:8px; }
+    .rp .rp-legal{ margin-top:10px; padding-top:8px; border-top:1px solid #D2C2B2; }
+    .rp .rp-legal-h{ display:flex; justify-content:space-between; align-items:baseline; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#5A4A3E; font-weight:700; margin-bottom:3px; }
+    .rp .rp-legal-h span{ font-weight:400; letter-spacing:.03em; text-transform:none; color:#8A7A6C; font-size:11px; }
+    .rp .rp-legal p{ margin:0; font-size:9.6px; line-height:1.4; color:#5A4A3E; text-align:justify; }
+    .rp .rp-ancla{ margin-top:auto; }
+    /* l1 · cola compacta */
+    .rp.l1 .rem-qr-img, .rp.l2 .rem-qr-img, .rp.l3 .rem-qr-img{ width:116px; height:116px; }
+    .rp.l1 .rem-paybox, .rp.l2 .rem-paybox, .rp.l3 .rem-paybox{ padding:8px 14px 9px; }
+    .rp.l1 .rem-paysub, .rp.l2 .rem-paysub, .rp.l3 .rem-paysub{ font-size:9px; }
+    .rp.l1 .rem-trow, .rp.l2 .rem-trow, .rp.l3 .rem-trow{ padding:4px 14px; }
+    .rp.l1 .rem-grand, .rp.l2 .rem-grand, .rp.l3 .rem-grand{ padding:6px 14px; }
+    .rp.l1 .rem-firma-sign, .rp.l2 .rem-firma-sign, .rp.l3 .rem-firma-sign{ height:30px; }
+    .rp.l1 .rem-firma-img, .rp.l2 .rem-firma-img, .rp.l3 .rem-firma-img{ max-height:28px; }
+    /* l2 · filas y tarjeta del cliente más juntas, políticas más chicas */
+    .rp.l2 .rem-table tbody td, .rp.l3 .rem-table tbody td{ padding:3px 10px; font-size:12px; }
+    .rp.l2 .rem-psku, .rp.l3 .rem-psku{ font-size:10px; }
+    .rp.l2 .cliente-box, .rp.l3 .cliente-box{ margin:9px 0 9px; padding:8px 16px 9px; }
+    .rp.l2 .rp-legal p, .rp.l3 .rp-legal p{ font-size:9px; line-height:1.34; }
+    .rp.l2 .rp-gap, .rp.l3 .rp-gap{ margin-top:9px; }
+    /* l3 · encabezado compacto */
+    .rp.l3 .rem-header{ padding:12px 24px 11px; } .rp.l3 .rem-logo-img{ max-height:42px; } .rp.l3 .rem-docid{ font-size:23px; }
+    .rp.l3 .rem-city{ margin-top:3px; font-size:10px; } .rp.l3 .rem-meta{ padding-top:9px; }
+    .rp.l3 .rem-firma-sign{ height:24px; } .rp.l3 .rem-firma-img{ max-height:22px; }
+    `;
 
-    /** Solo caracteres que las fuentes estándar del PDF dibujan bien (Latin-1). */
-    function pdfTxt_(s){
-      return String(s == null ? '' : s)
-        .replace(/[‘’‚]/g, "'").replace(/[“”„]/g, '"').replace(/[–—]/g, '-').replace(/…/g, '...')
-        .replace(/[^\x20-\x7E -ÿ]/g, '').replace(/\s+/g, ' ').trim();
-    }
-    /** Carga una imagen del sitio y la devuelve reducida (para que el PDF no pese). */
-    function cargarImgPDF_(url, mime, maxPx){
-      return new Promise(function(res){
-        var im = new Image(); im.crossOrigin = 'anonymous';
-        var fin = function(v){ im.onload = im.onerror = null; res(v); };
-        im.onload = function(){
-          try{
-            var k = Math.min(1, (maxPx || 700) / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas');
-            c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k));
-            var g = c.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
-            fin({ data:c.toDataURL(mime === 'image/png' ? 'image/png' : 'image/jpeg', 0.92), fmt:mime === 'image/png' ? 'PNG' : 'JPEG', w:im.naturalWidth, h:im.naturalHeight });
-          }catch(e){ fin(null); }
-        };
-        im.onerror = function(){ fin(null); };
-        setTimeout(function(){ fin(null); }, 6000);
-        im.src = url;
-      });
-    }
-
-    /** Pasa los datos del pedido a texto listo para dibujar. */
+    /** Datos del pedido, listos para dibujar. */
     function remDatos_(d){
       var id = String(kaemFirst(d.remision, d.id, d.numero, d.consecutivo, 'REM')).trim() || 'REM';
       var srcFecha = kaemFirst(d.fecha, d.timestamp, new Date()), fechaObj = kaemParseFecha(srcFecha) || new Date();
@@ -9226,9 +9257,9 @@
       if (!/^\d{1,2}:\d{2}$/.test(hora)) hora = kaemTieneHora(srcFecha) ? kaemFmtHora(fechaObj) : kaemFmtHora(new Date());
       var cli = d.cliente || {};
       var R = { id:id, fecha:kaemFmtFecha(fechaObj), emitido:kaemFmtFecha(fechaObj) + ' ' + hora,
-        cliente:{ nombre:kaemFirst(cli.nombre, cli.razonSocial, d.clienteNombre, '-'), nit:kaemFirst(cli.nit, cli.cedula, cli.documento, d.clienteNit, '-'),
-                  tel:kaemFirst(cli.telefono, cli.celular, cli.whatsapp, d.clienteTel, '-'), ciudad:kaemFirst(cli.ciudad, d.clienteCiudad, '-'),
-                  dir:kaemFirst(cli.direccion, cli.direccionEntrega, d.clienteDireccion, '-') }, filas:[] };
+        cliente:{ nombre:kaemFirst(cli.nombre, cli.razonSocial, d.clienteNombre, '—'), nit:kaemFirst(cli.nit, cli.cedula, cli.documento, d.clienteNit, '—'),
+                  tel:kaemFirst(cli.telefono, cli.celular, cli.whatsapp, d.clienteTel, '—'), ciudad:kaemFirst(cli.ciudad, d.clienteCiudad, '—'),
+                  dir:kaemFirst(cli.direccion, cli.direccionEntrega, d.clienteDireccion, '—') }, filas:[] };
       var items = d.items || d.productos || [], calcSub = 0, nUni = 0, nProd = 0;
       items.forEach(function(it){
         it = it || {};
@@ -9237,8 +9268,7 @@
         calcSub += tot; nUni += cant; if (!prob) nProd++;
         var sku = String(kaemFirst(it.sku, it.codigo, '')).trim(), nom = String(kaemFirst(it.nombre, it.producto, it.descripcion, '')).trim(), mar = String(kaemFirst(it.marca, it.brand, '')).trim();
         if ((!mar || !nom) && sku && typeof findProduct === 'function'){ var pr = findProduct(sku); if (pr){ if (!mar) mar = String(pr.marca || '').trim(); if (!nom) nom = String(pr.producto || '').trim(); } }
-        R.filas.push({ prob:prob, n:prob ? '' : String(nProd), nombre:nom || '-', sub:prob ? (prob === 'half' ? 'Probador 1/2 - mitad de precio' : 'Probador - cortesia de la casa') : [mar, sku].filter(Boolean).join('  ·  '),
-                       cant:String(cant), pu:formatCOP(pu), tot:formatCOP(tot) });
+        R.filas.push({ prob:prob, n:prob ? '' : nProd, nombre:nom || '—', marca:mar, sku:sku, cant:cant, pu:pu, tot:tot });
       });
       R.nProd = nProd; R.nUni = nUni;
       R.subtotal = (d.subtotal != null) ? toNum(d.subtotal) : calcSub;
@@ -9252,8 +9282,7 @@
       var venceRaw = kaemFirst(d.fechaVencimiento, d.vencimiento, '') || kaemFechaMas30(fechaObj);
       R.vence = R.credito ? (kaemFmtFecha(venceRaw) || String(venceRaw)) : '';
       R.venceLarga = R.credito ? kaemFechaLarga(venceRaw) : '';
-      R.condTxt = R.credito ? ('Pago: Credito ' + plazoCreditoActual() + ' dias - vence ' + (R.vence || '-')) : 'Pago: Contado';
-      R.condTxt = R.condTxt.replace('Credito', 'Crédito').replace('dias', 'días');
+      R.condTxt = R.credito ? ('Crédito ' + plazoCreditoActual() + ' días · Vence ' + (R.vence || '—')) : 'Contado';
       R.nivel = String(kaemFirst(d.nivel, d.nivelPrecio, 'Detal')).trim() || 'Detal';
       var ef = String(kaemFirst(d.fechaEntrega, '')).trim();
       R.entrega = ef ? ('Entrega ' + (d.entregaConfirmada ? 'confirmada: ' : 'estimada: ') + (kaemFmtFecha(ef) || ef)) : '';
@@ -9263,198 +9292,145 @@
       return R;
     }
 
-    /** Dibuja toda la remisión. Devuelve el PDF listo. */
-    function remDibujar_(pdf, R, logo, qr){
-      var W = PDFV.W, H = PDFV.H, mL = PDFV.mL, CW = W - PDFV.mL - PDFV.mR, C = PDFV_C, y = PDFV.mT;
-      var T = function(s){ return pdfTxt_(s); };
-      var fnt = function(est, pt, col){ pdf.setFont('helvetica', est); pdf.setFontSize(pt); pdf.setTextColor(col[0], col[1], col[2]); };
-      var espaciar = function(v){ try{ if (typeof pdf.setCharSpace === 'function') pdf.setCharSpace(v); }catch(e){} };
-      var linea = function(x1, y1, x2, y2, col, g){ pdf.setDrawColor(col[0], col[1], col[2]); pdf.setLineWidth(g); pdf.line(x1, y1, x2, y2); };
-      var caja = function(x, y0, w, h, col, r){ pdf.setDrawColor(col[0], col[1], col[2]); pdf.setLineWidth(0.25); pdf.roundedRect(x, y0, w, h, r == null ? 2 : r, r == null ? 2 : r, 'S'); };
-      var lh = function(pt){ return pt * 0.3528 * 1.22; };
-      var corta = function(s, w, est, pt){ pdf.setFont('helvetica', est); pdf.setFontSize(pt); return pdf.splitTextToSize(T(s) || '-', w); };
+    /* ——— Bloques de HTML ——— */
+    function rpCabecera_(R){
+      return '<div class="rem-header"><div class="rem-brandwrap"><div class="rem-logo"><img src="logo%20recibo.png" alt="KAÉM Beauty House" class="rem-logo-img" crossorigin="anonymous" onerror="this.onerror=null;this.parentNode.classList.add(\'no-img\');"><span class="rem-logo-text"><b>KAÉM</b> Beauty House</span></div>'
+        + '<div class="rem-city">Bucaramanga · Santander · Colombia · NIT 1005339178-8</div></div>'
+        + '<div class="rem-docbox"><div class="rem-doclabel">Remisión de venta</div><div class="rem-docid">' + escHTML(R.id) + '</div><div class="rem-docline"></div><div class="rem-docdate">Emitido: ' + escHTML(R.emitido) + '</div></div></div>'
+        + '<div class="rem-meta"><div class="rem-chips"><span class="rem-doccond">Pago: ' + escHTML(R.condTxt) + '</span><span class="rem-docnivel">Nivel: ' + escHTML(R.nivel) + '</span>'
+        + (R.entrega ? '<span class="rem-docnivel">' + escHTML(R.entrega) + '</span>' : '') + '</div>'
+        + '<div class="rem-contact"><span><b>WhatsApp:</b> 311 207 9880</span><span><b>Instagram:</b> @kaembeautyhouse</span></div></div>'
+        + '<div class="rem-card cliente-box"><div class="rem-cardtitle">Datos del cliente</div><div class="rem-cli-grid">'
+        + '<div class="rem-cell"><span>Nombre</span><b>' + escHTML(R.cliente.nombre) + '</b></div><div class="rem-cell"><span>Documento / NIT</span><b>' + escHTML(R.cliente.nit) + '</b></div>'
+        + '<div class="rem-cell"><span>Teléfono</span><b>' + escHTML(R.cliente.tel) + '</b></div><div class="rem-cell"><span>Ciudad</span><b>' + escHTML(R.cliente.ciudad) + '</b></div>'
+        + '<div class="rem-cell wide"><span>Dirección de entrega</span><b>' + escHTML(R.cliente.dir) + '</b></div></div></div>';
+    }
+    function rpContinuacion_(R){ return '<div class="rp-cont"><b>KAÉM BEAUTY HOUSE</b><span>Remisión ' + escHTML(R.id) + ' · continuación</span></div>'; }
+    var RP_THEAD = '<table class="rem-table"><colgroup><col style="width:5.5%"><col style="width:54.5%"><col style="width:8%"><col style="width:15%"><col style="width:17%"></colgroup><thead><tr><th class="c">#</th><th>Descripción</th><th class="c">Cant.</th><th class="r">Precio Unit.</th><th class="r">Subtotal</th></tr></thead><tbody>';
+    function rpFila_(f){
+      var titulo, num, cls = '';
+      if (f.prob){
+        titulo = escHTML(f.nombre) + ' <span class="rem-prob-tag">' + (f.prob === 'half' ? 'Probador ½ · mitad de precio' : 'Probador · cortesía de la casa') + '</span>';
+        num = '<span class="rem-prob-arrow">&#8627;</span>'; cls = ' class="rem-prob"';
+      } else { titulo = escHTML(f.nombre) + (f.marca ? ' <span class="rem-pmarca">· ' + escHTML(f.marca) + '</span>' : ''); num = f.n; }
+      return '<tr' + cls + '><td class="c">' + num + '</td><td><div class="rem-pname">' + titulo + ((f.sku && !f.prob) ? ' <span class="rem-psku">· ' + escHTML(f.sku) + '</span>' : '') + '</div></td><td class="c">' + f.cant + '</td><td class="r">' + formatCOP(f.pu) + '</td><td class="r">' + formatCOP(f.tot) + '</td></tr>';
+    }
+    function rpUnidades_(R){ return R.nProd ? '<div class="rp-uni">' + R.nProd + ' ' + (R.nProd === 1 ? 'producto' : 'productos') + ' · ' + R.nUni + ' ' + (R.nUni === 1 ? 'unidad' : 'unidades') + '</div>' : ''; }
+    function rpNotas_(R){ return R.notas ? '<div class="rem-card notas-box rp-gap"><div class="rem-cardtitle">Notas / Observaciones</div><p class="rem-notatext">' + escHTML(R.notas).replace(/\n/g, '<br>') + '</p></div>' : ''; }
+    function rpResumen_(R){
+      var llaves = '<div class="rem-paykeys' + (R.llaves.length > 5 ? ' mini' : '') + '">' + R.llaves.map(function(k){
+        return '<div class="rem-paykeyrow"><span class="rem-paykey-banco">' + escHTML(k.banco) + '</span><span class="rem-paykey-val' + (String(k.valor).length > 20 ? ' larga' : '') + '">' + escHTML(k.valor) + '</span></div>'; }).join('') + '</div>';
+      var qr = '<div class="rem-payleft"><div class="rem-payhint"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Escanea para pagar</div>'
+        + '<img src="QR-Nu.jpg" alt="QR Nu" class="rem-qr-img" crossorigin="anonymous" onerror="this.onerror=null;this.style.display=\'none\';"><div class="rem-paysub">Funciona con cualquier entidad bancaria</div></div>';
+      var mostrarSaldo = R.credito || R.abono > 0 || R.saldo > 0;
+      var tot = '<div class="rem-trow"><span>Subtotal</span><span>' + formatCOP(R.subtotal) + '</span></div>'
+        + (R.descuento > 0 ? '<div class="rem-trow rem-desc"><span>Descuento</span><span>- ' + formatCOP(R.descuento) + '</span></div>' : '')
+        + '<div class="rem-trow"><span>Envío / Flete</span><span>' + (R.envio > 0 ? formatCOP(R.envio) : 'GRATIS') + '</span></div>'
+        + '<div class="rem-trow rem-grand"><span>TOTAL</span><span>' + formatCOP(R.total) + '</span></div>'
+        + (mostrarSaldo ? '<div class="rem-trow rem-abono"><span>Abono / Anticipo</span><span>' + formatCOP(R.abono) + '</span></div><div class="rem-trow rem-saldo' + (R.saldo > 0 ? ' due' : '') + '"><span>SALDO PENDIENTE</span><span>' + formatCOP(R.saldo) + '</span></div>' : '');
+      var vence = (R.credito && R.saldo > 0 && R.venceLarga) ? '<div class="rem-vence"><span class="rem-vence-lbl">Fecha de pago</span><span class="rem-vence-val">' + escHTML(R.venceLarga) + '</span></div>' : '';
+      return '<div class="rem-summary rp-gap' + '"><div class="rem-paybox"><div class="rem-paytitle">Medio de pago</div><div class="rem-paybody">' + qr
+        + '<div class="rem-payright"><div class="rem-payright-t">¿Prefieres escribir? Estas son nuestras llaves y cuentas</div>' + llaves + '</div></div></div>'
+        + '<div class="rem-totwrap"><div class="totales-box">' + tot + '</div>' + vence + '</div></div>';
+    }
+    function rpFirmas_(R){
+      return '<div class="rem-firmas rp-gap"><div class="rem-firma"><div class="rem-firma-sign"><img src="logo.png" alt="Firma KAÉM" class="rem-firma-img" crossorigin="anonymous" onerror="this.onerror=null;this.style.display=\'none\';"></div><div class="rem-firma-line"></div><div class="rem-firma-label">Entregado por KAÉM</div><div class="rem-firma-sub">Bucaramanga · ' + escHTML(R.fecha) + '</div></div>'
+        + '<div class="rem-firma"><div class="rem-firma-sign"></div><div class="rem-firma-line"></div><div class="rem-firma-label">Recibido a Conformidad · Cliente</div><div class="rem-firma-sub">Firma · C.C. · Fecha</div></div></div>'
+        + (R.notaPie ? '<div class="pdf-nota-final">' + escHTML(R.notaPie) + '</div>' : '');
+    }
+    function rpLegal_(R, folio){ return '<div class="rp-legal"><div class="rp-legal-h">Políticas de garantía y entrega<span>' + escHTML(folio) + '</span></div><p>' + escHTML(POLITICA_PDF) + '</p></div>'; }
+    function rpFolio_(R, p, n){ return '<div class="rp-folio">' + escHTML(R.id) + ' · Página ' + p + ' de ' + n + '</div>'; }
 
-      // Altura que ocupa la franja de políticas (última hoja) según su texto
-      var legalPt = 7, legalLineas = (function(){ pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7); var l = pdf.splitTextToSize(T(POLITICA_PDF), CW); if (l.length > 5){ legalPt = 6.5; pdf.setFontSize(6.5); l = pdf.splitTextToSize(T(POLITICA_PDF), CW); } return l; })();
-      var legalH = 8.5 + legalLineas.length * lh(legalPt) + 1;
-      var bodyBottomMid = H - PDFV.mB - 3;                       // hojas intermedias
-      var bodyBottomLast = H - PDFV.mB - legalH - 4;             // última hoja (deja la franja legal)
+    /* ——— Medición real de cada bloque (con las mismas fuentes y anchos que tendrá la hoja) ——— */
+    function rpMedir_(stage, R, nivel){
+      var box = document.createElement('div'); box.className = 'rp rpm l' + nivel; stage.appendChild(box);
+      var alto = function(html){ var d = document.createElement('div'); d.style.cssText = 'display:flow-root;width:740px;'; d.innerHTML = html; box.appendChild(d); var h = d.getBoundingClientRect().height; box.removeChild(d); return Math.ceil(h); };
+      var M = { top1:alto(rpCabecera_(R)), topC:alto(rpContinuacion_(R)), th:alto(RP_THEAD + '</tbody></table>'), uni:alto(rpUnidades_(R)), notas:alto(rpNotas_(R)),
+                sum:alto(rpResumen_(R)), fir:alto(rpFirmas_(R)), legal:alto(rpLegal_(R, 'RV-000 · Página 1 de 1')) + 10, filas:[] };
+      var w = document.createElement('div'); w.style.width = '740px'; w.innerHTML = RP_THEAD + R.filas.map(rpFila_).join('') + '</tbody></table>'; box.appendChild(w);
+      Array.prototype.forEach.call(w.querySelectorAll('tbody tr'), function(tr){ M.filas.push(Math.ceil(tr.getBoundingClientRect().height)); });
+      stage.removeChild(box);
+      return M;
+    }
 
-      /* ——— Encabezado (hoja 1) ——— */
-      var logoH = 17, logoW = logo ? logoH * (logo.w / logo.h) : 0;
-      if (logo) pdf.addImage(logo.data, logo.fmt, mL, y, logoW, logoH);
-      else { fnt('bold', 20, C.tinta); pdf.text('KAÉM', mL, y + 8); fnt('normal', 8, C.tinta); pdf.text('BEAUTY HOUSE', mL, y + 13); }
-      fnt('bold', 7.5, C.terra); espaciar(0.5); pdf.text('REMISIÓN DE VENTA', W - PDFV.mR, y + 3.2, { align:'right' }); espaciar(0);
-      fnt('bold', 22, C.tinta); pdf.text(T(R.id), W - PDFV.mR, y + 12.2, { align:'right' });
-      fnt('normal', 8.5, C.gris); pdf.text('Emitido: ' + T(R.emitido), W - PDFV.mR, y + 17, { align:'right' });
-      y += logoH + 3.2;
-      linea(mL, y, W - PDFV.mR, y, C.cobre, 0.7);
-      y += 4.6;
-      fnt('normal', 8, C.gris);
-      pdf.text('Bucaramanga · Santander · Colombia  ·  NIT 1005339178-8', mL, y);
-      pdf.text('WhatsApp 311 207 9880  ·  Instagram @kaembeautyhouse', W - PDFV.mR, y, { align:'right' });
-      y += 4.4;
-
-      /* ——— Píldoras (ancho según su texto: no se corren) ——— */
-      var chips = [R.condTxt, 'Nivel: ' + R.nivel]; if (R.entrega) chips.push(R.entrega);
-      var cx = mL; fnt('normal', 8.5, C.tinta);
-      chips.forEach(function(c){
-        var t = T(c), w = pdf.getTextWidth(t) + 7;
-        if (cx + w > W - PDFV.mR){ cx = mL; y += 8; }
-        caja(cx, y, w, 6, C.linea, 3); pdf.text(t, cx + 3.5, y + 4.1);
-        cx += w + 3;
-      });
-      y += 9.5;
-
-      /* ——— Datos del cliente ——— */
-      var cl = R.cliente, pad = 4, anchoIn = CW - pad * 2, cols = [0.36, 0.22, 0.2, 0.22], campos = [['NOMBRE', cl.nombre], ['DOCUMENTO / NIT', cl.nit], ['TELÉFONO', cl.tel], ['CIUDAD', cl.ciudad]];
-      var lineasC = campos.map(function(c, i){ return corta(c[1], anchoIn * cols[i] - 3, 'bold', 9.5); });
-      var maxL = Math.max.apply(null, lineasC.map(function(l){ return l.length; }));
-      var dirL = corta(cl.dir, anchoIn, 'bold', 9.5);
-      var cardH = 3 + 4.6 + 3 + maxL * lh(9.5) + 2.2 + 3 + dirL.length * lh(9.5) + 3.2;
-      caja(mL, y, CW, cardH, C.linea, 2.2);
-      var yy = y + 6;
-      fnt('bold', 7, C.terra); espaciar(0.5); pdf.text('DATOS DEL CLIENTE', mL + pad, yy); espaciar(0);
-      yy += 4.6; var xx = mL + pad;
-      campos.forEach(function(c, i){
-        fnt('normal', 6.8, C.gris); espaciar(0.2); pdf.text(T(c[0]), xx, yy); espaciar(0);
-        fnt('bold', 9.5, C.tinta); pdf.text(lineasC[i], xx, yy + 4.2);
-        xx += anchoIn * cols[i];
-      });
-      yy += 4.2 + maxL * lh(9.5) + 2.2;
-      fnt('normal', 6.8, C.gris); espaciar(0.2); pdf.text('DIRECCIÓN DE ENTREGA', mL + pad, yy); espaciar(0);
-      fnt('bold', 9.5, C.tinta); pdf.text(dirL, mL + pad, yy + 4.2);
-      y += cardH + 5;
-
-      /* ——— Tabla de productos ——— */
-      var wN = 9, wC = 14, wU = 28, wT = 30, wD = CW - wN - wC - wU - wT, xN = mL, xD = xN + wN, xC = xD + wD, xU = xC + wC, xT = xU + wU;
-      var pagina = 1;
-      var cabeceraTabla = function(){
-        linea(mL, y, W - PDFV.mR, y, C.tinta, 0.45);
-        fnt('bold', 7, C.tinta); espaciar(0.4);
-        pdf.text('#', xN + wN / 2, y + 4.5, { align:'center' }); pdf.text('DESCRIPCIÓN', xD + 2, y + 4.5); pdf.text('CANT.', xC + wC / 2, y + 4.5, { align:'center' });
-        pdf.text('VALOR UNIT.', xU + wU - 2, y + 4.5, { align:'right' }); pdf.text('TOTAL', xT + wT - 2, y + 4.5, { align:'right' }); espaciar(0);
-        y += 6.6; linea(mL, y, W - PDFV.mR, y, C.tinta, 0.45);
-      };
-      var nuevaHoja = function(conTabla){
-        pdf.addPage(); pagina++; y = PDFV.mT;
-        fnt('bold', 8, C.tinta); pdf.text('KAÉM BEAUTY HOUSE', mL, y + 3);
-        fnt('normal', 8, C.gris); pdf.text('Remisión ' + T(R.id) + ' · continuación', W - PDFV.mR, y + 3, { align:'right' });
-        y += 6; linea(mL, y, W - PDFV.mR, y, C.cobre, 0.5); y += 4;
-        if (conTabla) cabeceraTabla();
-      };
-      cabeceraTabla();
-      R.filas.forEach(function(f){
-        var nomL = corta(f.nombre, wD - 4, f.prob ? 'italic' : 'bold', f.prob ? 8.5 : 9);
-        var rowH = 2.2 + nomL.length * lh(9) + (f.sub ? 3.4 : 0) + 1.6;
-        if (y + rowH > bodyBottomMid){ nuevaHoja(true); }
-        var yt = y + 2.2 + 2.9;
-        if (f.prob){ fnt('italic', 8.5, C.gris); } else { fnt('bold', 9, C.tinta); }
-        pdf.text(nomL, xD + 2, yt);
-        if (f.sub){ fnt('normal', 7.5, f.prob ? C.terra : C.gris); pdf.text(T(f.sub), xD + 2, yt + (nomL.length - 1) * lh(9) + 3.5); }
-        fnt('normal', 9, f.prob ? C.gris : C.tinta);
-        pdf.text(f.n, xN + wN / 2, yt, { align:'center' }); pdf.text(f.cant, xC + wC / 2, yt, { align:'center' });
-        pdf.text(T(f.pu), xU + wU - 2, yt, { align:'right' });
-        fnt('bold', 9, f.prob ? C.gris : C.tinta); pdf.text(T(f.tot), xT + wT - 2, yt, { align:'right' });
-        y += rowH; linea(mL, y, W - PDFV.mR, y, C.suave, 0.15);
-      });
-      if (!R.filas.length){ fnt('italic', 9, C.gris); pdf.text('Sin productos registrados en esta remisión.', mL + wN, y + 6); y += 9; }
-      linea(mL, y, W - PDFV.mR, y, C.tinta, 0.45);
-      if (R.nProd){ y += 4.6; fnt('normal', 8, C.gris); pdf.text(R.nProd + (R.nProd === 1 ? ' producto' : ' productos') + '  ·  ' + R.nUni + (R.nUni === 1 ? ' unidad' : ' unidades'), W - PDFV.mR, y, { align:'right' }); }
-      y += 4.5;
-
-      /* ——— Notas ——— */
-      if (R.notas){
-        var nL = corta(R.notas, CW - 8, 'normal', 8.5), nH = 3 + 4 + nL.length * lh(8.5) + 3.2;
-        if (y + nH > bodyBottomMid) nuevaHoja(false);
-        caja(mL, y, CW, nH, C.linea, 2.2);
-        fnt('bold', 7, C.terra); espaciar(0.5); pdf.text('NOTAS / OBSERVACIONES', mL + 4, y + 5.6); espaciar(0);
-        fnt('normal', 8.5, C.tinta); pdf.text(nL, mL + 4, y + 10.4);
-        y += nH + 4;
+    /* ——— Reparto en hojas por nivel de compactación; gana el arreglo con MENOS hojas (a igualdad, el menos apretado) ——— */
+    function rpPlan_(M, n, nivel){
+      var filas = M.filas, cap = RP_ALTO - RP_PIE, pages = [], i = 0, cola = M.uni + M.notas + M.sum + M.fir;
+      var cabecera = function(primera){ return (primera ? M.top1 : M.topC) + M.th + 4; };
+      while (i < n){
+        var usado = cabecera(!pages.length), rows = [];
+        while (i < n && usado + filas[i] <= cap){ usado += filas[i]; rows.push(i++); }
+        if (!rows.length){ rows.push(i); usado += filas[i]; i++; }
+        pages.push({ rows:rows, usado:usado });
       }
-
-      /* ——— Cola: pago + totales + firmas (siempre juntos, en la última hoja) ——— */
-      var filasTot = [['Subtotal', formatCOP(R.subtotal)]];
-      if (R.descuento > 0) filasTot.push(['Descuento', '- ' + formatCOP(R.descuento), 'desc']);
-      filasTot.push(['Envío / Flete', R.envio > 0 ? formatCOP(R.envio) : 'GRATIS']);
-      var mostrarSaldo = R.credito || R.abono > 0 || R.saldo > 0, conVence = R.credito && R.saldo > 0 && R.venceLarga;
-      var notaPieL = R.notaPie ? corta(R.notaPie, CW - 10, 'italic', 8.5) : [];
-      var medidas = function(compacto){
-        var qrS = compacto ? 27 : 36, rowH = compacto ? 5.4 : 6.2, signH = compacto ? 9 : 13;
-        var izq = 6 + qrS + 10, der = filasTot.length * rowH + 9 + (mostrarSaldo ? 2 * rowH : 0) + (conVence ? 11 : 0);
-        var firmas = 6 + signH + 11, nota = notaPieL.length ? (3 + notaPieL.length * lh(8.5) + 1) : 0;
-        return { qrS:qrS, rowH:rowH, signH:signH, alto:Math.max(izq, der) + firmas + nota, bloque:Math.max(izq, der) };
-      };
-      var libre = bodyBottomLast - y, m = medidas(false);
-      if (m.alto > libre){ var mc = medidas(true); if (mc.alto <= libre) m = mc; else { nuevaHoja(false); m = medidas(false); } }
-      var yTop = y, wIzq = CW * 0.55, xDer = mL + wIzq + 5, wDer = CW - wIzq - 5;
-
-      // Medio de pago (izquierda)
-      caja(mL, yTop, wIzq, m.bloque, C.linea, 2.2);
-      fnt('bold', 7, C.terra); espaciar(0.5); pdf.text('MEDIO DE PAGO', mL + wIzq / 2, yTop + 4.8, { align:'center' }); espaciar(0);
-      var qy = yTop + 7.5, qx = mL + 4;
-      if (qr) pdf.addImage(qr.data, qr.fmt, qx, qy, m.qrS, m.qrS);
-      else { caja(qx, qy, m.qrS, m.qrS, C.linea, 1); }
-      var kx = qx + m.qrS + 5, kw = mL + wIzq - 4 - kx;
-      linea(kx - 2.5, qy, kx - 2.5, qy + m.qrS, C.suave, 0.2);
-      fnt('normal', 7.5, C.gris); var kt = corta('¿Prefieres escribir? Estas son nuestras llaves y cuentas', kw, 'normal', 7.5); pdf.text(kt, kx, qy + 2.6);
-      var ky = qy + 2.6 + kt.length * lh(7.5) + 2.4, maxKeys = Math.max(1, Math.floor((qy + m.qrS - ky) / 8.6));
-      R.llaves.slice(0, maxKeys).forEach(function(k){
-        fnt('normal', 6.6, C.gris); espaciar(0.2); pdf.text(T(k.banco).toUpperCase(), kx, ky); espaciar(0);
-        var vv = T(k.valor), pt = vv.length > 22 ? 8.5 : 10.5; fnt('bold', pt, C.terra); pdf.text(corta(vv, kw, 'bold', pt)[0], kx, ky + 4.3);
-        ky += 8.6;
-      });
-      if (qr) { fnt('normal', 6.6, C.gris); pdf.text('Funciona con cualquier entidad bancaria', qx + m.qrS / 2, qy + m.qrS + 3.2, { align:'center', maxWidth:m.qrS + 14 }); }
-
-      // Totales (derecha)
-      var ty = yTop;
-      filasTot.forEach(function(f){
-        fnt('normal', 9.5, C.gris); pdf.text(T(f[0]), xDer, ty + m.rowH - 1.7);
-        fnt('bold', 9.5, f[2] === 'desc' ? C.terra : C.tinta); pdf.text(T(f[1]), xDer + wDer, ty + m.rowH - 1.7, { align:'right' });
-        ty += m.rowH; linea(xDer, ty, xDer + wDer, ty, C.suave, 0.15);
-      });
-      linea(xDer, ty + 0.6, xDer + wDer, ty + 0.6, C.tinta, 0.6);
-      fnt('bold', 10, C.tinta); espaciar(0.3); pdf.text('TOTAL', xDer, ty + 6.3); espaciar(0);
-      fnt('bold', 14, C.tinta); pdf.text(T(formatCOP(R.total)), xDer + wDer, ty + 6.6, { align:'right' });
-      ty += 9; linea(xDer, ty, xDer + wDer, ty, C.tinta, 0.6);
-      if (mostrarSaldo){
-        fnt('normal', 9.5, C.gris); pdf.text('Abono / Anticipo', xDer, ty + m.rowH - 1.7); fnt('bold', 9.5, C.tinta); pdf.text(T(formatCOP(R.abono)), xDer + wDer, ty + m.rowH - 1.7, { align:'right' });
-        ty += m.rowH; linea(xDer, ty, xDer + wDer, ty, C.suave, 0.15);
-        var due = R.saldo > 0; fnt('bold', 9.5, due ? C.rojo : C.tinta); espaciar(0.2); pdf.text('SALDO PENDIENTE', xDer, ty + m.rowH - 1.7); espaciar(0);
-        pdf.text(T(formatCOP(R.saldo)), xDer + wDer, ty + m.rowH - 1.7, { align:'right' }); ty += m.rowH;
+      if (!pages.length) pages.push({ rows:[], usado:cabecera(true) });
+      var capUlt = RP_ALTO - M.legal, ult = pages[pages.length - 1];
+      if (ult.usado + cola > capUlt){
+        // la cola no cabe: pasa a hoja nueva, pero con las últimas filas (nunca sola con las firmas)
+        var llevar = Math.min(2, Math.max(0, ult.rows.length - 1)), moved = ult.rows.splice(ult.rows.length - llevar, llevar);
+        var suma = moved.reduce(function(s, r){ return s + filas[r]; }, 0);
+        ult.usado -= suma;
+        pages.push({ rows:moved, usado:M.topC + (moved.length ? M.th + 4 : 0) + suma });
       }
-      if (conVence){
-        ty += 2.2; caja(xDer, ty, wDer, 8.2, C.terra, 2);
-        fnt('bold', 6.8, C.terra); espaciar(0.4); pdf.text('FECHA DE PAGO', xDer + 3, ty + 5.1); espaciar(0);
-        fnt('bold', 9, C.tinta); pdf.text(T(R.venceLarga), xDer + wDer - 3, ty + 5.2, { align:'right' });
+      return { pages:pages, nivel:nivel, n:pages.length, M:M };
+    }
+    function rpMejorPlan_(stage, R){
+      var mejor = null;
+      for (var nv = 0; nv <= 3; nv++){
+        var p = rpPlan_(rpMedir_(stage, R, nv), R.filas.length, nv);
+        if (!mejor || p.n < mejor.n) mejor = p;
+        if (p.n === 1) break;
       }
-      y = yTop + m.bloque + 6;
+      return mejor;
+    }
 
-      // Firmas
-      var gap = 26, wF = (CW - gap) / 2, ySig = y + m.signH;
-      if (logo){ var lw = 24, lhh = lw / (logo.w / logo.h); pdf.addImage(logo.data, logo.fmt, mL + (wF - lw) / 2, ySig - lhh - 0.6, lw, lhh); }
-      linea(mL, ySig, mL + wF, ySig, C.gris, 0.35); linea(mL + wF + gap, ySig, mL + CW, ySig, C.gris, 0.35);
-      fnt('normal', 8.5, C.tinta);
-      pdf.text('Entregado por KAÉM', mL + wF / 2, ySig + 4.2, { align:'center' }); pdf.text('Recibido a Conformidad · Cliente', mL + wF + gap + wF / 2, ySig + 4.2, { align:'center' });
-      fnt('normal', 7, C.gris);
-      pdf.text('Bucaramanga · ' + T(R.fecha), mL + wF / 2, ySig + 7.6, { align:'center' }); pdf.text('Firma · C.C. · Fecha', mL + wF + gap + wF / 2, ySig + 7.6, { align:'center' });
-      y = ySig + 11;
-      if (notaPieL.length){ fnt('italic', 8.5, C.terra); y += 3; pdf.text(notaPieL, W / 2, y, { align:'center' }); }
+    function rpHoja_(R, plan, k){
+      var pg = plan.pages[k], ultima = (k === plan.n - 1), total = plan.n;
+      var tabla = pg.rows.length ? ('<div>' + RP_THEAD + pg.rows.map(function(i){ return rpFila_(R.filas[i]); }).join('') + '</tbody></table></div>') : '';
+      var h = '<div class="rp l' + plan.nivel + '"><div class="rp-body">' + (k === 0 ? rpCabecera_(R) : rpContinuacion_(R)) + tabla;
+      if (ultima){
+        h += rpUnidades_(R) + rpNotas_(R) + rpResumen_(R) + '<div class="rp-ancla">' + rpFirmas_(R) + '</div>' + rpLegal_(R, R.id + ' · Página ' + (k + 1) + ' de ' + total);
+      } else { h += rpFolio_(R, k + 1, total); }
+      return h + '</div></div>';
+    }
 
-      /* ——— Pie: políticas (última hoja) + número de página en todas ——— */
-      var total = pdf.internal.getNumberOfPages();
-      for (var p = 1; p <= total; p++){
-        pdf.setPage(p);
-        var folio = T(R.id) + ' · Página ' + p + ' de ' + total;
-        if (p === total){
-          var y0 = H - PDFV.mB - legalH;
-          linea(mL, y0, W - PDFV.mR, y0, C.linea, 0.25);
-          fnt('bold', 7.2, C.gris); espaciar(0.3); pdf.text('POLÍTICAS DE GARANTÍA Y ENTREGA', mL, y0 + 4.2); espaciar(0);
-          fnt('normal', 7.2, C.gris); pdf.text(folio, W - PDFV.mR, y0 + 4.2, { align:'right' });
-          fnt('normal', legalPt, C.gris); pdf.text(legalLineas, mL, y0 + 8.3);
-        } else { fnt('normal', 8, C.gris); pdf.text(folio, W - PDFV.mR, H - PDFV.mB + 1, { align:'right' }); }
+    async function descargarPDFRemision(datosPedido){
+      var d = datosPedido || {};
+      if (!d.items || !d.items.length){ toast('El pedido no tiene productos.','error'); return; }
+      var Ctor = obtenerJsPDF_(), H2C = window.html2canvas;
+      if (typeof Ctor !== 'function' || typeof H2C !== 'function'){ toast('El generador de PDF aún se está cargando. Intenta de nuevo en unos segundos.','error'); return; }
+      var R = remDatos_(d); PDF_REM_ID = R.id; haptic(15); toast('Preparando la remisión…','info',2500);
+      var stage = document.createElement('div');
+      stage.setAttribute('aria-hidden', 'true');
+      stage.style.cssText = 'position:fixed; left:-10000px; top:0; margin:0; padding:0; background:#ffffff; z-index:-1;';
+      stage.innerHTML = '<style>' + RP_CSS + '</style>';
+      document.body.appendChild(stage);
+      try{
+        if (document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+        var pre = document.createElement('div'); pre.className = 'rp rpm'; pre.innerHTML = rpCabecera_(R) + rpFirmas_(R, false) + rpResumen_(R, false); stage.appendChild(pre);
+        await esperarImagenes_(pre); stage.removeChild(pre);                    // logo, firma y QR ya cargados (y en caché) antes de medir y fotografiar
+        await new Promise(function(res){ setTimeout(res, 60); });
+        var plan = rpMejorPlan_(stage, R);
+        var pdf = new Ctor({ unit:'mm', format:'letter', orientation:'portrait', compress:true });
+        pdf.setProperties({ title:'Remisión ' + R.id + ' · KAÉM Beauty House', author:'KAÉM Beauty House', subject:'Remisión de venta' });
+        for (var k = 0; k < plan.n; k++){
+          var hoja = document.createElement('div'); hoja.innerHTML = rpHoja_(R, plan, k); stage.appendChild(hoja);
+          var el = hoja.firstElementChild;
+          await esperarImagenes_(el);
+          var canvas;
+          try{ canvas = await H2C(el, { scale:3, useCORS:true, backgroundColor:'#ffffff', width:RP.W, height:RP.H, windowWidth:900, windowHeight:1100, scrollX:0, scrollY:0 }); }
+          catch(e1){ canvas = await H2C(el, { scale:2, useCORS:true, backgroundColor:'#ffffff', width:RP.W, height:RP.H, windowWidth:900, windowHeight:1100, scrollX:0, scrollY:0 }); }   // equipos con poca memoria
+          if (k > 0) pdf.addPage();
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG', 0, 0, 215.9, 279.4, undefined, 'FAST');
+          canvas.width = canvas.height = 0; stage.removeChild(hoja);
+        }
+        await entregarArchivo_(pdf.output('blob'), 'Remision_KAEM_' + R.id + '.pdf', 'Remisión ' + R.id);
+      }catch(err){
+        console.error('Error al generar la remisión de venta PDF:', err);
+        toast('No se pudo crear el PDF. Intenta de nuevo.','error');
+      }finally{
+        if (stage.parentNode) stage.parentNode.removeChild(stage);
       }
-      return pdf;
     }
 
     /* ═══════ ENTREGA DEL ARCHIVO (PDF o imagen) ═══════
@@ -9492,23 +9468,6 @@
       navigator.share({ files:[ENTREGA.file], title:ENTREGA.titulo }).then(function(){ entregaCerrar_(); toast('Listo','success'); }).catch(function(e){ if (!e || e.name !== 'AbortError') toast('No se pudo abrir compartir. Usa «Abrir» o «Descargar».','error'); });
     });
 
-    async function descargarPDFRemision(datosPedido){
-      var d = datosPedido || {};
-      if (!d.items || !d.items.length){ toast('El pedido no tiene productos.','error'); return; }
-      var Ctor = obtenerJsPDF_();
-      if (typeof Ctor !== 'function'){ toast('El generador de PDF aún se está cargando. Intenta de nuevo en unos segundos.','error'); return; }
-      var R = remDatos_(d); PDF_REM_ID = R.id; haptic(15);
-      try{
-        var imgs = await Promise.all([cargarImgPDF_('logo.png', 'image/png', 800), cargarImgPDF_('QR-Nu.jpg', 'image/jpeg', 520)]);
-        var pdf = new Ctor({ unit:'mm', format:'letter', orientation:'portrait', compress:true });
-        pdf.setProperties({ title:'Remisión ' + R.id + ' · KAÉM Beauty House', author:'KAÉM Beauty House', subject:'Remisión de venta' });
-        remDibujar_(pdf, R, imgs[0], imgs[1]);
-        await entregarArchivo_(pdf.output('blob'), 'Remision_KAEM_' + R.id + '.pdf', 'Remisión ' + R.id);
-      }catch(err){
-        console.error('Error al generar la remisión de venta PDF:', err);
-        toast('No se pudo crear el PDF. Intenta de nuevo.','error');
-      }
-    }
     /* ═══════ PLANTILLAS DE WHATSAPP · campos elegibles desde Ajustes ═══════
        Cada mensaje conserva su texto de siempre (sirve de guía) y en Ajustes se
        elige qué partes van. La elección es compartida entre equipos (AJUSTES_GLOBALES
