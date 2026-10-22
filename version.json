@@ -1,12 +1,12 @@
 {
-  "app": "2026-10-22-04",
-  "servidor": "2026.10.23",
+  "app": "2026-10-22-05",
+  "servidor": "2026.10.24",
   "fecha": "2026-10-22",
   "novedades": [
-    "Ajustes con otro look: categorías con icono, buscador y una barra fija de guardado que avisa si hay cambios sin guardar. Todo queda alineado en celular y escritorio.",
-    "Mensajes de WhatsApp a tu manera: edita el texto de cada mensaje (remisión, cobro, cupo, catálogo…) con variables como {nombre} o {total}, con vista previa y botón para probarlo. Los enlaces ahora abren bien aunque el número venga de otro país o el texto sea largo.",
-    "Historial y Clientes son módulos de pantalla completa, con totales, filtros y una ficha completa de cada cliente. Solo la píldora de estado queda como ventana flotante.",
-    "Estadísticas más claras: Estrellas, Exceso y Dormidos ya muestran sus productos (antes salían en 0), nueva pestaña Rentabilidad y se quitó lo que se repetía.",
-    "Diseño más cómodo: letras y botones más grandes y fáciles de tocar, mejor contraste, y animaciones de carga."
+    "Pedidos guiados: eliges con un toque si el cliente es nuevo o existente, el flete (gratis o con valor), contado o crédito, abono y descuento. El pedido no sale si falta alguno. El cliente existente entra con su nivel; al crear uno nuevo el nivel es obligatorio.",
+    "Clientes: botón Duplicados para unir un cliente registrado dos veces (por ejemplo con dos celulares) y botón Asignar nivel para llenar de una vez los que no lo tienen. Ya no se piden correo ni persona de contacto.",
+    "Productos: ahora puedes cambiar el precio de UN producto sin mover los márgenes de la marca, y volver a la marca cuando quieras.",
+    "Envío gratis siempre en Bucaramanga y área metropolitana para el nivel Detal.",
+    "Avisos con nuevo diseño: icono, título y detalle, barra de tiempo, botón para cerrar y se descartan deslizando."
   ]
 }

@@ -623,7 +623,7 @@
       +'<div class="lbl"><span>Cantidad</span><b id="hpDisp"></b></div><div class="cant"><div class="paso"><button type="button" data-q="-1" aria-label="Menos">−</button><b id="hpQ">'+PROD.cant+'</b><button type="button" data-q="1" aria-label="Más">+</button></div>'
       +(enBolsa?'<span class="tn" id="hpEnBolsa" style="margin-left:10px;font-size:13px;color:var(--salvia-txt)">✓ '+enBolsa+(enBolsa===1?' unidad':' unidades')+' en tu bolsa</span>':'<span id="hpEnBolsa"></span>')+'</div>'
       +'<div class="ficha" id="ficha">'+(g.ficha?'<div class="cargando-ficha"><div style="width:70%"></div><div></div><div style="width:85%"></div></div>':'')+'</div>'
-      +'<div class="garantias"><p class="g-t">Envíos, pago y pedido</p><div><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><span>Envío <b>gratis en Bucaramanga y área metropolitana desde '+cop(CAT.envio.localGratisDesde||0)+'</b> y al resto del país desde '+cop(CAT.envio.gratisDesde)+'. Si no llegas, flete fijo de '+cop(CAT.envio.tarifa)+'.</span></div>'
+      +'<div class="garantias"><p class="g-t">Envíos, pago y pedido</p><div><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><span>Envío <b>gratis en Bucaramanga y área metropolitana'+(CAT.envio.amGratis?'':' desde '+cop(CAT.envio.localGratisDesde||0))+'</b> y al resto del país desde '+cop(CAT.envio.gratisDesde)+'. Si no llegas, flete fijo de '+cop(CAT.envio.tarifa)+'.</span></div>'
       +(CAT.descuento&&CAT.descuento.pct?'<div><svg viewBox="0 0 24 24"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg><span><b>'+CAT.descuento.pct+'% de descuento</b>'+(CAT.descuento.minimo>0?' en compras desde '+cop(CAT.descuento.minimo):' en toda la tienda')+'.</span></div>':'')
       +'<div><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg><span><b>Sin pedido mínimo</b>: desde 1 unidad.</span></div>'
       +'<div><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg><span>Pagas por <b>transferencia</b> (llaves y QR al finalizar) o en <b>efectivo al recibir</b> si estás en Bucaramanga y AM.</span></div>'
@@ -768,7 +768,7 @@
     aviso('✓ '+g.nombre+(VAR[PROD.sku].v.tono?' · '+VAR[PROD.sku].v.tono:'')+' en tu bolsa', 1700);
   }
 
-  /* ——— Cuentas: descuento, envío (Bucaramanga y AM gratis desde $100.000 · resto del país desde $200.000) y total ——— */
+  /* ——— Cuentas: descuento, envío (Bucaramanga y AM siempre gratis · resto del país desde $200.000) y total ——— */
   function descDe(st){ var d=CAT.descuento; return (d && d.pct && st>=d.minimo) ? Math.round(st*d.pct/100) : 0; }
   function precioVis(p){ var d=CAT.descuento; return (d && d.pct && d.minimo===0) ? Math.round(p*(100-d.pct)/100) : p; }   // con descuento "siempre": el precio ya se muestra rebajado
   function totales(ciudad){
@@ -846,7 +846,7 @@
     box.innerHTML=lineasCuentas(t, envio);
     var p=$('pistaEnvio'); if(!p) return;
     var e=CAT.envio, d=CAT.descuento, msg='';
-    if(!t.ciudad) msg='🚚 Envío gratis en Bucaramanga y área metropolitana desde '+cop(e.localGratisDesde||0)+' · al resto del país desde '+cop(e.gratisDesde)+'.';
+    if(!t.ciudad) msg='🚚 Envío gratis en Bucaramanga y área metropolitana'+(e.amGratis?'':' desde '+cop(e.localGratisDesde||0))+' · al resto del país desde '+cop(e.gratisDesde)+'.';
     else if(t.flete) msg='💡 Agrega '+cop(t.falta)+' más y el envío te sale gratis. Hoy el flete es de '+cop(e.tarifa)+'.';
     else msg='🎉 ¡Tu pedido tiene envío gratis!';
     if(d && d.pct && d.minimo>0 && t.subtotal<d.minimo) msg+=' · 🏷️ Con '+cop(d.minimo-t.subtotal)+' más tienes '+d.pct+'% de descuento.';

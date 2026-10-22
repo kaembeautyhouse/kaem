@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-04';
+    const APP_VERSION = '2026-10-22-05';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -381,7 +381,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.23', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.24', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -948,14 +948,6 @@
     .nav-badge.show{display:flex}
 
     /* Toasts / overlay / modales */
-    .toast-wrap{position:fixed;top:14px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:80;pointer-events:none;padding:0 16px}
-    .toast{pointer-events:auto;max-width:480px;width:100%;background:var(--blanco);border-left:4px solid var(--salvia);border-radius:12px;padding:13px 15px;box-shadow:0 12px 30px rgba(44,33,30,.16);font-size:14.5px;display:flex;align-items:center;gap:10px;animation:drop .28s}
-    .toast.error{border-left-color:var(--terracota)}
-    .toast.info{border-left-color:var(--piedra)}
-    .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--salvia);flex:0 0 8px}
-    .toast.error .dot{background:var(--terracota)}
-    .toast.info .dot{background:var(--piedra)}
-    .toast.hide{animation:up .25s forwards}
 
     .overlay{position:fixed;inset:0;background:rgba(44,33,30,.28);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:70}
     .overlay.show{display:flex}
@@ -1748,7 +1740,6 @@
       #screen-registrar > *, #screen-pedidos > *, #screen-packing > *,
       #screen-cartera > *{max-width:780px}
       #productList, #alertList{max-width:1200px;grid-template-columns:repeat(auto-fill, minmax(330px, 1fr))}
-      .toast-wrap{left:auto;right:28px;transform:none}
     }
 
     /* ——— PANTALLAS MUY ANCHAS (≥ 1500px): más columnas, sin estirar texto ——— */
@@ -3079,6 +3070,27 @@
     @media (prefers-reduced-motion:reduce){
       #hubGrid .hub-card,.cli-item{animation:none !important;opacity:1 !important;transform:none !important}
     }
+
+    /* Botones de Duplicados y Asignar nivel + ventana de unir registros */
+    .cli-acciones{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+    .cli-accion{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--linea);border-radius:99px;background:var(--blanco);color:var(--espresso);font:600 14px 'Jost',sans-serif;cursor:pointer}
+    .cli-accion svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .cli-accion:active{transform:scale(.97)}
+    .cli-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--terracota);color:#fff;font:700 12px 'Jost',sans-serif;font-style:normal}
+    .cli-badge[hidden]{display:none}
+    .cli-dup-sheet{max-height:86vh;overflow:auto}
+    .cli-dup-g{border:1px solid var(--linea);border-radius:14px;padding:6px 12px 12px;margin:0 0 12px;background:var(--blanco)}
+    .cli-dup-m{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 0;cursor:pointer}
+    .cli-dup-m input{width:20px;height:20px;accent-color:var(--salvia-txt);flex:0 0 auto}
+    .cli-dup-m span{display:flex;flex-direction:column;min-width:0}
+    .cli-dup-m b{font-size:14.5px;font-weight:600;overflow-wrap:anywhere}
+    .cli-dup-m small,.cli-dup-op small{font-size:12.5px;color:var(--texto-suave)}
+    .cli-dup-un{width:100%;margin-top:6px}
+    .cli-dup-res{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .cli-dup-op{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:52px;padding:8px 14px;border:1px solid var(--linea);border-radius:12px;background:var(--blanco);color:var(--espresso);font:inherit;text-align:left;cursor:pointer}
+    .cli-dup-op b{font-size:14.5px;font-weight:600}
+    .cd-unir{width:100%;margin-top:10px;min-height:44px;font-size:13.5px}
+    .cd-alt{font-size:12.5px;color:var(--texto-suave);margin-top:2px}
     /* ═══ Historial · módulo de pantalla completa ═══ */
     .his-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:4px 0 12px}
     .his-kpi{display:flex;flex-direction:column;gap:1px;padding:12px 14px;min-height:78px;border:1px solid var(--linea);background:var(--blanco);border-radius:16px}
@@ -3227,6 +3239,60 @@
     .ios-num input,.ios-row input{min-height:44px}
     .wa-chip{min-height:44px;display:inline-flex;align-items:center}
     .cfg-enl b small,.cfg-card small{font-size:max(11px,.9em)}
+    /* ═══ Avisos (toast) ═══ */
+    .toast-wrap{position:fixed;top:max(10px,calc(env(safe-area-inset-top,0px) + 6px));left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:80;pointer-events:none;padding:0 12px}
+    .toast{--tn:var(--salvia);--tt:var(--salvia-txt);--tb:var(--st-wa-bg);--tl:var(--st-wa-border);
+      position:relative;overflow:hidden;pointer-events:auto;width:100%;max-width:440px;display:flex;align-items:flex-start;gap:12px;padding:12px 8px 14px 12px;
+      background:var(--tb);border:1px solid var(--tl);border-radius:18px;color:var(--espresso);box-shadow:0 14px 34px -10px rgba(44,33,30,.30),0 2px 6px rgba(44,33,30,.06);
+      touch-action:pan-y;animation:toastIn .32s var(--hub-ease,cubic-bezier(.22,.8,.24,1)) both;transition:transform .22s var(--hub-ease,ease),opacity .22s}
+    .toast.error{--tn:var(--terracota);--tt:var(--rojo-txt);--tb:var(--st-late-bg);--tl:var(--st-late-border)}
+    .toast.info{--tn:var(--piedra);--tt:var(--texto-suave);--tb:var(--blanco);--tl:var(--linea)}
+    .toast .t-ico{flex:0 0 32px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--tn) 22%,var(--blanco))}
+    .toast .t-ico svg{width:18px;height:18px;fill:none;stroke:var(--tt);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .toast .t-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:1px}
+    .toast .t-txt b{font-size:14.5px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+    .toast .t-txt small{font-size:13px;line-height:1.4;color:var(--texto-suave);overflow-wrap:anywhere}
+    .toast .t-acc{align-self:flex-start;margin-top:6px;min-height:36px;padding:0 14px;border:1px solid var(--tl);border-radius:99px;background:var(--blanco);color:var(--tt);font:600 13px 'Jost',sans-serif;cursor:pointer}
+    .toast .t-x{flex:0 0 36px;width:36px;height:36px;margin-top:-2px;border:0;border-radius:50%;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--texto-suave);position:relative}
+    .toast .t-x::after{content:'';position:absolute;inset:-4px}
+    .toast .t-x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+    @media (hover:hover) and (pointer:fine){ .toast .t-x:hover{background:color-mix(in srgb,var(--tn) 16%,transparent)} }
+    .toast .t-tp{position:absolute;left:0;right:0;bottom:0;height:3px;background:color-mix(in srgb,var(--tn) 16%,transparent)}
+    .toast .t-tp i{display:block;height:100%;background:var(--tn);transform-origin:left center}
+    .toast.hide{animation:toastOut .22s var(--hub-ease,ease) forwards;pointer-events:none}
+    @keyframes toastIn{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:none}}
+    @keyframes toastOut{to{opacity:0;transform:translateY(-8px) scale(.98)}}
+    @keyframes toastTiempo{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+    @media (min-width:1024px){ .toast-wrap{left:auto;right:24px;top:76px;align-items:flex-end;padding:0;width:min(440px,calc(100vw - 48px))} .toast{max-width:none} }
+    @media (prefers-reduced-motion:reduce){ .toast{animation:none} .toast.hide{animation:none;opacity:0} .toast .t-tp i{animation-duration:.01ms !important} }
+    /* ═══ Pedido guiado ═══ */
+    .pg-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}
+    .pg-op{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;min-height:64px;padding:10px 14px;border:1.5px solid var(--linea);border-radius:16px;background:var(--blanco);color:var(--espresso);font:inherit;text-align:left;cursor:pointer;transition:border-color .2s,background-color .2s,transform .15s}
+    .pg-op b{font-size:14.5px;font-weight:600;line-height:1.25}
+    .pg-op small{font-size:12px;color:var(--texto-suave)}
+    .pg-op:active{transform:scale(.98)}
+    .pg-op.on{border-color:var(--salvia-txt);background:var(--st-wa-bg)}
+    .pg-exist{margin:0 0 12px}
+    .pg-res{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .pg-it{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:center;min-height:52px;padding:8px 14px;border:1px solid var(--linea);border-radius:12px;background:var(--blanco);color:var(--espresso);font:inherit;text-align:left;cursor:pointer}
+    .pg-it b{font-size:14.5px;font-weight:600;overflow-wrap:anywhere}
+    .pg-it small{grid-column:1;font-size:12.5px;color:var(--texto-suave)}
+    .pg-it i{grid-row:1 / span 2;grid-column:2;font-style:normal;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--st-wa-bg);color:var(--salvia-txt)}
+    .pg-it i.sin{background:var(--st-late-bg);color:var(--rojo-txt)}
+    .pg-chip{margin:0 2px 10px;padding:8px 12px;border-radius:12px;background:var(--st-wa-bg);color:var(--salvia-txt);font-size:13px;font-weight:600}
+    .pg-chip.falta{background:var(--st-late-bg);color:var(--rojo-txt)}
+    .pg-pend .seg.active{background:transparent;color:inherit;font-weight:inherit;box-shadow:none}
+    .pg-row .segmented .seg{min-height:44px}
+    .pg-falta{outline:2px solid var(--terracota);outline-offset:3px;border-radius:14px;animation:shake .32s}
+    @media (max-width:420px){ .pg-two{grid-template-columns:1fr} }
+
+    /* Precios propios por producto */
+    .ep-row{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;align-items:center;margin:8px 0}
+    .ep-row .lbl{margin:0}
+    .ep-est{grid-column:1 / -1;font-size:12px;color:var(--texto-suave)}
+    .ep-est.propio{color:var(--terracota-txt);font-weight:600}
+    .ep-reset{grid-column:1 / -1;justify-self:start;min-height:36px;padding:0 12px;border:1px solid var(--linea);border-radius:99px;background:var(--blanco);color:var(--espresso);font:600 12.5px 'Jost',sans-serif;cursor:pointer}
+    .ep-reset[hidden]{display:none}
   </style>
 </head>
 <body>
@@ -3649,6 +3715,10 @@
             <option value="nombre">Nombre A–Z</option>
           </select>
         </div>
+        <div class="cli-acciones" id="cliAcciones">
+          <button type="button" class="cli-accion" id="cliBtnDup"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Duplicados</span><i class="cli-badge" id="cliDupN" hidden></i></button>
+          <button type="button" class="cli-accion" id="cliBtnNivel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.4 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg><span>Asignar nivel</span><i class="cli-badge" id="cliNivelN" hidden></i></button>
+        </div>
         <div class="cli-layout" id="cliLayout">
           <div class="cli-col-lista">
             <div id="cliList" role="list"></div>
@@ -3732,7 +3802,16 @@
         <p id="cartEmpty" class="cart-empty">El carrito está vacío. Escanea o busca productos.</p>
 
         <h3 class="section-title">Cliente</h3>
-        <div class="cli-grid">
+        <div class="pg-two" id="pgCli" role="group" aria-label="Cliente del pedido">
+          <button type="button" class="pg-op" data-m="nuevo"><b>Crear cliente nuevo</b><small>Primera compra</small></button>
+          <button type="button" class="pg-op" data-m="existente"><b>Seleccionar cliente existente</b><small>Ya nos ha comprado</small></button>
+        </div>
+        <div id="pgExist" class="pg-exist" style="display:none">
+          <div class="search-bar" style="box-shadow:none;border:1px solid var(--linea)"><input id="pgBuscar" type="search" autocomplete="off" aria-label="Buscar cliente" placeholder="Buscar por nombre, teléfono o NIT…"></div>
+          <div id="pgRes" class="pg-res"></div>
+        </div>
+        <p class="pg-chip" id="pgChip" style="display:none"></p>
+        <div class="cli-grid" id="pgGrid" style="display:none">
         <div class="field"><label class="lbl" for="cliNombre">Nombre / Razón social</label>
           <input id="cliNombre" list="clientList" autocomplete="off" placeholder="Nombre del cliente"></div>
         <datalist id="clientList"></datalist>
@@ -3748,8 +3827,9 @@
         <div class="field"><label class="lbl" for="orderNotes">Notas / Observaciones del Pedido</label>
           <textarea id="orderNotes" rows="3" autocomplete="off" placeholder="Ej. Entregar después de las 5 p. m. · Empaque de regalo"></textarea></div>
 
-        <div class="field row-field">
-          <label class="lbl inline" for="fleteInput">Flete / Envío</label>
+<div class="field row-field pg-row" id="pgFleteRow"><label class="lbl inline">Flete / Envío</label><div class="segmented" id="pgFlete" role="group" aria-label="Flete / Envío"><button type="button" class="seg" data-v="gratis">Gratis</button><button type="button" class="seg" data-v="valor">Con valor</button></div></div>
+        <div class="field row-field" id="fleteRow" style="display:none">
+          <label class="lbl inline" for="fleteInput">Valor del flete</label>
           <div class="cost-wrap cost-compact"><span class="sign">$</span><input id="fleteInput" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></div>
         </div>
         <p id="fleteHint" class="flete-hint" aria-live="polite"></p>
@@ -3766,15 +3846,22 @@
           <div id="cupoStrip" class="cupo-strip" style="display:none" role="status" aria-live="polite"></div>
           <div class="field"><label class="lbl" for="vencInput">Fecha límite de pago</label>
             <input id="vencInput" type="date"></div>
-          <div class="field row-field">
-            <label class="lbl inline" for="abonoInput">Abono inicial</label>
+<div class="field row-field pg-row" id="pgAbonoRow"><label class="lbl inline">Abono inicial</label><div class="segmented" id="pgAbono" role="group" aria-label="Abono inicial"><button type="button" class="seg" data-v="no">No</button><button type="button" class="seg" data-v="si">Sí</button></div></div>
+          <div class="field row-field" id="abonoRow" style="display:none">
+            <label class="lbl inline" for="abonoInput">¿Cuánto abona?</label>
             <div class="cost-wrap cost-compact"><span class="sign">$</span><input id="abonoInput" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></div>
           </div>
         </div>
 
+<div class="field row-field pg-row" id="pgDescRow"><label class="lbl inline">Descuento</label><div class="segmented" id="pgDesc" role="group" aria-label="Descuento"><button type="button" class="seg" data-v="sin">Sin descuento</button><button type="button" class="seg" data-v="con">Con descuento</button></div></div>
+        <div class="field row-field" id="pgDescWrap" style="display:none">
+          <label class="lbl inline" for="descInput">¿Cuánto descuento?</label>
+          <div class="cost-wrap cost-compact"><input id="descInput" type="text" inputmode="numeric" autocomplete="off" class="desc-inline" maxlength="3" placeholder="0"><span class="sign">%</span></div>
+        </div>
+
         <div class="kv math totals">
           <div><span>Subtotal productos</span><span id="tSubtotal">$0</span></div>
-          <div id="tDescRow"><span>Descuento <input id="descInput" type="text" inputmode="numeric" autocomplete="off" class="desc-inline" maxlength="3" placeholder="0">%</span><span id="tDesc">Sin descuento</span></div>
+          <div id="tDescRow"><span>Descuento</span><span id="tDesc">Sin descuento</span></div>
           <div><span>Flete</span><span id="tFlete">$0</span></div>
           <div class="total"><span>Total general</span><span id="tTotal">$0</span></div>
           <div id="tAbonoRow" style="display:none"><span>Abono inicial</span><span id="tAbono">$0</span></div>
@@ -3926,6 +4013,13 @@
         <label class="lbl" for="editCosto">Precio costo base</label>
         <div class="cost-wrap"><span class="sign">$</span><input id="editCosto" type="text" inputmode="numeric" autocomplete="off"></div>
       </div>
+      <div class="field" id="fe-precios">
+        <span class="lbl">Precios de venta</span>
+        <div class="ep-row" id="ep-distribuidor"><label class="lbl" for="editP-distribuidor">Distribuidor</label><div class="cost-wrap cost-compact"><span class="sign">$</span><input id="editP-distribuidor" type="text" inputmode="numeric" autocomplete="off" data-k="distribuidor"></div><span class="ep-est" id="epEst-distribuidor"></span><button type="button" class="ep-reset" id="epReset-distribuidor" data-k="distribuidor" hidden>Volver a la marca</button></div>
+        <div class="ep-row" id="ep-mayorista"><label class="lbl" for="editP-mayorista">Mayorista</label><div class="cost-wrap cost-compact"><span class="sign">$</span><input id="editP-mayorista" type="text" inputmode="numeric" autocomplete="off" data-k="mayorista"></div><span class="ep-est" id="epEst-mayorista"></span><button type="button" class="ep-reset" id="epReset-mayorista" data-k="mayorista" hidden>Volver a la marca</button></div>
+        <div class="ep-row" id="ep-detal"><label class="lbl" for="editP-detal">Detal</label><div class="cost-wrap cost-compact"><span class="sign">$</span><input id="editP-detal" type="text" inputmode="numeric" autocomplete="off" data-k="detal"></div><span class="ep-est" id="epEst-detal"></span><button type="button" class="ep-reset" id="epReset-detal" data-k="detal" hidden>Volver a la marca</button></div>
+        <p class="cfg-hint">Siguen el margen de la marca. Si escribes otro valor, ese precio queda fijo SOLO en este producto y la marca no cambia.</p>
+      </div>
       <div class="field" id="fe-stock">
         <div class="stk-now"><span>Stock actual en bodega</span><b id="editStockNow">0</b><small>unidades</small></div>
         <div class="stk-modos" id="editStockModo" role="group" aria-label="Qué quieres hacer con el stock">
@@ -3965,6 +4059,30 @@
       <p class="tone-sub" id="toneSub">Este código corresponde a varios tonos. Elige uno.</p>
       <div class="tone-list" id="toneList"></div>
       <button class="btn-ghost" id="toneCancel" type="button" style="width:100%;margin-top:4px">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="modal" id="cliDupModal" role="dialog" aria-modal="true" aria-labelledby="cliDupTit">
+    <div class="sheet cli-dup-sheet">
+      <h3 id="cliDupTit">Clientes duplicados</h3>
+      <p class="cfg-hint" id="cliDupInfo"></p>
+      <div id="cliDupBody"></div>
+      <div class="modal-actions single"><button class="btn-ghost" id="cliDupCerrar" type="button">Cerrar</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="cliNivelModal" role="dialog" aria-modal="true" aria-labelledby="cliNivelTit">
+    <div class="sheet">
+      <h3 id="cliNivelTit">Asignar nivel</h3>
+      <p id="cliNivelInfo"></p>
+      <div class="segmented segmented-3 cd-tipo" id="cliNivelSeg" role="group" aria-label="Nivel a asignar">
+        <button type="button" class="seg" data-t="DETAL">Detal</button><button type="button" class="seg active" data-t="DISTRIBUIDOR">Distribuidor</button><button type="button" class="seg" data-t="MAYORISTA">Mayorista</button>
+      </div>
+      <p class="cfg-hint">Solo se llenan los clientes que no tienen nivel. Los que ya lo tienen no se tocan.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cliNivelCancel" type="button">Cancelar</button>
+        <button class="btn-solid" id="cliNivelOk" type="button">Asignar</button>
+      </div>
     </div>
   </div>
 
@@ -6022,9 +6140,9 @@
 
     /* ═══════ CLIENTES · módulo completo: lista, ficha con datos y edición ═══════
        Cada cliente sale de sus pedidos (se agrupan por teléfono). El servidor suma compras, deuda y cupo, y guarda aparte
-       lo que no viaja en los pedidos (tipo, correo, contacto y notas). Esta pantalla solo LEE lo que listarClientes devuelve. */
+       lo que no viaja en los pedidos (nivel, notas y teléfonos alternos). Esta pantalla solo LEE lo que listarClientes devuelve. */
     var CLIENTES = { lista: [], busqueda: '', filtro: 'todos', orden: 'reciente', sel: '', cargado: false, cargando: false, enriquecido: true };
-    var CLI_TIPOS = [['', 'Sin definir'], ['DETAL', 'Detal'], ['DISTRIBUIDOR', 'Distribuidor'], ['MAYORISTA', 'Mayorista']];
+    var CLI_TIPOS = [['', 'Sin nivel'], ['DETAL', 'Detal'], ['DISTRIBUIDOR', 'Distribuidor'], ['MAYORISTA', 'Mayorista']];
     var CLI_INACTIVO_DIAS = 60;
     var CLI_MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
@@ -6067,7 +6185,7 @@
         if(f === 'deuda' && !(c.deuda > 0)) return false;
         if(f === 'inactivo' && !cliInactivo(c)) return false;
         if(f === 'incompleto' && c.completo) return false;
-        return !q || fnorm([c.nombre, c.telefono, c.nit, c.ciudad, c.contacto, c.correo].join(' ')).indexOf(q) >= 0;
+        return !q || fnorm([c.nombre, c.telefono, c.alternos, c.nit, c.ciudad].join(' ')).indexOf(q) >= 0;
       });
       var porNombre = function(a, b){ return String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'); };
       r.sort(function(a, b){
@@ -6105,8 +6223,94 @@
         + (tags ? '<span class="cli-tags">' + tags + '</span>' : '') + '</span>' + lado + '</button>';
     }
 
+    /* ——— Duplicados y nivel ——— */
+    function cliNormNombre(n){ return fnorm(n || '').split(/\s+/).filter(Boolean).sort().join(' '); }
+    // Posibles duplicados: mismo nombre (sin importar el orden de las palabras) o mismo NIT
+    function cliDuplicados(){
+      var gr = {}, vistos = {}, res = [];
+      CLIENTES.lista.forEach(function(c){
+        var ks = [], nn = cliNormNombre(c.nombre), nit = String(c.nit || '').replace(/\D/g, '');
+        if(nn.length >= 4) ks.push('n:' + nn); if(nit.length >= 5) ks.push('i:' + nit);
+        ks.forEach(function(k){ (gr[k] = gr[k] || []).push(c); });
+      });
+      Object.keys(gr).forEach(function(k){
+        var m = gr[k]; if(m.length < 2) return;
+        var sig = m.map(cliKey).sort().join(',');
+        if(vistos[sig]) return; vistos[sig] = 1;
+        m.sort(function(a, b){ return (b.pedidos || 0) - (a.pedidos || 0); });
+        res.push(m);
+      });
+      return res;
+    }
+    function cliSinNivel(){ return CLIENTES.lista.filter(function(c){ return !c.tipo; }).length; }
+    function cliAccionesPintar(){
+      var d = cliDuplicados().length, s = cliSinNivel(), bd = $('cliDupN'), bn = $('cliNivelN');
+      bd.hidden = !d; bd.textContent = d; bn.hidden = !s; bn.textContent = s;
+      $('cliBtnNivel').style.display = s ? '' : 'none';
+    }
+    function cliDupMiembro(c, g, i){
+      return '<label class="cli-dup-m"><input type="radio" name="dp' + g + '" value="' + i + '"' + (i === 0 ? ' checked' : '') + '><span><b>' + safe(c.nombre || '(sin nombre)') + '</b><small>'
+        + safe(cliTel(c.telefono)) + ' · ' + c.pedidos + (c.pedidos === 1 ? ' pedido' : ' pedidos') + (c.tipo ? ' · ' + safe(cliTipoNombre(c.tipo)) : '') + (c.nit ? ' · ' + safe(c.nit) : '') + '</small></span></label>';
+    }
+    // modo 'auto': lista los grupos encontrados · modo 'manual': se parte de un cliente (el de la ficha) y se busca el otro registro
+    function cliDupAbrir(modo){
+      CLIENTES.dupModo = modo; CLIENTES.dupGrupos = null;
+      var body = $('cliDupBody'), info = $('cliDupInfo');
+      if(modo === 'manual'){
+        var c = cliSeleccionado(); if(!c) return;
+        $('cliDupTit').textContent = 'Unir con otro registro';
+        info.textContent = 'Busca el otro registro de ' + (c.nombre || 'este cliente') + ' (por nombre o teléfono). Sus pedidos pasarán a este cliente.';
+        body.innerHTML = '<div class="search-bar"><input id="cliDupBuscar" type="search" autocomplete="off" aria-label="Buscar el otro registro" placeholder="Nombre o teléfono…"></div><div id="cliDupRes" class="cli-dup-res"></div>';
+        cliDupBuscar();
+      } else {
+        $('cliDupTit').textContent = 'Clientes duplicados';
+        var gs = cliDuplicados(); CLIENTES.dupGrupos = gs;
+        info.textContent = gs.length ? 'Estos clientes se llaman igual o tienen el mismo NIT. Marca cuál queda como principal y toca Unir.' : 'No se encontraron registros repetidos por nombre o NIT.';
+        body.innerHTML = gs.map(function(m, g){
+          return '<div class="cli-dup-g" data-g="' + g + '">' + m.map(function(c, i){ return cliDupMiembro(c, g, i); }).join('')
+            + '<button type="button" class="btn-solid cli-dup-un" data-g="' + g + '">Unir en uno</button></div>';
+        }).join('');
+      }
+      $('cliDupModal').classList.add('show');
+    }
+    function cliDupBuscar(){
+      var c = cliSeleccionado(), q = fnorm(($('cliDupBuscar') || {}).value || ''), box = $('cliDupRes'); if(!c || !box) return;
+      var r = CLIENTES.lista.filter(function(x){ return cliKey(x) !== cliKey(c) && (!q || fnorm([x.nombre, x.telefono].join(' ')).indexOf(q) >= 0); }).slice(0, 12);
+      CLIENTES.dupRes = r;
+      box.innerHTML = r.length ? r.map(function(x, i){
+        return '<button type="button" class="cli-dup-op" data-i="' + i + '"><b>' + safe(x.nombre || '(sin nombre)') + '</b><small>' + safe(cliTel(x.telefono)) + ' · ' + x.pedidos + (x.pedidos === 1 ? ' pedido' : ' pedidos') + '</small></button>';
+      }).join('') : '<p class="cfg-hint">Ningún cliente coincide.</p>';
+    }
+    function cliUnir(principal, duplicados){
+      var i = 0, tot = duplicados.length, op = String((AJUSTES && AJUSTES.operador) || '').trim();
+      var sig = function(){
+        if(i >= tot){ toast('Clientes unidos. Quedó un solo registro.', 'success'); beep('success'); haptic(15); $('cliDupModal').classList.remove('show'); CLIENTES.sel = cliKey(principal); CLIENTES.ver = (CLIENTES.ver || 0) + 1; cargarClientes(); refreshData(); sincronizarClientes(); return; }
+        var d = duplicados[i++];
+        google.script.run.withSuccessHandler(function(res){
+          if(res && res.ok) sig(); else { toast((res && res.message) || 'No se pudo unir.', 'error'); beep('error'); cargarClientes(); }
+        }).withFailureHandler(function(){ toast('Sin conexión · no se pudo unir.', 'error'); cargarClientes(); })
+          .unirClientes({ principal: principal.telefono, duplicado: d.telefono, nombre: principal.nombre, operador: op });
+      };
+      sig();
+    }
+    function cliNivelAbrir(){
+      var s = cliSinNivel(); if(!s){ toast('Todos los clientes ya tienen nivel.', 'info'); return; }
+      $('cliNivelInfo').textContent = s + (s === 1 ? ' cliente no tiene' : ' clientes no tienen') + ' nivel. ¿Qué nivel les asigno?';
+      $('cliNivelModal').classList.add('show');
+    }
+    function cliNivelAsignar(){
+      var a = $('cliNivelSeg').querySelector('.seg.active'), nivel = a ? a.getAttribute('data-t') : 'DISTRIBUIDOR', b = $('cliNivelOk');
+      b.disabled = true; b.textContent = 'Asignando…';
+      google.script.run.withSuccessHandler(function(res){
+        b.disabled = false; b.textContent = 'Asignar';
+        if(res && res.ok){ toast(res.message || 'Nivel asignado', 'success'); beep('success'); haptic(15); $('cliNivelModal').classList.remove('show'); CLIENTES.ver = (CLIENTES.ver || 0) + 1; cargarClientes(); sincronizarClientes(); }
+        else { toast((res && res.message) || 'No se pudo asignar el nivel.', 'error'); beep('error'); }
+      }).withFailureHandler(function(){ b.disabled = false; b.textContent = 'Asignar'; toast('Sin conexión · no se pudo asignar.', 'error'); })
+        .asignarNivelFaltante({ nivel: nivel, operador: String((AJUSTES && AJUSTES.operador) || '').trim() });
+    }
+
     function clientesRender(){
-      cliKpisPintar();
+      cliKpisPintar(); cliAccionesPintar();
       var lista = clientesFiltrados(), cont = $('cliList');
       if(!lista.length){
         cont.innerHTML = '';
@@ -6149,7 +6353,7 @@
       if(!c.completo) badges += '<i class="cli-tag inc">Incompleto</i>';
       var h = '<button type="button" class="cd-back" data-a="atras"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Clientes</button>'
         + '<div class="cd-head"><span class="cli-av grande" aria-hidden="true">' + safe(cliIni(c.nombre)) + '</span>'
-        + '<div class="cd-id"><h3>' + safe(c.nombre || '(sin nombre)') + '</h3><p>' + safe([c.ciudad, cliTel(c.telefono)].filter(Boolean).join(' · ')) + '</p>' + (badges ? '<div class="cli-tags">' + badges + '</div>' : '') + '</div></div>'
+        + '<div class="cd-id"><h3>' + safe(c.nombre || '(sin nombre)') + '</h3><p>' + safe([c.ciudad, cliTel(c.telefono)].filter(Boolean).join(' · ')) + '</p>' + (c.alternos ? '<p class="cd-alt">También usa: ' + safe(String(c.alternos).split(',').map(cliTel).join(', ')) + '</p>' : '') + (badges ? '<div class="cli-tags">' + badges + '</div>' : '') + '</div></div>'
         + '<div class="cd-acts">'
         +   '<button type="button" class="cd-act wa" data-a="wa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>WhatsApp</button>'
         +   '<a class="cd-act" href="tel:' + safe(String(c.telefono || '').replace(/[^\d+]/g, '')) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>Llamar</a>'
@@ -6179,14 +6383,13 @@
         +   '<div class="field"><label class="lbl" for="cdNit">NIT / Cédula</label><input id="cdNit" type="text" autocomplete="off" placeholder="Recomendado" value="' + safe(c.nit) + '"></div>'
         +   '<div class="field"><label class="lbl" for="cdCiudad">Ciudad</label><input id="cdCiudad" type="text" autocomplete="off" value="' + safe(c.ciudad) + '"></div>'
         +   '<div class="field"><label class="lbl" for="cdDir">Dirección</label><input id="cdDir" type="text" autocomplete="off" value="' + safe(c.direccion) + '"></div>'
-        +   '<div class="field cd-full"><span class="lbl">Tipo de cliente</span><div class="segmented segmented-3 cd-tipo" id="cdTipo" role="group" aria-label="Tipo de cliente">'
+        +   '<div class="field cd-full"><span class="lbl">Nivel del cliente</span><div class="segmented segmented-3 cd-tipo" id="cdTipo" role="group" aria-label="Nivel del cliente">'
         +     CLI_TIPOS.map(function(t){ return '<button type="button" class="seg' + (t[0] === (c.tipo || '') ? ' active' : '') + '" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div></div>'
-        +   '<div class="field"><label class="lbl" for="cdContacto">Persona de contacto</label><input id="cdContacto" type="text" autocomplete="off" placeholder="Opcional" value="' + safe(c.contacto) + '"></div>'
-        +   '<div class="field"><label class="lbl" for="cdCorreo">Correo</label><input id="cdCorreo" type="email" inputmode="email" autocomplete="off" placeholder="Opcional" value="' + safe(c.correo) + '"></div>'
         +   '<div class="field cd-full"><label class="lbl" for="cdNotas">Notas internas</label><textarea id="cdNotas" rows="3" maxlength="600" placeholder="Cómo le gusta pagar, a qué hora recibe, qué le interesa…">' + safe(c.notas) + '</textarea></div>'
         + '</div>'
         + '<p class="cfg-hint" id="cdHint">Se actualizará en ' + c.pedidos + (c.pedidos === 1 ? ' pedido' : ' pedidos') + ' y en cartera si tiene crédito activo.</p>'
-        + '<button type="button" class="btn-solid cd-guardar" id="cdGuardar" data-a="guardar">Guardar cambios</button></div>';
+        + '<button type="button" class="btn-solid cd-guardar" id="cdGuardar" data-a="guardar">Guardar cambios</button>'
+        + '<button type="button" class="btn-ghost cd-unir" data-a="unir">¿Es el mismo cliente con otro número? Unir registros</button></div>';
       return h;
     }
 
@@ -6195,8 +6398,7 @@
       var nombre = $('cdNombre').value.trim(), telefono = $('cdTel').value.trim(), nit = $('cdNit').value.trim(),
           direccion = $('cdDir').value.trim(), ciudad = $('cdCiudad').value.trim();
       if(!nombre || !telefono){ toast('Falta el nombre o el teléfono del cliente.', 'error'); beep('error'); return; }
-      var ta = $('cdTipo').querySelector('.seg.active'), ficha = { tipo: ta ? ta.getAttribute('data-t') : '', correo: $('cdCorreo').value.trim(),
-        contacto: $('cdContacto').value.trim(), notas: $('cdNotas').value.trim() };
+      var ta = $('cdTipo').querySelector('.seg.active'), ficha = { tipo: ta ? ta.getAttribute('data-t') : '', notas: $('cdNotas').value.trim() };
       var b = $('cdGuardar'); b.disabled = true; b.textContent = 'Guardando…';
       google.script.run.withSuccessHandler(function(res){
         b.disabled = false; b.textContent = 'Guardar cambios';
@@ -6204,7 +6406,7 @@
           toast(res.message || 'Cliente actualizado', 'success'); beep('success'); haptic(15);
           // se refleja ya mismo en pantalla; el servidor confirma enseguida con la lista nueva
           c.nombre = nombre.toUpperCase(); c.telefono = telefono; c.nit = nit.toUpperCase(); c.direccion = direccion.toUpperCase(); c.ciudad = ciudad.toUpperCase();
-          c.tipo = ficha.tipo; c.correo = ficha.correo.toLowerCase(); c.contacto = ficha.contacto; c.notas = ficha.notas; c.completo = !!(c.nit && c.direccion);
+          c.tipo = ficha.tipo; c.notas = ficha.notas; c.completo = !!(c.nit && c.direccion);
           CLIENTES.sel = cliKey(c); CLIENTES.ver = (CLIENTES.ver || 0) + 1;
           clientesRender(); cargarClientes();
           refreshData();
@@ -6247,6 +6449,28 @@
       else if(a === 'cartera') switchTab('cartera');
       else if(a === 'cupo') switchTab('cupos');
       else if(a === 'guardar') guardarCliente();
+      else if(a === 'unir') cliDupAbrir('manual');
+    });
+    $('cliBtnDup').addEventListener('click', function(){ haptic(8); cliDupAbrir('auto'); });
+    $('cliBtnNivel').addEventListener('click', function(){ haptic(8); cliNivelAbrir(); });
+    $('cliDupCerrar').addEventListener('click', function(){ $('cliDupModal').classList.remove('show'); });
+    $('cliNivelCancel').addEventListener('click', function(){ $('cliNivelModal').classList.remove('show'); });
+    $('cliNivelOk').addEventListener('click', cliNivelAsignar);
+    $('cliNivelSeg').addEventListener('click', function(e){ var t = e.target.closest('.seg'); if(!t) return; Array.prototype.forEach.call($('cliNivelSeg').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x === t); }); haptic(6); });
+    $('cliDupBody').addEventListener('input', function(e){ if(e.target.id === 'cliDupBuscar') cliDupBuscar(); });
+    $('cliDupBody').addEventListener('click', function(e){
+      var u = e.target.closest('.cli-dup-un');
+      if(u){
+        var g = +u.getAttribute('data-g'), m = (CLIENTES.dupGrupos || [])[g]; if(!m) return;
+        var r = document.querySelector('input[name="dp' + g + '"]:checked'), p = m[r ? +r.value : 0];
+        var otros = m.filter(function(x){ return x !== p; });
+        u.disabled = true; u.textContent = 'Uniendo…'; haptic(10); cliUnir(p, otros); return;
+      }
+      var o = e.target.closest('.cli-dup-op');
+      if(o){
+        var principal = cliSeleccionado(), dup = (CLIENTES.dupRes || [])[+o.getAttribute('data-i')]; if(!principal || !dup) return;
+        o.disabled = true; haptic(10); cliUnir(principal, [dup]);
+      }
     });
     document.addEventListener('keydown', function(e){
       if(e.key === 'Escape' && STATE.tab === 'clientes' && CLIENTES.sel && !cliEsEscritorio()){ CLIENTES.sel = ''; clientesRender(); }
@@ -7006,6 +7230,11 @@
       $('editProducto').value=p.producto||''; $('editTono').value=p.tono||''; EDIT_TONO_ORIG=String(p.tono||'').trim();
       fillBrandSelect($('editMarca')); $('editMarca').value=p.marca||'';
       editCostRaw=Math.round(Number(p.costo)||0); $('editCosto').value= editCostRaw?String(editCostRaw).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):'';
+      EDIT_PRECIOS={};
+      ['distribuidor','mayorista','detal'].forEach(function(k){
+        var v=Math.round(Number(p[k])||0); EDIT_PRECIOS[k]={ orig:v, val:v, propio:(p.propios||[]).indexOf(k)>=0, reset:false };
+        $('editP-'+k).value= v?String(v).replace(/B(?=(d{3})+(?!d))/g,'.'):''; pintarEditPrecio(k);
+      });
       EDIT_STOCK_BASE=Math.round(Number(p.stock)||0);
       setEditStockModo(modoInicial==='sumar'||modoInicial==='restar'||modoInicial==='exacto' ? modoInicial : 'sumar');
       actualizarEditStockPreview();
@@ -7014,6 +7243,18 @@
     }
     var editCostRaw=0, EDIT_TONO_ORIG='';
     var EDIT_STOCK_BASE=0, EDIT_STOCK_MODO='exacto';
+    var EDIT_PRECIOS={};
+    function pintarEditPrecio(k){
+      var s=EDIT_PRECIOS[k]; if(!s) return;
+      var cambio=!s.reset && s.val!==s.orig, propio=!s.reset && (s.propio || cambio);
+      $('epEst-'+k).textContent = s.reset ? 'Volverá al precio de la marca' : (propio ? (cambio?'Precio propio (sin guardar)':'Precio propio') : 'Según la marca');
+      $('epEst-'+k).className='ep-est'+(propio?' propio':'');
+      $('epReset-'+k).hidden = !(s.propio && !s.reset);
+    }
+    ['distribuidor','mayorista','detal'].forEach(function(k){
+      $('editP-'+k).addEventListener('input', function(e){ var d=e.target.value.replace(/D/g,''); var s=EDIT_PRECIOS[k]; if(!s) return; s.val=d?parseInt(d,10):0; s.reset=false; e.target.value=d?d.replace(/B(?=(d{3})+(?!d))/g,'.'):''; pintarEditPrecio(k); });
+      $('epReset-'+k).addEventListener('click', function(){ var s=EDIT_PRECIOS[k]; if(!s) return; s.reset=true; $('editP-'+k).value=s.orig?String(s.orig).replace(/B(?=(d{3})+(?!d))/g,'.'):''; haptic(8); pintarEditPrecio(k); });
+    });
     $('editCosto').addEventListener('input', function(e){ var d=e.target.value.replace(/\D/g,''); editCostRaw=d?parseInt(d,10):0; e.target.value=d?d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; });
     function getEditStock(){ var n=parseInt(String($('editStock').value).replace(/\D/g,''),10); return (isNaN(n)||n<0)?0:n; }
     function setEditStock(n){ if(n<0)n=0; $('editStock').value=String(n); actualizarEditStockPreview(); }
@@ -7062,6 +7303,11 @@
       // Sumar / dar de baja viajan como DIFERENCIA: el servidor la aplica sobre el stock real del momento
       if(EDIT_STOCK_MODO==='sumar') payload.stockDelta = getEditStock();
       else if(EDIT_STOCK_MODO==='restar') payload.stockDelta = -getEditStock();
+      var precios={}, hayP=false;
+      for(var kp in EDIT_PRECIOS){ var sp=EDIT_PRECIOS[kp];
+        if(sp.reset){ precios[kp]=null; hayP=true; }
+        else if(sp.val!==sp.orig){ if(!(sp.val>0)){ toast('Revisa el precio '+kp+': debe ser mayor a cero.','error'); beep('error'); return; } precios[kp]=sp.val; hayP=true; } }
+      if(hayP) payload.precios=precios;
       if(!payload.producto){ toast('Escribe el nombre.','error'); beep('error'); return; }
       if(!payload.marca){ toast('Selecciona una marca.','error'); beep('error'); return; }
       if(!payload.costo||payload.costo<=0){ toast('Revisa el costo: debe ser un número mayor a cero.','error'); beep('error'); return; }
@@ -7325,6 +7571,8 @@
        Si entra otro cliente a mitad de un pedido, antes había que perder el
        carrito. Ahora se guarda con nombre y se retoma después. Viven solo en
        este dispositivo (no se sincronizan): son borradores, no ventas. */
+    // Pasos del pedido guiado (cliente, nivel, flete, pago, abono, descuento): cada uno debe tocarse antes de guardar
+    var PG={cli:'',elegido:false,nivel:false,flete:'',pago:false,abono:'',desc:''};
     function loadDrafts(){ try{ return JSON.parse(localStorage.getItem('kaem_drafts')||'[]'); }catch(e){ return []; } }
     function saveDrafts(a){ try{ localStorage.setItem('kaem_drafts', JSON.stringify(a.slice(0,8))); }catch(e){} }
 
@@ -7339,7 +7587,7 @@
         items:CART.items.slice(), nivel:CART.nivel, nivelTocado:!!CART.nivelTocado, nivelAuto:!!CART.nivelAuto, metodo:CART.metodo,
         flete:$('fleteInput').value, fleteManual:FLETE_MANUAL, abono:$('abonoInput').value, desc:$('descInput').value,
         venc:$('vencInput').value, notas:$('orderNotes').value,
-        total:computeTotals().total, fecha:fmtDateNow()
+        total:computeTotals().total, fecha:fmtDateNow(), pg:pgSnap()
       };
       var arr=loadDrafts(); arr.unshift(d); saveDrafts(arr);
       newOrder(); pintarDrafts();
@@ -7361,6 +7609,7 @@
       applyNivelUI(d.nivel||'Detal'); setPago(d.metodo==='Crédito'?'Crédito':'Contado');
       // Un pedido en pausa conserva su lista tal como quedó (los guardados antes de esta función se tratan como elegidos a mano)
       CART.nivelTocado = (d.nivelTocado===undefined) ? true : !!d.nivelTocado; CART.nivelAuto = !!d.nivelAuto;
+      if(d.pg) pgCopiar(d.pg); else pgInferir();
       descartarDraft(id, true);
       renderCart(); haptic(15);
       toast('Pedido retomado'+(c.nombre?(' · '+c.nombre):''),'success');
@@ -7559,16 +7808,16 @@
       c.innerHTML=''; c.appendChild(frag);
       updateTotals(); markDirty();
     }
-    function getFlete(){ var d=String($('fleteInput').value).replace(/[^0-9]/g,''); return d?parseInt(d,10):0; }
+    function getFlete(){ if(PG.flete==='gratis') return 0; var d=String($('fleteInput').value).replace(/[^0-9]/g,''); return d?parseInt(d,10):0; }
 
     // ═══ POLÍTICA DE ENVÍO (fija · manual v5.1) — misma regla que el catálogo y el servidor ═══
-    //   Área Metropolitana (Bucaramanga, Floridablanca, Girón, Piedecuesta): Detal gratis desde $100.000;
+    //   Área Metropolitana (Bucaramanga, Floridablanca, Girón, Piedecuesta): Detal, Mayorista y Distribuidor SIEMPRE gratis;
     //   Mayorista y Distribuidor SIEMPRE gratis (mensajería propia KAÉM).
     //   Resto de Santander y del país: Detal y Mayorista gratis desde $200.000; Distribuidor desde $750.000.
     //   Si no alcanza: $15.000 (tarifa plena). Se evalúa sobre el subtotal de PRODUCTOS.
     var ENVIO_POLITICA = {
       tarifa: 15000,
-      Detal:        { am: 100000, nacional: 200000 },
+      Detal:        { am: 0,      nacional: 200000 },
       Mayorista:    { am: 0,      nacional: 200000 },
       Distribuidor: { am: 0,      nacional: 750000 }
     };
@@ -7605,6 +7854,8 @@
     function getDescPct(){
       var el=$('descInput');
       var v=el ? parseInt(String(el.value).replace(/[^0-9]/g,''),10) : NaN;
+      if(PG.desc==='sin') return 0;
+      if(PG.desc==='con') return isNaN(v) ? 0 : Math.max(0, Math.min(100, v));
       if(isNaN(v)) v = parseInt(AJUSTES && AJUSTES.descuentoDefecto, 10) || 0;
       return Math.max(0, Math.min(100, v));
     }
@@ -7689,6 +7940,7 @@
       $('tSaldoRow').style.display=cred?'flex':'none';
       if(cred){ $('tAbono').textContent=cop(t.abono); $('tSaldo').textContent=cop(t.saldo); }
       try{ cupoPintarStrip(); }catch(e){}
+      try{ pgPintar(); }catch(e){}
     }
     function applyNivelUI(nivel){ CART.nivel=nivel; Array.prototype.forEach.call($('nivelSeg').querySelectorAll('.seg'), function(s){ s.classList.toggle('active', s.dataset.nivel===nivel); }); }
     function setNivel(nivel, silent){
@@ -7776,11 +8028,13 @@
         abono:t.abono, saldo:t.saldo, fechaVencimiento:(CART.metodo==='Crédito'?vencDateStr():''),
         notas:$('orderNotes').value.trim(),
         operador:String(AJUSTES.operador||'').trim(),
-        estado:(t.saldo<=0?'Pagado':'Pendiente')
+        estado:(t.saldo<=0?'Pagado':'Pendiente'),
+        clienteNuevo:(PG.cli==='nuevo' && !editingRef)
       };
     }
     function validateOrder(p){
       if(!p.items.length) return 'Agrega al menos un producto al carrito.';
+      var pgE=pgValidar(); if(pgE) return pgE;
       if(!p.cliente.nombre) return 'Ingresa el nombre del cliente.';
       if(!p.cliente.nit) return 'La Cédula / NIT del cliente es obligatoria.';
       if(AJUSTES.inventarioEstricto){
@@ -8014,6 +8268,7 @@
       $('pedEditBadge').style.display='inline-block';
       lastOrder=null; orderCommitted=false;
       $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
+      pgInferir();
       setActionsEnabled(false); renderCart();
     }
     function loadOrderIntoForm(ref){
@@ -9179,7 +9434,7 @@
     }
     function waLlavesTexto(){ return llavesPagoActuales().map(function(l){ return '• '+l.banco+': '+l.valor; }).join('\n'); }
     var CAT_NIVEL_INFO = {
-      DETAL:   { nombre:'Detal',        minimo:0,      porRef:1, nacional:200000, local:100000 },
+      DETAL:   { nombre:'Detal',        minimo:0,      porRef:1, nacional:200000 },
       DISTRIB: { nombre:'Distribuidor', minimo:250000, porRef:2, nacional:750000 },
       MAYOR:   { nombre:'Mayorista',    minimo:150000, porRef:1, nacional:200000 }
     };
@@ -9528,7 +9783,7 @@
       setNivel('Detal', true); setPago('Crédito');
       setActionsEnabled(false);
       $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
-      CART.nivelTocado=false; CART.nivelAuto=false;
+      CART.nivelTocado=false; CART.nivelAuto=false; pgReiniciar();
       setDraftId(); renderCart(); pintarDrafts(); haptic(12); toast('Nuevo pedido · '+pedState.draftId,'info');
     }
 
@@ -11094,6 +11349,7 @@
       var txtPago = { Transferencia:'PAGO POR TRANSFERENCIA (anticipado: verificar el comprobante antes de despachar)', Efectivo:'PAGA EN EFECTIVO AL RECIBIR', Contraentrega:'PAGO AL RECIBIR (efectivo o transferencia)' }[p.pago];
       $('orderNotes').value = 'Pedido del catálogo '+p.id+(txtPago?' · '+txtPago:'')+(p.notas?' · '+p.notas:'');
       pedState.catalogoId = p.id;
+      pgInferir();
       renderCart(); markDirty();
       _cliValFirma = cliFirma(currentOrderPayload().cliente);
       $('catRevModal').classList.remove('show');
@@ -11531,23 +11787,45 @@
     function setLoading(on){ var b=$('saveBtn'); b.classList.toggle('loading',on); b.disabled=on; $('saveLabel').textContent=on?'Guardando…':'Guardar producto'; $('overlay').classList.toggle('show',on); }
     function markErr(field){ var el=$('f-'+field); if(!el) return; el.classList.add('field-error'); var i=el.querySelector('input,select'); if(i) i.focus(); }
     function clearErr(field){ var el=$('f-'+field); if(el) el.classList.remove('field-error'); }
-    function toast(msg,type,durMs){
+    /* ——— Avisos (toast) ———
+       Tarjeta con icono de color, la frase principal en negrita, barra de tiempo, botón para cerrar y, si se quiere, un botón de acción.
+       Se pausan al pasar el cursor o al tocarlos, y se descartan deslizando. toast(mensaje, 'success'|'error'|'info', ms, { accion:'Deshacer', fn:function(){} }) */
+    var TOAST_ICO = { success:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', error:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/>', info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5h.01"/>' };
+    function toast(msg,type,durMs,opts){
       var wrap=$('toastWrap'); if(!wrap) return;
-      type=type||'success'; msg=String(msg==null?'':msg);
-      // Duración según el largo: un aviso largo e importante (ej. "el crédito NO quedó
-      // en cartera") no alcanzaba a leerse en 3,2 s fijos. Los errores duran un poco más.
-      var dur=durMs || Math.min(9000, 2400 + msg.length*45 + (type==='error'?1500:0));
-      var cerrar=function(t){ if(t.__t) clearTimeout(t.__t); t.classList.add('hide'); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },260); };
-      var vivos=Array.prototype.filter.call(wrap.querySelectorAll('.toast'), function(t){ return !t.classList.contains('hide'); });
-      // El mismo aviso ya está en pantalla (ej. varios módulos sin conexión al arrancar): no se repite.
-      for(var i=0;i<vivos.length;i++){ if(vivos[i].__msg===msg){ clearTimeout(vivos[i].__t); vivos[i].__t=setTimeout(function(x){ return function(){ cerrar(x); }; }(vivos[i]),dur); return; } }
+      type=type||'success'; msg=String(msg==null?'':msg); opts=opts||{};
+      // Duración según el largo: un aviso largo e importante no alcanzaba a leerse en 3,2 s fijos. Los errores duran un poco más.
+      var dur=durMs || Math.min(9000, 2600 + msg.length*45 + (type==='error'?1500:0));
+      var cerrar=function(t){ if(t.__cerrado) return; t.__cerrado=1; if(t.__t) clearTimeout(t.__t); t.classList.add('hide'); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },240); };
+      var vivos=Array.prototype.filter.call(wrap.querySelectorAll('.toast'), function(t){ return !t.__cerrado; });
+      // El mismo aviso ya está en pantalla (ej. varios módulos sin conexión al arrancar): no se repite, solo se reinicia su tiempo.
+      for(var i=0;i<vivos.length;i++){ if(vivos[i].__msg===msg){ vivos[i].__reiniciar(dur); return; } }
       if(vivos.length>=3) cerrar(vivos[0]);
-      var t=document.createElement('div');
-      t.className='toast '+type; t.__msg=msg; t.setAttribute('role', type==='error'?'alert':'status');
-      t.innerHTML='<span class="dot"></span><span>'+safe(msg)+'</span>';
-      t.addEventListener('click', function(){ cerrar(t); });   // se cierra al tocarlo
-      wrap.appendChild(t);
-      t.__t=setTimeout(function(){ cerrar(t); },dur);
+      // La primera frase (hasta un punto, « · », « — » o «:») es el título; el resto, el detalle
+      var partes = msg.match(/^([\s\S]{6,72}?)(?:\s[·—–]\s|\.\s+|:\s+)([\s\S]+)$/), titulo = partes ? partes[1] : msg, detalle = partes ? partes[2] : '';
+      var el=document.createElement('div');
+      el.className='toast '+type; el.__msg=msg; el.setAttribute('role', type==='error'?'alert':'status');
+      el.innerHTML='<span class="t-ico" aria-hidden="true"><svg viewBox="0 0 24 24">'+(TOAST_ICO[type]||TOAST_ICO.info)+'</svg></span>'
+        +'<span class="t-txt"><b>'+safe(titulo)+'</b>'+(detalle?'<small>'+safe(detalle)+'</small>':'')
+        +(opts.accion?'<button type="button" class="t-acc">'+safe(opts.accion)+'</button>':'')+'</span>'
+        +'<button type="button" class="t-x" aria-label="Cerrar aviso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
+        +'<span class="t-tp" aria-hidden="true"><i></i></span>';
+      var barra=el.querySelector('.t-tp i'), restante=dur, inicio=0;
+      var arrancar=function(ms){ restante=ms; inicio=Date.now(); el.__t=setTimeout(function(){ cerrar(el); }, ms); if(barra){ barra.style.animation='none'; void barra.offsetWidth; barra.style.animation='toastTiempo '+ms+'ms linear forwards'; barra.style.animationPlayState='running'; } };
+      var pausar=function(){ if(el.__cerrado) return; clearTimeout(el.__t); restante=Math.max(600, restante-(Date.now()-inicio)); if(barra) barra.style.animationPlayState='paused'; };
+      var seguir=function(){ if(el.__cerrado) return; inicio=Date.now(); el.__t=setTimeout(function(){ cerrar(el); }, restante); if(barra) barra.style.animationPlayState='running'; };
+      el.__reiniciar=function(ms){ clearTimeout(el.__t); arrancar(ms); };
+      el.addEventListener('mouseenter', pausar); el.addEventListener('mouseleave', seguir);
+      el.querySelector('.t-x').addEventListener('click', function(e){ e.stopPropagation(); cerrar(el); });
+      var acc=el.querySelector('.t-acc'); if(acc) acc.addEventListener('click', function(e){ e.stopPropagation(); cerrar(el); try{ if(opts.fn) opts.fn(); }catch(er){} });
+      // deslizar a un lado (o hacia arriba) lo descarta; mientras se arrastra, el tiempo se detiene
+      var x0=null, y0=0, dx=0, dy=0;
+      el.addEventListener('pointerdown', function(e){ if(e.target.closest && e.target.closest('button')) return; x0=e.clientX; y0=e.clientY; dx=0; dy=0; pausar(); try{ el.setPointerCapture(e.pointerId); }catch(er){} });
+      el.addEventListener('pointermove', function(e){ if(x0===null) return; dx=e.clientX-x0; dy=e.clientY-y0; el.style.transition='none'; el.style.transform='translate('+dx+'px,'+Math.min(0,dy)+'px)'; el.style.opacity=String(Math.max(.25, 1-Math.abs(dx)/260)); });
+      var soltar=function(){ if(x0===null) return; var lejos=Math.abs(dx)>70 || dy<-40; x0=null; el.style.transition=''; if(lejos){ el.style.transform='translate('+(dx||0)+'px,-16px)'; el.style.opacity='0'; cerrar(el); } else { el.style.transform=''; el.style.opacity=''; seguir(); } };
+      el.addEventListener('pointerup', soltar); el.addEventListener('pointercancel', soltar);
+      wrap.appendChild(el);
+      arrancar(dur);
     }
 
     /* ═══════════════════════════════════════════════════════════════════
@@ -13664,6 +13942,125 @@
     }
     // En escritorio la página no se desplaza (cada pantalla tiene su propio scroll): si algún scrollIntoView la mueve, vuelve a su sitio
     window.addEventListener('scroll', function(){ if(window.scrollY || window.scrollX) window.scrollTo(0, 0); }, { passive:true });
+    /* ═══════ PEDIDO GUIADO ═══════
+       Cliente (nuevo o existente), nivel, flete, pago, abono y descuento se eligen con un toque. El pedido no sale si falta alguno.
+       Cliente existente → entra con su nivel. Cliente nuevo → el nivel es obligatorio y queda en su ficha (clienteNuevo).
+       Estado en PG (definido en pedidos en pausa). Los pedidos ya guardados, los de catálogo y los pausados se infieren de sus campos. */
+    function pgNivelNombre(n){ n=String(n||'').toUpperCase(); return n==='DETAL'?'Detal':n==='MAYORISTA'?'Mayorista':n==='DISTRIBUIDOR'?'Distribuidor':''; }
+    function pgSnap(){ return { cli:PG.cli, elegido:PG.elegido, nivel:PG.nivel, flete:PG.flete, pago:PG.pago, abono:PG.abono, desc:PG.desc }; }
+    function pgCopiar(o){ ['cli','elegido','nivel','flete','pago','abono','desc'].forEach(function(k){ PG[k]=o[k]; }); pgPintar(); }
+    function pgBuscarPorTel(tel){
+      var k=telKey(tel); if(!k) return null; var arr=loadClients();
+      for(var i=0;i<arr.length;i++){
+        if(telKey(arr[i].telefono)===k) return arr[i];
+        var alt=String(arr[i].alternos||'').split(',');
+        for(var j=0;j<alt.length;j++) if(alt[j] && telKey(alt[j])===k) return arr[i];
+      }
+      return null;
+    }
+    function pgReiniciar(){ PG.cli=''; PG.elegido=false; PG.nivel=false; PG.flete=''; PG.pago=false; PG.abono=''; PG.desc=''; if($('pgBuscar')) $('pgBuscar').value=''; if($('pgRes')) $('pgRes').innerHTML=''; pgPintar(); }
+    function pgInferir(){
+      var hay=!!pgBuscarPorTel($('cliTel').value);
+      PG.cli = hay ? 'existente' : 'nuevo'; PG.elegido=true; PG.nivel=true; PG.pago=true;
+      PG.flete = (parseInt(String($('fleteInput').value).replace(/\D/g,''),10)||0) > 0 ? 'valor' : 'gratis'; FLETE_MANUAL=true;
+      PG.abono = (CART.metodo==='Crédito' && (parseInt(String($('abonoInput').value).replace(/\D/g,''),10)||0) > 0) ? 'si' : 'no';
+      PG.desc  = (parseInt(String($('descInput').value).replace(/\D/g,''),10)||0) > 0 ? 'con' : 'sin';
+      pgPintar();
+    }
+    function pgSeg(id, val){ Array.prototype.forEach.call($(id).querySelectorAll('.seg'), function(s){ s.classList.toggle('active', !!val && s.getAttribute('data-v')===val); }); }
+    function pgPintar(){
+      if(!$('pgCli')) return;
+      Array.prototype.forEach.call($('pgCli').querySelectorAll('.pg-op'), function(b){ b.classList.toggle('on', b.getAttribute('data-m')===PG.cli); b.setAttribute('aria-pressed', b.getAttribute('data-m')===PG.cli); });
+      $('pgExist').style.display = PG.cli==='existente' ? 'block' : 'none';
+      $('pgGrid').style.display = (PG.cli==='nuevo' || (PG.cli==='existente' && PG.elegido)) ? '' : 'none';
+      var chip=$('pgChip');
+      if(PG.cli==='existente' && PG.elegido){ chip.style.display='block'; chip.textContent = PG.nivel ? 'Cliente existente · lista de precios '+CART.nivel : 'Este cliente aún no tiene nivel: elígelo en «Lista de precios».'; chip.className='pg-chip'+(PG.nivel?'':' falta'); }
+      else if(PG.cli==='nuevo'){ chip.style.display='block'; chip.textContent = PG.nivel ? 'Cliente nuevo · quedará guardado como '+CART.nivel : 'Cliente nuevo · elige su nivel en «Lista de precios».'; chip.className='pg-chip'+(PG.nivel?'':' falta'); }
+      else chip.style.display='none';
+      $('nivelSeg').classList.toggle('pg-pend', !PG.nivel);
+      pgSeg('pgFlete', PG.flete); $('fleteRow').style.display = PG.flete==='valor' ? '' : 'none';
+      $('pagoSeg').classList.toggle('pg-pend', !PG.pago);
+      if(!PG.pago) $('creditoBox').style.display='none';
+      pgSeg('pgAbono', PG.abono); $('abonoRow').style.display = PG.abono==='si' ? '' : 'none';
+      pgSeg('pgDesc', PG.desc); $('pgDescWrap').style.display = PG.desc==='con' ? '' : 'none';
+    }
+    function pgFalta(idEl, msg){
+      var el=$(idEl); if(el){ el.classList.remove('pg-falta'); void el.offsetWidth; el.classList.add('pg-falta'); try{ el.scrollIntoView({block:'center', behavior:'smooth'}); }catch(e){} setTimeout(function(){ el.classList.remove('pg-falta'); }, 2200); }
+      return msg;
+    }
+    function pgValidar(){
+      if(editingRef) return null;
+      if(!PG.cli) return pgFalta('pgCli', 'Elige si el cliente es nuevo o ya existe.');
+      if(PG.cli==='existente' && !PG.elegido) return pgFalta('pgExist', 'Busca y selecciona el cliente de la lista.');
+      if(!PG.nivel) return pgFalta('nivelSeg', 'Elige la lista de precios (nivel) del cliente.');
+      if(PG.cli==='nuevo'){
+        var ya=pgBuscarPorTel($('cliTel').value);
+        if(ya) return pgFalta('pgCli', 'Ese teléfono ya es de '+(ya.nombre||'un cliente')+'. Usa «Seleccionar cliente existente» para no duplicarlo.');
+      }
+      if(!PG.flete) return pgFalta('pgFleteRow', 'Elige el flete: gratis o con valor.');
+      if(PG.flete==='valor' && !getFlete()) return pgFalta('fleteRow', 'Escribe el valor del flete o elige Gratis.');
+      if(!PG.pago) return pgFalta('pagoSeg', 'Elige la condición de pago: contado o crédito.');
+      if(CART.metodo==='Crédito'){
+        if(!PG.abono) return pgFalta('pgAbonoRow', 'Indica si hay abono inicial: No o Sí.');
+        if(PG.abono==='si' && !getAbono()) return pgFalta('abonoRow', 'Escribe cuánto abona o elige No.');
+      }
+      if(!PG.desc) return pgFalta('pgDescRow', 'Indica si el pedido lleva descuento.');
+      if(PG.desc==='con' && !(parseInt(String($('descInput').value).replace(/\D/g,''),10)>0)) return pgFalta('pgDescWrap', 'Escribe el porcentaje de descuento o elige Sin descuento.');
+      return null;
+    }
+    function pgLimpiarCliente(){ ['cliNombre','clientNit','cliTel','cliDir','cliCiudad'].forEach(function(id){ $(id).value=''; }); }
+    function pgResultados(){
+      var q=fnorm($('pgBuscar').value||''), arr=loadClients().slice().reverse();
+      var r=arr.filter(function(c){ return c.nombre && (!q || fnorm([c.nombre,c.telefono,c.alternos,c.nit].join(' ')).indexOf(q)>=0); }).slice(0,8);
+      PG.res=r;
+      $('pgRes').innerHTML = r.length ? r.map(function(c,i){
+        var n=pgNivelNombre(c.nivel);
+        return '<button type="button" class="pg-it" data-i="'+i+'"><b>'+safe(c.nombre)+'</b><small>'+safe([c.telefono,c.ciudad].filter(Boolean).join(' · '))+'</small><i class="'+(n?'':'sin')+'">'+safe(n||'Sin nivel')+'</i></button>';
+      }).join('') : '<p class="cfg-hint">Ningún cliente coincide. Si es nuevo, toca «Crear cliente nuevo».</p>';
+    }
+    function pgElegir(c){
+      $('cliNombre').value=String(c.nombre||'').toUpperCase(); $('clientNit').value=String(c.nit||'').toUpperCase(); $('cliTel').value=String(c.telefono||'');
+      $('cliDir').value=String(c.direccion||'').toUpperCase(); $('cliCiudad').value=String(c.ciudad||'').toUpperCase();
+      PG.elegido=true; var n=pgNivelNombre(c.nivel);
+      if(n){ setNivel(n, true); CART.nivelTocado=true; PG.nivel=true; }
+      else { PG.nivel=false; toast('Este cliente aún no tiene nivel · elígelo en «Lista de precios»','info'); }
+      $('pgRes').innerHTML=''; $('pgBuscar').value='';
+      try{ cupoConsultarCliente(); }catch(e){}
+      updateTotals(); markDirty(); haptic(12);
+    }
+    $('pgCli').addEventListener('click', function(e){
+      var b=e.target.closest('.pg-op'); if(!b) return; var m=b.getAttribute('data-m'); haptic(10);
+      if(m!==PG.cli){ PG.cli=m; PG.elegido=false; PG.nivel=false; CART.nivelTocado=false; pgLimpiarCliente(); markDirty(); }
+      if(m==='existente'){ pgResultados(); setTimeout(function(){ $('pgBuscar').focus(); }, 60); } else setTimeout(function(){ $('cliNombre').focus(); }, 60);
+      updateTotals();
+    });
+    $('pgBuscar').addEventListener('input', pgResultados);
+    $('pgRes').addEventListener('click', function(e){ var b=e.target.closest('.pg-it'); if(!b) return; var c=(PG.res||[])[+b.getAttribute('data-i')]; if(c) pgElegir(c); });
+    $('nivelSeg').addEventListener('click', function(e){ if(e.target.closest('.seg')){ PG.nivel=true; pgPintar(); } });
+    $('pagoSeg').addEventListener('click', function(e){ if(!e.target.closest('.seg')) return; PG.pago=true; if(CART.metodo!=='Crédito'){ PG.abono=''; $('abonoInput').value=''; } updateTotals(); });
+    $('pgFlete').addEventListener('click', function(e){
+      var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10);
+      PG.flete=v; FLETE_MANUAL=true;
+      if(v==='gratis') $('fleteInput').value='';
+      else if(!getFlete()){
+        var sub=0; CART.items.forEach(function(it){ sub+=subCarrito(it); });
+        var f=fletePolitica(CART.nivel, $('cliCiudad').value, sub); if(f && f.valor) $('fleteInput').value=String(f.valor);
+        setTimeout(function(){ $('fleteInput').focus(); }, 60);
+      }
+      updateTotals(); markDirty();
+    });
+    $('fleteHint').addEventListener('click', function(e){ if(e.target && e.target.id==='fletePolBtn'){ PG.flete = getFlete()>0 ? 'valor' : 'gratis'; if(PG.flete==='gratis') $('fleteInput').value=''; FLETE_MANUAL=true; updateTotals(); } });
+    $('pgAbono').addEventListener('click', function(e){
+      var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PG.abono=v;
+      if(v==='no') $('abonoInput').value=''; else setTimeout(function(){ $('abonoInput').focus(); }, 60);
+      updateTotals(); markDirty();
+    });
+    $('pgDesc').addEventListener('click', function(e){
+      var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PG.desc=v;
+      if(v==='sin') $('descInput').value='';
+      else { var d=parseInt(AJUSTES && AJUSTES.descuentoDefecto,10)||0; if(!(parseInt($('descInput').value,10)>0) && d>0) $('descInput').value=String(d); setTimeout(function(){ $('descInput').focus(); }, 60); }
+      updateTotals(); markDirty();
+    });
     /* ═══════ SALUD DEL SISTEMA · se abre al tocar el estado (🟢 Al día · hora) ═══════ */
     var SAL = { t:null, prueba:'' };
     function saludFila(nivel, k, v){ return '<div class="sl-row '+nivel+(String(v).length>24?' ancho':'')+'"><i></i><div><small>'+safe(k)+'</small><b>'+safe(v)+'</b></div></div>'; }
