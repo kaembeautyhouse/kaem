@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-14';
+    const APP_VERSION = '2026-10-22-15';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -761,7 +761,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -9039,21 +9039,21 @@
         .rc-band .rem-logo-text{ color:#F7F4EE !important; }
         .rc-head{ display:flex; justify-content:space-between; align-items:center; }
         .rc-titlebox{ text-align:right; }
-        .rc-title{ font-family:'Playfair Display',Georgia,serif; font-size:38px; letter-spacing:.05em; color:#E8C29E; text-transform:uppercase; line-height:1; }
+        .rc-title{ font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:38px; letter-spacing:.04em; color:#E8C29E; text-transform:uppercase; line-height:1; }
         .rc-remnum{ display:inline-block; margin-top:12px; font-size:16px; letter-spacing:.04em; color:#F7F4EE;
                     border:1.5px solid #8A6A52; border-radius:20px; padding:6px 20px; }
         .rc-body{ flex:1; display:flex; flex-direction:column; padding:18px 12px 0; min-height:0; }
         .rc-grid{ display:grid; grid-template-columns:1.2fr .9fr 1fr 1fr; padding-bottom:0; }
         .rc-cell{ text-align:center; padding:0 8px; min-width:0; }
         .rc-cell + .rc-cell{ border-left:1px solid #E4D8C8; }
-        .rc-cell span{ display:block; font-family:'Playfair Display',Georgia,serif; font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:#B86B53; margin-bottom:7px; }
+        .rc-cell span{ display:block; font-family:'Jost',sans-serif; font-weight:600; font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:#B86B53; margin-bottom:7px; }
         .rc-cell b{ font-size:18px; color:#2C211E; font-weight:600; overflow-wrap:break-word; }
         .rc-monto{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; min-height:0; margin:14px 0 14px; padding:10px 0; background:linear-gradient(180deg,#FBF8F4,#F7F2EC); border:1px solid #E4D8C8; border-radius:22px; }
         .rc-estado{ display:inline-flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; padding:5px 14px; border-radius:20px; margin-bottom:8px; }
         .rc-estado.ok{ background:#E7F0E3; color:#3D6B34; border:1px solid #9FC393; }
         .rc-estado.abono{ background:#FBEBDD; color:#9A5A2E; border:1px solid #E0B88E; }
-        .rc-monto-lbl{ font-family:'Playfair Display',Georgia,serif; font-size:15px; letter-spacing:.3em; text-transform:uppercase; color:#8A7A6C; }
-        .rc-monto-val{ font-family:'Playfair Display',Georgia,serif; font-size:54px; color:#2C211E; margin-top:10px; line-height:1; overflow-wrap:break-word; }
+        .rc-monto-lbl{ font-family:'Jost',sans-serif; font-weight:600; font-size:14px; letter-spacing:.28em; text-transform:uppercase; color:#8A7A6C; }
+        .rc-monto-val{ font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:54px; color:#2C211E; margin-top:10px; line-height:1; overflow-wrap:break-word; }
         .rc-hist{ background:#FBF8F4; border:1px solid #E4D8C8; border-radius:14px; padding:8px 20px; margin-bottom:14px; }
         .rc-hist-t{ display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#B86B53; margin-bottom:6px; }
         .rc-hist-row{ display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:#5A4A3E; padding:2px 0; }
@@ -9062,12 +9062,12 @@
         .rc-breakdown{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
         .rc-bbox{ text-align:center; border-radius:16px; padding:12px 8px; background:#FBF8F4; border:1px solid #E4D8C8; }
         .rc-bbox span{ display:block; font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:#8A7A6C; margin-bottom:7px; }
-        .rc-bbox b{ font-family:'Playfair Display',Georgia,serif; font-size:22px; color:#2C211E; }
+        .rc-bbox b{ font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:22px; color:#2C211E; }
         .rc-bbox.ok{ background:#E7F0E3; border-color:#9FC393; }
         .rc-bbox.ok b{ color:#3D6B34; }
         .rc-bbox.pend{ background:#F9E2D8; border-color:#E0A88E; }
         .rc-bbox.pend b{ color:#A63A26; }
-        .rc-closing{ text-align:center; font-family:'Playfair Display',Georgia,serif; font-style:italic; font-size:13.5px; color:#B86B53; padding-bottom:16px; }
+        .rc-closing{ text-align:center; font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:500; font-size:13.5px; color:#B86B53; padding-bottom:16px; }
         .rc-foot{ display:flex; justify-content:space-between; align-items:center; font-size:13.5px; color:#D9CBBB; padding:13px 30px; }
         .rc-foot b{ color:#F7F4EE; }
         </style>`
@@ -9119,6 +9119,7 @@
       haptic(15);
       try{
         var root = stage.querySelector('#kaem-remision-root');
+        if (document.fonts && document.fonts.load){ try{ await Promise.all([document.fonts.load('600 20px Fraunces'), document.fonts.load('italic 500 14px Fraunces'), document.fonts.load('600 12px Jost')]); }catch(e){} }
         if (document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
         await esperarImagenes_(root);
         await new Promise(function(res){ setTimeout(res,60); });
@@ -9204,21 +9205,35 @@
     .rp.rpm{ height:auto !important; overflow:visible !important; display:block !important; }
     .rp .rp-body{ flex:1; display:flex; flex-direction:column; min-height:0; width:740px; }
     .rp .rem-header{ margin:0 !important; border-radius:18px; padding:18px 28px 16px; border-bottom:4px solid #C9985F !important; }
-    .rp .rem-logo{ min-height:0; } .rp .rem-logo-img{ max-height:56px; max-width:240px; }
+    .rp .rem-logo{ min-height:0; } .rp .rem-logo-img{ max-height:78px; max-width:320px; }
     .rp .rem-city{ margin-top:6px; }
     .rp .rem-docid{ font-size:27px; } .rp .rem-docline{ margin-top:5px; }
     .rp .rem-meta{ padding:12px 2px 0; align-items:flex-start; }
     .rp .rem-chips{ flex:1; align-items:center; }
     .rp .rem-doccond, .rp .rem-docnivel{ white-space:nowrap; line-height:1.3; padding:4px 12px; font-size:11.5px; }
+    .rp .rem-doclabel{ font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:14px; letter-spacing:.12em; color:#F0CFA6; }
+    .rp .rem-cardtitle, .rp .rem-paytitle, .rp .rem-vence-lbl{ font-family:'Jost','Helvetica Neue',Arial,sans-serif; font-weight:600; font-size:10.5px; letter-spacing:.16em; color:#A85F48; }
+    .rp .rem-paytitle{ color:#6B5B52; } .rp .rem-vence-lbl{ white-space:nowrap; }
+    .rp .rem-table thead th{ font-family:'Jost','Helvetica Neue',Arial,sans-serif; font-weight:600; letter-spacing:.1em; }
+    .rp .rem-grand > span:first-child{ font-family:'Fraunces',Georgia,serif; font-weight:600; letter-spacing:.1em; font-size:14px; }
+    .rp .rem-logo-text{ font-family:'Fraunces',Georgia,serif; }
     .rp .rem-header{ flex-direction:column; align-items:stretch; }
     .rp .rem-hrow{ display:flex; justify-content:space-between; align-items:center; }
     .rp .rem-hbar{ display:flex; justify-content:space-between; align-items:center; gap:14px; margin-top:12px; padding-top:9px; border-top:1px solid rgba(232,194,158,.30); font-size:11px; letter-spacing:.02em; color:#D9CBBB; white-space:nowrap; }
     .rp .rem-hbar b{ color:#F7F4EE; font-weight:600; }
     .rp .rem-hbar i{ font-style:normal; color:#C9985F; padding:0 7px; }
     .rp .rem-card{ border-radius:16px; }
-    .rp .cliente-box{ margin:12px 0 12px; padding:10px 16px 11px; }
-    .rp .rem-cli-grid{ gap:6px 18px; }
-    .rp .rem-table thead th{ padding:8px 10px; font-size:11px; white-space:nowrap; letter-spacing:.04em; }
+    .rp .cliente-box{ margin:14px 0 12px; padding:12px 18px 13px; }
+    .rp .rem-cliwrap{ display:flex; gap:20px; align-items:stretch; }
+    .rp .rem-cliL{ flex:1; min-width:0; }
+    .rp .rem-cli-grid{ display:grid; grid-template-columns:1.45fr 1fr; gap:7px 18px; }
+    .rp .rem-cell{ min-width:0; flex:none; } .rp .rem-cell.wide{ grid-column:1 / -1; }
+    .rp .rem-cliR{ flex:0 0 218px; border-left:1px solid #E4D8C8; padding-left:18px; display:flex; flex-direction:column; gap:8px; }
+    .rp .rem-cond{ display:flex; flex-direction:column; gap:3px; }
+    .rp .rem-cond span{ font-family:'Jost',sans-serif; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#8A7A6C; font-weight:500; }
+    .rp .rem-cond em{ font-style:normal; display:inline-block; align-self:flex-start; max-width:100%; font-size:12px; font-weight:500; color:#2C211E; background:#fff; border:1px solid #D2C2B2; border-radius:12px; padding:4px 11px; line-height:1.3; }
+    .rp .rem-cond em.cr{ color:#8A4B38; border-color:#E3C9BD; background:#FBF1EC; }
+    .rp .rem-table thead th{ padding:8px 10px; font-size:10.5px; white-space:nowrap; }
     .rp .rem-table tbody td{ padding:6px 10px; font-size:12.5px; }
     .rp .rem-psku{ font-size:10.5px; }
     .rp .rp-uni{ text-align:right; font-size:11px; letter-spacing:.03em; color:#8A7A6C; margin:9px 6px 0; }
@@ -9252,11 +9267,11 @@
     /* l2 · filas y tarjeta del cliente más juntas, políticas más chicas */
     .rp.l2 .rem-table tbody td, .rp.l3 .rem-table tbody td{ padding:3px 10px; font-size:12px; }
     .rp.l2 .rem-psku, .rp.l3 .rem-psku{ font-size:10px; }
-    .rp.l2 .cliente-box, .rp.l3 .cliente-box{ margin:9px 0 9px; padding:8px 16px 9px; }
+    .rp.l2 .cliente-box, .rp.l3 .cliente-box{ margin:10px 0 9px; padding:9px 16px 10px; } .rp.l3 .rem-cliR{ gap:5px; }
     .rp.l2 .rp-legal p, .rp.l3 .rp-legal p{ font-size:9px; line-height:1.34; }
     .rp.l2 .rp-gap, .rp.l3 .rp-gap{ margin-top:13px; }
     /* l3 · encabezado compacto */
-    .rp.l3 .rem-header{ padding:12px 24px 11px; } .rp.l3 .rem-logo-img{ max-height:42px; } .rp.l3 .rem-docid{ font-size:23px; }
+    .rp.l3 .rem-header{ padding:12px 24px 11px; } .rp.l3 .rem-logo-img{ max-height:54px; } .rp.l3 .rem-docid{ font-size:23px; }
     .rp.l3 .rem-city{ margin-top:3px; font-size:10px; } .rp.l3 .rem-meta{ padding-top:9px; }
     .rp.l3 .rem-firma-sign{ height:24px; } .rp.l3 .rem-firma-img{ max-height:22px; }
     `;
@@ -9308,16 +9323,17 @@
     function rpCabecera_(R){
       return '<div class="rem-header"><div class="rem-hrow"><div class="rem-brandwrap"><div class="rem-logo"><img src="logo%20recibo.png" alt="KAÉM Beauty House" class="rem-logo-img" crossorigin="anonymous" onerror="this.onerror=null;this.parentNode.classList.add(\'no-img\');"><span class="rem-logo-text"><b>KAÉM</b> Beauty House</span></div></div>'
         + '<div class="rem-docbox"><div class="rem-doclabel">Remisión de venta</div><div class="rem-docid">' + escHTML(R.id) + '</div><div class="rem-docline"></div><div class="rem-docdate">Emitido: ' + escHTML(R.emitido) + '</div></div></div>'
-        + '<div class="rem-hbar"><span>Bucaramanga<i>·</i>Santander<i>·</i>Colombia<i>·</i>NIT 1005339178-8</span><span><b>WhatsApp</b> 311 207 9880<i>·</i><b>Instagram</b> @kaembeautyhouse</span></div></div>'
-        + '<div class="rem-meta"><div class="rem-chips"><span class="rem-doccond">Pago: ' + escHTML(R.condTxt) + '</span><span class="rem-docnivel">Nivel: ' + escHTML(R.nivel) + '</span>'
-        + (R.entrega ? '<span class="rem-docnivel">' + escHTML(R.entrega) + '</span>' : '') + '</div>'
-        + '</div>'
-        + '<div class="rem-card cliente-box"><div class="rem-cardtitle">Datos del cliente</div><div class="rem-cli-grid">'
+        + '<div class="rem-hbar"><span>Bucaramanga<i>·</i>Santander<i>·</i>Colombia<i>·</i>NIT 1005339178-8</span><span><b>Instagram</b> @kaembeautyhouse<i>·</i><b>WhatsApp</b> 311 207 9880</span></div></div>'
+        + '<div class="rem-card cliente-box"><div class="rem-cliwrap"><div class="rem-cliL"><div class="rem-cardtitle">Datos del cliente</div><div class="rem-cli-grid">'
         + '<div class="rem-cell"><span>Nombre</span><b>' + escHTML(R.cliente.nombre) + '</b></div><div class="rem-cell"><span>Documento / NIT</span><b>' + escHTML(R.cliente.nit) + '</b></div>'
         + '<div class="rem-cell"><span>Teléfono</span><b>' + escHTML(R.cliente.tel) + '</b></div><div class="rem-cell"><span>Ciudad</span><b>' + escHTML(R.cliente.ciudad) + '</b></div>'
-        + '<div class="rem-cell wide"><span>Dirección de entrega</span><b>' + escHTML(R.cliente.dir) + '</b></div></div></div>';
+        + '<div class="rem-cell wide"><span>Dirección de entrega</span><b>' + escHTML(R.cliente.dir) + '</b></div></div></div>'
+        + '<div class="rem-cliR"><div class="rem-cardtitle">Condiciones</div>'
+        + '<div class="rem-cond"><span>Pago</span><em class="' + (R.credito ? 'cr' : '') + '">' + escHTML(R.condTxt) + '</em></div>'
+        + '<div class="rem-cond"><span>Lista de precios</span><em>' + escHTML(R.nivel) + '</em></div>'
+        + (R.entrega ? '<div class="rem-cond"><span>Entrega</span><em>' + escHTML(R.entrega.replace(/^Entrega /, '')) + '</em></div>' : '')
+        + '</div></div></div>';
     }
-    function rpContinuacion_(R){ return '<div class="rp-cont"><b>KAÉM BEAUTY HOUSE</b><span>Remisión ' + escHTML(R.id) + ' · continuación</span></div>'; }
     var RP_THEAD = '<div class="rem-tw"><table class="rem-table"><colgroup><col style="width:5%"><col style="width:59%"><col style="width:7.5%"><col style="width:13.5%"><col style="width:15%"></colgroup><thead><tr><th class="c">#</th><th>Descripción</th><th class="c">Cant.</th><th class="r">Precio Unit.</th><th class="r">Subtotal</th></tr></thead><tbody>';
     function rpFila_(f){
       var titulo, num, cls = '';
@@ -9357,7 +9373,7 @@
     function rpMedir_(stage, R, nivel){
       var box = document.createElement('div'); box.className = 'rp rpm l' + nivel; stage.appendChild(box);
       var alto = function(html){ var d = document.createElement('div'); d.style.cssText = 'display:flow-root;width:740px;'; d.innerHTML = html; box.appendChild(d); var h = d.getBoundingClientRect().height; box.removeChild(d); return Math.ceil(h); };
-      var M = { top1:alto(rpCabecera_(R)), topC:alto(rpContinuacion_(R)), th:alto(RP_THEAD + '</tbody></table></div>'), uni:alto(rpUnidades_(R)), notas:alto(rpNotas_(R)),
+      var M = { top1:alto(rpCabecera_(R)), topC:0, th:alto(RP_THEAD + '</tbody></table></div>'), uni:alto(rpUnidades_(R)), notas:alto(rpNotas_(R)),
                 sum:alto(rpResumen_(R)), fir:alto(rpFirmas_(R)), legal:alto(rpLegal_(R, 'RV-000 · Página 1 de 1')) + 10, filas:[] };
       var w = document.createElement('div'); w.style.width = '740px'; w.innerHTML = RP_THEAD + R.filas.map(rpFila_).join('') + '</tbody></table></div>'; box.appendChild(w);
       Array.prototype.forEach.call(w.querySelectorAll('tbody tr'), function(tr){ M.filas.push(Math.ceil(tr.getBoundingClientRect().height)); });
@@ -9399,7 +9415,7 @@
     function rpHoja_(R, plan, k){
       var pg = plan.pages[k], ultima = (k === plan.n - 1), total = plan.n;
       var tabla = pg.rows.length ? ('<div>' + RP_THEAD + pg.rows.map(function(i){ return rpFila_(R.filas[i]); }).join('') + '</tbody></table></div></div>') : '';
-      var h = '<div class="rp l' + plan.nivel + '"><div class="rp-body">' + (k === 0 ? rpCabecera_(R) : rpContinuacion_(R)) + tabla;
+      var h = '<div class="rp l' + plan.nivel + '"><div class="rp-body">' + (k === 0 ? rpCabecera_(R) : '') + tabla;
       if (ultima){
         h += rpUnidades_(R) + rpNotas_(R) + rpResumen_(R) + '<div class="rp-ancla">' + rpFirmas_(R) + '</div>' + rpLegal_(R, R.id + ' · Página ' + (k + 1) + ' de ' + total);
       } else { h += rpFolio_(R, k + 1, total); }
@@ -9418,6 +9434,7 @@
       stage.innerHTML = '<style>' + RP_CSS + '</style>';
       document.body.appendChild(stage);
       try{
+        if (document.fonts && document.fonts.load){ try{ await Promise.all([document.fonts.load('600 20px Fraunces'), document.fonts.load('italic 500 14px Fraunces'), document.fonts.load('400 12px Jost'), document.fonts.load('600 12px Jost')]); }catch(e){} }
         if (document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
         var pre = document.createElement('div'); pre.className = 'rp rpm'; pre.innerHTML = rpCabecera_(R) + rpFirmas_(R, false) + rpResumen_(R, false); stage.appendChild(pre);
         await esperarImagenes_(pre); stage.removeChild(pre);                    // logo, firma y QR ya cargados (y en caché) antes de medir y fotografiar
