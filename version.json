@@ -1,5 +1,5 @@
 {
-  "app": "2026-10-22-05",
+  "app": "2026-10-22-06",
   "servidor": "2026.10.24",
   "fecha": "2026-10-22",
   "novedades": [
@@ -7,6 +7,7 @@
     "Clientes: botón Duplicados para unir un cliente registrado dos veces (por ejemplo con dos celulares) y botón Asignar nivel para llenar de una vez los que no lo tienen. Ya no se piden correo ni persona de contacto.",
     "Productos: ahora puedes cambiar el precio de UN producto sin mover los márgenes de la marca, y volver a la marca cuando quieras.",
     "Envío gratis siempre en Bucaramanga y área metropolitana para el nivel Detal.",
-    "Avisos con nuevo diseño: icono, título y detalle, barra de tiempo, botón para cerrar y se descartan deslizando."
+    "Avisos con nuevo diseño: icono, título y detalle, barra de tiempo, botón para cerrar y se descartan deslizando.",
+    "Catálogos web: botones más grandes y letras más legibles. En Pedidos del catálogo ahora ves también los últimos pedidos aprobados o rechazados."
   ]
 }
