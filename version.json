@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-22-16",
+  "app": "2026-10-22-17",
   "servidor": "2026.10.28",
   "fecha": "2026-10-22",
   "novedades": [
+    "Remisión y recibo con la fuente del logo (TAN Pearl) en el título y en «TOTAL»: título compacto que no le quita espacio a la hoja.",
     "Nueva tipografía Fraunces en toda la app (títulos, cifras y tarjetas). La remisión de nivel Detal o Mayorista sale con el WhatsApp de Detal y sus propias políticas al pie, y el vencimiento del crédito queda en dos líneas.",
     "Remisión: las condiciones (pago, lista de precios, entrega) ahora van dentro de la tarjeta del cliente, el logo es más grande, Instagram y WhatsApp cambiaron de orden, las hojas siguientes ya no llevan franja de continuación y los títulos usan una tipografía editorial más legible (Fraunces). El recibo de pago usa la misma tipografía.",
     "Remisión y recibo con el mismo estilo: WhatsApp e Instagram en una sola línea dentro del encabezado, hojas de continuación con tarjeta oscura, tabla con esquinas redondeadas, columnas más ajustadas, QR grande como antes y más aire sobre los totales. En Android la remisión se descarga sola y además queda el botón Compartir. La pantalla de bloqueo sigue el modo claro u oscuro y las categorías del Inicio quedaron centradas.",
