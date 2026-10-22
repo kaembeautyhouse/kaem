@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-22-08",
-  "servidor": "2026.10.25",
+  "app": "2026-10-22-09",
+  "servidor": "2026.10.26",
   "fecha": "2026-10-22",
   "novedades": [
+    "Auditoría Shopify más clara: la hoja ahora tiene una columna por cada cosa que revisar (foto, descripción, precio, proveedor, activo y metadatos) con ✅ o ❌, y una columna «Qué hacer» que dice exactamente qué falta en cada producto.",
     "Fotos en el pedido: cada producto del carrito y de la búsqueda muestra su foto; al tocarla se abre una ventana con la foto, el nombre y el precio. Nuevo botón «Mostrar productos al cliente» con una vitrina de fotos y botón +2 (Distribuidor) para armar el pedido cara a cara.",
     "Pedidos guiados: eliges con un toque si el cliente es nuevo o existente, el flete (gratis o con valor), contado o crédito, abono y descuento. El pedido no sale si falta alguno. El cliente existente entra con su nivel; al crear uno nuevo el nivel es obligatorio.",
     "Clientes: botón Duplicados para unir un cliente registrado dos veces (por ejemplo con dos celulares) y botón Asignar nivel para llenar de una vez los que no lo tienen. Ya no se piden correo ni persona de contacto.",

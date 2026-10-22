@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-08';
+    const APP_VERSION = '2026-10-22-09';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -6002,7 +6002,8 @@
     });
     $('cfgShopResyncBtn').addEventListener('click', resincronizarCatalogoUI);
     var AUD_TXT = { OK:'✅ Correctos', SKU_EAN:'🔁 SKU distinto (código de barras)', SKU_NOMBRE:'🔁 SKU distinto (nombre)', TONO:'🎨 Tono diferente',
-                    FALTA:'➕ Faltan en Shopify', SOBRA:'➖ Sobran en Shopify', SIN_FOTO:'📷 Sin foto' };
+                    FALTA:'➕ Faltan en Shopify', SOBRA:'➖ Sobran en Shopify', INCOMPLETO:'📝 Incompletos en Shopify' };
+    var AUD_FALTA = { foto:'📷 sin foto', descripcion:'📝 sin descripción', precio:'💲 precio mal', proveedor:'🏷️ sin proveedor', activo:'⛔ no activos', metadatos:'🧩 sin metadatos' };
     $('cfgShopAuditBtn').addEventListener('click', function(){
       var b=$('cfgShopAuditBtn'); b.disabled=true; b.textContent='Comparando la App con Shopify…';
       $('audSub').textContent='Trayendo el catálogo de Shopify y cruzándolo con la App…'; $('audChips').innerHTML=''; $('audLista').innerHTML=''; $('audHoja').style.display='none';
@@ -6012,7 +6013,8 @@
         if(!r || !r.ok){ $('audSub').textContent=(r&&r.message)||'No se pudo hacer la auditoría.'; return; }
         $('audSub').textContent = r.message + ' La App es la fuente oficial: los cambios se hacen en Shopify.';
         $('audChips').innerHTML = Object.keys(AUD_TXT).filter(function(k){ return r.resumen[k]; })
-          .map(function(k){ return '<span class="'+(k==='OK'?'ok':'')+'">'+AUD_TXT[k]+' · '+r.resumen[k]+'</span>'; }).join('');
+          .map(function(k){ return '<span class="'+(k==='OK'?'ok':'')+'">'+AUD_TXT[k]+' · '+r.resumen[k]+'</span>'; }).join('')
+          + Object.keys(AUD_FALTA).filter(function(k){ return r.faltantes && r.faltantes[k]; }).map(function(k){ return '<span>'+AUD_FALTA[k]+' · '+r.faltantes[k]+'</span>'; }).join('');
         $('audLista').innerHTML = (r.muestra||[]).map(function(x){
           return '<div class="aud-item"><small>'+safe(AUD_TXT[x.estado]||x.estado)+'</small><b>'+safe(x.producto||'')+(x.tono?' · '+safe(x.tono):'')+'</b>'
             +(x.skuApp?'<small>SKU App: '+safe(x.skuApp)+'</small>':'')+'<div class="accion">👉 '+safe(x.accion)+'</div></div>';
