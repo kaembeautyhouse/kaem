@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-22-21';
+    const APP_VERSION = '2026-10-23-01';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4008,7 +4008,6 @@
           <button class="btn-ghost" id="orderPdfBtn" type="button" disabled>Descargar PDF</button>
           <button class="btn-solid wa" id="orderWaBtn" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enviar WhatsApp</span></button>
         </div>
-        <div class="order-actions"><button class="btn-solid" id="orderSendBtn" type="button" disabled style="width:100%;min-height:48px">Enviar PDF al cliente</button></div>
         <div class="order-actions">
           <button class="btn-ghost" id="orderPauseBtn" type="button">Pausar este pedido</button>
           <button class="btn-ghost" id="historyBtn" type="button">Ver historial</button>
@@ -7879,7 +7878,7 @@
     }
 
     // ——— Estado de acciones (PDF/WhatsApp bloqueados hasta guardar) ———
-    function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; if($('orderSendBtn')) $('orderSendBtn').disabled=!on; }
+    function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; }
     function markDirty(){ if(orderCommitted){ orderCommitted=false; $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText(); setActionsEnabled(false); } }
 
     // ——— Carrito ———
@@ -8598,7 +8597,6 @@
         +'<div class="hist-actions">'
         +  '<button data-hact="pdf" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Reimprimir</button>'
         +  '<button class="hact-wa" data-hact="wa" data-ref="'+ref+'">'+WA_ICON+'WhatsApp</button>'
-        +  '<button data-hact="send" data-ref="'+ref+'">Enviar PDF</button>'
         +  '<button data-hact="detail" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Detalle</button>'
         +  '<button data-hact="edit" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar</button>'
         +  '<button data-hact="devol" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>Devolución</button>'
@@ -9400,7 +9398,7 @@
 
     /* ——— Reparto en hojas por nivel de compactación; gana el arreglo con MENOS hojas (a igualdad, el menos apretado) ——— */
     function rpPlan_(M, n, nivel){
-      var filas = M.filas, cap = RP_ALTO - RP_PIE, pages = [], i = 0, cola = M.uni + M.notas + M.sum + M.fir;
+      var filas = M.filas, cap = RP_ALTO - RP_PIE, pages = [], i = 0, cola = M.notas + M.sum + M.fir;
       var cabecera = function(primera){ return (primera ? M.top1 : M.topC) + M.th + 4; };
       while (i < n){
         var usado = cabecera(!pages.length), rows = [];
@@ -9409,15 +9407,13 @@
         pages.push({ rows:rows, usado:usado });
       }
       if (!pages.length) pages.push({ rows:[], usado:cabecera(true) });
-      var capUlt = RP_ALTO - M.legal, ult = pages[pages.length - 1];
-      if (ult.usado + cola > capUlt){
-        // la cola no cabe: pasa a hoja nueva, pero con las últimas filas (nunca sola con las firmas)
-        var llevar = Math.min(2, Math.max(0, ult.rows.length - 1)), moved = ult.rows.splice(ult.rows.length - llevar, llevar);
-        var suma = moved.reduce(function(s, r){ return s + filas[r]; }, 0);
-        ult.usado -= suma;
-        pages.push({ rows:moved, usado:M.topC + (moved.length ? M.th + 4 : 0) + suma });
-      }
-      return { pages:pages, nivel:nivel, n:pages.length, M:M };
+      // La lista de productos NO se parte para acomodar la cola: cada hoja se llena con filas completas y la cola va después
+      var iU = pages.length - 1;                                    // línea «N productos · N unidades»: pegada a la última fila
+      if (pages[iU].usado + M.uni > cap){ pages.push({ rows:[], usado:0 }); iU = pages.length - 1; }
+      pages[iU].usado += M.uni;
+      var capUlt = RP_ALTO - M.legal;
+      if (pages[pages.length - 1].usado + cola > capUlt) pages.push({ rows:[], usado:0 });   // la cola no cabe: hoja siguiente
+      return { pages:pages, nivel:nivel, n:pages.length, M:M, uniEn:iU };
     }
     function rpMejorPlan_(stage, R){
       var mejor = null;
@@ -9433,8 +9429,9 @@
       var pg = plan.pages[k], ultima = (k === plan.n - 1), total = plan.n;
       var tabla = pg.rows.length ? ('<div>' + RP_THEAD + pg.rows.map(function(i){ return rpFila_(R.filas[i]); }).join('') + '</tbody></table></div></div>') : '';
       var h = '<div class="rp l' + plan.nivel + '"><div class="rp-body">' + (k === 0 ? rpCabecera_(R) : '') + tabla;
+      if (k === plan.uniEn) h += rpUnidades_(R);
       if (ultima){
-        h += rpUnidades_(R) + rpNotas_(R) + rpResumen_(R) + '<div class="rp-ancla">' + rpFirmas_(R) + '</div>' + rpLegal_(R, R.id + ' · Página ' + (k + 1) + ' de ' + total);
+        h += rpNotas_(R) + rpResumen_(R) + '<div class="rp-ancla">' + rpFirmas_(R) + '</div>' + rpLegal_(R, R.id + ' · Página ' + (k + 1) + ' de ' + total);
       } else { h += rpFolio_(R, k + 1, total); }
       return h + '</div></div>';
     }
@@ -9938,6 +9935,8 @@
     // Remisión en PDF + el mismo mensaje del pedido, lista para mandar (celular: hoja de compartir · computador: descarga + chat de WhatsApp)
     function enviarPDFCliente(o){
       if(!o || !o.items || !o.items.length){ toast('El pedido no tiene productos.','error'); return; }
+      // Si el generador de PDF aún no cargó, se abre el chat con el mensaje (como siempre) en vez de fallar
+      if(typeof obtenerJsPDF_()!=='function' || typeof window.html2canvas!=='function'){ whatsappFor(o); return; }
       pdfFor(o, { enviar:true, texto:waMensaje('pedido', o), telefono:(o.cliente||{}).telefono });
     }
     function sendPDFClient(){ enviarPDFCliente(orderForOutput()); }
@@ -10035,8 +10034,7 @@
     $('cliTel').addEventListener('blur', function(){ fillClientByPhone(); sugerirNivelCliente(); });
     $('orderSaveBtn').addEventListener('click', function(){ haptic(15); submitOrder(); });
     $('orderPdfBtn').addEventListener('click', downloadOrderPDF);
-    $('orderWaBtn').addEventListener('click', sendWhatsApp);
-    $('orderSendBtn').addEventListener('click', sendPDFClient);
+    $('orderWaBtn').addEventListener('click', sendPDFClient);
     $('orderNewBtn').addEventListener('click', function(){
       // Si hay una edición en curso o un carrito con productos sin guardar,
       // no se descarta en silencio — antes 'Nuevo Pedido' borraba todo sin
@@ -10063,7 +10061,7 @@
       if(act==='del'){ openOrderDelete(ref); return; }
       if(act==='devol'){ abrirDevolucion(ref); return; }
       var o=findHistByRef(ref); if(!o){ toast('No se encontró ese pedido. Actualiza e intenta de nuevo.','error'); return; }
-      if(act==='pdf') pdfFor(o); else if(act==='wa') whatsappFor(o); else if(act==='send') enviarPDFCliente(o);
+      if(act==='pdf') pdfFor(o); else if(act==='wa') enviarPDFCliente(o);
     });
     window.addEventListener('online', function(){ if(loadPending().length) syncPending(); });
 

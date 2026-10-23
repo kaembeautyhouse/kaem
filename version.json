@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-22-21",
+  "app": "2026-10-23-01",
   "servidor": "2026.10.29",
-  "fecha": "2026-10-22",
+  "fecha": "2026-10-23",
   "novedades": [
+    "Un solo botón de WhatsApp en Pedidos y en el historial: manda la remisión en PDF con el mensaje. En la remisión, la lista de productos ya no se parte: cada hoja se llena con filas completas y pago, totales y firmas pasan juntos a la hoja siguiente si no caben.",
     "Catálogo virtual: el panel ahora cuenta cuántos productos tienen gancho comercial y cuántos faltan, con los nombres de los primeros que faltan.",
     "Remisión: el archivo se llama con el número y el cliente (RV-126_Diana_Bolivar.pdf) y hay un botón «Enviar PDF al cliente» en Pedidos y en el historial (en el celular abre compartir con el PDF y el mensaje; en computador descarga y abre el chat de WhatsApp). Al editar un producto, una marca antigua ya no se pierde.",
     "Remisión: ya no se imprime ninguna fecha de entrega y el título tiene más aire arriba.",
