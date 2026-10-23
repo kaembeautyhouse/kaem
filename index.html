@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-23-01';
+    const APP_VERSION = '2026-10-23-02';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -9264,6 +9264,13 @@
     .rp .rp-legal-h span{ font-weight:400; letter-spacing:.03em; text-transform:none; color:#8A7A6C; font-size:11px; }
     .rp .rp-legal p{ margin:0; font-size:9.6px; line-height:1.4; color:#5A4A3E; text-align:justify; }
     .rp .rp-ancla{ margin-top:auto; }
+    .rp .rp-sigue-wrap{ flex:1; min-height:0; display:flex; align-items:center; justify-content:center; }
+    .rp .rp-sigue{ display:flex; align-items:center; gap:14px; width:78%; color:#A85F48; opacity:.82; }
+    .rp .rp-sigue i{ flex:1; height:0; border-top:1.5px dashed #D2C2B2; }
+    .rp .rp-sigue div{ text-align:center; line-height:1.25; }
+    .rp .rp-sigue em{ display:block; font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:500; font-size:14px; letter-spacing:.01em; }
+    .rp .rp-sigue small{ display:block; margin-top:3px; font-family:'Jost',sans-serif; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:#8A7A6C; }
+    .rp .rp-sigue svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto; }
     /* l1 · cola compacta */
     .rp.l1 .rem-paybox, .rp.l2 .rem-paybox, .rp.l3 .rem-paybox{ padding:8px 14px 9px; }
     .rp.l1 .rem-paysub, .rp.l2 .rem-paysub, .rp.l3 .rem-paysub{ font-size:9px; }
@@ -9432,7 +9439,12 @@
       if (k === plan.uniEn) h += rpUnidades_(R);
       if (ultima){
         h += rpNotas_(R) + rpResumen_(R) + '<div class="rp-ancla">' + rpFirmas_(R) + '</div>' + rpLegal_(R, R.id + ' · Página ' + (k + 1) + ' de ' + total);
-      } else { h += rpFolio_(R, k + 1, total); }
+      } else {
+        // Hoja que no es la última: en el espacio libre, un aviso sutil de que el documento sigue (para que la hoja siguiente no pase desapercibida)
+        var libre = (RP_ALTO - RP_PIE) - pg.usado, sig = plan.pages[k + 1], n2 = k + 2;
+        var sigue = '<div class="rp-sigue"><i></i><div><em>Continúa en la hoja ' + n2 + '</em><small>' + (sig && !sig.rows.length ? 'Totales · medio de pago · firmas y políticas' : 'Más productos de la lista') + '</small></div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><i></i></div>';
+        h += '<div class="rp-sigue-wrap">' + (libre >= 70 ? sigue : '') + '</div>' + rpFolio_(R, k + 1, total);
+      }
       return h + '</div></div>';
     }
 
