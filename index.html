@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-23-03';
+    const APP_VERSION = '2026-10-24-01';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4659,6 +4659,11 @@
       <p class="cfg-hint" id="audSub">Comparando…</p>
       <div class="aud-chips" id="audChips"></div>
       <div id="audLista"></div>
+      <div id="audPreciosBox" style="display:none;margin-top:14px">
+        <button class="btn-solid" id="audPrecios" type="button" style="width:100%;min-height:48px">Corregir precios en Shopify (la App manda)</button>
+        <button class="btn-ghost" id="audPreciosAuto" type="button" style="width:100%;margin-top:8px;min-height:44px"></button>
+        <p class="cfg-hint" id="audPreciosMsg" aria-live="polite"></p>
+      </div>
       <a class="btn-solid" id="audHoja" target="_blank" rel="noopener noreferrer" style="display:none;width:100%;margin-top:14px;text-align:center;text-decoration:none">Abrir la lista completa en la hoja</a>
       <button class="btn-ghost" id="audCerrar" type="button" style="width:100%;margin-top:8px">Cerrar</button>
     </div>
@@ -6074,12 +6079,37 @@
             +(x.skuApp?'<small>SKU App: '+safe(x.skuApp)+'</small>':'')+'<div class="accion">👉 '+safe(x.accion)+'</div></div>';
         }).join('') || '<p class="cart-empty">✨ Todo coincide.</p>';
         if(r.urlHoja){ $('audHoja').href=r.urlHoja; $('audHoja').style.display='block'; }
+        AUD_AUTO = !!r.preciosAuto; $('audPreciosBox').style.display = ((r.faltantes && r.faltantes.precio) || AUD_AUTO) ? 'block' : 'none';
+        $('audPrecios').style.display = (r.faltantes && r.faltantes.precio) ? '' : 'none'; $('audPrecios').textContent = 'Corregir ' + ((r.faltantes && r.faltantes.precio) || 0) + ' precios en Shopify (la App manda)';
+        audAutoPintar();
         beep('success');
       }).withFailureHandler(function(){
         b.disabled=false; b.textContent='🔎 Auditoría App ↔ Shopify (SKU, tonos y fotos)'; $('audSub').textContent='No hay conexión con el servidor.';
       }).auditarShopify();
     });
     $('audCerrar').addEventListener('click', function(){ $('audModal').classList.remove('show'); });
+    // Precios: el de la App es el real. Vista previa → confirmación → corrección en bloque; opcionalmente automática cada 6 h
+    var AUD_AUTO = false;
+    function audAutoPintar(){ $('audPreciosAuto').textContent = AUD_AUTO ? '✓ Corrección automática cada 6 h · tocar para apagar' : 'Activar corrección automática de precios (cada 6 h)'; }
+    $('audPrecios').addEventListener('click', function(){
+      var b=$('audPrecios'), msg=$('audPreciosMsg'); b.disabled=true; msg.textContent='Comparando precios…';
+      google.script.run.withSuccessHandler(function(r){
+        if(!r || !r.ok){ b.disabled=false; msg.textContent=(r&&r.message)||'No se pudo comparar.'; return; }
+        if(!r.total){ b.disabled=false; msg.textContent='Todos los precios ya coinciden ✓'; return; }
+        var ej=(r.muestra||[]).slice(0,3).map(function(x){ return '• '+x.producto+': '+cop(x.de)+' → '+cop(x.a); }).join('\n');
+        if(!window.confirm('Se cambiarán '+r.total+' precios en Shopify para que sean iguales a los de la App (el precio Detal).\n\n'+ej+(r.total>3?'\n…':'')+'\n\n¿Aplicar?')){ b.disabled=false; msg.textContent='Sin cambios.'; return; }
+        msg.textContent='Corrigiendo precios en Shopify… (puede tardar un minuto)';
+        google.script.run.withSuccessHandler(function(r2){
+          b.disabled=false; msg.textContent=(r2&&r2.message)||'Listo.';
+          if(r2 && (r2.ok || r2.aplicados)){ toast(r2.message||'Precios corregidos','success'); beep('success'); $('cfgShopAuditBtn').click(); } else { toast((r2&&r2.message)||'No se pudo corregir.','error'); beep('error'); }
+        }).withFailureHandler(function(){ b.disabled=false; msg.textContent='Se cortó la conexión. Repite la auditoría para ver qué quedó.'; })
+          .sincronizarPreciosShopify({ aplicar:true, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+      }).withFailureHandler(function(){ b.disabled=false; msg.textContent='Sin conexión con el servidor.'; }).sincronizarPreciosShopify({ aplicar:false });
+    });
+    $('audPreciosAuto').addEventListener('click', function(){
+      google.script.run.withSuccessHandler(function(r){ if(r && r.ok){ AUD_AUTO=!!r.preciosAuto; audAutoPintar(); toast(r.message,'success'); } else toast((r&&r.message)||'No se pudo cambiar.','error'); })
+        .withFailureHandler(function(){ toast('Sin conexión con el servidor.','error'); }).configurarPreciosAuto({ activo:!AUD_AUTO, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+    });
 
     /* ═══ Cambiar SKU (uno) y en lote ═══ */
     var SKU_CAMBIO={ actual:'', listo:false };

@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-23-03",
-  "servidor": "2026.10.29",
-  "fecha": "2026-10-23",
+  "app": "2026-10-24-01",
+  "servidor": "2026.10.30",
+  "fecha": "2026-10-24",
   "novedades": [
+    "Auditoría Shopify: botón «Corregir precios en Shopify (la App manda)» con vista previa y confirmación, y opción de corrección automática cada 6 horas. El precio real siempre es el Detal de la App.",
     "Pedidos: la ganancia del pedido ahora siempre está oculta (sin cifras ni colores) y se despliega y se oculta con un toque; también se oculta sola a los 30 segundos, al abrir Pedidos y al empezar un pedido. El botón de WhatsApp de los pedidos vuelve a abrir el chat del cliente con su número y el saludo y resumen escritos, y descarga la remisión en PDF para adjuntarla con el clip.",
     "Remisión: cuando una hoja queda con espacio libre y el documento sigue, aparece un aviso discreto «Continúa en la hoja 2» (con qué viene después) para que la hoja siguiente no pase desapercibida.",
     "Un solo botón de WhatsApp en Pedidos y en el historial: manda la remisión en PDF con el mensaje. En la remisión, la lista de productos ya no se parte: cada hoja se llena con filas completas y pago, totales y firmas pasan juntos a la hoja siguiente si no caben.",
