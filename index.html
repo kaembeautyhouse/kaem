@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-23-02';
+    const APP_VERSION = '2026-10-23-03';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -2500,6 +2500,12 @@
       .car-toolbar .car-recibos-btn{padding:0 12px}
     }
 
+
+    /* Ganancia del pedido OCULTA: un botón discreto, sin cifras ni colores de alerta */
+    .rent-box.plegado{border-style:dashed;background:transparent}
+    .rent-box.plegado .rent-head{padding:10px 14px}
+    .rent-box.plegado .rent-tit{font-size:13px;letter-spacing:.04em;text-transform:none;font-weight:500}
+    .rent-box.plegado .rent-chip{background:var(--crema-2);color:var(--texto-suave)}
     /* ═══ MÓVIL · aprovechar el espacio ═══ (al final a propósito: gana sobre las reglas anteriores) */
     @media (max-width:520px){
       .topbar{padding:max(8px,env(safe-area-inset-top)) 12px 6px}
@@ -3987,10 +3993,10 @@
           <div id="tSaldoRow" style="display:none;color:var(--terracota-txt)"><span>Saldo pendiente</span><span id="tSaldo">$0</span></div>
         </div>
 
-        <!-- Rentabilidad en vivo (solo para el equipo · se puede plegar si el cliente ve la pantalla) -->
+        <!-- Rentabilidad en vivo (solo para el equipo): siempre OCULTA al abrir; se despliega con el botón y se vuelve a ocultar sola -->
         <div class="rent-box" id="rentBox" style="display:none">
-          <button type="button" class="rent-head" id="rentToggle" aria-expanded="true">
-            <span class="rent-tit">Ganancia del pedido</span>
+          <button type="button" class="rent-head" id="rentToggle" aria-expanded="false">
+            <span class="rent-tit" id="rentTit">Ganancia del pedido</span>
             <span class="rent-chip" id="rentChip">—</span>
             <svg class="rent-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
@@ -4722,6 +4728,7 @@
       <h3 id="entregaTitulo">Archivo listo</h3>
       <p class="cfg-hint">Tu teléfono pide un toque nuevo para guardar o compartir. Elige una opción:</p>
       <button type="button" class="btn-solid" id="entregaCompartir" style="width:100%;min-height:48px;margin-top:6px">Compartir o guardar</button>
+      <button type="button" class="btn-solid" id="entregaChat" style="width:100%;min-height:48px;margin-top:8px;display:none">Abrir chat del cliente con el mensaje</button>
       <a class="btn-ghost shop-link" id="entregaAbrir" href="#" target="_blank" rel="noopener">Abrir</a>
       <a class="btn-ghost shop-link" id="entregaDescargar" href="#" download>Descargar</a>
       <button type="button" class="btn-ghost" id="entregaCerrar" style="width:100%;min-height:44px">Cerrar</button>
@@ -8072,16 +8079,26 @@
       var neta=bruta+t.flete-envioReal, margen=base>0?Math.round(100*neta/base):0;
       return { costo:costo, base:base, bruta:bruta, envioReal:envioReal, envioNeto:t.flete-envioReal, neta:neta, margen:margen, sinCosto:sinCosto, conCiudad:!!ciudad, am:am };
     }
-    var RENT_PLEGADO=false; try{ RENT_PLEGADO = localStorage.getItem('kaem_rent_plegado')==='1'; }catch(e){}
+    /* La ganancia es solo para el equipo: SIEMPRE arranca oculta (no se recuerda abierta), se muestra con el botón y se oculta sola a los 30 s,
+       al abrir el módulo y al empezar un pedido nuevo. Oculta, no muestra cifras ni colores (ni siquiera si hay pérdida). */
+    var RENT_PLEGADO=true, RENT_T=null;
+    function rentOcultar(){ RENT_PLEGADO=true; clearTimeout(RENT_T); try{ updateTotals(); }catch(e){} }
+    function rentAlternar(){
+      RENT_PLEGADO=!RENT_PLEGADO; clearTimeout(RENT_T);
+      if(!RENT_PLEGADO) RENT_T=setTimeout(rentOcultar, 30000);
+      updateTotals();
+    }
     function pintarRentabilidad(t){
       var box=$('rentBox'); if(!box) return;
       if(!CART.items.length){ box.style.display='none'; return; }
       box.style.display='';
       var r=rentabilidadCarrito(t), chip=$('rentChip');
       var est = r.neta<0 ? 'late' : (r.margen<10 ? 'soon' : 'ok');
-      box.className='rent-box '+est+(RENT_PLEGADO?' plegado':'');
+      box.className='rent-box '+(RENT_PLEGADO?'plegado':est);
       $('rentToggle').setAttribute('aria-expanded', !RENT_PLEGADO);
-      chip.textContent = RENT_PLEGADO ? 'Toca para ver' : ((r.neta<0?'Pérdida ':'')+cop(Math.abs(r.neta))+' · '+r.margen+' %');
+      $('rentTit').textContent = RENT_PLEGADO ? 'Ver ganancias' : 'Ganancia · ocultar';
+      if(RENT_PLEGADO){ chip.textContent='Mostrar'; ['rCosto','rBruta','rEnvio','rNeta'].forEach(function(id){ $(id).textContent='—'; }); $('rNota').textContent=''; return; }   // oculta: no se calcula ni se escribe ninguna cifra
+      chip.textContent = ((r.neta<0?'Pérdida ':'')+cop(Math.abs(r.neta))+' · '+r.margen+' %');
       $('rCosto').textContent = '− '+cop(r.costo);
       $('rBruta').textContent = cop(r.bruta);
       if(!r.conCiudad){ $('rEnvioLbl').textContent='Envío'; $('rEnvio').textContent='Falta la ciudad'; }
@@ -9498,32 +9515,39 @@
         .map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join('_').slice(0, 36);
       return [prefijo, String(id || '').replace(/[^A-Za-z0-9-]+/g, ''), slug].filter(Boolean).join('_') + '.' + ext;
     }
+    function esIOS_(){ return /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
     function esMovil_(){ return /iP(hone|ad|od)|Android/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
-    var ENTREGA = { blob:null, file:null, nombre:'', titulo:'', url:'', texto:'' };
+    var ENTREGA = { blob:null, file:null, nombre:'', titulo:'', url:'', texto:'', tel:'', chat:false };
     function entregaCerrar_(){ $('entregaModal').classList.remove('show'); }
     function entregaMostrar_(){
       $('entregaTitulo').textContent = ENTREGA.titulo;
       var ab = $('entregaAbrir'), de = $('entregaDescargar'); ab.href = ENTREGA.url; de.href = ENTREGA.url; de.setAttribute('download', ENTREGA.nombre);
       $('entregaCompartir').style.display = ENTREGA.file && navigator.share && navigator.canShare && navigator.canShare({ files:[ENTREGA.file] }) ? '' : 'none';
+      $('entregaChat').style.display = ENTREGA.chat ? '' : 'none';
       $('entregaModal').classList.add('show');
     }
     async function entregarArchivo_(blob, nombre, titulo, opc){
       opc = opc || {};
       var file = null; try{ file = new File([blob], nombre, { type:blob.type }); }catch(e){}
       try{ if (ENTREGA.url) URL.revokeObjectURL(ENTREGA.url); }catch(e){}
-      ENTREGA = { blob:blob, file:file, nombre:nombre, titulo:titulo, url:URL.createObjectURL(blob), texto:opc.texto || '' };
+      ENTREGA = { blob:blob, file:file, nombre:nombre, titulo:titulo, url:URL.createObjectURL(blob), texto:opc.texto || '', tel:opc.telefono || '', chat:!!opc.enviar };
       var puede = !!(file && navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
       var descargar = function(){ var a = document.createElement('a'); a.href = ENTREGA.url; a.download = nombre; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
-      // «Enviar al cliente»: en el celular abre la hoja de compartir con el PDF y el mensaje (se elige WhatsApp y el chat); en computador se descarga y se abre el chat con el mensaje para adjuntarlo
+      // «WhatsApp» de un pedido: se abre el chat del cliente (con su número) con el saludo y el resumen ya escritos, y el PDF queda descargado
+      // para adjuntarlo con el clip 📎 → Documento (WhatsApp no deja adjuntar archivos desde un enlace). En iPhone, que bloquea la descarga
+      // automática, se ofrece la hoja de compartir (PDF) o el chat con el mensaje.
       if (opc.enviar){
-        if (esMovil_() && puede){
-          try{ await navigator.share({ files:[file], title:titulo, text:opc.texto || '' }); toast('Listo','success'); return; }
-          catch(e){ if (e && e.name === 'AbortError') return; }
+        var chat = function(){ try{ waAbrir(opc.telefono, opc.texto || ''); }catch(eW){} };
+        if (esIOS_()){
+          if (puede){
+            try{ await navigator.share({ files:[file], title:titulo, text:opc.texto || '' }); toast('Listo','success'); return; }
+            catch(e){ if (e && e.name === 'AbortError') return; }
+          }
           entregaMostrar_(); return;
         }
         descargar();
-        try{ waAbrir(opc.telefono, opc.texto || ''); }catch(eW){}
-        toast(titulo + ' descargado · adjúntalo en el chat de WhatsApp','success', 8000);
+        toast('PDF descargado (' + nombre + '). En el chat, toca el clip 📎 → Documento y elígelo para enviarlo junto al mensaje.', 'success', 14000);
+        setTimeout(chat, esMovil_() ? 900 : 400);
         return;
       }
       // Android y computador: se descarga sola (como siempre); en celular además queda el botón «Compartir» para mandarlo al cliente
@@ -9540,6 +9564,7 @@
       entregaMostrar_();
     }
     $('entregaCerrar').addEventListener('click', entregaCerrar_);
+    $('entregaChat').addEventListener('click', function(){ try{ waAbrir(ENTREGA.tel, ENTREGA.texto); }catch(e){} entregaCerrar_(); });
     $('entregaModal').addEventListener('click', function(e){ if (e.target === this) entregaCerrar_(); });
     $('entregaCompartir').addEventListener('click', function(){
       if (!ENTREGA.file) return;
@@ -9966,11 +9991,11 @@
       setNivel('Detal', true); setPago('Crédito');
       setActionsEnabled(false);
       $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
-      CART.nivelTocado=false; CART.nivelAuto=false; pgReiniciar();
+      CART.nivelTocado=false; CART.nivelAuto=false; pgReiniciar(); rentOcultar();
       setDraftId(); renderCart(); pintarDrafts(); haptic(12); toast('Nuevo pedido · '+pedState.draftId,'info');
     }
 
-    function onEnterPedidos(){ renderPending(); if(!pedState.remisionId && !pedState.draftId) setDraftId(); try{ catPedCargar(false); }catch(e){} }
+    function onEnterPedidos(){ rentOcultar(); renderPending(); if(!pedState.remisionId && !pedState.draftId) setDraftId(); try{ catPedCargar(false); }catch(e){} }
     function initPedidos(){
       renderClientList(); sincronizarClientes(); setDraftId(); setActionsEnabled(false);
       actualizarTextoPlazoCredito();
@@ -10028,10 +10053,7 @@
     $('fleteInput').addEventListener('input', function(){ FLETE_MANUAL=true; updateTotals(); markDirty(); });
     $('cliCiudad').addEventListener('input', function(){ updateTotals(); });
     $('cliCiudad').addEventListener('change', function(){ updateTotals(); });
-    $('rentToggle').addEventListener('click', function(){
-      RENT_PLEGADO=!RENT_PLEGADO; try{ localStorage.setItem('kaem_rent_plegado', RENT_PLEGADO?'1':'0'); }catch(e){}
-      haptic(8); updateTotals();
-    });
+    $('rentToggle').addEventListener('click', function(){ haptic(8); rentAlternar(); });
     $('fleteHint').addEventListener('click', function(e){
       if(e.target && e.target.id==='fletePolBtn'){ FLETE_MANUAL=false; haptic(10); updateTotals(); markDirty(); }
     });
