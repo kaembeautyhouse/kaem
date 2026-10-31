@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-31-03';
+    const APP_VERSION = '2026-10-31-04';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -8543,7 +8543,7 @@
     // ——— Cola offline ———
     function loadPending(){ try{ return JSON.parse(localStorage.getItem('kaem_pending_orders')||'[]'); }catch(e){ return []; } }
     function savePending(a){ try{ localStorage.setItem('kaem_pending_orders', JSON.stringify(a)); }catch(e){} }
-    function queueOrder(p){ var q=loadPending(), i=-1; for(var k=0;k<q.length;k++){ if(q[k].clientRef===p.clientRef){ i=k; break; } } if(i>=0) q[i]=p; else q.push(p); savePending(q); renderPending(); }
+    function queueOrder(p){ var q=loadPending(), i=-1; for(var k=0;k<q.length;k++){ if(q[k].clientRef===p.clientRef){ i=k; break; } } if(i>=0){ if(q[i].catalogoId && !p.catalogoId) p.catalogoId=q[i].catalogoId; q[i]=p; } else q.push(p); savePending(q); renderPending(); }
     function removePendingByRef(ref){ var q=loadPending(), n=q.filter(function(o){ return o.clientRef!==ref; }); if(n.length!==q.length){ savePending(n); renderPending(); } }
     function isPendingRef(ref){ var q=loadPending(); for(var i=0;i<q.length;i++){ if(q[i].clientRef===ref) return true; } return false; }
     function renderPending(){
@@ -11798,9 +11798,9 @@
       $('cliTel').value=String(elegido.telefono||''); $('cliCiudad').value=String(elegido.ciudad||'').toUpperCase(); $('cliDir').value=String(elegido.direccion||'').toUpperCase();
       setNivel(p.nivel==='Mayorista'?'Mayorista':(p.nivel==='Detal'?'Detal':'Distribuidor'), true); CART.nivelTocado=true;
       CART.items = items.map(function(it){
-        var prod=findProduct(it.sku);
+        var prod=findProduct(it.sku), actual=priceForLevel(prod, CART.nivel), visto=Number(it.precio)>0?Number(it.precio):actual;   // vale el precio que el cliente vio en el catálogo
         return { sku:prod.sku, nombre:(prod.producto||'')+(prod.tono?(' · '+prod.tono):''), marca:prod.marca, distribuidor:prod.distribuidor, mayorista:prod.mayorista,
-                 detal:prod.detal, stock:prod.stock, precio:priceForLevel(prod, CART.nivel), cantidad:it.cantidad, probFull:0, probHalf:0, manual:false };
+                 detal:prod.detal, stock:prod.stock, precio:visto, cantidad:it.cantidad, probFull:0, probHalf:0, manual:visto!==actual };
       });
       $('descInput').value = String(Number(p.descuentoPct)||0);   // "0" explícito: así no se aplica el descuento por defecto de Ajustes
       $('fleteInput').value = p.flete ? String(p.flete) : ''; FLETE_MANUAL=true;   // calculado por el servidor con la misma política

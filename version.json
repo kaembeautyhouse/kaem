@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-31-03",
-  "servidor": "2026.10.36",
+  "app": "2026-10-31-04",
+  "servidor": "2026.10.37",
   "fecha": "2026-10-31",
   "novedades": [
+    "Catálogo: aprobar un pedido ya no puede duplicar la venta y se respeta el precio que vio el cliente.",
     "Correcciones en Cupos, Pagos y pedidos guardados sin señal. Pantallas de carga y mejor contraste.",
     "Correcciones en devoluciones con probador, plazos de crédito, remisiones anuladas y escaneo en Empaque. Botones más fáciles de tocar y tarjetas uniformes según la guía de estilo.",
     "Estadísticas con plan de la semana: a quién cobrar, a quién escribirle, qué reponer y qué liberar, con nombres y montos. Cálculos corregidos y Alertas y Estadísticas ya dan las mismas cifras. Inicio sin píldoras.",
