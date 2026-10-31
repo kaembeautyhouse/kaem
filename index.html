@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-30-01';
+    const APP_VERSION = '2026-10-30-02';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3449,6 +3449,29 @@
     .cart-result.sin-stock{background:var(--st-soon-bg,#F6E9D8)}
     .cart-result.sin-stock small{color:var(--st-soon-text,#8A5A1F);font-weight:600}
     .cart-result.sin-stock .rs-foto{opacity:.7}
+    /* ═══════ PULIDO FINAL · va al final a propósito ═══════ */
+    /* Cifras de las tarjetas resumen: nunca se parten en dos líneas (antes «$11.104.0 / 00») */
+    .car-kpi b{word-break:normal;white-space:nowrap;font-size:clamp(13px,4.5vw,19px)}
+    .car-kpi.total b{font-size:clamp(18px,6vw,24px)}
+    /* Filtros de Cupos: una sola fila que se desliza, sin un botón suelto en la segunda línea */
+    #cpFiltro,#gsFiltro{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;gap:4px}
+    #cpFiltro::-webkit-scrollbar,#gsFiltro::-webkit-scrollbar{display:none}
+    #cpFiltro .seg,#gsFiltro .seg{flex:0 0 auto;padding-left:14px;padding-right:14px;white-space:nowrap}
+    /* Ajustes: las descripciones se leen completas en vez de cortarse con «…» */
+    .cfg-nav-i small,.cfg-sec > summary small{white-space:normal;overflow:visible;text-overflow:clip}
+    /* Packing: pedidos sugeridos cuando no hay uno elegido */
+    .pack-sug{display:grid;gap:8px;margin-top:14px;text-align:left;width:100%}
+    .pack-sug-it{display:flex;flex-direction:column;gap:2px;width:100%;padding:12px 14px;border:1px solid var(--linea);border-radius:14px;background:var(--blanco);cursor:pointer;font-family:inherit;text-align:left;color:var(--espresso)}
+    .pack-sug-it b{font-size:14px;font-weight:600}
+    .pack-sug-it small{font-size:12px;color:var(--texto-suave)}
+    .pack-sug-it.tarde{border-color:var(--st-late-border,#E3B7AB)}
+    .pack-sug-it.tarde small{color:var(--st-late-text,#9E5842)}
+    .pack-sug-it:active{transform:scale(.985)}
+    #packEmpty.empty{padding-top:18px}
+    .fecha-btn .fb-txt small{letter-spacing:.05em;font-size:11px}
+    .al-kpi b{word-break:normal;white-space:nowrap}
+    .al-kpi b{font-size:clamp(14px,4.4vw,20px)}
+    .pg-cat b{white-space:nowrap;font-size:clamp(13px,4.2vw,16px)}
   </style>
 </head>
 <body>
@@ -3521,12 +3544,12 @@
         <div class="field" id="f-ean">
           <label class="lbl" for="eanFabrica">Código de fábrica (EAN)</label>
           <input id="eanFabrica" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Opcional">
-          <p class="cfg-hint">Opcional. Si la marca no trae código impreso, déjalo vacío: se generará un SKU interno.</p>
+          <p class="cfg-hint">Si la marca no trae código, déjalo vacío.</p>
         </div>
         <div class="field" id="f-sku">
           <label class="lbl" for="sku">SKU interno</label>
           <input id="sku" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Se genera solo">
-          <p class="cfg-hint">Clave única del inventario. Escribe el tuyo (ej. CAR-LIP-01) o déjalo vacío.</p>
+          <p class="cfg-hint">Vacío = se genera solo. O escribe el tuyo (ej. CAR-LIP-01).</p>
         </div>
         <div class="field" id="f-producto">
           <label class="lbl" for="producto">Nombre del producto</label>
@@ -3593,7 +3616,8 @@
 
         <div id="packEmpty" class="empty">
           <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>
-          <div>Selecciona un pedido para comenzar el alistamiento.</div>
+          <div id="packEmptyTxt">Selecciona un pedido para comenzar el alistamiento.</div>
+          <div id="packSugeridos" class="pack-sug"></div>
         </div>
 
         <div id="packHud" style="display:none">
@@ -3616,7 +3640,7 @@
 
           <div class="ent-box" id="packEntregaBox">
             <label class="lbl" for="packEntregaFecha">📅 Fecha aproximada de entrega</label>
-            <p class="ent-nota">Aún no sabes el día exacto: pon el estimado. Cuando pase esa fecha te recordamos confirmar cuándo le llegó.</p>
+            <p class="ent-nota">Pon el día estimado; cuando pase te recordamos confirmar que le llegó.</p>
             <div class="ent-row">
               <input type="date" id="packEntregaFecha">
               <div class="ent-chips">
@@ -3625,7 +3649,6 @@
                 <button type="button" class="chip" data-ent-dias="-2" data-ent-in="packEntregaFecha">+2</button>
                 <button type="button" class="chip" data-ent-dias="-3" data-ent-in="packEntregaFecha">+3</button>
                 <button type="button" class="chip" data-ent-dias="-5" data-ent-in="packEntregaFecha">+5</button>
-                <button type="button" class="chip" data-ent-cal="packEntregaFecha">📅 Otro día</button>
               </div>
             </div>
             <label class="ent-check"><input type="checkbox" id="packEntregaConf"><span>El cliente <b>ya lo recibió</b> (fecha confirmada)</span></label>
@@ -3825,8 +3848,7 @@
             <small>clientes que ya compraron</small>
           </div>
         </div>
-        <p class="cp-intro">El cupo es el <b>tope</b> para armar pedidos a crédito de cada cliente. Sube cuando paga a tiempo y baja o se pausa si se atrasa. Es una dinámica interna de confianza de KAÉM (no un crédito financiero).</p>
-        <div class="cp-acciones">
+                <div class="cp-acciones">
           <button class="btn-solid" id="cpInicialBtn" type="button">Asignar cupos iniciales</button>
           <button class="btn-ghost" id="cpReglasBtn" type="button">Cómo funciona</button>
         </div>
@@ -3863,7 +3885,7 @@
         <div class="cli-toolbar">
           <div class="search-bar">
             <svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input id="cliSearch" type="search" inputmode="search" autocomplete="off" aria-label="Buscar clientes" placeholder="Buscar por nombre, teléfono, NIT o ciudad…">
+            <input id="cliSearch" type="search" inputmode="search" autocomplete="off" aria-label="Buscar clientes" placeholder="Nombre, teléfono, NIT o ciudad…">
           </div>
           <select id="cliOrden" class="cli-orden" aria-label="Ordenar clientes">
             <option value="reciente">Compraron hace poco</option>
@@ -3889,7 +3911,7 @@
         <div class="his-kpis" id="hisKpis" role="group" aria-label="Resumen del historial"></div>
         <div class="cli-toolbar">
           <div class="search-bar hist-busca"><svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input id="histBuscar" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Buscar por cliente, remisión, producto, fecha…" aria-label="Buscar en el historial"></div>
+            <input id="histBuscar" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Cliente, remisión, producto o fecha…" aria-label="Buscar en el historial"></div>
           <select id="hisOrden" class="cli-orden" aria-label="Ordenar pedidos">
             <option value="reciente">Más recientes</option>
             <option value="valor">Mayor valor</option>
@@ -4064,11 +4086,11 @@
       <div class="nav-sep" aria-hidden="true"></div>
       <button class="nav-item" id="nav-consultar" type="button" data-tab="consultar">
         <svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        <span>Consultar</span>
+        <span>Inventario</span>
       </button>
       <button class="nav-item" id="nav-registrar" type="button" data-tab="registrar">
         <svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span>Registrar</span>
+        <span>Nuevo producto</span>
       </button>
       <button class="nav-item" id="nav-pedidos" type="button" data-tab="pedidos">
         <span class="nav-badge" id="pedBadge">0</span>
@@ -4418,7 +4440,6 @@
             <button type="button" class="chip" data-ent-dias="1" data-ent-in="repackFecha">Ayer</button>
             <button type="button" class="chip" data-ent-dias="0" data-ent-in="repackFecha">Hoy</button>
             <button type="button" class="chip" data-ent-dias="-1" data-ent-in="repackFecha">Mañana</button>
-            <button type="button" class="chip" data-ent-cal="repackFecha">📅 Otro día</button>
           </div>
         </div>
         <div id="repackPlazoBox" style="display:none">
@@ -8055,7 +8076,7 @@
           +    '<button class="cart-trash" data-act="remove" data-idx="'+idx+'" aria-label="Quitar"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'
           +  '</div>'
           +  '<div class="cart-ctrl">'
-          +    '<div class="cart-price-wrap"><span>$</span><input class="cart-price" data-idx="'+idx+'" inputmode="numeric" value="'+it.precio+'"></div>'
+          +    '<div class="cart-price-wrap"><span>$</span><input class="cart-price" data-idx="'+idx+'" inputmode="numeric" value="'+(Number(it.precio)||0).toLocaleString('es-CO')+'"></div>'
           +    '<div class="cart-qty"><button data-act="minus" data-idx="'+idx+'" type="button">&minus;</button><span>'+it.cantidad+'</span><button data-act="plus" data-idx="'+idx+'" type="button">+</button></div>'
           +    '<div class="cart-sub">'+cop(sub)+'</div>'
           +  '</div>'
@@ -10121,7 +10142,7 @@
     $('cartList').addEventListener('input', function(e){
       var inp=e.target.closest?e.target.closest('.cart-price'):null; if(!inp) return;
       var idx=parseInt(inp.getAttribute('data-idx'),10), it=CART.items[idx]; if(!it) return;
-      var d=inp.value.replace(/[^0-9]/g,''); it.precio=d?parseInt(d,10):0; it.manual=true;
+      var d=inp.value.replace(/[^0-9]/g,''); it.precio=d?parseInt(d,10):0; it.manual=true; inp.value = d ? it.precio.toLocaleString('es-CO') : '';
       var row=inp.closest('.cart-row'), sub=row?row.querySelector('.cart-sub'):null; if(sub) sub.textContent=cop(it.precio*it.cantidad);
       updateTotals(); markDirty();
     });
@@ -10136,6 +10157,7 @@
       e.target.value=v;
       updateTotals(); markDirty();
     });
+    pgMoneyInput($('fleteInput')); pgMoneyInput($('abonoInput'));
     $('fleteInput').addEventListener('input', function(){ FLETE_MANUAL=true; updateTotals(); markDirty(); });
     $('cliCiudad').addEventListener('input', function(){ updateTotals(); });
     $('cliCiudad').addEventListener('change', function(){ updateTotals(); });
@@ -10331,6 +10353,17 @@
                 (x.dias != null && x.dias >= 2 ? '⚠️ ' : '') + safe(id) + ' · ' + safe(nom) + ' (' + unds + ' un.)' + edad + '</option>';
       });
       sel.innerHTML = html;
+      // Los más antiguos, a un toque (el menú de arriba sigue para buscar cualquiera)
+      var sg = $('packSugeridos'), et = $('packEmptyTxt');
+      if(sg){
+        sg.innerHTML = conDias.slice(0,5).map(function(x){
+          var o=x.o, ref=String(o.clientRef||o.remision||o.id||''), nom=(o.cliente&&o.cliente.nombre)?o.cliente.nombre:'Sin cliente';
+          var unds=(o.items||[]).reduce(function(a,it){ return a+(Number(it.cantidad)||0); },0);
+          var edad = x.dias==null ? '' : (x.dias===0 ? 'hoy' : (x.dias===1 ? 'ayer' : 'hace '+x.dias+' d'));
+          return '<button type="button" class="pack-sug-it'+(x.dias!=null&&x.dias>=2?' tarde':'')+'" data-ref="'+safe(ref)+'"><b>'+safe(nom)+'</b><small>'+safe(o.remision||o.id||'')+' · '+unds+' un.'+(edad?' · '+edad:'')+'</small></button>';
+        }).join('');
+      }
+      if(et) et.textContent = conDias.length ? 'Toca un pedido para empezar a alistarlo (primero los más antiguos).' : 'No hay pedidos por alistar. ¡Todo al día!';
       var an = $('packAntig');
       if(an){
         an.textContent = PACK.pendientes.length
@@ -10871,13 +10904,14 @@
         +         (c.abonado>0?(' · <span class="car-abonado">abonó '+cop(c.abonado)+'</span>'):'')+'</div></div>'
         +   '<div class="car-saldo"><b>'+cop(c.saldoPendiente)+'</b><span>Saldo</span></div>'
         + '</div>'
-        + '<div class="car-bar"><div class="car-bar-fill" style="width:'+(c.vencido?100:c.pctTiempo)+'%"></div></div>'
+        + (c.porEntregar ? '' : '<div class="car-bar"><div class="car-bar-fill" style="width:'+(c.vencido?100:c.pctTiempo)+'%"></div></div>')
         + (c.proximoAbono ? ('<div class="car-prox'+(c.abonoVencido?' late':'')+'">'
               + (c.abonoVencido ? '⚠ Abono pactado vencido: ' : '📅 Abono pactado: ')
               + carteraFechaLarga(c.proximoAbono) + '</div>') : '')
         + '<div class="car-meta">'
-        +   '<span class="car-dias">'+carteraTextoDias(c)+'</span>'
-        +   '<span class="car-venc">'+(c.porEntregar?'Pendiente de empaque':('Vence el '+carteraFechaLarga(c.fechaVencimiento)+(c.entregaConfirmada===false?' · entrega estimada':'')))+'</span>'
+        +   (c.porEntregar
+              ? '<span class="car-dias">Sin empacar · el plazo corre desde la entrega</span>'
+              : ('<span class="car-dias">'+carteraTextoDias(c)+'</span><span class="car-venc">Vence el '+carteraFechaLarga(c.fechaVencimiento)+(c.entregaConfirmada===false?' · entrega estimada':'')+'</span>'))
         + '</div>'
         // Todas las acciones en UNA fila: la tarjeta mide lo mismo con o sin abonos
         + '<div class="car-acts'+(c.abonado>0?' tres':'')+'">'
@@ -11771,14 +11805,14 @@
       var futura = iso > isoOf(new Date());
       el.innerHTML = (futura ? '🚚 Aún no lo recibe: el crédito empezará a contar desde esa fecha estimada y te recordamos confirmarla. ' : '') + (inf.cred
         ? ('Crédito de <b>'+pl+' días</b> contados desde esa fecha: vence el <b>'+safe(entVence(iso, pl))+'</b>.')
-        : 'Pedido de contado o ya pagado: la fecha solo queda registrada, no hay cobro que contar.');
+        : '');
     }
     /** Convierte cada selector de fecha de entrega en un botón grande con la fecha en letras. */
     function fbTexto(iso){
       if(!iso) return { k:'Fecha de entrega', t:'Toca para elegir' };
       var d=new Date(iso+'T00:00:00'), hoy=new Date(); hoy.setHours(0,0,0,0);
       var dif=Math.round((d-hoy)/864e5), rel = dif===0?'Hoy':dif===1?'Mañana':dif===-1?'Ayer':dif>1?'En '+dif+' días':'Hace '+(-dif)+' días';
-      return { k:rel, t:d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long' }) };
+      return { k:rel+' · toca para elegir otro día', t:d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long' }) };
     }
     function fbRefrescar(id){
       var inp=$(id), t=inp && inp.parentNode && inp.parentNode.querySelector('.fb-txt'); if(!t) return;
@@ -12110,6 +12144,7 @@
 
     /* ——— Wiring ——— */
     $('packOrderSel').addEventListener('change', function(e){ packSeleccionar(e.target.value); });
+    $('packSugeridos').addEventListener('click', function(e){ var b=e.target.closest('.pack-sug-it'); if(!b) return; var ref=b.getAttribute('data-ref'); $('packOrderSel').value=ref; packSeleccionar(ref); });
     $('packCamBtn').addEventListener('click', function(){ haptic(12); scanTarget = 'packing'; openScanner(); });
     $('packInput').addEventListener('blur', function(){
       setTimeout(function(){
@@ -13481,6 +13516,7 @@
       $('gsKpiHoy').textContent=cop(gsSuma(deHoy)); $('gsKpiHoySub').textContent=deHoy.length+(deHoy.length===1?' gasto':' gastos');
       $('gsKpiSem').textContent=cop(gsSuma(sem)); $('gsKpiSemSub').textContent='desde el lunes · '+sem.length+(sem.length===1?' gasto':' gastos');
       var vt=gsSuma(via); $('gsKpiVia').textContent=cop(vt);
+      var kv=$('gsKpiVia'); if(kv && kv.parentNode) kv.parentNode.style.display = presTot>0 ? '' : 'none';   // sin presupuesto repetiría «Esta semana»
       $('gsKpiViaSub').textContent = presTot>0 ? ('de '+cop(presTot)+' · '+Math.round(100*vt/presTot)+' %') : 'sin presupuesto (Ajustes → Finanzas)';
       $('gsKpiMes').textContent=cop(gsSuma(mes)); $('gsKpiMesSub').textContent=mes.length+(mes.length===1?' gasto':' gastos');
       gsPintarPresupuesto(via, pres, presTot); gsPintarCiudades(mes); gsPintarLista();
@@ -13488,9 +13524,9 @@
       Array.prototype.forEach.call($('gsPeriodo').querySelectorAll('.seg'), function(b){ b.classList.toggle('active', b.getAttribute('data-p')===GS.periodo); });
       try{ if(window.KAEM && KAEM.hub) KAEM.hub.pintar(); }catch(e){}
     }
-    function gsBarra(txt, val, cap, color, extra){
-      var pct=cap>0?Math.min(100,Math.round(100*val/cap)):0, over=cap>0 && val>cap;
-      return '<div class="gs-bar"><div class="gs-bar-top"><span>'+safe(txt)+'</span><b'+(over?' class="over"':'')+'>'+cop(val)+(cap>0?(' <small>de '+cop(cap)+'</small>'):'')+(extra||'')+'</b></div>'
+    function gsBarra(txt, val, cap, color, extra, sinDe){
+      var pct=cap>0?Math.min(100,Math.round(100*val/cap)):0, over=!sinDe && cap>0 && val>cap;
+      return '<div class="gs-bar"><div class="gs-bar-top"><span>'+safe(txt)+'</span><b'+(over?' class="over"':'')+'>'+cop(val)+((cap>0 && !sinDe)?(' <small>de '+cop(cap)+'</small>'):'')+(extra||'')+'</b></div>'
         +'<div class="gs-bar-track"><i style="width:'+pct+'%;background:'+(over?'var(--rojo)':color)+'"></i></div></div>';
     }
     function gsPintarPresupuesto(via, pres, presTot){
@@ -13500,7 +13536,7 @@
       if(!total && !presTot){ box.innerHTML=''; return; }
       var maxV=Math.max.apply(null, subs.map(function(s){ return por[s]||0; }).concat([1]));
       box.innerHTML='<div class="gs-card"><p class="gs-card-t">Viáticos de esta semana</p>'
-        +subs.map(function(s){ return gsBarra(s, por[s]||0, presTot>0?pres[s]:maxV, GS_TIPOS.VIATICOS.color); }).join('')
+        +subs.map(function(s){ return gsBarra(s, por[s]||0, presTot>0?pres[s]:maxV, GS_TIPOS.VIATICOS.color, '', !(presTot>0)); }).join('')
         +(presTot>0 ? '<p class="cfg-hint" style="margin:8px 0 0">'+(total>presTot?'Te pasaste '+cop(total-presTot)+' del presupuesto.':'Te quedan '+cop(presTot-total)+' del presupuesto semanal.')+'</p>'
                     : '<p class="cfg-hint" style="margin:8px 0 0">Fija un presupuesto semanal en Ajustes → Finanzas para ver cuánto te queda.</p>')+'</div>';
     }
@@ -13511,7 +13547,7 @@
       if(!lista.length){ box.innerHTML=''; return; }
       var max=lista[0].total;
       box.innerHTML='<div class="gs-card"><p class="gs-card-t">Viáticos del mes por ciudad</p>'
-        +lista.slice(0,6).map(function(c){ return gsBarra(c.ciudad+(c.depto?(' · '+c.depto):''), c.total, max, GS_TIPOS.VIATICOS.color, ' <small>'+Object.keys(c.dias).length+' d</small>'); }).join('')+'</div>';
+        +lista.slice(0,6).map(function(c){ return gsBarra(c.ciudad+(c.depto?(' · '+c.depto):''), c.total, max, GS_TIPOS.VIATICOS.color, ' <small>'+Object.keys(c.dias).length+' d</small>', true); }).join('')+'</div>';
     }
     function gsFiltrados(){
       var hoy=gsIso(new Date()), lunes=gsIso(gsLunes(new Date())), ym=hoy.slice(0,7);
@@ -13870,7 +13906,7 @@
     // k = clave · go = adónde lleva ("tab:" abre un módulo, "fn:" una ventana) · priv = se oculta en Modo cliente
     var HUB_DEF = [
       { k:'pedidos',   big:1,                  priv:1, go:'tab:pedidos',   t:'Pedidos' },
-      { k:'consultar', tone:'esp',                     go:'tab:consultar', t:'Catálogo' },
+      { k:'consultar', tone:'esp',                     go:'tab:consultar', t:'Inventario' },
       { k:'cartera',   tone:'salvia',          priv:1, go:'tab:cartera',   t:'Cartera' },
       { k:'packing',                          priv:1, go:'tab:packing',   t:'Packing' },
       { k:'alertas',                          priv:1, go:'tab:alertas',   t:'Alertas' },
@@ -13878,13 +13914,13 @@
       { k:'cupos',     tone:'salvia',          priv:1, go:'tab:cupos',     t:'Cupos' },
       { k:'gastos',    tone:'salvia',          priv:1, go:'tab:gastos',    t:'Gastos' },
       { k:'bi',        tone:'salvia',          priv:1, go:'fn:bi',         t:'Estadísticas' },
-      { k:'registrar', tone:'esp',             priv:1, go:'tab:registrar', t:'Registrar' },
+      { k:'registrar', tone:'esp',             priv:1, go:'tab:registrar', t:'Nuevo producto' },
       { k:'catweb',    tone:'esp',             priv:1, go:'fn:catweb',     t:'Catálogos web' },
       { k:'historial', tone:'arena',           priv:1, go:'tab:historial',  t:'Historial' },
       { k:'clientes',  tone:'arena',           priv:1, go:'tab:clientes',  t:'Clientes' },
       { k:'ajustes',   tone:'arena',           priv:1, go:'fn:cfg',        t:'Ajustes' }
     ];
-    var HUB_MOD = { historial:'Historial', hub:'', consultar:'Catálogo', registrar:'Registrar', pedidos:'Ventas', packing:'Packing', cartera:'Cartera', pagos:'Pagos', gastos:'Gastos', cupos:'Cupos', alertas:'Alertas', clientes:'Clientes' };
+    var HUB_MOD = { historial:'Historial', hub:'', consultar:'Inventario', registrar:'Nuevo producto', pedidos:'Pedidos', packing:'Packing', cartera:'Cartera', pagos:'Pagos', gastos:'Gastos', cupos:'Cupos', alertas:'Alertas', clientes:'Clientes' };
 
     // Botón «Fechas de entrega» de Packing: cuántas entregas están por confirmar
     function packPintarPorConfirmar(){
@@ -13944,7 +13980,7 @@
                  s:D.gs.length?('Semana '+abrevCop(D.gsSem)+' · mes '+abrevCop(D.gsMes)):'Viáticos, personal y operación', warn:D.gsPres>0&&D.gsVia>D.gsPres, badge:0 };
       var cr=D.cpRes, moraN=cr?((cr.enMora||0)+(cr.bloqueados||0)):0;
       M.cupos={ v:cr?(abrevCop(cr.usado)+' en uso'):'Cupos', s:cr?(moraN?(hubPlural(moraN,'cliente en mora','clientes en mora')):(cr.sinAsignar?(hubPlural(cr.sinAsignar,'cliente sin cupo','clientes sin cupo')):'Todos al día')):'Tope de crédito por cliente', warn:moraN>0, badge:moraN, bad:1 };
-      M.consultar={ v:D.prod?(D.disp+' disponibles'):'Catálogo', s:D.prod?(D.ago+' agotados · '+D.baj+' por agotarse'):'Busca y compara precios' };
+      M.consultar={ v:D.prod?(D.disp+' disponibles'):'Inventario', s:D.prod?(D.ago+' agotados · '+D.baj+' por agotarse'):'Busca y compara precios' };
       M.registrar={ v:'Nuevo producto', s:'Alta con tonos y precios' };
       M.catweb={ v:'3 catálogos', s:'Detal · Mayorista · Distribuidor' };
       M.historial={ v:D.hist.length?hubPlural(D.hist.length,'remisión','remisiones'):'Remisiones', s:(D.hist[0]&&D.hist[0].cliente&&D.hist[0].cliente.nombre)?('Última: '+D.hist[0].cliente.nombre):'Busca, reimprime y edita' };

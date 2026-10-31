@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-30-01",
+  "app": "2026-10-30-02",
   "servidor": "2026.10.31",
   "fecha": "2026-10-30",
   "novedades": [
+    "Repaso de toda la interfaz: nombres iguales en menú, inicio y títulos (Inventario, Nuevo producto, Pedidos), cifras que ya no se parten en dos líneas, Gastos y Cartera sin datos repetidos, Packing con los pedidos más antiguos a un toque, filtros sin botones sueltos, y precio, flete y abono con separador de miles.",
     "Cartera: ahora se pueden corregir o eliminar abonos (Recibos → Editar). Pedido: el abono inicial aparece al elegir crédito, descuento libre en compras de mercancía, buscador que muestra todo (también lo agotado), probadores más compactos, vitrina con fotos grandes, calendario en «Otro día» y mensajes de WhatsApp más naturales. Estadísticas se calculan desde cero cada vez.",
     "Auditoría Shopify: botón «Corregir precios en Shopify (la App manda)» con vista previa y confirmación, y opción de corrección automática cada 6 horas. El precio real siempre es el Detal de la App.",
     "Pedidos: la ganancia del pedido ahora siempre está oculta (sin cifras ni colores) y se despliega y se oculta con un toque; también se oculta sola a los 30 segundos, al abrir Pedidos y al empezar un pedido. El botón de WhatsApp de los pedidos vuelve a abrir el chat del cliente con su número y el saludo y resumen escritos, y descarga la remisión en PDF para adjuntarla con el clip.",
