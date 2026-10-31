@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-31-01';
+    const APP_VERSION = '2026-10-31-02';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -2814,9 +2814,6 @@
     .hub-refresh{width:44px;height:44px;border-radius:50%;border:1px solid var(--linea);background:var(--hub-glass);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;transition:transform .2s var(--hub-ease)}
     .hub-refresh svg{width:20px;height:20px;stroke:var(--espresso);fill:none}
     .hub-refresh:active{transform:scale(.93)} .hub-refresh.spin-on svg{animation:rot .8s linear infinite}
-    .hub-leyenda{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;margin:18px 2px 8px;font-size:11.5px;color:var(--texto-suave)}
-    .hub-leyenda span{display:inline-flex;align-items:center;gap:6px}
-    .hub-leyenda i{width:10px;height:10px;border-radius:50%;background:var(--c)}
     .hub-grid{gap:10px}
     .hub-card{--tone:var(--terracota);min-height:92px;padding:13px;gap:4px;justify-content:flex-end;
       background:color-mix(in srgb,var(--tone) 14%,var(--blanco));border-color:color-mix(in srgb,var(--tone) 32%,var(--linea))}
@@ -3532,6 +3529,22 @@
     /* Guía de estilo: 18 px en tarjetas y contenedores */
     .hub-card,.card,.car-kpi,.car-card,.al-kpi,.al-card,.hist-row,.fin-kpi,.bi-plan,.bi-card,.cart-row,.gs-card,.cli-kpi{border-radius:18px}
     @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important} }
+
+    /* Marcador de carga */
+    .esqueleto{display:grid;gap:12px;padding:4px 0}
+    .esqueleto i{display:block;height:84px;border-radius:18px;background:currentColor;opacity:.07;animation:esqueleto-latido 1.3s ease-in-out infinite}
+    @keyframes esqueleto-latido{50%{opacity:.14}}
+
+    /* Contraste AA en textos pequeños (claro y oscuro) */
+    .bi-dot,.cli-badge{background:#A5573F}
+    .hub-card .hc-n{color:color-mix(in srgb,var(--texto-suave) 70%,var(--texto))}
+    .hub-card .hc-n.urg{color:var(--terracota-txt)}
+    .cli-av{color:color-mix(in srgb,var(--salvia-txt) 80%,var(--texto))}
+    .estado-pill[data-state="sync"] .led-txt,.estado-pill[data-state="ok-pend"] .led-txt{color:color-mix(in srgb,var(--st-soon-text) 75%,var(--texto))}
+    .cp-nums span{color:color-mix(in srgb,var(--texto-suave) 70%,var(--texto))}
+    .btn-solid.wa{background:#557161}
+    .stock-badge span{color:color-mix(in srgb,var(--texto-suave) 70%,var(--texto))}
+    .estado-pill[data-state="ok"] .led-txt{color:color-mix(in srgb,var(--salvia-txt) 75%,var(--texto))}
   </style>
 </head>
 <body>
@@ -3569,7 +3582,6 @@
             <div class="hub-grid" id="hubGrid"></div>
             <aside class="hub-side" id="hubSide" aria-live="polite" aria-label="Vista previa"></aside>
           </div>
-          <div class="hub-leyenda hub-priv" aria-label="Colores por categoría"><span style="--c:#B86B53"><i></i>Operación</span><span style="--c:#8FA08E"><i></i>Dinero</span><span style="--c:#6B5B52"><i></i>Inventario</span><span style="--c:#C2B6A6"><i></i>Gestión</span></div>
         </div>
       </section>
 
@@ -7349,7 +7361,7 @@
               +'<p class="al-nota">'+safe(p.marca)+' · '+(d<0?('Vendiendo sin stock · faltan '+Math.abs(d)):(d===0?'Sin unidades':('Quedan '+d)))+'</p></div>'
               +'<div class="al-num"><b>'+d+'</b><span>disp.</span></div></div>';
           }).join('')
-        : '<div class="empty"><div>Consultando las ventas para calcular las alertas…</div></div>';
+        : esqueletoHtml(4);
     }
 
     function pintarBadgeAlertas(n){
@@ -7376,6 +7388,13 @@
       SIN_ROTACION:   {t:'Sin rotación',       c:'u5'}
     };
 
+    function alertasShopifyHtml(r){
+      return (r.shopifyRevisar||[]).map(function(x){
+        return '<div class="al-card u2"><div class="al-info"><div class="al-top"><span class="al-tag">Revisar Shopify</span></div>'
+          +'<p class="al-nom">Pedido '+safe(x.pedido)+(x.sku?(' · '+safe(x.sku)+(x.cantidad?' × '+x.cantidad:'')):'')+'</p>'
+          +'<p class="al-nota">'+safe(x.detalle)+'</p><p class="al-meta">'+safe(String(x.fecha).split('-').reverse().join('/'))+'</p></div></div>';
+      }).join('');
+    }
     function pintarAlertas(){
       var r=window.ALERTAS.datos; if(!r) return;
       var res=r.resumen||{};
@@ -7400,11 +7419,12 @@
       else if(window.ALERTAS.filtro==='dormido') lista=lista.filter(function(a){ return a.urgencia>=5; });
 
       var c=$('alertList');
+      var shopifyHtml=window.ALERTAS.filtro==='urgente' ? alertasShopifyHtml(r) : '';
       if(!lista.length){
-        c.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div>Nada que atender en este filtro.</div></div>';
+        c.innerHTML=shopifyHtml || '<div class="empty"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div>Nada que atender en este filtro.</div></div>';
         return;
       }
-      c.innerHTML = lista.map(function(a){
+      c.innerHTML = shopifyHtml + lista.map(function(a){
         var et=AL_ETIQUETA[a.tipo]||{t:a.tipo,c:'u4'};
         var extra='';
         if(a.sugerido>0) extra='<span class="al-pedir">Pedir '+a.sugerido+'</span>';
@@ -8546,9 +8566,17 @@
       var q=loadPending(); if(!q.length){ toast('No hay pedidos pendientes.','info'); return; }
       if(navigator.onLine===false){ toast('Sigues sin conexión.','error'); return; }
       var btn=$('syncBtn'); if(btn){ btn.disabled=true; btn.textContent='Sincronizando…'; }
+      SYNC_MOTIVO='';
       syncNext(q.slice(), 0);
     }
-    function syncEnd(sent){ var btn=$('syncBtn'); if(btn){ btn.disabled=false; btn.textContent='Sincronizar'; } renderPending(); if(sent){ refreshData(); toast(sent+' pedido'+(sent!==1?'s':'')+' sincronizado'+(sent!==1?'s':''),'success'); beep('success'); } }
+    var SYNC_MOTIVO='';   // por qué se quedó en cola el último pedido rechazado
+    function syncEnd(sent){
+      var btn=$('syncBtn'); if(btn){ btn.disabled=false; btn.textContent='Sincronizar'; } renderPending();
+      if(sent) refreshData();
+      var quedan=loadPending().length, txt=sent?(sent+' pedido'+(sent!==1?'s':'')+' sincronizado'+(sent!==1?'s':'')):'';
+      if(quedan && SYNC_MOTIVO){ toast((txt?txt+' · ':'')+quedan+' sigue'+(quedan!==1?'n':'')+' pendiente'+(quedan!==1?'s':'')+'. '+SYNC_MOTIVO,'error'); beep('error'); }
+      else if(sent){ toast(txt,'success'); beep('success'); }
+    }
     function syncNext(queue, sent){
       if(!queue.length){ syncEnd(sent); return; }
       var order=queue[0];
@@ -8559,12 +8587,16 @@
           if(order.catalogoId) catPedResolver(order.catalogoId, 'APROBADO', { remision: res.remision || order.remision });
           syncNext(queue.slice(1), sent+1);
         } else {
+          // Un pedido rechazado sigue en cola, pero no frena a los demás
           if(res && res.status==='stock_insuficiente'){
-            var b=$('syncBtn'); if(b){ b.disabled=false; b.textContent='Sincronizar'; }
             var f=(res.faltantes&&res.faltantes.length)?res.faltantes[0]:null;
-            var det=f?(' · '+f.sku+(f.disponible!==undefined?(': quedan '+f.disponible):'')):'';
-            toast('Stock insuficiente'+det+'. El pedido sigue pendiente.','error');
-            beep('error'); renderPending();
+            SYNC_MOTIVO='Stock insuficiente'+(f?(' · '+f.sku+(f.disponible!==undefined?(': quedan '+f.disponible):'')):'')+'.';
+            syncNext(queue.slice(1), sent);
+          } else if(res && res.cupoExcedido){
+            // Se guardó sin señal, así que la pregunta del cupo llega ahora
+            if(window.confirm((order.cliente&&order.cliente.nombre?order.cliente.nombre+': ':'')+(res.message||'El pedido pasa del cupo.')+'\n\n¿Aprobar de todos modos? (queda anotado como excepción)')){
+              order.forzarCupo=true; queueOrder(order); syncNext(queue, sent);
+            } else { SYNC_MOTIVO='Pasa del cupo del cliente.'; syncNext(queue.slice(1), sent); }
           } else if(res && res.conflicto){
             // Un conflicto de edición NUNCA se resuelve solo reintentando — el pedido
             // cambió del lado del servidor mientras este quedaba en espera offline.
@@ -8576,9 +8608,8 @@
             beep('error');
             syncNext(queue.slice(1), sent);   // sigue con los demás, este no bloquea al resto
           } else {
-            var b2=$('syncBtn'); if(b2){ b2.disabled=false; b2.textContent='Sincronizar'; }
-            toast((res&&res.message)||'Error al sincronizar.','error');
-            beep('error'); renderPending();
+            SYNC_MOTIVO=(res&&res.message)||'Error al sincronizar.';
+            syncNext(queue.slice(1), sent);
           }
         }
       }).withFailureHandler(function(){ var b=$('syncBtn'); if(b){ b.disabled=false; b.textContent='Sincronizar'; } toast('Se cortó la conexión a mitad de la sincronización. Los pedidos que faltan siguen guardados en este celular: intenta de nuevo.','error'); beep('error'); renderPending(); });
@@ -13182,7 +13213,7 @@
     }
     function biVistaResumen(d, F){
       var h='', rv=window.RESUMEN_VENTAS;
-      if(!d && !F) return '<p class="hist-empty">Analizando tu negocio…</p>';
+      if(!d && !F) return esqueletoHtml(4);
       if(d && !d.pedidosAnalizados) return '<p class="hist-empty">Todavía no hay pedidos para analizar. Cuando registres ventas, aquí verás cómo va el negocio y tu plan de la semana.</p>';
       // Dos calificaciones: el negocio (ventas, inventario, clientes) y el dinero (caja, deudas, gastos)
       h+='<div class="bi-hero">'+(d?biGauge(d.salud.puntaje, d.salud.nivel).replace('Salud del negocio:','Negocio:'):'<div class="bi-gauge"><div class="bi-g-num"><b>…</b></div></div>')
@@ -13491,7 +13522,9 @@
       var f = $('statsFecha'); if(f) f.textContent = r.generado || '';
       if(({ resumen:1, ventas:1, rent:1, inv:1 })[BI.tab]) biPintar(true);
     }
-    function stEspera(){ return ST_R === false ? '<p class="hist-empty">Sin conexión · no se pudieron calcular estos datos.<br><br><button class="btn-ghost" type="button" data-stretry="1" style="width:100%">Reintentar</button></p>' : '<p class="hist-empty">Calculando…</p>'; }
+    function stEspera(){ return ST_R === false ? '<p class="hist-empty">Sin conexión · no se pudieron calcular estos datos.<br><br><button class="btn-ghost" type="button" data-stretry="1" style="width:100%">Reintentar</button></p>' : esqueletoHtml(4); }
+    /* Marcador mientras llegan los datos: mismo tamaño que las tarjetas, para que la pantalla no salte */
+    function esqueletoHtml(n){ var h='<div class="esqueleto" role="status" aria-label="Cargando">'; for(var i=0;i<n;i++) h+='<i></i>'; return h+'</div>'; }
     /* Rentabilidad: lo que de verdad queda después de costos y envíos */
     function stRentHtml(r){
       var h = '';
@@ -13815,7 +13848,8 @@
       var box=$('cpList'), vacio=$('cpEmpty');
       if(!lista.length){
         box.innerHTML=''; vacio.style.display='block';
-        vacio.textContent = !CP.lista.length ? (CP.ts ? 'Aún no hay clientes. Cuando hagas pedidos aparecerán aquí con su cupo.' : '⏳ Calculando los cupos…') : 'Ningún cliente coincide.';
+        if(!CP.lista.length && !CP.ts){ vacio.innerHTML=esqueletoHtml(3); return; }
+        vacio.textContent = !CP.lista.length ? 'Aún no hay clientes. Cuando hagas pedidos aparecerán aquí con su cupo.' : 'Ningún cliente coincide.';
         return;
       }
       vacio.style.display='none';
@@ -13954,7 +13988,7 @@
       el.className='cupo-strip '+(pasa?'bad':'ok'); el.style.display='block';
       el.innerHTML='<b>'+(i.nuevo?'Cliente nuevo':'Cupo de crédito')+(i.nivel&&i.nivel!=='Nuevo'?(' · '+safe(i.nivel)):'')+'</b>'
         +'<span>Cupo '+cop(i.cupo)+' · usa '+cop(i.usado)+' · disponible <b>'+cop(i.disponible)+'</b></span>'
-        +'<small>'+(pausado?'Tiene remisiones vencidas: no se le puede dar crédito nuevo hasta que se ponga al día.':(saldo>i.disponible?('Este pedido a crédito ('+cop(saldo)+') pasa del cupo por '+cop(saldo-i.disponible)+'. Sube el abono inicial o aprueba la excepción al guardar.'):(saldo>0?('Después de este pedido le quedarían '+cop(i.disponible-saldo)+'.'):'')))+'</small>';
+        +'<small>'+(i.manualBloqueado?'Su crédito está pausado. Reactívalo en Cupos o aprueba la excepción al guardar.':pausado?'Tiene remisiones vencidas: no se le puede dar crédito nuevo hasta que se ponga al día.':(saldo>i.disponible?('Este pedido a crédito ('+cop(saldo)+') pasa del cupo por '+cop(saldo-i.disponible)+'. Sube el abono inicial o aprueba la excepción al guardar.'):(saldo>0?('Después de este pedido le quedarían '+cop(i.disponible-saldo)+'.'):'')))+'</small>';
     }
     var ORDER_FORZAR_CUPO=false;
 

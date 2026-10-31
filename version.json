@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-31-01",
-  "servidor": "2026.10.34",
+  "app": "2026-10-31-02",
+  "servidor": "2026.10.35",
   "fecha": "2026-10-31",
   "novedades": [
+    "Las cancelaciones y reembolsos de Shopify ya devuelven las unidades al inventario. Lo que no se pueda aplicar solo aparece en Alertas. Correcciones en Cupos y Pagos.",
     "Correcciones en devoluciones con probador, plazos de crédito, remisiones anuladas y escaneo en Empaque. Botones más fáciles de tocar y tarjetas uniformes según la guía de estilo.",
     "Estadísticas con plan de la semana: a quién cobrar, a quién escribirle, qué reponer y qué liberar, con nombres y montos. Cálculos corregidos y Alertas y Estadísticas ya dan las mismas cifras. Inicio sin píldoras.",
     "Inicio: cada tarjeta muestra su conteo (por empacar, vencidas, por reponer…). Las cifras de dinero siguen ocultas.",
