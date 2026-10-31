@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-31-02';
+    const APP_VERSION = '2026-10-31-03';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -7388,13 +7388,6 @@
       SIN_ROTACION:   {t:'Sin rotación',       c:'u5'}
     };
 
-    function alertasShopifyHtml(r){
-      return (r.shopifyRevisar||[]).map(function(x){
-        return '<div class="al-card u2"><div class="al-info"><div class="al-top"><span class="al-tag">Revisar Shopify</span></div>'
-          +'<p class="al-nom">Pedido '+safe(x.pedido)+(x.sku?(' · '+safe(x.sku)+(x.cantidad?' × '+x.cantidad:'')):'')+'</p>'
-          +'<p class="al-nota">'+safe(x.detalle)+'</p><p class="al-meta">'+safe(String(x.fecha).split('-').reverse().join('/'))+'</p></div></div>';
-      }).join('');
-    }
     function pintarAlertas(){
       var r=window.ALERTAS.datos; if(!r) return;
       var res=r.resumen||{};
@@ -7419,12 +7412,11 @@
       else if(window.ALERTAS.filtro==='dormido') lista=lista.filter(function(a){ return a.urgencia>=5; });
 
       var c=$('alertList');
-      var shopifyHtml=window.ALERTAS.filtro==='urgente' ? alertasShopifyHtml(r) : '';
       if(!lista.length){
-        c.innerHTML=shopifyHtml || '<div class="empty"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div>Nada que atender en este filtro.</div></div>';
+        c.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div>Nada que atender en este filtro.</div></div>';
         return;
       }
-      c.innerHTML = shopifyHtml + lista.map(function(a){
+      c.innerHTML = lista.map(function(a){
         var et=AL_ETIQUETA[a.tipo]||{t:a.tipo,c:'u4'};
         var extra='';
         if(a.sugerido>0) extra='<span class="al-pedir">Pedir '+a.sugerido+'</span>';
