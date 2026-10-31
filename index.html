@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-30-03';
+    const APP_VERSION = '2026-10-30-04';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3525,6 +3525,29 @@
     .fin-tabla td:first-child{overflow-wrap:anywhere}
     .inv-marca-top{flex-wrap:wrap;row-gap:2px}
     .inv-marca-top span{white-space:normal;min-width:0}
+
+    /* WhatsApp: mensajes plegados */
+    .wa-msg-h{cursor:pointer;margin-bottom:0}
+    .wa-msg.ver .wa-msg-h{margin-bottom:10px}
+    .wa-msg:not(.ver) > :not(.wa-msg-h){display:none}
+    .cfg-en-sec .cfg-head{margin:0}
+    /* Contraste en ambos temas */
+    .hist-actions button.hact-wa{background:#55735C;border-color:#55735C}
+    .badge-pago.pendiente{color:var(--terracota-txt)}
+    .bi-abc .abc-B,.bi-abc .abc-C{color:#2C211E}
+    button.fin-kpi{color:var(--espresso)}
+    .fin-kpi b.neg,.fin-tabla td.neg,.gs-bar-top b.over{color:var(--rojo-txt)}
+    /* Modo oscuro: colores fijos que quedaban apagados o invisibles */
+    :root.theme-dark .stk-modos .seg.active{background:var(--espresso);border-color:var(--espresso);color:var(--crema)}
+    :root.theme-dark .marca-chip.marca-disp{border-color:#5F8F6B;color:#8FCB9B}
+    :root.theme-dark .marca-chip.marca-disp.active{background:#8FCB9B;border-color:#8FCB9B;color:#1C1714}
+    :root.theme-dark .hist-gan-soon b,:root.theme-dark .bi-g-niv.bi-soon,:root.theme-dark .bi-kpi.soon b,:root.theme-dark .bi-badge.soon{color:#E0A868}
+    :root.theme-dark .bi-g-niv.bi-ok,:root.theme-dark .bi-chip.ok,:root.theme-dark .bi-badge.ok,:root.theme-dark .bi-tr .pos{color:#8FCB9B}
+    :root.theme-dark .hist-actions button.hact-wa{background:#4F7057;border-color:#4F7057}
+    .fecha-btn{color:var(--crema)}
+    :root.theme-dark #deleteModal .btn-solid,:root.theme-dark #orderDeleteModal .btn-solid{color:#fff}
+    :root.theme-dark #devolModal .btn-ghost{color:var(--terracota-txt) !important}
+    .ent-chips .chip{padding-left:4px;padding-right:4px;min-width:0}
   </style>
 </head>
 <body>
@@ -5165,10 +5188,10 @@
       <details class="cfg-sec" id="cfgWaSec">
         <summary><span><b>Mensajes de WhatsApp</b><small>Escribe a tu gusto cada mensaje que envía la app</small></span></summary>
         <div class="cfg-sec-body">
-      <p class="cfg-hint" style="margin-top:0">Aquí ves los mensajes que la app arma por ti (remisión, cobro, cupo, catálogo…). Para cada uno puedes <b>elegir qué partes lleva</b> o <b>escribirlo completo a tu manera</b> con variables como <b>{nombre}</b> o <b>{total}</b> que se llenan solas. Se comparte con todos los equipos al tocar <b>Guardar</b>.</p>
+      <p class="cfg-hint" style="margin-top:0">Toca un mensaje para verlo, elegir qué partes lleva o escribirlo a tu manera. Los cambios valen para todos los equipos.</p>
       <div class="field"><label class="lbl" for="waNumPrueba">Tu número para probar (opcional)</label>
         <input id="waNumPrueba" type="tel" inputmode="tel" autocomplete="off" placeholder="Ej. 300 123 4567">
-        <p class="cfg-hint">«Probar en WhatsApp» abre el mensaje con datos de ejemplo hacia este número (o te deja elegir el contacto). Sirve para comprobar que el enlace abre bien.</p></div>
+        <p class="cfg-hint">«Probar en WhatsApp» lo abre con datos de ejemplo hacia este número.</p></div>
       <div id="waMensajes"></div>
         </div>
       </details>
@@ -10083,12 +10106,13 @@
       if(t.length > 1200) av.push('Es un mensaje largo ('+t.length+' letras): en WhatsApp se lee mejor corto.');
       return av.join(' ');
     }
+    var WA_VER='';
     function pintarWaMensajes(){
       var box = $('waMensajes'); if(!box) return;
       var F = waFuente();
       box.innerHTML = Object.keys(WA_MSGS).map(function(k){
         var M = WA_MSGS[k], propio = waEsPropio(k), abierto = WA_ABIERTO===k;
-        var h = '<article class="wa-msg'+(abierto?' abierto':'')+'" data-k="'+k+'"><header class="wa-msg-h"><div><h4>'+safe(M.titulo)+'</h4><p>'+safe(M.uso)+'</p></div>'
+        var h = '<article class="wa-msg'+(abierto?' abierto':'')+((abierto||WA_VER===k)?' ver':'')+'" data-k="'+k+'"><header class="wa-msg-h"><div><h4>'+safe(M.titulo)+'</h4><p>'+safe(M.uso)+'</p></div>'
           +'<span class="wa-tag'+(propio?' propio':'')+'">'+(propio?'Personalizado':'Predeterminado')+'</span></header>'
           +'<pre class="wa-prev" aria-label="Vista previa con datos de ejemplo">'+safe(waVistaPrevia(k))+'</pre>';
         if(abierto){
@@ -10122,6 +10146,12 @@
     }
     (function(){
       var box = $('waMensajes'); if(!box) return;
+      box.addEventListener('click', function(e){
+        var h = e.target.closest ? e.target.closest('.wa-msg-h') : null; if(!h) return;
+        var art = h.parentNode, k = art.getAttribute('data-k'), abrir = !art.classList.contains('ver');
+        Array.prototype.forEach.call(box.querySelectorAll('.wa-msg.ver:not(.abierto)'), function(x){ x.classList.remove('ver'); });
+        art.classList.toggle('ver', abrir || art.classList.contains('abierto')); WA_VER = abrir ? k : ''; haptic(6);
+      });
       try{ var n = localStorage.getItem('kaem_wa_prueba'); if(n && $('waNumPrueba')) $('waNumPrueba').value = n; }catch(e){}
       box.addEventListener('click', function(e){
         var t = e.target.closest ? e.target.closest('button') : null; if(!t) return;

@@ -118,8 +118,8 @@
     if(CAT.descuento && CAT.descuento.pct) p.push('<b>'+CAT.descuento.pct+'% de descuento</b>'+(CAT.descuento.minimo>0?' desde '+cop(CAT.descuento.minimo):''));
     if(e.siempreGratis) p.push('Envío gratis a todo el país');
     else {
-      if(e.localGratisDesde != null) p.push('Envío gratis en Bucaramanga y AM desde <b>'+cop(e.localGratisDesde)+'</b>');
-      else if(e.amGratis) p.push('Envío gratis en Bucaramanga y AM');
+      if(e.localGratisDesde != null) p.push('Envío gratis en Bucaramanga y área metropolitana desde <b>'+cop(e.localGratisDesde)+'</b>');
+      else if(e.amGratis) p.push('Envío gratis en Bucaramanga y área metropolitana');
       p.push('A todo el país desde <b>'+cop(e.gratisDesde)+'</b>');
     }
     c.innerHTML = '✦ ' + p.join(' · ') + ' ✦';

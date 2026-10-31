@@ -382,7 +382,7 @@
   <div class="barra-top" id="barraTop">
     <div class="fila-b">
       <label class="buscar"><span class="sr">Buscar</span><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
-        <input id="q" type="search" placeholder="Busca un labial, una base, un tono…" autocomplete="off" enterkeyhint="search"></label>
+        <input id="q" type="search" placeholder="Busca un producto o tono…" autocomplete="off" enterkeyhint="search"></label>
       <button class="btn-filtro" id="bFiltro" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.2" fill="var(--crema)"/><circle cx="15" cy="17" r="2.2" fill="var(--crema)"/></svg>Filtrar<span class="c" id="cFiltro"></span></button>
     </div>
     <div class="chips-w"><button class="ch-f i" type="button" aria-label="Categorías anteriores"><svg viewBox="0 0 24 24"><polyline points="15 5 8 12 15 19"/></svg></button><div class="chips" id="chips" role="tablist" aria-label="Categorías"></div><button class="ch-f d" type="button" aria-label="Más categorías"><svg viewBox="0 0 24 24"><polyline points="9 5 16 12 9 19"/></svg></button></div>
@@ -488,7 +488,7 @@
         if(r && (r.apagado || /no es válido|venció/i.test(r.message||''))){
           try{ localStorage.removeItem(K_CAT); localStorage.removeItem(K_CAR); }catch(e){}
           CAT=null; CARRITO={}; $('grid').innerHTML=''; $('bolsaB').classList.remove('on');
-          $('estado').style.display='block'; $('estado').innerHTML='<b>Tienda no disponible</b>'+esc(r.message||''); return;
+          $('estado').style.display='block'; $('estado').innerHTML='<b>Tienda no disponible</b>'+esc(r.message||''); $('cinta').style.display='none'; return;
         }
         if(!previo){ $('grid').innerHTML=''; $('estado').style.display='block'; $('estado').innerHTML='<b>Algo no salió bien</b>'+esc((r&&r.message)||'No se pudo cargar la tienda.'); }
         else aviso((r&&r.message)||'No se pudo actualizar la tienda.');
@@ -782,7 +782,7 @@
   function metas(){
     var m=[], d=CAT.descuento, e=CAT.envio, ciu=String(CIUDAD_CLI||'').trim(), local=ciu?esAreaMetro(ciu):null, L=e.localGratisDesde;
     if(d && d.pct && d.minimo>0) m.push({ k:'desc', en:d.minimo, falta:'para tu '+d.pct+'% de descuento' });
-    if(!e.amGratis && L>0 && local!==false) m.push({ k:'local', en:L, falta: local ? 'para envío gratis' : 'para envío gratis en Bucaramanga y AM' });
+    if(!e.amGratis && L>0 && local!==false) m.push({ k:'local', en:L, falta: local ? 'para envío gratis' : 'para envío gratis en Bucaramanga y área metropolitana' });
     if(local!==true && e.gratisDesde>0) m.push({ k:'envio', en:e.gratisDesde, falta: ciu ? 'para envío gratis' : 'para envío gratis a todo el país' });
     return m.sort(function(a,b){ return a.en-b.en; });
   }
