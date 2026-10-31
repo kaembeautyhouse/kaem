@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-30-02';
+    const APP_VERSION = '2026-10-30-03';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -381,7 +381,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.24', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.32', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -3472,6 +3472,59 @@
     .al-kpi b{word-break:normal;white-space:nowrap}
     .al-kpi b{font-size:clamp(14px,4.4vw,20px)}
     .pg-cat b{white-space:nowrap;font-size:clamp(13px,4.2vw,16px)}
+
+    /* Estado del pedido */
+    .ped-edit-badge.ok{background:var(--st-wa-bg);color:var(--st-wa-text)}
+    .ped-edit-hint{margin:12px 2px 8px;font-size:13px;line-height:1.4;color:var(--terracota-txt)}
+    .ped-guardado{margin-top:14px;padding:14px;border-radius:16px;border:1px solid var(--st-wa-border);background:var(--st-wa-bg);color:var(--st-wa-text)}
+    .ped-guardado > b{display:block;font-size:15px}
+    .ped-guardado p{margin:4px 0 12px;font-size:13px;line-height:1.45}
+    .ped-guardado .btn-solid{width:100%;min-height:48px}
+    .ped-hist{width:100%;margin-top:10px}
+    .draft-t{flex:0 0 auto;align-self:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-suave)}
+
+    /* Ajustes: la barra de Guardar siempre abajo (no flotando a media pantalla), sin títulos repetidos */
+    .cfg-sheet{display:flex;flex-direction:column;min-height:100%}
+    .cfg-layout{flex:1 1 auto}
+    .cfg-bar{margin-top:auto !important}
+    .cfg-sec-head p{display:none}
+    .cfg-sec-head h4{margin-bottom:14px}
+    .cfg-bar .btn-solid:disabled{opacity:.45}
+    /* Estadísticas: el título ya está en la barra superior; calificaciones compactas también en celular */
+    .stats-head h3{display:none}
+    .stats-head{margin-bottom:10px;justify-content:space-between}
+    @media (max-width:520px){
+      .bi-hero{flex-direction:row !important;align-items:center !important;gap:10px;margin-bottom:12px}
+      .bi-gauge{flex:0 0 112px !important;margin:0 !important}
+      .bi-gauge svg{width:112px;height:70px}
+      .bi-g-num{top:30px}
+      .bi-g-num b{font-size:26px}
+      .bi-g-num span{display:none}
+      .bi-g-niv{font-size:11.5px;margin-top:3px;line-height:1.25}
+      .bi-comp{gap:5px}
+      .bi-comp-r{grid-template-columns:minmax(0,84px) 1fr 22px;gap:6px;font-size:11px;line-height:1.15}
+    }
+    /* Tarjetas en rejilla de 2: si queda una sola al final, ocupa todo el ancho (sin hueco) */
+    .fin-hero > :last-child:nth-child(odd){grid-column:1 / -1}
+    .bi-kpis > :only-child{grid-column:1 / -1}
+
+    /* Cartera: tarjetas-filtro */
+    #carFiltro{display:none}
+    .car-tf{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+    .car-tf.on{border-color:var(--espresso);box-shadow:inset 0 0 0 1px var(--espresso)}
+    .car-tf:active{transform:scale(.985)}
+    /* Empaque con pedido abierto */
+    #screen-packing.con-pedido #packHistBtn,#screen-packing.con-pedido #packAntig{display:none}
+    /* Alertas: el título ya está arriba */
+    #screen-alertas .section-title{display:none}
+    /* Botones pequeños del pedido: área de toque suficiente */
+    .cart-body .cart-ext{min-height:32px}
+    #fletePolBtn{padding:6px 8px;margin:-6px 0 -6px 2px}
+    /* Tablas de Estadísticas: las cifras no se parten; marcas sin desbordarse */
+    .fin-tabla td + td,.fin-tabla th + th{white-space:nowrap}
+    .fin-tabla td:first-child{overflow-wrap:anywhere}
+    .inv-marca-top{flex-wrap:wrap;row-gap:2px}
+    .inv-marca-top span{white-space:normal;min-width:0}
   </style>
 </head>
 <body>
@@ -3603,7 +3656,7 @@
       <section class="screen" id="screen-packing">
         <div class="pack-head">
           <div class="field" style="flex:1;margin:0">
-            <label class="lbl" for="packOrderSel">Pedido a alistar</label>
+            <label class="lbl" for="packOrderSel">Pedido a empacar</label>
             <select id="packOrderSel"><option value="">Cargando pedidos…</option></select>
           </div>
         </div>
@@ -3616,7 +3669,7 @@
 
         <div id="packEmpty" class="empty">
           <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>
-          <div id="packEmptyTxt">Selecciona un pedido para comenzar el alistamiento.</div>
+          <div id="packEmptyTxt">Selecciona un pedido para empezar a empacarlo.</div>
           <div id="packSugeridos" class="pack-sug"></div>
         </div>
 
@@ -3663,23 +3716,23 @@
       <!-- ————— CARTERA · CUENTAS POR COBRAR ————— -->
       <section class="screen" id="screen-cartera">
         <div class="car-kpis">
-          <div class="car-kpi total">
+          <div class="car-kpi total car-tf on" data-tf="todos" role="button" tabindex="0">
             <span class="car-kpi-lbl">Cartera pendiente</span>
             <b id="carTotal">$0</b>
             <small id="carRemis">0 remisiones</small>
           </div>
-          <div class="car-kpi warn">
+          <div class="car-kpi warn car-tf" data-tf="porvencer" role="button" tabindex="0">
             <span class="car-kpi-lbl">Por vencer</span>
             <b id="carPorVencer">0</b>
             <small id="carPorVencerSub">en 5 días o menos</small>
           </div>
-          <div class="car-kpi danger">
+          <div class="car-kpi danger car-tf" data-tf="vencidos" role="button" tabindex="0">
             <span class="car-kpi-lbl">Vencidas</span>
             <b id="carVencidos">0</b>
-            <small>requieren gestión</small>
+            <small>toca para verlas</small>
           </div>
-          <div class="car-kpi" id="carPorEntregarBox" style="display:none">
-            <span class="car-kpi-lbl">Por entregar</span>
+          <div class="car-kpi car-tf" id="carPorEntregarBox" data-tf="sinempacar" role="button" tabindex="0" style="display:none">
+            <span class="car-kpi-lbl">Sin empacar</span>
             <b id="carPorEntregar">0</b>
             <small>el plazo aún no corre</small>
           </div>
@@ -4064,15 +4117,18 @@
           </div>
         </div>
 
+        <p class="ped-edit-hint" id="orderEditHint" style="display:none"></p>
         <button class="btn-primary" id="orderSaveBtn" type="button"><span class="spin"></span><span id="orderSaveLabel">Guardar pedido</span></button>
-        <div class="order-actions">
+        <div class="ped-guardado" id="orderSavedBox" style="display:none">
+          <b id="orderSavedTit">Pedido guardado</b>
+          <p>¿Falta o sobra algo? Cámbialo aquí arriba y toca <b>Actualizar pedido</b>: se corrige este mismo, no se crea otro.</p>
+          <button class="btn-solid" id="orderSavedNew" type="button">Empezar otro pedido</button>
+        </div>
+        <div class="order-actions" id="orderActionsRow" style="display:none">
           <button class="btn-ghost" id="orderPdfBtn" type="button" disabled>Descargar PDF</button>
           <button class="btn-solid wa" id="orderWaBtn" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enviar WhatsApp</span></button>
         </div>
-        <div class="order-actions">
-          <button class="btn-ghost" id="orderPauseBtn" type="button">Pausar este pedido</button>
-          <button class="btn-ghost" id="historyBtn" type="button">Ver historial</button>
-        </div>
+        <button class="btn-ghost ped-hist" id="historyBtn" type="button">Ver pedidos guardados (Historial)</button>
       </section>
 
     </div>
@@ -4100,7 +4156,7 @@
       <button class="nav-item" id="nav-packing" type="button" data-tab="packing">
         <span class="nav-badge" id="packBadge">0</span>
         <svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-        <span>Packing</span>
+        <span>Empaque</span>
       </button>
       <button class="nav-item" id="nav-cartera" type="button" data-tab="cartera">
         <svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
@@ -4728,7 +4784,7 @@
   <div class="modal" id="skuModal" style="z-index:86">
     <div class="sheet">
       <h3>Cambiar SKU</h3>
-      <p class="cfg-hint" style="margin-top:0">El SKU nuevo se cambia en el catálogo <b>y en todo el historial</b> (pedidos, packing, devoluciones). Las cantidades, precios y reservas no se tocan: solo cambia el nombre del código.</p>
+      <p class="cfg-hint" style="margin-top:0">El SKU nuevo se cambia en el catálogo <b>y en todo el historial</b> (pedidos, empaque, devoluciones). Las cantidades, precios y reservas no se tocan: solo cambia el nombre del código.</p>
       <div class="field"><label class="lbl">SKU actual</label><div class="ssku" id="skuActual" style="margin:0"></div></div>
       <div class="field"><label class="lbl" for="skuNuevo">SKU nuevo</label>
         <input id="skuNuevo" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" placeholder="Ej. HZ-LABIAL-01">
@@ -4850,6 +4906,16 @@
     </div>
   </div>
 
+  <div class="modal" id="orderNuevoModal" role="dialog" aria-modal="true" aria-labelledby="onmTit">
+    <div class="sheet">
+      <h3 id="onmTit">Este pedido no está guardado</h3>
+      <p class="cfg-hint">Si te llegó otro cliente, déjalo aparte: queda arriba en «Sin terminar» (solo en este equipo) y lo retomas cuando quieras.</p>
+      <button class="btn-solid" id="onmAparte" type="button" style="width:100%;min-height:48px;margin-top:10px">Dejarlo aparte y empezar otro</button>
+      <button class="btn-ghost" id="onmDescartar" type="button" style="width:100%;margin-top:8px;color:var(--terracota-txt)">Borrarlo y empezar otro</button>
+      <button class="btn-ghost" id="onmSeguir" type="button" style="width:100%;margin-top:8px">Seguir con este pedido</button>
+    </div>
+  </div>
+
   <div class="modal" id="abEditModal">
     <div class="sheet">
       <h3>Corregir abono</h3>
@@ -4923,7 +4989,7 @@
           <option value="Kevin">Kevin</option>
           <option value="Camilo">Camilo</option>
         </select>
-        <p class="cfg-hint">Queda registrado en cada pedido enviado a KAEM_BASE_APP.</p></div>
+        <p class="cfg-hint">Queda registrado en cada pedido.</p></div>
       <div class="field"><label class="lbl" for="cfgNotaPDF">Nota al pie de la remisión (PDF)</label>
         <textarea id="cfgNotaPDF" rows="2" placeholder="Ej. Garantía de 8 días. ¡Gracias por tu compra!"></textarea></div>
       <div class="field row-field">
@@ -4935,8 +5001,8 @@
       </div>
       <div class="field row-field"><label class="lbl inline">Aviso de pagos al abrir</label>
         <div class="segmented" id="cfgAvisoPagosSeg" role="group">
-          <button type="button" class="seg" data-avisopg="off">No</button>
-          <button type="button" class="seg active" data-avisopg="on">Sí</button>
+          <button type="button" class="seg" data-avisopg="off">Apagado</button>
+          <button type="button" class="seg active" data-avisopg="on">Activo</button>
         </div></div>
       <p class="cfg-hint">Al abrir la app avisa si hay pagos (proveedores, créditos…) vencidos o que vencen hoy.</p>
         </div>
@@ -4952,7 +5018,7 @@
         </div></div>
       <p class="cfg-hint">Automático sigue el modo claro/oscuro del sistema operativo. Se aplica al instante, no hace falta guardar.</p>
       <div class="lote-row">
-        <div class="txt">Modo cliente<small>Oculta costos, otros precios y cantidades exactas en Consultar. Úsalo antes de enseñar la pantalla o tomar una captura</small></div>
+        <div class="txt">Modo cliente<small>Oculta costos, otros precios y cantidades exactas en Inventario. Úsalo antes de enseñar la pantalla o tomar una captura</small></div>
         <label class="switch"><input type="checkbox" id="cfgModoCliente"><span class="slider"></span></label>
       </div>
       <div class="lote-row">
@@ -4960,7 +5026,7 @@
         <label class="switch"><input type="checkbox" id="cfgVerCosto"><span class="slider"></span></label>
       </div>
       <div class="lote-row">
-        <div class="txt">Códigos QR / de barras en Consultar<small>Apagado por defecto: se oculta el botón de código en cada producto</small></div>
+        <div class="txt">Códigos QR / de barras en Inventario<small>Apagado por defecto: se oculta el botón de código en cada producto</small></div>
         <label class="switch"><input type="checkbox" id="cfgQrOn"><span class="slider"></span></label>
       </div>
       <div class="field row-field" id="cfgQrTipoWrap">
@@ -5029,8 +5095,8 @@
       <p class="cfg-sub">Cupos de crédito de los clientes</p>
       <div class="field row-field"><label class="lbl inline">Usar cupos</label>
         <div class="segmented" id="cfgCupoSeg" role="group">
-          <button type="button" class="seg" data-cupo="off">No</button>
-          <button type="button" class="seg active" data-cupo="on">Sí</button>
+          <button type="button" class="seg" data-cupo="off">Apagado</button>
+          <button type="button" class="seg active" data-cupo="on">Activo</button>
         </div></div>
       <div class="cli-grid">
         <div class="field"><label class="lbl" for="cfgCupoInicial">Cupo para clientes nuevos</label>
@@ -5092,7 +5158,7 @@
         </div>
       </div>
       <button class="btn-ghost" id="cfgAddMarcaBtn" type="button" style="width:100%">Agregar marca</button>
-      <p class="cfg-hint">Se sincroniza con la hoja CONFIG_MARCAS de KAEM_BASE_APP. Los márgenes definen los precios Distribuidor, Mayorista y Detal de esa marca. Elige una marca existente para corregir sus márgenes.</p>
+      <p class="cfg-hint">Los márgenes definen los precios Distribuidor, Mayorista y Detal de esa marca. Elige una marca existente para corregir sus márgenes.</p>
         </div>
       </details>
       <p class="cfg-grupo">Comunicación</p>
@@ -5152,7 +5218,7 @@
         <button class="btn-ghost" id="cfgCatDiag" type="button">¿Por qué falta un producto?</button>
       </div>
       <p class="cfg-hint">Las fotos, categorías y fichas se actualizan solas cada 6 horas desde Shopify.</p>
-      <p class="lbl" style="margin:12px 0 6px">💡 Ganchos comerciales <small style="font-weight:400">(solo Mayorista y Distribuidor)</small></p>
+      <p class="lbl" style="margin:12px 0 6px">Ganchos comerciales <small style="font-weight:400">(solo Mayorista y Distribuidor)</small></p>
       <div class="cfg-2col">
         <button class="btn-solid" id="cfgCatGanchosExp" type="button">1 · Descargar para la IA</button>
         <button class="btn-ghost" id="cfgCatGanchosPrompt" type="button">2 · Copiar instrucción</button>
@@ -5225,14 +5291,13 @@
         <button class="btn-ghost" id="cfgRespAhora" type="button">Respaldar ahora</button>
         <button class="btn-ghost" id="cfgRespAuto" type="button">Activar semanal</button>
       </div>
-      <p class="cfg-hint">Copia completa de KAEM_BASE_APP en tu Google Drive (carpeta "KAÉM · Respaldos"). Se guardan las 8 más recientes.</p>
+      <p class="cfg-hint">Copia completa de la base de datos en tu Google Drive (carpeta "KAÉM · Respaldos"). Se guardan las 8 más recientes.</p>
         </div>
       </details>
       <details class="cfg-sec">
-        <summary><span><b>Herramientas</b><small>Clientes, movimientos recientes y respaldo</small></span></summary>
+        <summary><span><b>Herramientas</b><small>Movimientos recientes, SKU en lote y exportar inventario</small></span></summary>
         <div class="cfg-sec-body">
-      <button class="btn-ghost" id="cfgClientesBtn" type="button" style="width:100%">Ir al módulo Clientes</button>
-      <p class="cfg-hint">Ahora los clientes tienen su propio módulo: búscalos, mira lo que han comprado y lo que deben, y edita su nombre, teléfono, NIT, dirección, tipo, correo y notas. El cambio se aplica a todos sus pedidos y a la cartera.</p>
+      <button id="cfgClientesBtn" type="button" hidden></button>
       <button class="btn-ghost" id="cfgAuditoriaBtn" type="button" style="width:100%">Ver movimientos recientes</button>
       <p class="cfg-hint">Quién registró, editó, empacó, anuló o cobró cada cosa, y cuándo. Útil cuando dos personas trabajan a la vez.</p>
       <button class="btn-ghost" id="cfgSkuLoteBtn" type="button" style="width:100%">🏷️ Cambiar SKU en lote</button>
@@ -5251,15 +5316,15 @@
       <p class="cfg-hint">Cuando hay una versión nueva la app te lo avisa sola con las novedades. Este botón lo revisa ya.</p>
       <p class="cfg-sub">Revisiones</p>
       <div class="cfg-2col">
-        <button class="btn-ghost" id="cfgConexionBtn" type="button">📡 Probar conexión completa</button>
-        <button class="btn-ghost" id="cfgInvRevBtn" type="button">🧮 Revisar inventario y reservas</button>
+        <button class="btn-ghost" id="cfgConexionBtn" type="button">Probar conexión completa</button>
+        <button class="btn-ghost" id="cfgInvRevBtn" type="button">Revisar inventario y reservas</button>
       </div>
-      <p class="cfg-hint"><b>Conexión:</b> mide la velocidad del servidor y revisa la salud de la hoja, los disparadores y la seguridad. <b>Inventario:</b> compara lo reservado de cada producto con lo que piden los pedidos por alistar y corrige diferencias.</p>
-      <button class="btn-ghost" id="cfgBaseBtn" type="button" style="width:100%;margin-top:8px">🗂️ Ordenar y revisar la base de datos (KAEM_BASE_APP)</button>
+      <p class="cfg-hint"><b>Conexión:</b> mide la velocidad del servidor y revisa la salud de la hoja, los disparadores y la seguridad. <b>Inventario:</b> compara lo reservado de cada producto con lo que piden los pedidos por empacar y corrige diferencias.</p>
+      <button class="btn-ghost" id="cfgBaseBtn" type="button" style="width:100%;margin-top:8px">Ordenar y revisar la base de datos</button>
       <p class="cfg-hint">Ordena las pestañas por grupos y colores, crea la hoja <b>LEEME</b> (qué es cada hoja) y limpia lo que solo crece. No toca tus datos.</p>
       <p class="cfg-sub">Si algo falla</p>
       <button class="btn-ghost danger-ghost" id="cfgWipeBtn" type="button" style="width:100%">Reinicio completo de la app</button>
-      <p class="cfg-hint">Déjala como recién instalada en este equipo: borra lo guardado (catálogo, historial, preferencias, copia de la app) y la descarga de nuevo. Tus pedidos sin enviar se conservan. <b>El botón ↻ de arriba</b> es el refresco normal: trae el inventario al día desde KAEM_BASE_APP y no borra nada.</p>
+      <p class="cfg-hint">Déjala como recién instalada en este equipo: borra lo guardado (catálogo, historial, preferencias, copia de la app) y la descarga de nuevo. Tus pedidos sin enviar se conservan. <b>El botón ↻ de arriba</b> es el refresco normal: trae el inventario al día y no borra nada.</p>
         </div>
       </details>
 
@@ -6077,7 +6142,7 @@
       }).resincronizarCatalogoShopify();
     }
     /** REINICIO COMPLETO · deja la app como recién instalada. Úsalo después de actualizar si algo falla.
-        Borra: catálogo, historial, cartera, packing, pagos, ajustes y preferencias guardadas, el service worker y
+        Borra: catálogo, historial, cartera, empaque, pagos, ajustes y preferencias guardadas, el service worker y
         la copia de la app en caché del navegador; pide también al servidor que renueve su memoria. Luego recarga.
         NO borra (es trabajo tuyo, no caché): pedidos sin sincronizar, borradores, directorio de clientes,
         el PIN de este equipo, el consecutivo y el último operador. */
@@ -6952,7 +7017,7 @@
       var list=getFiltered(), c=$('productList');
       var totUnid=STATE.products.reduce(function(s,p){ return s+(Number(p.stock)||0); },0);
       $('consultCount').textContent = STATE.products.length
-        ? (MODO_CLIENTE ? (list.length+' productos') : (list.length+' de '+STATE.products.length+' productos · '+totUnid.toLocaleString('es-CO')+' unidades en inventario'))
+        ? (MODO_CLIENTE ? (list.length+' productos') : ((list.length===STATE.products.length?list.length:(list.length+' de '+STATE.products.length))+' productos · '+totUnid.toLocaleString('es-CO')+' unidades'))
         : 'Sin productos registrados';
       if(!list.length){
         c.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><div>'+(STATE.products.length?'Ningún producto coincide con la búsqueda.':(sinCatalogoAun_()?'⏳ Conectando con el servidor de Google… Si estuvo inactivo puede tardar hasta un minuto. La app lo intenta sola: no hace falta tocar nada.':'Registra tu primer producto en la pestaña Registrar.'))+'</div></div>';
@@ -7351,7 +7416,7 @@
           +  '<p class="al-nom">'+safe(a.nombre)+'</p>'
           +  '<p class="al-nota">'+safe(a.nota)+'</p>'
           +  '<p class="al-meta">'+safe(a.marca)+' · '+safe(a.sku)
-          +    (a.porDia>0?(' · vende '+a.porDia+'/día'+(a.tendencia==='subiendo'?' <b class="al-tend up">↑</b>':a.tendencia==='bajando'?' <b class="al-tend down">↓</b>':'')):'')+'</p>'
+          +    (a.porDia>0?(' · vende '+String(a.porDia).replace('.',',')+' al día'+(a.tendencia==='subiendo'?' <b class="al-tend up">↑</b>':a.tendencia==='bajando'?' <b class="al-tend down">↓</b>':'')):'')+'</p>'
           +'</div>'
           +'<div class="al-num"><b>'+numMostrado+'</b><span>disp.</span>'+extra+'</div>'
           +'</div>';
@@ -7871,16 +7936,19 @@
         total:computeTotals().total, fecha:fmtDateNow(), pg:pgSnap()
       };
       var arr=loadDrafts(); arr.unshift(d); saveDrafts(arr);
-      newOrder(); pintarDrafts();
+      newOrder(true); pintarDrafts();
       haptic(18); beep('success');
-      toast('Pedido en pausa'+(nombre?(' · '+nombre):'')+' · retómalo cuando quieras','success');
+      toast('Pedido dejado aparte'+(nombre?(' · '+nombre):'')+' · está arriba, en «Sin terminar»','success');
     }
 
     function retomarDraft(id){
       var arr=loadDrafts(), d=null;
       for(var i=0;i<arr.length;i++) if(arr[i].id===id){ d=arr[i]; break; }
       if(!d){ toast('Ese pedido ya no está disponible.','error'); return; }
-      if(CART.items.length && !window.confirm('El pedido actual se perderá. ¿Retomar el pausado?')) return;
+      if(CART.items.length && !orderCommitted && !window.confirm('Lo que llevas en pantalla sin guardar se perderá. ¿Retomar este pedido?')) return;
+      // Se retoma como pedido nuevo: nada de lo guardado antes queda abierto
+      editingRef=null; editingTs=''; orderCommitted=false; lastOrder=null; PED_ERA_EDICION=false; pedState.remisionId=null; setDraftId(); setActionsEnabled(false);
+      $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
       var c=d.cliente||{};
       $('cliNombre').value=c.nombre||''; $('clientNit').value=c.nit||''; $('cliTel').value=c.telefono||'';
       $('cliDir').value=c.direccion||''; $('cliCiudad').value=c.ciudad||'';
@@ -7899,7 +7967,7 @@
     function descartarDraft(id, silencioso){
       var arr=loadDrafts().filter(function(x){ return x.id!==id; });
       saveDrafts(arr); pintarDrafts();
-      if(!silencioso){ haptic(12); toast('Pedido en pausa descartado','info'); }
+      if(!silencioso){ haptic(12); toast('Pedido sin terminar descartado','info'); }
     }
 
     function pintarDrafts(){
@@ -7908,7 +7976,7 @@
       bar.style.display='flex';
       bar.innerHTML=arr.map(function(d){
         var n=(d.cliente&&d.cliente.nombre)?d.cliente.nombre:'Sin nombre';
-        return '<div class="draft-chip" data-draft="'+safe(d.id)+'">'
+        return (arr[0]===d?'<span class="draft-t">Sin terminar</span>':'')+'<div class="draft-chip" data-draft="'+safe(d.id)+'">'
           +'<div><div class="nm">'+safe(n)+'</div>'
           +'<div class="mt">'+(d.items?d.items.length:0)+' ref · '+cop(d.total||0)+'</div></div>'
           +'<button type="button" class="x" data-drop="'+safe(d.id)+'" aria-label="Descartar">×</button></div>';
@@ -7920,7 +7988,12 @@
       var chip=e.target.closest?e.target.closest('[data-draft]'):null;
       if(chip) retomarDraft(chip.getAttribute('data-draft'));
     });
-    $('orderPauseBtn').addEventListener('click', pausarPedido);
+    /* Nuevo pedido con algo sin guardar: se decide ahí mismo (dejarlo aparte reemplaza al antiguo botón «Pausar») */
+    $('onmAparte').addEventListener('click', function(){ $('orderNuevoModal').classList.remove('show'); pausarPedido(); });
+    $('onmDescartar').addEventListener('click', function(){ $('orderNuevoModal').classList.remove('show'); newOrder(); });
+    $('onmSeguir').addEventListener('click', function(){ $('orderNuevoModal').classList.remove('show'); });
+    $('orderNuevoModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
+    $('orderSavedNew').addEventListener('click', function(){ newOrder(); try{ window.scrollTo({ top:0, behavior:'smooth' }); }catch(e){ window.scrollTo(0,0); } });
 
     /* ——— Nivel de precio sugerido por historial del cliente ———
        Un distribuidor recurrente no debería tener que cambiar la lista a mano
@@ -7985,7 +8058,19 @@
 
     // ——— Estado de acciones (PDF/WhatsApp bloqueados hasta guardar) ———
     function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; }
-    function markDirty(){ if(orderCommitted){ orderCommitted=false; $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText(); setActionsEnabled(false); } }
+    function markDirty(){ if(orderCommitted){ orderCommitted=false; $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText(); setActionsEnabled(false); } pedEstadoPintar(); }
+    /* Qué se ve abajo del pedido según su estado: sin guardar → Guardar · guardado → aviso, PDF y WhatsApp · con cambios → Actualizar */
+    var PED_ERA_EDICION=false;
+    function pedEstadoPintar(){
+      var g=!!orderCommitted, ed=!!editingRef, id=pedState.remisionId||'', b=$('pedEditBadge');
+      b.style.display=(g||ed)?'inline-block':'none'; b.textContent=g?'✓ Guardado':'✎ Editando'; b.classList.toggle('ok',g);
+      $('orderSavedBox').style.display=g?'':'none';
+      $('orderSavedTit').textContent=(PED_ERA_EDICION?'Pedido actualizado':'Pedido guardado')+(id?' · '+id:'');
+      $('orderSaveBtn').style.display=g?'none':'';
+      $('orderActionsRow').style.display=g?'':'none';
+      $('orderNewBtn').style.display=(g||ed||CART.items.length)?'':'none';
+      if($('orderEditHint')){ $('orderEditHint').style.display=(!g&&ed)?'':'none'; $('orderEditHint').textContent='Estás cambiando '+(id||'este pedido')+'. Toca «Actualizar pedido» para que quede; no se crea uno nuevo.'; }
+    }
 
     // ——— Carrito ———
     function addToCart(sku){
@@ -8222,13 +8307,13 @@
       var t=computeTotals();
       try{ pintarRentabilidad(t); }catch(e){ console.error('Rentabilidad:', e); }
       $('tSubtotal').textContent=cop(t.subtotal);
-      $('tFlete').textContent=cop(t.flete);
+      $('tFlete').textContent= t.flete ? cop(t.flete) : (PG.flete==='gratis' ? 'Gratis' : 'Por definir');
       $('tTotal').textContent=cop(t.total);
       // La fila queda siempre visible — 'Sin descuento' en reposo, el monto real
       // en cuanto se escribe un %. Antes el campo estaba escondido del todo
       // hasta que ya hubiera un valor, y era fácil no saber que existía.
       var hayDesc=t.descuentoPct>0;
-      $('tDesc').textContent = hayDesc ? ('- '+cop(t.descuento)) : 'Sin descuento';
+      $('tDesc').textContent = hayDesc ? ('- '+cop(t.descuento)) : ''; $('tDescRow').style.display = hayDesc ? '' : 'none';
       if(document.activeElement!==$('descInput')) $('descInput').value = hayDesc ? String(t.descuentoPct) : '';
       var cred=CART.metodo==='Crédito';
       $('tAbonoRow').style.display=cred?'flex':'none';
@@ -8374,7 +8459,7 @@
           var sigue=window.confirm(
             (p.cliente.nombre||'Este cliente')+' ya tiene un pedido pendiente sin pagar: '+
             (yaExiste.idRemision||'')+' por '+cop(yaExiste.saldoPendiente||yaExiste.montoTotal||0)+'.\n\n'+
-            '¿Seguro que quieres crear uno NUEVO y aparte? Si la idea era agregarle o corregirle algo a ese pedido, cancela y edítalo desde Pedidos → Ver historial en su lugar.'
+            '¿Seguro que quieres crear uno NUEVO y aparte? Si la idea era agregarle o corregirle algo a ese pedido, cancela y edítalo desde Historial.'
           );
           if(!sigue) return;
         }
@@ -8394,7 +8479,7 @@
               if(nSrv && nSrv>=peekRem()) localStorage.setItem('kaem_next_rem', String(nSrv+1));
             }catch(e){}
           }
-          if(res.remision) p.remisionServidor = String(res.remision);   // número definitivo, para aprobar el CT- con él
+          if(res.remision){ p.remisionServidor = String(res.remision); p.remision = p.remisionServidor; p.id = p.remisionServidor; }   // el número definitivo es el del servidor
           if(res.ts) p.ts = res.ts;                                        // sello de modificación: la próxima edición detecta cambios ajenos
           commitOrder(p, true, res.id); refreshData(); packRefrescarFondo();
           if(res.cartera && res.cartera.ok===false){
@@ -8433,11 +8518,11 @@
       }
       setActionsEnabled(true);
       orderCommitted=true; $('orderSaveBtn').disabled=true;
-      $('orderSaveLabel').textContent=editing?'Pedido actualizado ✓':'Pedido guardado ✓';
       beep('success'); haptic(30); flash();
       toast((editing?'Pedido actualizado · ':(online?'Pedido guardado · ':'Guardado offline · '))+p.remision+' · Total '+cop(p.total), online?'success':'info');
-      editingRef=null; editingTs='';
-      $('pedEditBadge').style.display='none';
+      // Queda abierto: si falta o sobra algo, se cambia aquí mismo y se ACTUALIZA este pedido (no se crea otro)
+      editingRef=p.clientRef; editingTs=p.ts||''; PED_ERA_EDICION=editing;
+      pedEstadoPintar();
     }
 
     // ——— Cola offline ———
@@ -8448,6 +8533,7 @@
     function isPendingRef(ref){ var q=loadPending(); for(var i=0;i<q.length;i++){ if(q[i].clientRef===ref) return true; } return false; }
     function renderPending(){
       var q=loadPending(), n=q.length;
+      var hs=document.querySelector('#hisFiltro [data-f="sync"]'); if(hs) hs.style.display=n?'':'none';   // el filtro solo aparece si hay pedidos sin sincronizar
       var banner=$('pendingBanner'); if(banner) banner.style.display=n?'flex':'none';
       if(n && $('pendingText')) $('pendingText').textContent='Tienes '+n+' pedido'+(n>1?'s':'')+' pendiente'+(n>1?'s':'')+' por sincronizar';
       var nCat=(typeof CATPED!=='undefined' && CATPED.lista) ? CATPED.lista.length : 0, nTot=n+nCat;
@@ -9863,7 +9949,7 @@
 
     var WA_MSGS = {
       pedido: { titulo:'Envío de remisión', campos:'pedido',
-        uso:'Al tocar WhatsApp en un pedido (Historial, Pedidos y Packing).',
+        uso:'Al tocar WhatsApp en un pedido (Historial, Pedidos y Empaque).',
         vars:[['cliente','Nombre completo'],['nombre','Primer nombre'],['remision','N.º de remisión'],['fecha','Fecha del pedido'],['ciudad','Ciudad'],['productos','Lista de productos'],['flete','Flete'],
               ['credito','Línea «Crédito a N días» (solo si es a crédito)'],['total','Total'],['abono','Abono'],['saldo','Línea de abono y saldo (solo a crédito)'],['plazo','Días de crédito'],['vence','Fecha de vencimiento'],['bloque_pago','Bloque con los datos de pago']],
         valores:function(o){
@@ -10078,8 +10164,8 @@
     function sendPDFClient(){ enviarPDFCliente(orderForOutput()); }
 
     // ——— Nuevo pedido ———
-    function newOrder(){
-      CART.items=[]; lastOrder=null; orderCommitted=false; editingRef=null; editingTs=''; pedState.catalogoId=null;
+    function newOrder(silencio){
+      CART.items=[]; lastOrder=null; orderCommitted=false; editingRef=null; editingTs=''; pedState.catalogoId=null; PED_ERA_EDICION=false;
       $('pedEditBadge').style.display='none';
       $('cliNombre').value=''; $('clientNit').value=''; $('cliTel').value=''; $('cliDir').value=''; $('cliCiudad').value='';
       $('orderNotes').value='';
@@ -10091,7 +10177,7 @@
       setActionsEnabled(false);
       $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
       CART.nivelTocado=false; CART.nivelAuto=false; pgReiniciar(); rentOcultar();
-      setDraftId(); renderCart(); pintarDrafts(); haptic(12); toast('Nuevo pedido · '+pedState.draftId,'info');
+      setDraftId(); renderCart(); pintarDrafts(); haptic(12); if(silencio!==true) toast('Pedido nuevo, listo para llenar','info');
     }
 
     function onEnterPedidos(){ rentOcultar(); renderPending(); if(!pedState.remisionId && !pedState.draftId) setDraftId(); try{ catPedCargar(false); }catch(e){} }
@@ -10183,10 +10269,11 @@
       // preguntar, y eso es exactamente lo que abre la puerta a que una
       // edición a medias se pierda y termine guardándose como un pedido
       // nuevo y duplicado en vez de actualizar el original.
+      if(orderCommitted){ newOrder(); return; }     // ya está guardado: no hay nada que perder
       if(editingRef){
-        if(!window.confirm('Estás editando '+(pedState.remisionId||'un pedido')+'. Si empiezas uno nuevo, se pierde esa edición (el pedido original queda como estaba). ¿Continuar?')) return;
+        if(!window.confirm('Tienes cambios sin guardar en '+(pedState.remisionId||'este pedido')+'. Si empiezas otro, esos cambios se pierden (el pedido queda como estaba guardado). ¿Continuar?')) return;
       } else if(CART.items.length){
-        if(!window.confirm('Hay productos sin guardar en el pedido actual. ¿Empezar uno nuevo de todas formas?')) return;
+        $('orderNuevoModal').classList.add('show'); haptic(10); return;
       }
       newOrder();
     });
@@ -10299,7 +10386,7 @@
           if(res.resumen){ window.RESUMEN_VENTAS=res.resumen; window.RESUMEN_VENTAS.ts=Date.now(); try{ localStorage.setItem('kaem_resumen_ventas', JSON.stringify(window.RESUMEN_VENTAS)); }catch(e){} }
           packPintarSelector();
           packReconciliarActual();
-          if(!silencioso) toast(PACK.pendientes.length + ' pedidos por alistar', 'info');
+          if(!silencioso) toast(PACK.pendientes.length + ' pedidos por empacar', 'info');
         } else {
           packPintarSelector();
           if(!silencioso) toast((res && res.message) || 'No se pudieron cargar los pedidos.', 'error');
@@ -10323,7 +10410,7 @@
       var nombre = PACK.pedido.remision || PACK.pedido.id || ref;
       if(!nuevo){
         packLimpiar(); packPintarSelector();
-        toast('El pedido '+nombre+' ya no está por alistar (se empacó o se anuló). Se cerró esta pantalla.', 'info');
+        toast('El pedido '+nombre+' ya no está por empacar (se empacó o se anuló). Se cerró esta pantalla.', 'info');
         return;
       }
       if(packFirma(nuevo) !== packFirma(PACK.pedido)){
@@ -10333,7 +10420,7 @@
     }
     function packPintarSelector(){
       var sel = $('packOrderSel'), actual = packRef();
-      var html = '<option value="">' + (PACK.pendientes.length ? 'Selecciona un pedido…' : 'No hay pedidos por alistar') + '</option>';
+      var html = '<option value="">' + (PACK.pendientes.length ? 'Selecciona un pedido…' : 'No hay pedidos por empacar') + '</option>';
       // Del más antiguo al más reciente: el manual promete alistar en 24 h hábiles
       var hoy0 = new Date(); hoy0.setHours(0,0,0,0);
       var conDias = PACK.pendientes.map(function(o, i){
@@ -10363,11 +10450,11 @@
           return '<button type="button" class="pack-sug-it'+(x.dias!=null&&x.dias>=2?' tarde':'')+'" data-ref="'+safe(ref)+'"><b>'+safe(nom)+'</b><small>'+safe(o.remision||o.id||'')+' · '+unds+' un.'+(edad?' · '+edad:'')+'</small></button>';
         }).join('');
       }
-      if(et) et.textContent = conDias.length ? 'Toca un pedido para empezar a alistarlo (primero los más antiguos).' : 'No hay pedidos por alistar. ¡Todo al día!';
+      if(et) et.textContent = conDias.length ? 'Toca un pedido para empezar a empacarlo (primero los más antiguos).' : 'No hay pedidos por empacar. ¡Todo al día!';
       var an = $('packAntig');
       if(an){
         an.textContent = PACK.pendientes.length
-          ? (PACK.pendientes.length + (PACK.pendientes.length === 1 ? ' pedido por alistar' : ' pedidos por alistar')
+          ? (PACK.pendientes.length + (PACK.pendientes.length === 1 ? ' pedido por empacar' : ' pedidos por empacar')
              + (atrasados ? ' · ' + atrasados + ' con 2 días o más ⚠️' : ' · todos al día'))
           : '';
         an.classList.toggle('warn', atrasados > 0);
@@ -10401,7 +10488,7 @@
 
       packRestaurarProgreso();
       $('packEmpty').style.display = 'none';
-      $('packHud').style.display = 'block';
+      $('packHud').style.display = 'block'; $('screen-packing').classList.add('con-pedido');
       $('packCliente').textContent = (o.cliente && o.cliente.nombre) ? o.cliente.nombre : '';
       if($('packEntregaConf')) $('packEntregaConf').checked=false; $('packEntregaFecha').value = isoOf(new Date()); $('packEntregaFecha').min = dmyToISO(o.fecha) || ''; $('packEntregaFecha').removeAttribute('max'); fbRefrescar('packEntregaFecha');
       entPintarHint('packEntregaHint', o, $('packEntregaFecha').value, 0);
@@ -10411,7 +10498,7 @@
     }
     function packLimpiar(){
       PACK.pedido = null; PACK.items = [];
-      $('packHud').style.display = 'none';
+      $('packHud').style.display = 'none'; $('screen-packing').classList.remove('con-pedido');
       $('packEmpty').style.display = 'block';
       packGuardarProgreso();
     }
@@ -10511,7 +10598,7 @@
     function packProcesar(codigo){
       var raw = String(codigo == null ? '' : codigo).trim();
       if(!raw) return;
-      if(!PACK.pedido){ toast('Selecciona primero un pedido para alistar.', 'error'); return; }
+      if(!PACK.pedido){ toast('Selecciona primero un pedido para empacar.', 'error'); return; }
 
       var norm = cleanSku(raw), idx = -1;
       for(var i = 0; i < PACK.items.length; i++){
@@ -10606,7 +10693,7 @@
     }
     function packFinalizar(){
       if(PACK.cerrando) return;
-      if(!PACK.items.length){ toast('No hay productos que alistar.', 'error'); return; }
+      if(!PACK.items.length){ toast('No hay productos que empacar.', 'error'); return; }
       var r = packResumen();
 
       // Decisión de negocio: si no salió completo, no cuenta como empacado.
@@ -10624,7 +10711,7 @@
       b.classList.add('loading'); b.disabled = true; $('packFinishLabel').textContent = 'Cerrando…';
       var restaurar = function(){
         PACK.cerrando = false; b.classList.remove('loading');
-        $('packFinishLabel').textContent = 'Finalizar y comprobar packing';
+        $('packFinishLabel').textContent = 'Finalizar y comprobar empaque';
         packRender();
       };
 
@@ -10650,7 +10737,7 @@
           PACK.pendientes = []; try{ localStorage.removeItem('kaem_pack_pend'); }catch(e){}
           packCargarPendientes(true);
         } else {
-          toast((res && res.message) || 'No se pudo cerrar el alistamiento.', 'error'); beep('error');
+          toast((res && res.message) || 'No se pudo cerrar el empaque.', 'error'); beep('error');
         }
       }).withFailureHandler(function(){
         restaurar(); toast('Sin conexión · el cierre requiere internet.', 'error'); beep('error');
@@ -11185,7 +11272,7 @@
       $('pgKpiMesSub').textContent=mesN+(mesN===1?' pago':' pagos')+(vencN?' · con vencidos':'');
       $('pgKpiVenc').textContent=vencN; $('pgKpiVencSub').textContent=cop(vencTot);
       $('pgKpiSemana').textContent=semN; $('pgKpiSemanaSub').textContent=cop(semTot);
-      $('pgKpiPagado').textContent=cop(pagTot); $('pgKpiPagadoSub').textContent=pagN+(pagN===1?' pago':' pagos');
+      $('pgKpiPagado').textContent=cop(pagTot); $('pgKpiPagadoSub').textContent=pagN+(pagN===1?' pago':' pagos'); $('pgKpiPagado').parentNode.style.display=pagN?'':'none';
       var b=$('pagosBadge'); if(b){ b.textContent=badge; b.classList.toggle('show', badge>0); }
       pgRenderCats();
       if(PG.vista==='calendario') pgRenderCal(); else pgRenderLista();
@@ -12119,12 +12206,17 @@
         haptic(8); carteraRender();
       });
     });
+    function carTilesPintar(){ Array.prototype.forEach.call(document.querySelectorAll('#screen-cartera .car-tf'), function(x){ x.classList.toggle('on', x.getAttribute('data-tf')===CARTERA.filtro); }); }
+    Array.prototype.forEach.call(document.querySelectorAll('#screen-cartera .car-tf'), function(t){
+      var ir=function(){ var f=t.getAttribute('data-tf'); if(CARTERA.filtro===f) f='todos'; var s=$('carFiltro').querySelector('[data-filtro="'+f+'"]'); if(s) s.click(); carTilesPintar(); };
+      t.addEventListener('click', ir); t.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); ir(); } });
+    });
     $('carHoyBtn').addEventListener('click', function(){
       CARTERA.filtro = CARTERA.filtro==='hoy' ? 'todos' : 'hoy';
       Array.prototype.forEach.call($('carFiltro').querySelectorAll('.seg'), function(x){
         x.classList.toggle('active', CARTERA.filtro==='todos' && x.getAttribute('data-filtro')==='todos');
       });
-      haptic(8); carteraRender();
+      haptic(8); carTilesPintar(); carteraRender();
     });
     $('pagoEfectivo').addEventListener('click', function(){ PAGO.metodo='Efectivo'; haptic(8); pagoPintar(); });
     $('pagoTransfer').addEventListener('click', function(){ PAGO.metodo='Transferencia'; haptic(8); pagoPintar(); });
@@ -12959,6 +13051,10 @@
         ST_R = false; if(({ ventas:1, rent:1, inv:1 })[BI.tab]) biPintar(true);
       }).obtenerEstadisticas({ sinCache:true });
     }
+    function biPl(n, uno, varios){ return n+' '+(Number(n)===1?uno:varios); }
+    function biDec(n){ return String(n).replace('.',','); }
+    function biMil(n){ return (Number(n)||0).toLocaleString('es-CO'); }
+    function biFecha(s){ return String(s||'').replace(/(\d{4})-(\d{2})-(\d{2})/,'$3/$2/$1'); }
     function stFila(i, nombre, sub, num, pct){
       return '<div class="st-row"><span class="st-rank">'+(i+1)+'</span>'
         +'<span class="st-nom">'+safe(nombre)+(sub?('<small>'+safe(sub)+'</small>'):'')
@@ -13043,7 +13139,7 @@
     var FIN_EGR = [['proveedores','Pagos a proveedores'],['prestamos','Cuotas de préstamos'],['personalDeuda','Deudas personales'],['viaticos','Viáticos'],['personal','Gastos personales'],['operacion','Operación'],['mercancia','Compras de mercancía']];
     function finBarras(filas, color){
       var mx=Math.max.apply(null, filas.map(function(f){ return f[1]; }).concat([1]));
-      return filas.filter(function(f){ return f[1]>0; }).map(function(f){ return gsBarra(f[0], f[1], mx, color||'var(--terracota)', f[2]||''); }).join('') || '<p class="bi-vacio">Sin movimientos este mes.</p>';
+      return filas.filter(function(f){ return f[1]>0; }).map(function(f){ return gsBarra(f[0], f[1], mx, color||'var(--terracota)', f[2]||'', true); }).join('') || '<p class="bi-vacio">Sin movimientos este mes.</p>';
     }
     function finGraficoMeses(meses){
       var mx=1; meses.forEach(function(m){ mx=Math.max(mx, m.ing.total, m.egr.total); });
@@ -13082,18 +13178,18 @@
       var h='', rv=window.RESUMEN_VENTAS;
       if(!d && !F) return '<p class="hist-empty">Analizando tu negocio…</p>';
       // Dos calificaciones: el negocio (ventas, inventario, clientes) y el dinero (caja, deudas, gastos)
-      h+='<div class="bi-hero">'+(d?biGauge(d.salud.puntaje, d.salud.nivel):'<div class="bi-gauge"><div class="bi-g-num"><b>…</b></div></div>')
+      h+='<div class="bi-hero">'+(d?biGauge(d.salud.puntaje, d.salud.nivel).replace('Salud del negocio:','Negocio:'):'<div class="bi-gauge"><div class="bi-g-num"><b>…</b></div></div>')
         +'<div class="bi-comp">'+(d?d.salud.componentes.map(function(c){ return '<div class="bi-comp-r" title="'+safe(c.d)+'"><span>'+safe(c.n)+'</span><span class="bi-comp-b"><i class="bi-'+biSemaforo(c.p)+'" style="width:'+Math.max(3,c.p)+'%"></i></span><em>'+c.p+'</em></div>'; }).join(''):'')+'</div></div>';
       if(F){
-        h+='<div class="bi-hero">'+biGauge(F.salud.puntaje, F.salud.nivel).replace('Salud del negocio:','Salud financiera:')
+        h+='<div class="bi-hero">'+biGauge(F.salud.puntaje, F.salud.nivel).replace('Salud del negocio:','Dinero:')
           +'<div class="bi-comp">'+F.salud.componentes.map(function(c){ return '<div class="bi-comp-r" title="'+safe(c.d)+'"><span>'+safe(c.n)+'</span><span class="bi-comp-b"><i class="bi-'+biSemaforo(c.p)+'" style="width:'+Math.max(3,c.p)+'%"></i></span><em>'+c.p+'</em></div>'; }).join('')+'</div></div>';
       } else h+='<p class="bi-nota">Calculando las finanzas…</p>';
       // Lectura corta del asesor: solo las dos primeras frases (el resto de cifras ya está en las tarjetas de abajo)
       var ejT=((d&&d.ejecutivo)||'').replace(/\.\s+([A-ZÁÉÍÓÚ])/g, '.\u0001$1').split('\u0001').slice(0,2).join(' ');
-      if(ejT) h+='<div class="asesor bi-exec"><div class="asesor-top"><span class="asesor-ic">✦</span><div><p class="asesor-tit">Lectura del asesor KAÉM</p><p class="asesor-sub">Análisis automático de tus ventas, dinero, gastos, deudas e inventario'+(d?(' · confianza '+safe(d.confianza)):'')+'</p></div></div><p class="asesor-res">'+safe(ejT)+'</p></div>';
+      if(ejT) h+='<div class="asesor bi-exec"><div class="asesor-top"><span class="asesor-ic">✦</span><div><p class="asesor-tit">Lectura del asesor KAÉM</p>'+(d?('<p class="asesor-sub">Confianza '+safe(d.confianza)+'</p>'):'')+'</div></div><p class="asesor-res">'+safe(ejT)+'</p></div>';
       var M=F&&F.mesActual;
       h+='<div class="fin-hero">'
-        + finKpi('Vendido este mes', rv?abrevCop(rv.mes.v):(d?abrevCop(d.proyeccion.mes.vendido):'—'), rv?('hoy '+abrevCop(rv.hoy.v)+' · semana '+abrevCop(rv.semana.v)):(d?(d.proyeccion.mes.pedidos+' pedidos'):''))
+        + finKpi('Vendido este mes', d?abrevCop(d.proyeccion.mes.vendido):(rv?abrevCop(rv.mes.v):'—'), (ST_R&&ST_R.ventas)?('hoy '+abrevCop(ST_R.ventas.hoy)+' · 7 días '+abrevCop(ST_R.ventas.semana)):(d?biPl(d.proyeccion.mes.pedidos,'pedido','pedidos'):''))
         + (M?finKpi('Ganancia real del mes', abrevCop(M.gananciaOperativa), 'después de retiros: '+biSig(M.resultado), M.resultado<0?'neg':'pos'):finKpi('Ganancia real','—',''))
         + (F&&F.caja.configurada?finKpi('Caja calculada', abrevCop(F.caja.saldo), 'pagos a 30 días: '+abrevCop(F.deudas.proximos30.total), F.caja.saldo<F.deudas.proximos30.total?'neg':''):(M?finKpi('Entró este mes', abrevCop(M.ing.total), 'salió '+abrevCop(M.egr.total)):finKpi('Entró','—','')))
         + (F?finKpi('Lo que debes', abrevCop(F.deudas.total), 'vencen en 30 días: '+abrevCop(F.deudas.proximos30.total), F.deudas.proximos30.vencido>0?'neg':''):finKpi('Debes','—',''))
@@ -13117,7 +13213,7 @@
         + (C.configurada?finKpi('Caja calculada', abrevCop(C.saldo), 'desde '+safe(String(C.desde).split('-').reverse().join('/'))+' con '+abrevCop(C.inicial), C.saldo<0?'neg':''):'<button type="button" class="fin-kpi" data-bicfg="1" style="text-align:left;cursor:pointer;font-family:inherit"><span>Caja</span><b style="font-size:16px">Configúrala</b><small>Dinero inicial y fecha, en Ajustes → Finanzas</small></button>')
         +'</div>';
       h+='<p class="fin-sec">Dinero que entra y sale · 6 meses</p><div class="bi-card">'+finGraficoMeses(F.meses)
-        +'<table class="fin-tabla"><tr><th>Mes</th><th>Entra</th><th>Sale</th><th>Neto</th></tr>'+F.meses.slice().reverse().map(function(m){ return '<tr><td>'+safe(m.etiqueta)+'</td><td>'+abrevCop(m.ing.total)+'</td><td>'+abrevCop(m.egr.total)+'</td><td class="'+(m.neto<0?'neg':'pos')+'">'+biSig(m.neto).replace('$','$')+'</td></tr>'; }).join('')+'</table></div>';
+        +'<table class="fin-tabla"><tr><th>Mes</th><th>Entra</th><th>Sale</th><th>Neto</th></tr>'+F.meses.slice().reverse().filter(function(m){ return m.ing.total||m.egr.total; }).map(function(m){ return '<tr><td>'+safe(m.etiqueta)+'</td><td>'+abrevCop(m.ing.total)+'</td><td>'+abrevCop(m.egr.total)+'</td><td class="'+(m.neto<0?'neg':'pos')+'">'+biSig(m.neto).replace('$','$')+'</td></tr>'; }).join('')+'</table></div>';
       h+='<p class="fin-sec">En qué se va lo que sale este mes</p><div class="bi-card">'+finBarras(FIN_EGR.map(function(x){ return [x[1], M.egr[x[0]]]; }))+'</div>';
       h+='<p class="fin-sec">Resultado del mes</p><div class="bi-card"><table class="fin-tabla">'
         +'<tr><td>Margen de los productos vendidos</td><td>'+biSig(M.margen)+'</td></tr>'
@@ -13130,13 +13226,13 @@
         +'<tr><td><b>Resultado final</b></td><td><b class="'+(M.resultado<0?'neg':'pos')+'">'+biSig(M.resultado)+'</b></td></tr></table>'
         +'<p class="bi-nota">El costo de la mercancía ya está en el margen de los productos; por eso las compras de mercancía no se restan otra vez aquí (sí salen de la caja).</p></div>';
       h+='<p class="fin-sec">Lo que debes</p><div class="fin-hero">'
-        + finKpi('Proveedores', abrevCop(cat.Proveedores.deuda), cat.Proveedores.n+' facturas'+(cat.Proveedores.vencidos?(' · '+cat.Proveedores.vencidos+' vencidas'):''), cat.Proveedores.vencidos?'neg':'')
-        + finKpi('Préstamos', abrevCop(cat['Préstamo'].deuda), 'cuotas ~'+abrevCop(cat['Préstamo'].cuotaMes)+' al mes'+(cat['Préstamo'].vencidos?(' · '+cat['Préstamo'].vencidos+' vencidas'):''), cat['Préstamo'].vencidos?'neg':'')
-        + finKpi('Personal', abrevCop(cat.Personal.deuda), cat.Personal.n+' deudas'+(cat.Personal.vencidos?(' · '+cat.Personal.vencidos+' vencidas'):''), cat.Personal.vencidos?'neg':'')
-        + finKpi('Ahorro con descuentos', abrevCop(D.ahorro6m), 'este mes '+abrevCop(D.ahorroMes)+' · 6 meses','pos')
+        + finKpi('Proveedores', abrevCop(cat.Proveedores.deuda), biPl(cat.Proveedores.n,'factura','facturas')+(cat.Proveedores.vencidos?(' · '+biPl(cat.Proveedores.vencidos,'vencida','vencidas')):''), cat.Proveedores.vencidos?'neg':'')
+        + finKpi('Préstamos', abrevCop(cat['Préstamo'].deuda), 'cuotas ~'+abrevCop(cat['Préstamo'].cuotaMes)+' al mes'+(cat['Préstamo'].vencidos?(' · '+biPl(cat['Préstamo'].vencidos,'vencida','vencidas')):''), cat['Préstamo'].vencidos?'neg':'')
+        + finKpi('Personal', abrevCop(cat.Personal.deuda), biPl(cat.Personal.n,'deuda','deudas')+(cat.Personal.vencidos?(' · '+biPl(cat.Personal.vencidos,'vencida','vencidas')):''), cat.Personal.vencidos?'neg':'')
+        + (D.ahorro6m>0 ? finKpi('Ahorro con descuentos', abrevCop(D.ahorro6m), 'en 6 meses · este mes '+abrevCop(D.ahorroMes),'pos') : '')
         +'</div>';
       if(D.porMarca.length) h+='<p class="fin-sec">Proveedores por marca</p><div class="bi-card"><table class="fin-tabla"><tr><th>Marca</th><th>Comprado</th><th>Desc.</th><th>Ahorro</th><th>Debes</th></tr>'+D.porMarca.slice(0,10).map(function(m){ return '<tr><td>'+safe(m.marca)+'</td><td>'+abrevCop(m.neto)+'</td><td>'+(m.descuentoPct?m.descuentoPct+' %':'—')+'</td><td class="pos">'+(m.ahorro?abrevCop(m.ahorro):'—')+'</td><td>'+(m.deuda?abrevCop(m.deuda):'—')+'</td></tr>'; }).join('')+'</table></div>';
-      if(D.proximos30.lista.length) h+='<p class="fin-sec">Próximos pagos · 30 días</p><div class="bi-card">'+D.proximos30.lista.map(function(x){ return '<div class="gs-bar"><div class="gs-bar-top"><span>'+safe(x.nombre)+' <small>'+safe(x.categoria)+' · '+safe(x.fecha)+(x.vencido?' · vencido':'')+'</small></span><b'+(x.vencido?' class="over"':'')+'>'+cop(x.monto)+'</b></div></div>'; }).join('')+'<button type="button" class="st-ins-acc" data-ir="pagos">Ir a Pagos →</button></div>';
+      if(D.proximos30.lista.length) h+='<p class="fin-sec">Próximos pagos · 30 días</p><div class="bi-card">'+D.proximos30.lista.map(function(x){ return '<div class="gs-bar"><div class="gs-bar-top"><span>'+safe(x.nombre)+' <small>'+safe(x.categoria)+' · '+safe(biFecha(x.fecha))+(x.vencido?' · vencido':'')+'</small></span><b'+(x.vencido?' class="over"':'')+'>'+cop(x.monto)+'</b></div></div>'; }).join('')+'<button type="button" class="st-ins-acc" data-ir="pagos">Ir a Pagos →</button></div>';
       if(d) h+='<p class="fin-sec">Proyección de caja · próximas 8 semanas</p>'+biVistaCajaProy(d, F);
       return h;
     }
@@ -13150,16 +13246,12 @@
         + finKpi('Ruta de esta semana', abrevCop(V.semana.total), V.semana.presupuesto>0?('de '+abrevCop(V.semana.presupuesto)+' · '+V.semana.porcentaje+' %'):'sin presupuesto', V.semana.porcentaje>=100?'neg':'')
         + finKpi('Gasto personal', abrevCop(F.personal.mes), '~'+abrevCop(F.personal.promedioDia)+' al día'+(F.personal.hormiga?(' · hormiga '+abrevCop(F.personal.hormiga)):''))
         +'</div>';
-      if(V.semana.detalle.some(function(x){ return x.gastado>0 || x.presupuesto>0; })){
-        h+='<p class="fin-sec">Viáticos de la semana (desde el lunes)</p><div class="bi-card">'+V.semana.detalle.map(function(x){ return gsBarra(x.subtipo, x.gastado, x.presupuesto>0?x.presupuesto:Math.max(1,V.semana.total), 'var(--terracota)'); }).join('')+'</div>';
-      }
       if(V.ciudades90.length){
         h+='<p class="fin-sec">¿Se pagan las rutas? · últimos 90 días</p><div class="bi-card"><table class="fin-tabla"><tr><th>Ciudad</th><th>Viáticos</th><th>Margen</th><th>Resultado</th></tr>'
           +V.ciudades90.slice(0,10).map(function(c){ return '<tr><td>'+safe(c.ciudad)+'</td><td>'+(c.viaticos?abrevCop(c.viaticos):'—')+'</td><td>'+abrevCop(c.margen)+'</td><td class="'+(c.neto<0?'neg':'pos')+'">'+biSig(c.neto)+'</td></tr>'; }).join('')+'</table>'
           +'<p class="bi-nota">Margen = ganancia de los productos vendidos en esa ciudad. Si el resultado es negativo, la ruta cuesta más de lo que deja.</p></div>';
       }
-      if(V.mes.ciudades.length) h+='<p class="fin-sec">Viáticos del mes por ciudad</p><div class="bi-card">'+finBarras(V.mes.ciudades.map(function(c){ return [c.ciudad+(c.departamento?(' · '+c.departamento):''), c.total, ' <small>'+c.dias+' d</small>']; }))+'</div>';
-      if(V.rutas.length) h+='<p class="fin-sec">Rutas recientes</p><div class="bi-card">'+V.rutas.slice(0,6).map(function(r){ return '<div class="gs-bar"><div class="gs-bar-top"><span>'+safe(r.ruta)+'<small> · '+safe((r.ciudades||[]).join(', ')||'—')+'</small></span><b>'+cop(r.total)+'</b></div></div>'; }).join('')+'</div>';
+      if(V.rutas.length) h+='<p class="fin-sec">Rutas recientes</p><div class="bi-card">'+V.rutas.slice(0,6).map(function(r){ return '<div class="gs-bar"><div class="gs-bar-top"><span>'+safe(biFecha(r.ruta))+'<small> · '+safe((r.ciudades||[]).join(', ')||'—')+'</small></span><b>'+cop(r.total)+'</b></div></div>'; }).join('')+'</div>';
       if(Object.keys(F.personal.sub||{}).length) h+='<p class="fin-sec">Gastos personales del mes</p><div class="bi-card">'+finBarras(Object.keys(F.personal.sub).map(function(k){ return [k, F.personal.sub[k]]; }), 'var(--salvia)')+'</div>';
       if(Object.keys(F.operacion.sub||{}).length) h+='<p class="fin-sec">Operación del mes</p><div class="bi-card">'+finBarras(Object.keys(F.operacion.sub).map(function(k){ return [k, F.operacion.sub[k]]; }), '#C9985F')+'</div>';
       h+='<button type="button" class="btn-solid" data-ir="gastos" style="width:100%;margin-top:12px">Registrar o revisar gastos</button>';
@@ -13211,7 +13303,7 @@
     function biVistaProy(d){
       var P=d.proyeccion, M=P.mes, h='';
       h+='<div class="bi-kpis">'
-        + biKpi('Vendido este mes', abrevCop(M.vendido), M.pedidos+' pedidos · faltan '+M.diasRestantes+' días')
+        + biKpi('Vendido este mes', abrevCop(M.vendido), biPl(M.pedidos,'pedido','pedidos')+' · '+(M.diasRestantes===0?'último día':(M.diasRestantes===1?'falta 1 día':'faltan '+M.diasRestantes+' días')))
         + biKpi('Cierre proyectado', abrevCop(M.cierre), 'Rango '+abrevCop(M.bajo)+' – '+abrevCop(M.alto))
         +'</div>';
       var V=ST_R&&ST_R.ventas;
@@ -13254,9 +13346,9 @@
     function biVistaInv(d){
       var R=d.rotacion, S=R.resumen, h='';
       h+='<div class="bi-kpis">'
-        + biKpi('Días de inventario', S.diasInventario==null?'—':S.diasInventario+' d', 'Rotas '+S.rotacionAnual+' veces al año')
+        + biKpi('Días de inventario', S.diasInventario==null?'—':S.diasInventario+' d', 'Rotas '+biDec(S.rotacionAnual)+' veces al año')
         + biKpi('Retorno por $1 invertido', S.gmroi.toFixed(1).replace('.',',')+'×', 'Ganancia anual / capital en inventario')
-        + biKpi('Capital en inventario', abrevCop(S.capital), S.unidades+' unidades')
+        + biKpi('Capital en inventario', abrevCop(S.capital), biMil(S.unidades)+' unidades')
         + biKpi('Capital dormido', abrevCop(S.capitalDormido), S.dormidos+' ref. · '+S.pctDormido+' %', S.pctDormido>15?'soon':'')
         +'</div>';
       var tg=R.abc.A.ganancia+R.abc.B.ganancia+R.abc.C.ganancia||1;
@@ -13363,7 +13455,7 @@
         h+='<p class="st-sec">Ventas por marca</p>';
         var maxM=P.porMarca[0].valor||1;
         P.porMarca.slice(0,8).forEach(function(m,i){
-          h+=stFila(i, m.marca, m.unidades+' unidades'+(m.margenPct!=null?(' · margen '+m.margenPct+'%'):''), cop(m.valor), Math.round((m.valor/maxM)*100));
+          h+=stFila(i, m.marca, biMil(m.unidades)+' unidades'+(m.margenPct!=null?(' · margen '+m.margenPct+'%'):''), cop(m.valor), Math.round((m.valor/maxM)*100));
         });
       }
       return h;
@@ -13427,7 +13519,7 @@
         // Pedidos que menos dejaron
         if(Mo.bajos && Mo.bajos.length) h+='<p class="rent-st-sub">Pedidos con ganancia baja este mes (menos del 10 %)</p><div class="rent-st-lineas">'+Mo.bajos.map(function(b){
           return '<div><span>'+safe(b.remision)+' · '+safe(b.cliente)+'<small> · venta '+cop(b.venta)+(b.envio>0?' · envío asumido '+cop(b.envio):'')+'</small></span><b class="'+(b.neta<0?'late':'soon')+'">'+(b.neta<0?'− ':'')+cop(Math.abs(b.neta))+' · '+b.margen+' %</b></div>'; }).join('')+'</div>';
-        h+='<p class="rent-st-nota">Envío nacional calculado a '+cop(RN.costoEnvioNac)+' y entrega local a '+cop(RN.costoEnvioAm)+' (se ajusta en Ajustes → Metas y costos).'
+        h+='<p class="rent-st-nota">Esta ganancia es antes de viáticos y operación (el resultado completo está en Dinero). Envío nacional calculado a '+cop(RN.costoEnvioNac)+' y entrega local a '+cop(RN.costoEnvioAm)+' (se ajusta en Ajustes → Metas y costos).'
           +(RN.sinCosto?' '+RN.sinCosto+' líneas sin costo registrado.':'')+'</p></div>';
       }
       return h || '<p class="hist-empty">Aún no hay ventas suficientes este mes para calcular la rentabilidad.</p>';
@@ -13443,7 +13535,7 @@
         r.inventarioPorMarca.forEach(function(m){
           var cf=m.configurado;
           var cfg=function(x){ return (cf && cf[x]!=null && cf[x]!==0) ? ' <em>(config. '+cf[x]+'%)</em>' : ''; };
-          h+='<div class="inv-marca"><div class="inv-marca-top"><b>'+safe(m.marca)+'</b><span>'+m.unidades+' un. · '+m.referencias+' ref.'+(m.agotados?(' · '+m.agotados+' agotadas'):'')+' · '+m.pctDelCosto+'% del capital</span></div>'
+          h+='<div class="inv-marca"><div class="inv-marca-top"><b>'+safe(m.marca)+'</b><span>'+biMil(m.unidades)+' un. · '+m.referencias+' ref.'+(m.agotados?(' · '+biPl(m.agotados,'agotada','agotadas')):'')+' · '+biDec(m.pctDelCosto)+' % del capital</span></div>'
             +'<div class="inv-marca-bar"><i style="width:'+Math.min(100,m.pctDelCosto)+'%"></i></div>'
             +'<div class="inv-marca-vals"><div><small>Costo</small><b>'+cop(m.valorCosto)+'</b></div>'
             +'<div><small>Distribuidor</small><b>'+cop(m.valorDistribuidor)+'</b></div>'
@@ -13760,7 +13852,7 @@
       var h=(f.historial||[]);
       $('cpHistList').innerHTML = h.length ? h.map(function(e){
         var d=Number(e.d)||0;
-        return '<div class="cp-hist-row"><div><b>'+safe(CP_EVT[e.t]||e.t)+'</b><small>'+safe(e.f||'')+(e.rem?(' · '+safe(e.rem)):'')+(e.n?(' · '+safe(e.n)):'')+'</small></div>'
+        return '<div class="cp-hist-row"><div><b>'+safe(CP_EVT[e.t]||e.t)+'</b><small>'+safe(biFecha(e.f||''))+(e.rem?(' · '+safe(e.rem)):'')+(e.n?(' · '+safe(e.n)):'')+'</small></div>'
           +'<span class="'+(d>0?'up':(d<0?'down':''))+'">'+(d>0?'+':(d<0?'−':''))+(d?cop(Math.abs(d)):'')+'</span></div>';
       }).join('') : '<p class="cfg-hint" style="text-align:center">Aún no hay movimientos: el cupo se mueve cuando el cliente paga o se atrasa.</p>';
       $('cpHistModal').classList.add('show'); haptic(10);
@@ -13908,7 +14000,7 @@
       { k:'pedidos',   big:1,                  priv:1, go:'tab:pedidos',   t:'Pedidos' },
       { k:'consultar', tone:'esp',                     go:'tab:consultar', t:'Inventario' },
       { k:'cartera',   tone:'salvia',          priv:1, go:'tab:cartera',   t:'Cartera' },
-      { k:'packing',                          priv:1, go:'tab:packing',   t:'Packing' },
+      { k:'packing',                          priv:1, go:'tab:packing',   t:'Empaque' },
       { k:'alertas',                          priv:1, go:'tab:alertas',   t:'Alertas' },
       { k:'pagos',     tone:'salvia',          priv:1, go:'tab:pagos',     t:'Pagos' },
       { k:'cupos',     tone:'salvia',          priv:1, go:'tab:cupos',     t:'Cupos' },
@@ -13920,7 +14012,7 @@
       { k:'clientes',  tone:'arena',           priv:1, go:'tab:clientes',  t:'Clientes' },
       { k:'ajustes',   tone:'arena',           priv:1, go:'fn:cfg',        t:'Ajustes' }
     ];
-    var HUB_MOD = { historial:'Historial', hub:'', consultar:'Inventario', registrar:'Nuevo producto', pedidos:'Pedidos', packing:'Packing', cartera:'Cartera', pagos:'Pagos', gastos:'Gastos', cupos:'Cupos', alertas:'Alertas', clientes:'Clientes' };
+    var HUB_MOD = { historial:'Historial', hub:'', consultar:'Inventario', registrar:'Nuevo producto', pedidos:'Pedidos', packing:'Empaque', cartera:'Cartera', pagos:'Pagos', gastos:'Gastos', cupos:'Cupos', alertas:'Alertas', clientes:'Clientes' };
 
     // Botón «Fechas de entrega» de Packing: cuántas entregas están por confirmar
     function packPintarPorConfirmar(){
@@ -13969,7 +14061,7 @@
       M.pedidos={ v:nPed?hubPlural(nPed,'por revisar','por revisar'):'Nuevo pedido',
                   s:D.cat.length?(hubPlural(D.cat.length,'pedido del catálogo','pedidos del catálogo')+' por aprobar'):(D.cola.length?(hubPlural(D.cola.length,'pedido','pedidos')+' sin enviar (sin señal)'):'Crea una venta en segundos'),
                   warn:nPed>0, badge:nPed };
-      M.packing={ v:D.pk.length?hubPlural(D.pk.length,'pedido','pedidos'):'Al día', s:(D.pk.length?(D.atras?(D.atras+' con 2 días o más'):'Todos recientes'):'Nada por alistar')+(D.pc.length?(' · '+hubPlural(D.pc.length,'entrega por confirmar','entregas por confirmar')):''), warn:D.atras>0||D.pc.length>0, badge:D.atras+D.pc.length, bad:1 };
+      M.packing={ v:D.pk.length?hubPlural(D.pk.length,'pedido','pedidos'):'Al día', s:(D.pk.length?(D.atras?(D.atras+' con 2 días o más'):'Todos recientes'):'Nada por empacar')+(D.pc.length?(' · '+hubPlural(D.pc.length,'entrega por confirmar','entregas por confirmar')):''), warn:D.atras>0||D.pc.length>0, badge:D.atras+D.pc.length, bad:1 };
       M.alertas={ v:D.alN?(D.alN+' por reponer'):(D.al?'Todo en orden':'Revisando…'),
                   s:D.alRes.ventaEnRiesgo?('Venta en riesgo '+abrevCop(D.alRes.ventaEnRiesgo)):(D.prod?(D.ago+' agotados · '+D.baj+' por agotarse'):''), warn:D.alN>0, badge:D.alN, bad:1 };
       M.cartera={ v:k.totalPendiente?abrevCop(k.totalPendiente):(CARTERA&&CARTERA.ts?'Sin deudas':'—'), s:hubPlural(k.vencidos||0,'vencida','vencidas')+' · '+(k.porVencer||0)+' por vencer', warn:(k.vencidos||0)>0, badge:k.vencidos||0, bad:1 };
@@ -14025,7 +14117,7 @@
       var ch=[];
       function add(txt, num, tab, cls){ ch.push('<button type="button" class="hub-chip'+(cls?(' '+cls):'')+'" data-go="tab:'+tab+'"><i></i><span>'+txt+'</span></button>'); }
       if(D.cat.length||D.cola.length) add('<b>'+(D.cat.length+D.cola.length)+'</b> por revisar', 0, 'pedidos', 'warn');
-      if(D.pk.length) add('<b>'+D.pk.length+'</b> por alistar', 0, 'packing', D.atras?'bad':'');
+      if(D.pk.length) add('<b>'+D.pk.length+'</b> por empacar', 0, 'packing', D.atras?'bad':'');
       if(D.pc.length) ch.push('<button type="button" class="hub-chip warn" data-go="fn:ent"><i></i><span><b>'+D.pc.length+'</b> '+(D.pc.length===1?'entrega por confirmar':'entregas por confirmar')+'</span></button>');
       if(D.cpRes && (D.cpRes.enMora||0)+(D.cpRes.bloqueados||0)>0) add('<b>'+((D.cpRes.enMora||0)+(D.cpRes.bloqueados||0))+'</b> en mora con cupo', 0, 'cupos', 'bad');
       if(D.k.vencidos) add('<b>'+D.k.vencidos+'</b> '+(D.k.vencidos===1?'vencida':'vencidas')+' en cartera', 0, 'cartera', 'bad');
@@ -14066,7 +14158,7 @@
           R.rows.push({ a:(x.o.cliente&&x.o.cliente.nombre)||'Sin cliente', sa:(x.o.remision||x.o.id||'')+' · '+u+' un.', b:x.e==null?'':(x.e===0?'hoy':(x.e===1?'ayer':('hace '+x.e+' d'))), w:x.e>=2 });
         });
         D.pc.slice(0,4).forEach(function(x){ R.rows.push({ a:x.cliente||x.remision, sa:'Confirmar entrega · estimada '+x.fechaEntrega, b:x.dias===0?'hoy':('hace '+x.dias+' d'), w:1 }); });
-        if(!R.rows.length) R.d='Nada por alistar. ¡Todo empacado!';
+        if(!R.rows.length) R.d='Nada por empacar. ¡Todo al día!';
       } else if(k==='cartera'){
         R.d=D.k.totalPendiente?('Por cobrar: '+cop(D.k.totalPendiente)+' en '+hubPlural(D.k.remisiones||0,'remisión','remisiones')+'.'):'Sin saldos pendientes.';
         D.cred.slice().sort(function(a,b){ return (a.diasRestantes==null?999:a.diasRestantes)-(b.diasRestantes==null?999:b.diasRestantes); }).slice(0,7).forEach(function(c){
@@ -14239,9 +14331,8 @@
         else if(el.tagName==='H3' || el.classList.contains('cfg-hint')){ el.remove(); }
       });
       var cab = document.createElement('header'); cab.className = 'cfg-head';
-      cab.innerHTML = '<div class="cfg-head-t"><h3>Ajustes</h3><p>Configura la app a tu manera. Los cambios se aplican al tocar <b>Guardar</b>.</p></div>'
-        + '<div class="search-bar cfg-buscar"><svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
-        + '<input id="cfgBuscar" type="search" autocomplete="off" placeholder="Buscar un ajuste (plazo, WhatsApp, PIN…)" aria-label="Buscar un ajuste"></div>';
+      cab.innerHTML = '<div class="search-bar cfg-buscar"><svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+        + '<input id="cfgBuscar" type="search" autocomplete="off" placeholder="Buscar: plazo, WhatsApp, PIN…" aria-label="Buscar un ajuste"></div>';
       var lay = document.createElement('div'); lay.className = 'cfg-layout';
       var nav = document.createElement('nav'); nav.className = 'cfg-nav'; nav.id = 'cfgNav'; nav.setAttribute('aria-label','Secciones de ajustes');
       var panel = document.createElement('div'); panel.className = 'cfg-panel'; panel.id = 'cfgPanel';
@@ -14321,6 +14412,7 @@
         var el = $('cfgEstado'); if(!el) return;
         var s = cfgHayCambios();
         el.textContent = s ? 'Tienes cambios sin guardar' : 'Todo guardado'; el.classList.toggle('sucio', s);
+        var g = $('cfgSaveBtn'); if(g && g.textContent==='Guardar') g.disabled = !!_cfgBase && !s;
       }, ya === true ? 0 : 160);
     }
     // En escritorio la página no se desplaza (cada pantalla tiene su propio scroll): si algún scrollIntoView la mueve, vuelve a su sitio
