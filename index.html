@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-30-04';
+    const APP_VERSION = '2026-10-30-05';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3548,6 +3548,14 @@
     :root.theme-dark #deleteModal .btn-solid,:root.theme-dark #orderDeleteModal .btn-solid{color:#fff}
     :root.theme-dark #devolModal .btn-ghost{color:var(--terracota-txt) !important}
     .ent-chips .chip{padding-left:4px;padding-right:4px;min-width:0}
+
+    /* Inicio: conteo debajo del nombre (reemplaza al globo con número); el dinero sigue oculto */
+    #hubGrid .hc-badge{display:none !important}
+    .hc-n{display:block;min-height:16px;margin-top:1px;font-size:12px;line-height:1.3;color:var(--texto-suave)}
+    .hc-n.urg{color:var(--terracota-txt);font-weight:600}
+    .hub-card.big .hc-n{color:#E9DCCB}
+    .hub-card.big .hc-n.urg{color:#F2C9A6}
+    #hubChips:empty{display:none}
   </style>
 </head>
 <body>
@@ -14085,6 +14093,21 @@
       return D;
     }
 
+    /* Línea visible de cada tarjeta del Inicio: SOLO conteos, nunca dinero (el cliente puede ver la pantalla). urg = pide atención */
+    function hubConteos(D){
+      var k=D.k||{}, cr=D.cpRes, mora=cr?((cr.enMora||0)+(cr.bloqueados||0)):0, nPed=D.cola.length+D.cat.length, N={};
+      var cobrar=(typeof CARTERA!=='undefined' && CARTERA.creditos) ? CARTERA.creditos.length : 0;
+      N.pedidos = nPed ? { t:nPed+' por revisar', urg:1 } : { t:'' };
+      N.consultar = D.prod ? (D.ago ? { t:hubPlural(D.ago,'agotado','agotados') } : { t:D.disp+' disponibles' }) : { t:'' };
+      N.cartera = k.vencidos ? { t:hubPlural(k.vencidos,'vencida','vencidas'), urg:1 } : (k.porVencer ? { t:k.porVencer+' por vencer', urg:1 } : { t:cobrar?(cobrar+' por cobrar'):'' });
+      N.packing = D.pk.length ? { t:D.pk.length+' por empacar', urg:D.atras>0 } : { t:'' };
+      N.alertas = D.alN ? { t:D.alN+' por reponer', urg:1 } : { t:'' };
+      N.pagos = D.pgVen ? { t:hubPlural(D.pgVen,'vencido','vencidos'), urg:1 } : { t:D.pgSem?(D.pgSem+' esta semana'):'' };
+      N.cupos = mora ? { t:mora+' en mora', urg:1 } : { t:(cr&&cr.sinAsignar)?(cr.sinAsignar+' sin cupo'):'' };
+      N.historial = { t:D.hist.length?hubPlural(D.hist.length,'remisión','remisiones'):'' };
+      var nCli=D.nCli||loadClients().length; N.clientes = { t:nCli?hubPlural(nCli,'cliente','clientes'):'' };
+      return N;
+    }
     /* Texto de cada tarjeta: v = cifra grande · s = línea de apoyo */
     function hubTarjetas(D){
       var nPed=D.cola.length+D.cat.length, k=D.k, M={};
@@ -14117,7 +14140,7 @@
         if(c.sec){ h+='<p class="hub-sec'+(c.priv?' hub-priv':'')+'">'+c.sec+'</p>'; return; }
         h+='<button type="button" class="hub-card'+(c.big?' big':'')+(c.wide?' wide':'')+(c.tone?' t-'+c.tone:'')+(c.priv?' hub-priv':'')+'" data-hk="'+c.k+'" style="--i:'+(i++)+'">'
           +'<span class="hc-top"><span class="hc-ico"><svg viewBox="0 0 24 24" aria-hidden="true">'+HUB_I[c.k]+'</svg></span><span class="hc-badge" aria-hidden="true"></span></span>'
-          +'<span class="hc-t">'+c.t+'</span><span class="hc-v"></span><span class="hc-s"></span>'
+          +'<span class="hc-t">'+c.t+'</span><span class="hc-n"></span><span class="hc-v"></span><span class="hc-s"></span>'
           +'<span class="hc-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>';
       });
       $('hubGrid').innerHTML=h; HUB.listo=true;
@@ -14132,10 +14155,11 @@
 
     function hubPintar(){
       if(!HUB.listo) hubConstruir();
-      var D=hubCalc(), M=hubTarjetas(D); HUB.datos=D;
+      var D=hubCalc(), M=hubTarjetas(D), NC=hubConteos(D); HUB.datos=D;
       HUB_DEF.forEach(function(c){
         if(!c.k) return;
         var el=$('hubGrid').querySelector('[data-hk="'+c.k+'"]'); if(!el) return;
+        var nc=NC[c.k]||{ t:'' }, ne=el.querySelector('.hc-n'); if(ne){ ne.textContent=nc.t; ne.classList.toggle('urg', !!nc.urg); }
         var m=M[c.k]||{}, v=el.querySelector('.hc-v'), s=el.querySelector('.hc-s'), b=el.querySelector('.hc-badge');
         if(v.textContent!==m.v){ var primera=!v.textContent; v.textContent=m.v; if(!primera){ v.classList.remove('tick'); void v.offsetWidth; v.classList.add('tick'); } }
         if(s.textContent!==m.s) s.textContent=m.s||'';
@@ -14151,10 +14175,10 @@
       if(D.pc.length) ch.push('<button type="button" class="hub-chip warn" data-go="fn:ent"><i></i><span><b>'+D.pc.length+'</b> '+(D.pc.length===1?'entrega por confirmar':'entregas por confirmar')+'</span></button>');
       if(D.cpRes && (D.cpRes.enMora||0)+(D.cpRes.bloqueados||0)>0) add('<b>'+((D.cpRes.enMora||0)+(D.cpRes.bloqueados||0))+'</b> en mora con cupo', 0, 'cupos', 'bad');
       if(D.k.vencidos) add('<b>'+D.k.vencidos+'</b> '+(D.k.vencidos===1?'vencida':'vencidas')+' en cartera', 0, 'cartera', 'bad');
-      else if(D.k.totalPendiente) add('Por cobrar <b>'+abrevCop(D.k.totalPendiente)+'</b>', 0, 'cartera', '');
       if(D.alN) add('<b>'+D.alN+'</b> por reponer', 0, 'alertas', 'warn');
       if(D.pgVen) add('<b>'+D.pgVen+'</b> pago'+(D.pgVen===1?'':'s')+' vencido'+(D.pgVen===1?'':'s'), 0, 'pagos', 'bad');
-      if(!ch.length) add(D.prod?'Todo al día':'Cargando tu información…', 0, 'consultar', '');
+      // Lo pendiente ya se ve en cada tarjeta: arriba solo se confirma cuando no hay nada (y sin cifras de dinero)
+      if(ch.length) ch=[]; else add(D.prod?'Todo al día':'Cargando tu información…', 0, 'consultar', '');
       var cont=$('hubChips'), nuevo=ch.join('');
       if(cont.getAttribute('data-sig')!==nuevo){ cont.innerHTML=nuevo; cont.setAttribute('data-sig', nuevo); }
       hubSaludo(); packPintarPorConfirmar();
@@ -14233,9 +14257,24 @@
       } else if(k==='ajustes'){ R.d='Operador, datos de pago, seguridad, versión y mantenimiento.'; }
       return R;
     }
+    /* El panel lateral sigue la misma regla del Inicio: conteos y nombres sí, cifras de dinero no */
+    var HUB_DINERO=/[−-]?\s?\$\s?[\d.,]+(\s?[Mk]\b)?/g;
+    function hubSinDinero(R, D){
+      var NC=hubConteos(D), DET={ cartera:hubPlural((D.k&&D.k.remisiones)||0,'remisión','remisiones')+' por cobrar.', alertas:'Productos por reponer y capital dormido.', gastos:'Viáticos, personal, operación y mercancía.', cupos:'Tope de crédito por cliente.', bi:'Ventas, margen, rotación y proyección.' };
+      if(/\$\s?\d/.test(R.d||'')) R.d=DET[R.go]||'';
+      var claves=['pedidos','packing','alertas','cartera','pagos','consultar'];
+      R.rows.forEach(function(r, i){
+        if(r.sa && /\$\s?\d/.test(r.sa)) r.sa='';
+        if(r.b!=null && /\$\s?\d/.test(String(r.b))){
+          r.b=String(r.b).replace(HUB_DINERO,'').replace(/^\s*[·\/]\s*/,'').replace(/\s*[·\/]\s*$/,'').replace(/^\s*(de|Hoy|Mes)\s*$/,'').trim();
+          if(!r.b && !R.go){ var nc=NC[claves[i]]; r.b=(nc&&nc.t)||''; }
+        }
+      });
+      return R;
+    }
     function hubPrevPintar(k){
       var side=$('hubSide'); if(!side || side.offsetParent===null) return;
-      var R=hubPrev(k, HUB.datos||hubCalc());
+      var dH=HUB.datos||hubCalc(), R=hubSinDinero(hubPrev(k, dH), dH);
       var sig=k+'|'+JSON.stringify(R.rows)+R.d; if(side.getAttribute('data-sig')===sig) return; side.setAttribute('data-sig', sig);
       side.innerHTML='<p class="hs-k">'+safe(R.k||'Vista previa')+'</p><h2 class="hs-t">'+safe(R.t)+'</h2><p class="hs-d">'+safe(R.d)+'</p>'
         +hubFilas(R.rows)+(R.go?'<button type="button" class="hs-go" data-hk="'+R.go+'">Abrir '+safe(R.t)+' →</button>':'');

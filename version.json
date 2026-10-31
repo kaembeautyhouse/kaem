@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-30-04",
+  "app": "2026-10-30-05",
   "servidor": "2026.10.32",
   "fecha": "2026-10-30",
   "novedades": [
+    "Inicio: cada tarjeta muestra su conteo (por empacar, vencidas, por reponer…). Las cifras de dinero siguen ocultas.",
     "Modo oscuro revisado (botones y cifras que casi no se veían), mensajes de WhatsApp plegados en Ajustes y catálogos web con textos más claros.",
     "Pedido guardado: ahora puedes corregirlo ahí mismo con «Actualizar pedido» sin crear otro. «Pausar» pasa a «Dejarlo aparte» al empezar otro pedido. Packing ahora se llama Empaque. Estadísticas y Ajustes más claros y sin datos repetidos; Cartera filtra tocando sus tarjetas.",
     "Repaso de toda la interfaz: nombres iguales en menú, inicio y títulos (Inventario, Nuevo producto, Pedidos), cifras que ya no se parten en dos líneas, Gastos y Cartera sin datos repetidos, Packing con los pedidos más antiguos a un toque, filtros sin botones sueltos, y precio, flete y abono con separador de miles.",
