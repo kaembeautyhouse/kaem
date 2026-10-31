@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-30-05';
+    const APP_VERSION = '2026-10-30-06';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -381,7 +381,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.32', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.33', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -1171,7 +1171,6 @@
     #orderDeleteModal{z-index:90}
     #orderDeleteText{color:var(--texto-suave);font-size:14px;line-height:1.55;white-space:pre-line}
     /* ——— Barra superior · LED de estado ——— */
-    .brand-wrap{display:flex;align-items:flex-start;gap:9px}
     .topbar-actions{display:flex;gap:8px}
     .led{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:9px;background:var(--led-sync);transition:background .3s ease;cursor:pointer}
     .led[data-state="ok"]{background:var(--led-ok);animation:pulse-ok 2.6s infinite}
@@ -1249,7 +1248,7 @@
     .nav-item.active svg{transform:scale(1.04)}
 
     /* ——— Tarjetas: radios amplios y sombra difusa en dos capas ——— */
-    .card, .car-card, .chk-row, .cart-row, .st-card, .tono-row{
+    .card, .car-card, .chk-row, .cart-row, .tono-row{
       border-radius:var(--r-lg);
       box-shadow:0 1px 2px rgba(44,33,30,.05), 0 8px 24px -12px rgba(44,33,30,.14);
       transition:transform .22s var(--ios-ease), box-shadow .22s var(--ios-ease);
@@ -1452,7 +1451,7 @@
       .topbar{min-width:0}
       /* Las rejillas se ajustan al espacio real disponible, no a un mínimo fijo */
       #productList, #alertList{grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr))}
-      .car-kpis, .al-kpis, .st-grid{grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr))}
+      .car-kpis, .al-kpis{grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr))}
     }
 
     /* ═══════ CORRECCIONES DE DISEÑO ═══════ */
@@ -1498,7 +1497,7 @@
     :root.theme-dark .al-kpi.urg{background:var(--st-late-bg);border-color:var(--st-late-border)}
     :root.theme-dark .al-kpi.urg b{color:var(--st-late-text)}
     :root.theme-dark .devol-total{background:var(--st-late-bg);color:var(--st-late-text)}
-    :root.theme-dark .pago-opt,:root.theme-dark .st-card,:root.theme-dark .car-kpi{background:var(--al-card);border-color:var(--al-line)}
+    :root.theme-dark .pago-opt,:root.theme-dark .car-kpi{background:var(--al-card);border-color:var(--al-line)}
     :root.theme-dark .stock-badge{background:#2B231E}
     :root.theme-dark .stock-badge.low{background:var(--st-late-bg)}
     :root.theme-dark .price{background:#2B231E}
@@ -1520,7 +1519,7 @@
     .lbl, .section-sub, .count-line{letter-spacing:.07em}
     .lbl{font-weight:500;font-size:11px}
     /* Cifras siempre alineadas y sin ambigüedad entre 0 y O */
-    .price b,.stock-badge b,.al-num b,.car-saldo b,.st-val,.chk-num,.cart-sub,.car-kpi b,.al-kpi b,.tone-chip{
+    .price b,.stock-badge b,.al-num b,.car-saldo b,.chk-num,.cart-sub,.car-kpi b,.al-kpi b,.tone-chip{
       font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1;
     }
     /* Nombres de producto: un punto más de peso para que destaquen sobre el resto */
@@ -1539,10 +1538,9 @@
     /* Nada puede desbordar horizontalmente y crear scroll lateral */
     .screen, .sheet{overflow-x:hidden}
     .screen *{max-width:100%}
-    .card, .al-card, .car-card, .chk-row, .st-card{box-sizing:border-box}
+    .card, .al-card, .car-card, .chk-row{box-sizing:border-box}
     /* Rejillas que se adaptan solas en vez de romperse en pantallas estrechas */
     .price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(68px,1fr))}
-    .st-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
 
     /* ——— Pantallas intermedias (tablet vertical): sin barra lateral aún ——— */
     @media (min-width:700px) and (max-width:1023px){
@@ -1617,7 +1615,6 @@
     .ab-recibo:active{background:var(--terracota);color:#fff}
     .car-abonado{font-size:11px;color:var(--salvia-txt);font-weight:600}
 
-
     .ab-recibo[disabled]{opacity:.4;pointer-events:none}
     .rec-row .ab-edit,.ab-row .ab-edit{margin-left:6px}
     /* ═══════ ESTADÍSTICAS ═══════ */
@@ -1636,12 +1633,6 @@
     .stats-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px}
     .stats-head h3{margin:0}
     .stats-fecha{font-size:11px;color:var(--texto-suave)}
-    .st-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-    .st-card{background:var(--blanco);border:1px solid var(--linea);border-radius:16px;padding:16px 15px}
-    .st-card.wide{grid-column:1 / -1}
-    .st-lbl{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:7px}
-    .st-val{display:block;font-family:'Fraunces',serif;font-size:23px;line-height:1.15;color:var(--espresso);word-break:break-word}
-    .st-val.sm{font-size:18px}
     .st-sub{display:block;font-size:11px;color:var(--texto-suave);margin-top:5px;line-height:1.45}
     .st-delta{font-size:12px;font-weight:600}
     .st-delta.up{color:var(--salvia-txt)} .st-delta.down{color:var(--rojo-txt)}
@@ -1657,7 +1648,6 @@
     .st-num{flex:0 0 auto;font-weight:600;color:var(--espresso);white-space:nowrap}
     .st-bar{height:5px;border-radius:5px;background:var(--crema-2);overflow:hidden;margin-top:5px}
     .st-bar span{display:block;height:100%;background:var(--terracota);border-radius:5px}
-    .st-alerta{color:var(--rojo-txt);font-weight:600}
     .st-vacio{font-size:12.5px;color:var(--texto-suave);padding:8px 2px}
 
     /* ═══════ ACCESIBILIDAD ═══════
@@ -1859,7 +1849,6 @@
     .pack-hist-badge{font-style:normal;font-size:11px;font-weight:700;background:var(--terracota);color:#fff;border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:1px}
     .pack-hist-btn i{font-style:normal;font-size:22px;opacity:.4}
     .pack-hist-btn:active{transform:scale(.99)}
-
 
     /* Tarjeta HUD: tipografía gigante, legible a un brazo de distancia */
 
@@ -2073,8 +2062,6 @@
     .car-hoy small{display:block;font-weight:400;font-size:12px;opacity:.85}
     .car-hoy.on{outline:2px solid var(--terracota)}
     .seg-btns-3 button{font-size:12.5px;padding:11px 4px;line-height:1.2}
-    .wa-pl{border:1px solid var(--linea);border-radius:14px;padding:12px;margin:0 0 12px;background:var(--blanco)}
-    .wa-pl-t{margin:0 0 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--texto-suave);font-weight:600}
     .wa-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
     .wa-chip{font-family:'Jost',sans-serif;font-size:12.5px;min-height:34px;padding:6px 11px;border-radius:999px;border:1px solid var(--linea);
              background:transparent;color:var(--texto-suave);cursor:pointer;transition:background .15s,color .15s,transform .12s}
@@ -2082,8 +2069,6 @@
     .wa-chip:active{transform:scale(.95)}
     .wa-prev{margin:0;white-space:pre-wrap;word-break:break-word;font-family:'Jost',system-ui,sans-serif;font-size:12.5px;line-height:1.45;
              background:var(--crema-2,#EFEAE2);border-radius:10px 10px 10px 2px;padding:10px 12px;max-height:220px;overflow:auto;color:var(--espresso)}
-    .wa-libre{margin-top:6px}
-    .wa-libre summary{cursor:pointer;font-size:13px;color:var(--texto-suave);padding:6px 0}
     .seg-btns button{padding:11px 6px;font-size:13px}
 
     /* Sin zoom por doble toque en toda la app (iOS y Android); los toques responden al instante */
@@ -2162,18 +2147,13 @@
     .st-ins-oportunidad{background:rgba(143,160,142,.12);border-color:rgba(143,160,142,.35);color:var(--espresso)}
     .st-ins-acc{display:block;margin-top:2px;background:transparent;border:none;padding:8px 0;min-height:32px;font-family:inherit;font-size:12.5px;
                 font-weight:700;color:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-    .st-meta,.st-flujo{background:var(--blanco);border:1px solid var(--linea);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+    .st-meta{background:var(--blanco);border:1px solid var(--linea);border-radius:14px;padding:12px 14px;margin-bottom:10px}
     .st-meta-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--texto-suave)}
     .st-meta-top b{font-family:'Fraunces',serif;font-size:20px;color:var(--espresso)}
     .st-meta-bar{position:relative;height:9px;border-radius:9px;background:var(--crema-2);margin:8px 0 7px;overflow:visible}
     .st-meta-fill{height:100%;border-radius:9px;background:var(--salvia);transition:width .6s ease}
     .st-meta-proy{position:absolute;top:-3px;width:2px;height:15px;background:var(--terracota);border-radius:2px}
     .st-meta-sub{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:var(--texto-suave)}
-    .st-flujo-tit{font-size:12px;color:var(--texto-suave);margin:0 0 8px}
-    .st-flujo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
-    .st-flujo-grid small{display:block;font-size:11px;color:var(--texto-suave)}
-    .st-flujo-grid b{display:block;font-family:'Fraunces',serif;font-size:16px;margin:2px 0;white-space:nowrap}
-    .st-flujo-grid b.ok{color:var(--salvia-txt)} .st-flujo-grid b.late{color:var(--rojo-txt)}
 
     /* Ajustes en secciones plegables */
     .cfg-sec{border:1px solid var(--linea);border-radius:14px;background:var(--blanco);margin-bottom:8px;overflow:hidden}
@@ -2200,14 +2180,11 @@
     .led-txt.off{color:var(--rojo-txt);font-weight:600}
     .led-txt.ok{color:var(--salvia-txt)}
     .led-txt.pend{color:var(--st-soon-text);font-weight:600}
-    .led-txt.fade{opacity:0}
     /* Celular: al lado del punto no cabe (partía el título y corría los botones).
        Pasa a su propia línea bajo el título y se contrae al desvanecerse. */
     @media (max-width:699px){
-      .brand-wrap{flex-wrap:wrap;row-gap:0}
       .led-txt{flex-basis:100%;order:3;margin:1px 0 0;max-width:none;font-size:11px;line-height:15px;max-height:15px;
                transition:opacity .5s ease,max-height .4s ease .3s}
-      .led-txt.fade{max-height:0}
     }
 
     /* Devoluciones previas dentro del formulario de devolución */
@@ -2226,7 +2203,6 @@
       .bottom-nav .nav-badge{right:calc(50% - 19px)}
     }
 
-
     .ent-chips{flex-wrap:wrap}
     /* ═══════════════════════════════════════════════════════════════════
        TOQUE APPLE · manteniendo la paleta KAÉM (va al final: gana la cascada)
@@ -2244,7 +2220,7 @@
     .btn-solid:active,.btn-ghost:active,.icon-btn:active,.car-btn:active,.chip:active,.seg:active,.nav-item:active,
     .cat-banner:active,.car-recibos-btn:active,.op-card:active,.ab-recibo:active{transform:scale(.965)}
     /* Tarjetas con sombra suave y bordes continuos */
-    .card,.car-card,.al-card,.cart-row,.car-kpi,.cfg-sec,.catp-card,.st-card,.pg-dia-item{
+    .card,.car-card,.al-card,.cart-row,.car-kpi,.cfg-sec,.catp-card,.pg-dia-item{
       box-shadow:0 1px 2px rgba(44,33,30,.04),0 6px 20px rgba(44,33,30,.05)}
     :root.theme-dark .card,:root.theme-dark .car-card,:root.theme-dark .al-card,:root.theme-dark .cart-row,:root.theme-dark .car-kpi,
     :root.theme-dark .cfg-sec,:root.theme-dark .catp-card{box-shadow:0 1px 2px rgba(0,0,0,.3)}
@@ -2260,7 +2236,6 @@
     @media (prefers-reduced-motion:reduce){.screen.active,.modal .sheet{animation:none}}
 
     /* ═══ Píldora de estado junto al logo ═══ */
-    .brand-wrap{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;min-width:0}
     .brand{margin:0}
     .estado-pill{position:relative;min-height:28px;display:inline-flex;align-items:center;gap:6px;max-width:190px;min-width:0;padding:5px 11px 5px 9px;border-radius:999px;border:none;
                  font-family:'Jost',sans-serif;cursor:pointer;background:rgba(143,160,142,.16);transition:background-color .3s,transform .16s;align-self:center}
@@ -2274,7 +2249,6 @@
     .estado-pill[data-state="sync"] .led{animation:kLatido 1.2s ease-in-out infinite}
     @keyframes kLatido{50%{opacity:.35}}
     @media (max-width:699px){
-      .brand-wrap{flex-wrap:nowrap}
       .estado-pill{max-width:128px}
       .estado-pill .led-txt{flex-basis:auto;order:0}
       .topbar-actions{gap:6px} .topbar-actions .icon-btn{width:40px;height:40px}
@@ -2315,7 +2289,6 @@
       #configModal .sheet{max-width:620px}
     }
 
-
     /* ═══ UNIFORMIDAD (medido en los 7 módulos y 26 ventanas) ═══ */
     /* Etiquetas de campo: todas pequeñas en mayúsculas (había 5 en 14 px) */
     .lbl{font-size:11px!important;letter-spacing:.14em;text-transform:uppercase;font-weight:500}
@@ -2325,8 +2298,7 @@
     .btn-solid,.btn-ghost{min-height:44px}
     #configModal .btn-solid,#configModal .btn-ghost{font-size:15px}
     /* Tarjetas: el mismo borde redondeado en todos los módulos (había 16 y 20 px) — igual al catálogo */
-    .card,.car-card,.al-card,.cart-row,.catp-card,.st-card,.pg-card,.op-card{border-radius:18px}
-
+    .card,.car-card,.al-card,.cart-row,.catp-card,.pg-card,.op-card{border-radius:18px}
 
     /* ════════════════════════════════════════════════════════════════════
        AJUSTES DE DISEÑO v2 (30/09/2026) · compacto en móvil, adaptable en todo
@@ -2342,8 +2314,6 @@
     .asesor-tit{margin:0;font-family:'Fraunces',serif;font-size:17px;color:var(--espresso)}
     .asesor-sub{margin:1px 0 0;font-size:11px;color:var(--texto-suave);line-height:1.35}
     .asesor-res{margin:12px 0 4px;font-size:14px;line-height:1.5;color:var(--espresso)}
-    .asesor-g{margin-top:12px}
-    .asesor-gt{margin:0 0 6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);font-weight:600}
     .asesor .st-ins + .st-ins{margin-top:6px}
     .rent-st{border:1px solid var(--linea);border-radius:16px;background:var(--blanco);padding:12px 14px;margin-bottom:18px}
     .rent-st-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin-bottom:8px}
@@ -2367,9 +2337,7 @@
     /* Dentro de Estadísticas hay reglas genéricas para <p>: se fija la tipografía del Asesor */
     #biBody .asesor-sub{font-size:11px;line-height:1.35;margin:1px 0 0}
     #biBody .asesor-tit{font-size:17px;margin:0}
-    #biBody .asesor-res{font-size:14px;margin:12px 0 4px}
-    #biBody .asesor-gt, #biBody .rent-st-sub{font-size:11px;letter-spacing:.1em;font-weight:600;line-height:1.3}
-    #biBody .asesor-gt{margin:0 0 6px} #biBody .rent-st-sub{margin:12px 0 2px}
+    #biBody .asesor-res{font-size:14px;margin:12px 0 4px} #biBody .rent-st-sub{font-size:11px;letter-spacing:.1em;font-weight:600;line-height:1.3} #biBody .rent-st-sub{margin:12px 0 2px}
     #biBody .rent-st-nota{font-size:11px;line-height:1.4;margin:10px 0 0}
     /* Rentabilidad en vivo (Pedidos) */
     .rent-box{border:1px solid var(--linea);border-radius:16px;background:var(--blanco);margin-top:10px;margin-bottom:14px;overflow:hidden}
@@ -2506,7 +2474,6 @@
       .car-toolbar .car-recibos-btn{padding:0 12px}
     }
 
-
     /* Ganancia del pedido OCULTA: un botón discreto, sin cifras ni colores de alerta */
     .rent-box.plegado{border-style:dashed;background:transparent}
     .rent-box.plegado .rent-head{padding:10px 14px}
@@ -2612,13 +2579,6 @@
     .bi-nota{margin:8px 2px;font-size:12.5px;line-height:1.45;color:var(--texto-suave)}.bi-nota b{color:var(--espresso)}.bi-nota.late{color:var(--terracota-txt)}
     .bi-vacio{text-align:center;color:var(--texto-suave);padding:18px 8px;font-size:14px}
     .bi-sup{margin:12px 2px 4px;font-size:12.5px;color:var(--texto-suave)}.bi-sup summary{cursor:pointer;padding:8px 0;font-weight:500}.bi-sup li{margin:5px 0 5px 16px;line-height:1.45}
-    .bi-al{display:flex;gap:10px;background:var(--blanco);border:1px solid var(--linea);border-left-width:4px;border-radius:14px;padding:11px 12px;margin-bottom:8px}
-    .bi-al-critica{border-left-color:#C4604A}.bi-al-alta{border-left-color:#D98B5E}.bi-al-media{border-left-color:#D9A860}.bi-al-info{border-left-color:#8FA184}
-    .bi-al-ic{flex:0 0 auto;font-size:15px;line-height:1.3}
-    .bi-al-tx{min-width:0}.bi-al-tx b{display:block;font-size:14px;line-height:1.3;color:var(--espresso)}
-    .bi-al-tx p{margin:4px 0 0;font-size:12.5px;line-height:1.45;color:var(--texto-suave)}
-    .bi-al-imp{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:600;color:var(--terracota-txt);background:rgba(196,96,74,.12);padding:2px 9px;border-radius:999px}
-    .bi-al .st-ins-acc{display:block;margin-top:8px}
     .bi-abc{display:flex;gap:3px;height:34px;border-radius:9px;overflow:hidden}
     .bi-abc i{display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11.5px;font-weight:600;color:#fff;min-width:34px;padding:0 4px;white-space:nowrap}
     .bi-abc .abc-A{background:#5E8A55}.bi-abc .abc-B{background:#D9A860}.bi-abc .abc-C{background:#B6A796}
@@ -2651,7 +2611,7 @@
     .topbar{position:relative;z-index:5;-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px)}
     .topbar .brand{cursor:pointer;border-radius:12px;transition:transform .2s var(--hub-ease),opacity .2s}
     .topbar .brand:active{transform:scale(.96)}
-    .topbar .brand:focus-visible,.hub-card:focus-visible,.hub-chip:focus-visible,.hub-cta:focus-visible{outline:2px solid var(--terracota);outline-offset:3px}
+    .topbar .brand:focus-visible,.hub-card:focus-visible{outline:2px solid var(--terracota);outline-offset:3px}
     @media (hover:hover) and (pointer:fine){ .topbar .brand:hover{opacity:.82} }
 
     /* — Móvil: sin barra inferior; el contenido usa todo el alto — */
@@ -2666,20 +2626,6 @@
     .hub-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:6px 2px 14px}
     .hub-fecha{margin:0;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--texto-suave)}
     .hub-saludo{margin:3px 0 0;font-family:'Fraunces',serif;font-weight:500;font-size:clamp(26px,5.2vw,38px);line-height:1.1;letter-spacing:.005em}
-    .hub-cta{display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;background:var(--espresso);color:var(--crema);font:600 14px/1 'Jost',sans-serif;letter-spacing:.03em;padding:14px 20px;min-height:46px;border-radius:999px;box-shadow:0 10px 22px -10px rgba(44,33,30,.55);transition:transform .22s var(--hub-ease),box-shadow .22s var(--hub-ease)}
-    .hub-cta svg{width:17px;height:17px;stroke:currentColor;fill:none}
-    .hub-cta:active{transform:scale(.96)}
-    @media (hover:hover) and (pointer:fine){ .hub-cta:hover{transform:translateY(-2px);box-shadow:0 16px 26px -12px rgba(44,33,30,.6)} }
-
-    .hub-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 14px;margin:0 -2px;scrollbar-width:none}
-    .hub-chips::-webkit-scrollbar{display:none}
-    .hub-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--linea);background:var(--hub-glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--espresso);font:500 13px/1 'Jost',sans-serif;padding:10px 14px;min-height:40px;border-radius:999px;cursor:pointer;transition:transform .2s var(--hub-ease),border-color .2s,background .2s}
-    .hub-chip b{font-weight:700}
-    .hub-chip i{width:8px;height:8px;border-radius:50%;background:var(--salvia);flex:0 0 auto}
-    .hub-chip.warn i{background:var(--terracota)}
-    .hub-chip.bad i{background:var(--rojo)}
-    .hub-chip:active{transform:scale(.97)}
-    @media (hover:hover) and (pointer:fine){ .hub-chip:hover{border-color:var(--piedra);transform:translateY(-1px)} }
 
     .hub-main{display:block}
     .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-content:start}
@@ -2727,7 +2673,6 @@
     @keyframes hubPop{0%{transform:scale(.4)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
     @keyframes hubTick{0%{opacity:.25;transform:translateY(5px)}100%{opacity:1;transform:none}}
     .hub-side{display:none}
-    .hub-pie{margin:18px 2px 4px;text-align:center;font-size:11.5px;letter-spacing:.06em;color:var(--texto-suave)}
 
     @media (min-width:700px){
       .hub-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -2755,7 +2700,6 @@
       .hs-row small{display:block;color:var(--texto-suave);font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
       .hs-row b{flex:0 0 auto;font-weight:700;white-space:nowrap}
       .hs-row b.warn{color:var(--terracota-txt)}
-      .hs-vacio{padding:14px 2px;color:var(--texto-suave);font-size:13px}
       .hs-go{width:100%;border:1px solid var(--linea);background:var(--blanco);color:var(--espresso);border-radius:14px;padding:12px;font:600 13.5px 'Jost',sans-serif;cursor:pointer;min-height:44px;transition:background .2s,transform .2s var(--hub-ease)}
       .hs-go:hover{background:var(--crema-2)} .hs-go:active{transform:scale(.98)}
       .hub-sec{margin-top:14px}
@@ -2769,7 +2713,6 @@
     /* — Modo cliente: solo el catálogo — */
     .modo-cliente .hub-priv{display:none !important}
     .modo-cliente .hub-side{display:none}
-
 
     /* — Gastos y viáticos — */
     .gs-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
@@ -2795,7 +2738,6 @@
     .gs-monto{font-weight:700;font-size:14.5px;flex:0 0 auto}
 
     /* — Cupos de crédito — */
-    .cp-intro{font-size:13px;line-height:1.5;color:var(--texto-suave);margin:2px 2px 10px}
     .cp-acciones{display:grid;grid-template-columns:1.4fr 1fr;gap:8px}
     .cp-acciones .btn-solid,.cp-acciones .btn-ghost{width:100%;font-size:13.5px;padding:13px 8px;min-height:48px}
     .cp-card{border-left:4px solid var(--salvia)}
@@ -2853,7 +2795,6 @@
     .fin-tabla th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);font-weight:700}
     .fin-tabla td.neg{color:var(--rojo)} .fin-tabla td.pos{color:var(--salvia-txt)}
     @media (min-width:700px){ .fin-hero{grid-template-columns:repeat(4,minmax(0,1fr))} }
-
 
     /* ═══ Barra única en 3 zonas: módulo (izq) · logo (centro, inicio) · estado (der) ═══ */
     .topbar{display:grid !important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:10px 14px 8px}
@@ -2947,7 +2888,6 @@
     /* — Toques cómodos (≥ 44 px) sin agrandar lo que se ve: el área de toque se extiende con ::after — */
     .topbar .brand{position:relative}
     .topbar .brand::after,.estado-pill::after{content:'';position:absolute;inset:-10px -8px}
-    .hub-chip{min-height:44px}
     .car-btn{min-height:44px}
 
     /* — Escritorio: la barra lateral ya no empuja la página — */
@@ -3027,7 +2967,7 @@
     .cli-kpi span{font-size:12.5px;font-weight:600}
     .cli-kpi small{font-size:11.5px;line-height:1.3;color:var(--texto-suave)}
     .cli-kpi.on{border-color:var(--espresso);box-shadow:inset 0 0 0 1px var(--espresso)}
-    .cli-kpi.tono-deuda b{color:var(--terracota-txt)} .cli-kpi.tono-incompleto b{color:var(--texto-suave)}
+    .cli-kpi.tono-deuda b{color:var(--terracota-txt)}
     .cli-kpi:active{transform:scale(.97)}
     @media (hover:hover) and (pointer:fine){ .cli-kpi:hover{border-color:var(--piedra);transform:translateY(-2px)} }
     .cli-toolbar{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-bottom:12px}
@@ -3207,7 +3147,7 @@
     .cfg-nav-bloque[hidden]{display:none}
     .cfg-vacio{margin:18px 4px;font-size:13.5px;color:var(--texto-suave);text-align:center}
     .cfg-panel{display:none}
-    .cfg-en-sec .cfg-nav,.cfg-en-sec .cfg-buscar,.cfg-en-sec .cfg-head-t{display:none}
+    .cfg-en-sec .cfg-nav,.cfg-en-sec .cfg-buscar{display:none}
     .cfg-en-sec .cfg-panel{display:block}
     .cfg-back{display:inline-flex;align-items:center;gap:4px;min-height:44px;margin:0 0 6px -4px;padding:0 12px 0 4px;border:0;background:none;color:var(--texto-suave);font:600 14px 'Jost',sans-serif;cursor:pointer}
     .cfg-back svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -3233,7 +3173,7 @@
       .cfg-nav{position:sticky;top:0;max-height:calc(100dvh - 230px);overflow-y:auto;padding-bottom:8px}
       .cfg-panel{display:block}
       .cfg-back{display:none}
-      .cfg-en-sec .cfg-nav,.cfg-en-sec .cfg-head-t{display:block}
+      .cfg-en-sec .cfg-nav{display:block}
       .cfg-en-sec .cfg-buscar{display:flex}
       .cfg-card{padding:26px 28px}
     }
@@ -3244,8 +3184,8 @@
     .ped-new{min-height:44px}
     .car-acts .car-btn,.car-btn{min-height:44px}
     #descInput{min-height:40px}
-    #marcaChips,.bi-tabs,.hub-chips,.stk-chips{scrollbar-width:none;-ms-overflow-style:none}
-    #marcaChips::-webkit-scrollbar,.bi-tabs::-webkit-scrollbar,.hub-chips::-webkit-scrollbar{display:none}
+    #marcaChips,.bi-tabs,.stk-chips{scrollbar-width:none;-ms-overflow-style:none}
+    #marcaChips::-webkit-scrollbar,.bi-tabs::-webkit-scrollbar{display:none}
     .cfg-nav-i .chev{stroke:var(--texto-suave);opacity:.55}
     /* campos: el foco se ve (anillo suave del color de la marca) */
     input:not([type=checkbox]):not([type=radio]):focus,select:focus,textarea:focus{border-color:var(--terracota);box-shadow:0 0 0 3px color-mix(in srgb,var(--terracota) 18%,transparent);outline:none}
@@ -3555,7 +3495,30 @@
     .hc-n.urg{color:var(--terracota-txt);font-weight:600}
     .hub-card.big .hc-n{color:#E9DCCB}
     .hub-card.big .hc-n.urg{color:#F2C9A6}
-    #hubChips:empty{display:none}
+
+    /* Estadísticas: plan de la semana */
+    .bi-plan{border:1px solid var(--linea);border-left:4px solid var(--salvia);border-radius:14px;background:var(--blanco);margin-bottom:8px;overflow:hidden}
+    .bi-plan.alta{border-left-color:var(--terracota)}
+    .bi-plan.info{border-left-color:var(--piedra,#C2B6A6)}
+    .bi-plan > summary{list-style:none;cursor:pointer;padding:12px 34px 12px 13px;position:relative}
+    .bi-plan > summary::-webkit-details-marker{display:none}
+    .bi-plan > summary::after{content:'';position:absolute;right:14px;top:18px;width:8px;height:8px;border-right:2px solid var(--texto-suave);border-bottom:2px solid var(--texto-suave);transform:rotate(45deg);transition:transform .2s}
+    .bi-plan[open] > summary::after{transform:rotate(-135deg);top:22px}
+    .bi-plan > summary b{display:block;font-size:14.5px;line-height:1.3;color:var(--espresso)}
+    .bi-plan > summary small{display:block;margin-top:3px;font-size:12.5px;line-height:1.4;color:var(--texto-suave)}
+    .bi-plan-b{padding:0 13px 12px}
+    .bi-plan-f{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--linea)}
+    .bi-plan-f > span{flex:1;min-width:0}
+    .bi-plan-f b{display:block;font-size:13px;font-weight:600;color:var(--espresso);overflow-wrap:anywhere}
+    .bi-plan-f small{display:block;font-size:11.5px;line-height:1.35;color:var(--texto-suave)}
+    .bi-plan-f em{font-style:normal;font-size:13px;font-weight:600;white-space:nowrap;color:var(--espresso)}
+    .bi-plan-wa{flex:0 0 auto;min-height:34px;padding:0 10px;border:1px solid var(--st-wa-border);border-radius:10px;background:var(--st-wa-bg);color:var(--st-wa-text);font:600 12px 'Jost',sans-serif;cursor:pointer}
+    .bi-plan-b .st-ins-acc{margin-top:8px}
+    .bi-hall > div{padding:9px 0;border-top:1px solid var(--linea)}
+    .bi-hall > div:first-child{border-top:0;padding-top:0}
+    .bi-hall > div:last-child{padding-bottom:0}
+    .bi-hall b{display:block;font-size:13.5px;font-weight:600;line-height:1.3;color:var(--espresso)}
+    .bi-hall small{display:block;margin-top:2px;font-size:12px;line-height:1.4;color:var(--texto-suave)}
   </style>
 </head>
 <body>
@@ -3589,7 +3552,6 @@
             </div>
             <button type="button" class="hub-refresh" id="hubRefresh" aria-label="Actualizar datos" title="Actualizar datos"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
           </div>
-          <div class="hub-chips hub-priv" id="hubChips" aria-label="Lo que pide atención"></div>
           <div class="hub-main">
             <div class="hub-grid" id="hubGrid"></div>
             <aside class="hub-side" id="hubSide" aria-live="polite" aria-label="Vista previa"></aside>
@@ -4529,10 +4491,6 @@
             <button type="button" class="chip" data-ent-dias="-1" data-ent-in="repackFecha">Mañana</button>
           </div>
         </div>
-        <div id="repackPlazoBox" style="display:none">
-          <label class="lbl" style="margin-top:12px">Días de crédito</label>
-          <div class="ent-plazo" id="repackPlazoChips"></div>
-        </div>
         <p class="ent-hint" id="repackHint"></p>
       </div>
       <div class="modal-actions" style="margin-top:14px">
@@ -5328,7 +5286,6 @@
       <details class="cfg-sec">
         <summary><span><b>Herramientas</b><small>Movimientos recientes, SKU en lote y exportar inventario</small></span></summary>
         <div class="cfg-sec-body">
-      <button id="cfgClientesBtn" type="button" hidden></button>
       <button class="btn-ghost" id="cfgAuditoriaBtn" type="button" style="width:100%">Ver movimientos recientes</button>
       <p class="cfg-hint">Quién registró, editó, empacó, anuló o cobró cada cosa, y cuándo. Útil cuando dos personas trabajan a la vez.</p>
       <button class="btn-ghost" id="cfgSkuLoteBtn" type="button" style="width:100%">🏷️ Cambiar SKU en lote</button>
@@ -6447,7 +6404,6 @@
     Array.prototype.forEach.call($('cfgTemaSeg').querySelectorAll('.seg'), function(s){
       s.addEventListener('click', function(){ haptic(10); setTema(s.dataset.tema); });
     });
-    $('cfgClientesBtn').addEventListener('click', abrirClientes);
     $('cfgAuditoriaBtn').addEventListener('click', abrirAuditoria);
 
     /* ═══════ BITÁCORA · quién hizo qué (Ajustes → Movimientos recientes) ═══════ */
@@ -7419,7 +7375,7 @@
         + '<div class="al-kpi"><span>Venta en riesgo</span><b>'+cop(res.ventaEnRiesgo||0)+'</b>'
         +   '<small>al mes si no se repone</small></div>'
         + '<div class="al-kpi"><span>Capital dormido</span><b>'+cop(res.dineroParado||0)+'</b>'
-        +   '<small>en productos sin salida</small></div>';
+        +   '<small>sin ventas en 90 días</small></div>';
 
       var urgentes=(r.alertas||[]).filter(function(a){ return a.urgencia<=3; });
       // El número rojo cuenta solo lo que cuesta ventas YA (igual que "Reponer ya"); lo "bajo"
@@ -8960,11 +8916,7 @@
 
     // ——— Remisión de venta PDF (Soft Luxury) ———
     /* ═══════════════════════════════════════════════════════════════════════
-       REMISIÓN PDF · KAÉM Beauty House
-       Motor: html2pdf (html2canvas + jsPDF) sobre iframe aislado.
-       · El cuerpo fluye libre (sin min-height) → los pedidos cortos ocupan una sola página.
-       · Los 26 mm inferiores quedan RESERVADOS por el margen de jsPDF.
-       · El pie legal se dibuja con jsPDF en TODAS las páginas (texto vectorial, nítido).
+       FECHAS Y UTILIDADES DE LA REMISIÓN · el motor del PDF está en 18a-pdf-remision.js
        ═══════════════════════════════════════════════════════════════════════ */
     // ——— Fechas: nunca se imprime un objeto Date crudo (bug de Safari/Chrome móvil) ———
     function kaemZ(n){ return (n < 10 ? '0' : '') + n; }
@@ -9566,7 +9518,6 @@
       R.nivel = String(kaemFirst(d.nivel, d.nivelPrecio, 'Detal')).trim() || 'Detal';
       R.whatsapp = remEsDetalOMayor_(R.nivel) ? '318 130 5060' : '311 207 9880';
       R.politica = remEsDetalOMayor_(R.nivel) ? POLITICA_PDF_DETAL : POLITICA_PDF;
-      var ef = String(kaemFirst(d.fechaEntrega, '')).trim();
       R.entrega = '';   // ninguna fecha de entrega se imprime (son datos internos de empaque y cartera)
       R.notas = notasParaCliente(String(kaemFirst(d.notas, d.notes, d.observaciones, '')).trim());
       R.notaPie = String(kaemFirst(d.notaPieRemision, d.notaPDF, (typeof AJUSTES !== 'undefined' && AJUSTES ? (AJUSTES.notaPieRemision || AJUSTES.notaPDF) : ''), '')).trim();
@@ -10036,6 +9987,13 @@
         defecto:function(x){ return waLlenar(WA_MSGS.reactivar.plantilla(), WA_MSGS.reactivar.valores(x)); },
         plantilla:function(){ return 'Hola {nombre}, ¿cómo vas? 🤍 Hace rato no te vemos por KAÉM y me acordé de ti. Llegaron novedades que creo que te van a gustar, ¿te cuento cuáles?'; },
         muestra:{ nombre:'MARÍA GÓMEZ', diasSinComprar:55 } },
+      recompra: { titulo:'Cliente al que le toca recomprar', campos:null,
+        uso:'Al escribirle desde el plan de la semana (Estadísticas → Resumen).',
+        vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['dias','Días desde su última compra']],
+        valores:function(x){ return { nombre:waPrimerNombre(x.nombre), cliente:x.nombre||'', dias:String(x.diasSinComprar||'') }; },
+        defecto:function(x){ return waLlenar(WA_MSGS.recompra.plantilla(), WA_MSGS.recompra.valores(x)); },
+        plantilla:function(){ return 'Hola {nombre} 🤍 ¿cómo vas? Ya debe estar por acabarse lo que llevaste, ¿te preparo algo? Cuéntame qué te está haciendo falta.'; },
+        muestra:{ nombre:'MARÍA GÓMEZ', diasSinComprar:21 } },
       cliente: { titulo:'Saludo a un cliente', campos:null,
         uso:'Al tocar WhatsApp en la ficha de un cliente (módulo Clientes).',
         vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['ciudad','Ciudad']],
@@ -10191,7 +10149,6 @@
       haptic(15);
     }
     function downloadOrderPDF(){ pdfFor(orderForOutput()); }
-    function sendWhatsApp(){ whatsappFor(orderForOutput()); }
     // Remisión en PDF + el mismo mensaje del pedido, lista para mandar (celular: hoja de compartir · computador: descarga + chat de WhatsApp)
     function enviarPDFCliente(o){
       if(!o || !o.items || !o.items.length){ toast('El pedido no tiene productos.','error'); return; }
@@ -11951,12 +11908,10 @@
       w.appendChild(inp); fbRefrescar(id);
       inp.addEventListener('input', function(){ fbRefrescar(id); }); inp.addEventListener('change', function(){ fbRefrescar(id); });
     });
-    // Calendario: el botón «Otro día» (y un toque sobre la fecha) abre el selector para elegir cualquier día, pasado o futuro
+    // Calendario: un toque sobre la fecha abre el selector para elegir cualquier día, pasado o futuro
     function entAbrirCalendario(inp){ if(!inp) return; try{ if(inp.showPicker){ inp.showPicker(); return; } }catch(e){} try{ inp.focus(); inp.click(); }catch(e2){} }
     ['packEntregaFecha','repackFecha'].forEach(function(id){ var i=$(id); if(i) i.addEventListener('click', function(){ entAbrirCalendario(i); }); });
     document.addEventListener('click', function(e){
-      var cal = e.target.closest ? e.target.closest('[data-ent-cal]') : null;
-      if(cal){ haptic(8); entAbrirCalendario($(cal.getAttribute('data-ent-cal'))); return; }
       var b = e.target.closest ? e.target.closest('[data-ent-dias]') : null; if(!b) return;
       var inp = $(b.getAttribute('data-ent-in')); if(!inp) return;
       var d = new Date(); d.setDate(d.getDate() - parseInt(b.getAttribute('data-ent-dias'),10));
@@ -11970,17 +11925,6 @@
 
     var REPACK = { ref:null, o:null, plazo:30 };
     function repackHint(){ entPintarHint('repackHint', REPACK.o, $('repackFecha').value, REPACK.plazo); }
-    function repackChipsPlazo(){
-      var opciones = [15,30,45,60,90]; if(opciones.indexOf(REPACK.plazo) < 0) opciones.push(REPACK.plazo);
-      opciones.sort(function(a,b){ return a-b; });
-      $('repackPlazoChips').innerHTML = opciones.map(function(n){
-        return '<button type="button" class="chip'+(n===REPACK.plazo?' on':'')+'" data-plazo="'+n+'">'+n+' días</button>';
-      }).join('');
-    }
-    $('repackPlazoChips').addEventListener('click', function(e){
-      var b = e.target.closest ? e.target.closest('[data-plazo]') : null; if(!b) return;
-      REPACK.plazo = parseInt(b.getAttribute('data-plazo'),10); repackChipsPlazo(); repackHint(); haptic(8);
-    });
     $('repackFecha').addEventListener('input', repackHint);
     var HIST_ENT = [];
     function abrirHistoricoEmpaque(){
@@ -12024,8 +11968,6 @@
       $('repackSub').textContent = (cli.nombre||'')+' · '+(o.remision||o.id)+' · venta del '+(o.fecha||'');
       var base = dmyToISO(o.fechaEntrega) || dmyToISO(kaemFmtFecha(o.packingFecha)) || isoOf(new Date());
       $('repackFecha').value = base; $('repackFecha').removeAttribute('max'); $('repackFecha').min = dmyToISO(o.fecha) || ''; fbRefrescar('repackFecha');
-      $('repackPlazoBox').style.display = 'none';   // el plazo ya viene del pedido; aquí solo se elige la fecha
-      if(inf.cred) repackChipsPlazo();
       repackHint();
       $('packHistModal').classList.remove('show');
       $('repackModal').classList.add('show'); haptic(10);
@@ -13145,12 +13087,6 @@
         +'<div class="bi-g-num"><b>'+p+'</b><span>de 100</span></div><div class="bi-g-niv bi-'+biSemaforo(p)+'">Salud del negocio: '+safe(nivel)+'</div></div>';
     }
     function biKpi(lbl, val, sub, cls){ return '<div class="bi-kpi'+(cls?(' '+cls):'')+'"><span>'+lbl+'</span><b>'+val+'</b>'+(sub?('<small>'+sub+'</small>'):'')+'</div>'; }
-    function biAlertaHtml(a){
-      var IC = { critica:'⛔', alta:'⚠', media:'●', info:'✦' }, ACC = { cartera:'Ir a Cartera', pagos:'Ver Pagos', alertas:'Ver Alertas', pedidos:'Ir a Pedidos', consultar:'Ver productos' };
-      return '<div class="bi-al bi-al-'+a.nivel+'"><span class="bi-al-ic">'+IC[a.nivel]+'</span><div class="bi-al-tx"><b>'+safe(a.titulo)+'</b><p>'+safe(a.detalle)+'</p>'
-        +(a.impacto>0?'<span class="bi-al-imp">En juego: '+abrevCop(a.impacto)+'</span>':'')
-        +(a.accion&&ACC[a.accion]?'<button type="button" class="st-ins-acc" data-ir="'+a.accion+'">'+ACC[a.accion]+' →</button>':'')+'</div></div>';
-    }
     /* ═══════ FINANZAS: dinero que entra y sale (obtenerFinanzas) ═══════ */
     var FIN = { datos:null, cargando:false, ts:0 };
     (function(){ try{ var c=JSON.parse(localStorage.getItem('kaem_fin')||'null'); if(c && c.datos){ FIN.datos=c.datos; FIN.ts=c.ts||0; } }catch(e){} })();
@@ -13196,7 +13132,8 @@
     /* Recomendaciones del negocio (BI) + del dinero (Finanzas), mezcladas por importancia y sin repetir */
     function biRecomendaciones(d, F){
       var L=[], orden={ critica:0, alta:1, media:2, info:3, ok:4 };
-      ((d&&d.alertas)||[]).forEach(function(a){ L.push({ nivel:a.nivel, titulo:a.titulo, detalle:a.detalle, impacto:a.impacto, ir:a.accion||'', area:'negocio' }); });
+      var enPlan={ quiebre_estrella:1, reposicion:1, capital_dormido:1, cartera_vencida:1, fuga:1, ritmo_bajo:1 };
+      ((d&&d.alertas)||[]).forEach(function(a){ if(enPlan[a.clave] && d.plan) return; L.push({ nivel:a.nivel, titulo:a.titulo, detalle:a.detalle, impacto:a.impacto, ir:a.accion||'', area:'negocio' }); });
       var hayPagosVenc=L.some(function(x){ return /pago/i.test(x.titulo) && /vencid/i.test(x.titulo); });
       ((F&&F.insights)||[]).forEach(function(i){
         if(hayPagosVenc && i.area==='deudas' && /vencid/i.test(i.titulo)) return;
@@ -13212,6 +13149,14 @@
       return L;
     }
 
+    function biPlanHtml(p, i){
+      return '<details class="bi-plan '+safe(p.nivel)+'"'+(i===0?' open':'')+'><summary><b>'+safe(p.titulo)+'</b><small>'+safe(p.porque)+'</small></summary><div class="bi-plan-b">'
+        +(p.filas||[]).map(function(f, j){
+          return '<div class="bi-plan-f"><span><b>'+safe(f.a)+'</b><small>'+safe(f.s||'')+'</small></span><em>'+safe(f.b||'')+'</em>'
+            +(f.tel?'<button type="button" class="bi-plan-wa" data-pwa="'+i+'|'+j+'" aria-label="Escribir por WhatsApp a '+safe(f.a)+'">WhatsApp</button>':'')+'</div>';
+        }).join('')
+        +(p.ir?'<button type="button" class="st-ins-acc" data-ir="'+safe(p.ir)+'">'+safe(({ cartera:'Ir a Cartera', alertas:'Ver Alertas' })[p.ir]||'Abrir')+' →</button>':'')+'</div></details>';
+    }
     function biVistaResumen(d, F){
       var h='', rv=window.RESUMEN_VENTAS;
       if(!d && !F) return '<p class="hist-empty">Analizando tu negocio…</p>';
@@ -13222,9 +13167,8 @@
         h+='<div class="bi-hero">'+biGauge(F.salud.puntaje, F.salud.nivel).replace('Salud del negocio:','Dinero:')
           +'<div class="bi-comp">'+F.salud.componentes.map(function(c){ return '<div class="bi-comp-r" title="'+safe(c.d)+'"><span>'+safe(c.n)+'</span><span class="bi-comp-b"><i class="bi-'+biSemaforo(c.p)+'" style="width:'+Math.max(3,c.p)+'%"></i></span><em>'+c.p+'</em></div>'; }).join('')+'</div></div>';
       } else h+='<p class="bi-nota">Calculando las finanzas…</p>';
-      // Lectura corta del asesor: solo las dos primeras frases (el resto de cifras ya está en las tarjetas de abajo)
-      var ejT=((d&&d.ejecutivo)||'').replace(/\.\s+([A-ZÁÉÍÓÚ])/g, '.\u0001$1').split('\u0001').slice(0,2).join(' ');
-      if(ejT) h+='<div class="asesor bi-exec"><div class="asesor-top"><span class="asesor-ic">✦</span><div><p class="asesor-tit">Lectura del asesor KAÉM</p>'+(d?('<p class="asesor-sub">Confianza '+safe(d.confianza)+'</p>'):'')+'</div></div><p class="asesor-res">'+safe(ejT)+'</p></div>';
+      var ejT=(d&&d.ejecutivo)||'';
+      if(ejT) h+='<div class="asesor bi-exec"><div class="asesor-top"><span class="asesor-ic">✦</span><div><p class="asesor-tit">Cómo va el negocio</p>'+(d?('<p class="asesor-sub">Confianza '+safe(d.confianza)+'</p>'):'')+'</div></div><p class="asesor-res">'+safe(ejT)+'</p></div>';
       var M=F&&F.mesActual;
       h+='<div class="fin-hero">'
         + finKpi('Vendido este mes', d?abrevCop(d.proyeccion.mes.vendido):(rv?abrevCop(rv.mes.v):'—'), (ST_R&&ST_R.ventas)?('hoy '+abrevCop(ST_R.ventas.hoy)+' · 7 días '+abrevCop(ST_R.ventas.semana)):(d?biPl(d.proyeccion.mes.pedidos,'pedido','pedidos'):''))
@@ -13235,8 +13179,12 @@
       if(d){ var P=d.proyeccion.mes, dif=P.mesAnterior>0?Math.round(100*(P.cierre/P.mesAnterior-1)):null;
         h+='<div class="bi-kpis">'+biKpi('Cierre proyectado del mes', abrevCop(P.cierre), 'Rango '+abrevCop(P.bajo)+' – '+abrevCop(P.alto)+(dif!=null?(' · <span class="st-delta '+(dif>=0?'up':'down')+'">'+(dif>=0?'▲ +':'▼ ')+dif+' %</span>'):''))
           +biKpi('Capital dormido', abrevCop(d.rotacion.resumen.capitalDormido), d.rotacion.resumen.pctDormido+' % del inventario', d.rotacion.resumen.pctDormido>15?'soon':'')+'</div>'; }
-      var recs=biRecomendaciones(d,F), top=recs.filter(function(r){ return r.nivel!=='info' && r.nivel!=='ok'; }).slice(0,5), resto=recs.filter(function(r){ return top.indexOf(r)<0; });
-      h+='<p class="fin-sec">Lo que más importa ahora</p>'+(top.length?top.map(finRecHtml).join(''):'<p class="bi-vacio">Sin riesgos importantes por ahora. 👏</p>');
+      var plan=(d&&d.plan)||[]; BI.plan=plan;
+      if(plan.length) h+='<p class="fin-sec">Tu plan de esta semana</p>'+plan.map(biPlanHtml).join('');
+      if(d&&d.hallazgos&&d.hallazgos.length) h+='<p class="fin-sec">Lo que muestran tus datos</p><div class="bi-card bi-hall">'+d.hallazgos.map(function(x){ return '<div><b>'+safe(x.t)+'</b><small>'+safe(x.d)+'</small></div>'; }).join('')+'</div>';
+      var recs=biRecomendaciones(d,F), top=recs.filter(function(r){ return r.nivel!=='info' && r.nivel!=='ok'; }).slice(0,3), resto=recs.filter(function(r){ return top.indexOf(r)<0; });
+      if(top.length) h+='<p class="fin-sec">También ten presente</p>'+top.map(finRecHtml).join('');
+      else if(!plan.length) h+='<p class="bi-vacio">Sin riesgos importantes por ahora.</p>';
       if(resto.length) h+='<details class="bi-sup"><summary>Ver '+resto.length+' recomendaciones más</summary><div style="margin-top:8px">'+resto.map(finRecHtml).join('')+'</div></details>';
       return h;
     }
@@ -13448,6 +13396,8 @@
       finCargar(false);
     });
     $('biBody').addEventListener('click', function(e){
+      var pw=e.target.closest?e.target.closest('[data-pwa]'):null;
+      if(pw){ var pp=pw.getAttribute('data-pwa').split('|'), fp=((BI.plan||[])[+pp[0]]||{ filas:[] }).filas[+pp[1]]; if(fp&&fp.tel){ waAbrir(fp.tel, waMensaje(fp.wa==='recompra'?'recompra':'reactivar', { nombre:fp.a, diasSinComprar:fp.dias })); haptic(10); } return; }
       var t=e.target; if(!t.closest) return;
       var per=t.closest('[data-per]'); if(per && ST_R){ ST_PERIODO=per.getAttribute('data-per'); var rk=$('stRank'); if(rk) rk.innerHTML=stRankHtml(ST_R); haptic(8); return; }
       if(t.id==='invMarcasCsv'){ invMarcasCSV(); return; }
@@ -14100,7 +14050,7 @@
       N.pedidos = nPed ? { t:nPed+' por revisar', urg:1 } : { t:'' };
       N.consultar = D.prod ? (D.ago ? { t:hubPlural(D.ago,'agotado','agotados') } : { t:D.disp+' disponibles' }) : { t:'' };
       N.cartera = k.vencidos ? { t:hubPlural(k.vencidos,'vencida','vencidas'), urg:1 } : (k.porVencer ? { t:k.porVencer+' por vencer', urg:1 } : { t:cobrar?(cobrar+' por cobrar'):'' });
-      N.packing = D.pk.length ? { t:D.pk.length+' por empacar', urg:D.atras>0 } : { t:'' };
+      N.packing = D.pk.length ? { t:D.pk.length+' por empacar', urg:D.atras>0 } : (D.pc.length ? { t:D.pc.length+' por confirmar', urg:1 } : { t:'' });
       N.alertas = D.alN ? { t:D.alN+' por reponer', urg:1 } : { t:'' };
       N.pagos = D.pgVen ? { t:hubPlural(D.pgVen,'vencido','vencidos'), urg:1 } : { t:D.pgSem?(D.pgSem+' esta semana'):'' };
       N.cupos = mora ? { t:mora+' en mora', urg:1 } : { t:(cr&&cr.sinAsignar)?(cr.sinAsignar+' sin cupo'):'' };
@@ -14119,7 +14069,7 @@
                   s:D.alRes.ventaEnRiesgo?('Venta en riesgo '+abrevCop(D.alRes.ventaEnRiesgo)):(D.prod?(D.ago+' agotados · '+D.baj+' por agotarse'):''), warn:D.alN>0, badge:D.alN, bad:1 };
       M.cartera={ v:k.totalPendiente?abrevCop(k.totalPendiente):(CARTERA&&CARTERA.ts?'Sin deudas':'—'), s:hubPlural(k.vencidos||0,'vencida','vencidas')+' · '+(k.porVencer||0)+' por vencer', warn:(k.vencidos||0)>0, badge:k.vencidos||0, bad:1 };
       M.pagos={ v:D.pgSem?(D.pgSem+' esta semana'):((PG&&PG.ts)?'Sin pagos próximos':'—'), s:D.pgVen?hubPlural(D.pgVen,'vencido','vencidos'):'Proveedores · préstamos · personal', warn:D.pgVen>0, badge:D.pgVen, bad:1 };
-      M.bi={ v:D.rv?('Hoy '+abrevCop(D.rv.hoy.v)):(D.nv?('Mes '+abrevCop(D.vm)):'Panel IA'),
+      M.bi={ v:D.rv?('Hoy '+abrevCop(D.rv.hoy.v)):(D.nv?('Mes '+abrevCop(D.vm)):'Estadísticas'),
              s:D.rv?('Semana '+abrevCop(D.rv.semana.v)+' · Mes '+abrevCop(D.rv.mes.v)+(D.rv.mesAnt&&D.rv.mesAnt.v?(' · mes pasado '+abrevCop(D.rv.mesAnt.v)):'')):(D.nv?(hubPlural(D.nv,'venta','ventas')+' este mes'):'Ventas, caja, gastos y recomendaciones') };
       M.gastos={ v:D.gsPres>0?(abrevCop(D.gsVia)+' de '+abrevCop(D.gsPres)+' en ruta'):(D.gsVia?(abrevCop(D.gsVia)+' en ruta esta semana'):(D.gs.length?('Hoy '+abrevCop(D.gsHoy)):'Registrar gasto')),
                  s:D.gs.length?('Semana '+abrevCop(D.gsSem)+' · mes '+abrevCop(D.gsMes)):'Viáticos, personal y operación', warn:D.gsPres>0&&D.gsVia>D.gsPres, badge:0 };
@@ -14167,20 +14117,6 @@
         var n=m.badge||0; b.textContent=n>99?'99+':n; b.classList.toggle('on', n>0); b.classList.toggle('bad', !!m.bad);
         el.setAttribute('aria-label', c.t+'. '+m.v+(m.s?('. '+m.s):'')+(n>0?(m.bad?'. Requiere atención':''):''));
       });
-      // Atajos de lo que pide atención (se ven primero, también en el celular)
-      var ch=[];
-      function add(txt, num, tab, cls){ ch.push('<button type="button" class="hub-chip'+(cls?(' '+cls):'')+'" data-go="tab:'+tab+'"><i></i><span>'+txt+'</span></button>'); }
-      if(D.cat.length||D.cola.length) add('<b>'+(D.cat.length+D.cola.length)+'</b> por revisar', 0, 'pedidos', 'warn');
-      if(D.pk.length) add('<b>'+D.pk.length+'</b> por empacar', 0, 'packing', D.atras?'bad':'');
-      if(D.pc.length) ch.push('<button type="button" class="hub-chip warn" data-go="fn:ent"><i></i><span><b>'+D.pc.length+'</b> '+(D.pc.length===1?'entrega por confirmar':'entregas por confirmar')+'</span></button>');
-      if(D.cpRes && (D.cpRes.enMora||0)+(D.cpRes.bloqueados||0)>0) add('<b>'+((D.cpRes.enMora||0)+(D.cpRes.bloqueados||0))+'</b> en mora con cupo', 0, 'cupos', 'bad');
-      if(D.k.vencidos) add('<b>'+D.k.vencidos+'</b> '+(D.k.vencidos===1?'vencida':'vencidas')+' en cartera', 0, 'cartera', 'bad');
-      if(D.alN) add('<b>'+D.alN+'</b> por reponer', 0, 'alertas', 'warn');
-      if(D.pgVen) add('<b>'+D.pgVen+'</b> pago'+(D.pgVen===1?'':'s')+' vencido'+(D.pgVen===1?'':'s'), 0, 'pagos', 'bad');
-      // Lo pendiente ya se ve en cada tarjeta: arriba solo se confirma cuando no hay nada (y sin cifras de dinero)
-      if(ch.length) ch=[]; else add(D.prod?'Todo al día':'Cargando tu información…', 0, 'consultar', '');
-      var cont=$('hubChips'), nuevo=ch.join('');
-      if(cont.getAttribute('data-sig')!==nuevo){ cont.innerHTML=nuevo; cont.setAttribute('data-sig', nuevo); }
       hubSaludo(); packPintarPorConfirmar();
       hubPrevPintar(HUB.hover||'');
     }
@@ -14244,7 +14180,7 @@
         R.d=D.cpRes?('Cupos en uso: '+cop(D.cpRes.usado)+' de '+cop(D.cpRes.cupoTotal)+'. Disponible: '+cop(D.cpRes.disponible)+'.'):'Tope de crédito por cliente: sube si paga a tiempo, baja si se atrasa.';
         D.cp.filter(function(f){ return f.tieneRegistro && (f.usado>0 || f.estado!=='ok'); }).slice(0,7).forEach(function(f){ R.rows.push({ a:f.nombre, sa:cpEstadoTxt(f), b:cop(f.usado)+' / '+cop(f.cupo), w:f.estado==='mora'||f.estado==='bloqueado' }); });
       } else if(k==='bi'){
-        R.d=D.nv?('Este mes: '+cop(D.vm)+' en '+hubPlural(D.nv,'venta','ventas')+' (según el historial guardado).'):'Ventas, margen, rotación y proyección con IA.';
+        R.d=D.nv?('Este mes: '+cop(D.vm)+' en '+hubPlural(D.nv,'venta','ventas')+' (según el historial guardado).'):'Ventas, margen, rotación y proyección.';
         if(D.rv){ R.d='Ventas de hoy, la semana y el mes (del servidor, sin pedir nada extra).'; R.rows=[{ a:'Hoy', sa:D.rv.hoy.n+' pedidos', b:cop(D.rv.hoy.v) },{ a:'Ayer', sa:D.rv.ayer.n+' pedidos', b:cop(D.rv.ayer.v) },{ a:'Últimos 7 días', sa:D.rv.semana.n+' pedidos', b:cop(D.rv.semana.v) },{ a:'Este mes', sa:D.rv.mes.n+' pedidos (día '+D.rv.dia+')', b:cop(D.rv.mes.v) },{ a:'Mes pasado', sa:D.rv.mesAnt.n+' pedidos', b:cop(D.rv.mesAnt.v) }]; }
         else D.hist.slice(0,6).forEach(function(o){ R.rows.push({ a:(o.cliente&&o.cliente.nombre)||'—', sa:o.remision||o.id||'', b:cop(o.total) }); });
       } else if(k==='historial'){
@@ -14342,7 +14278,6 @@
         br.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); haptic(10); hubIr(); } });
       }
       $('hubGrid').addEventListener('click', function(e){ var c=e.target.closest('[data-hk]'); if(c) hubAccion(hubGoDe(c.getAttribute('data-hk'))); });
-      $('hubChips').addEventListener('click', function(e){ var c=e.target.closest('[data-go]'); if(c) hubAccion(c.getAttribute('data-go')); });
       $('hubSide').addEventListener('click', function(e){ var c=e.target.closest('[data-hk]'); if(c) hubAccion(hubGoDe(c.getAttribute('data-hk'))); });
       $('hubRefresh').addEventListener('click', function(){ var b=this; b.classList.add('spin-on'); setTimeout(function(){ b.classList.remove('spin-on'); }, 1200); haptic(10); $('brandRefresh').click(); });
       var g=$('hubGrid');
