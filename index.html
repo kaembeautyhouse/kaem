@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-24-01';
+    const APP_VERSION = '2026-10-30-01';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -1328,6 +1328,7 @@
     .swipe-item .card{position:relative;margin-bottom:0;
                       transition:transform .32s var(--ios-ease);will-change:transform}
     .swipe-item.abierto .card{transform:translateX(-246px)}
+    .swipe-item.sw2.abierto .card{transform:translateX(-164px)}   /* sin el botón de código: 2 botones, sin hueco vacío */
     .swipe-item.arrastrando .card{transition:none}
     /* Pista visual: solo la primera vez, para que se descubra el gesto */
     .swipe-item.pista .card{animation:swHint 1.6s var(--ios-ease) .6s 2}
@@ -1616,6 +1617,9 @@
     .ab-recibo:active{background:var(--terracota);color:#fff}
     .car-abonado{font-size:11px;color:var(--salvia-txt);font-weight:600}
 
+
+    .ab-recibo[disabled]{opacity:.4;pointer-events:none}
+    .rec-row .ab-edit,.ab-row .ab-edit{margin-left:6px}
     /* ═══════ ESTADÍSTICAS ═══════ */
     .stats-sheet{max-width:640px}
     .cfg-sheet{max-width:430px}
@@ -2222,6 +2226,8 @@
       .bottom-nav .nav-badge{right:calc(50% - 19px)}
     }
 
+
+    .ent-chips{flex-wrap:wrap}
     /* ═══════════════════════════════════════════════════════════════════
        TOQUE APPLE · manteniendo la paleta KAÉM (va al final: gana la cascada)
        ═══════════════════════════════════════════════════════════════════ */
@@ -3322,6 +3328,14 @@
     .catp-est.ok{background:var(--st-wa-bg);color:var(--salvia-txt)}
     .catp-est.no{background:var(--st-late-bg);color:var(--rojo-txt)}
     .catp-hist .catp-tot{grid-column:2;justify-self:end}
+
+    /* Textos verdes del pedido (política de flete y cupo de crédito): con aire, para que cada dato se lea aparte */
+    .cupo-strip{gap:6px;padding:12px 14px;line-height:1.45}
+    .cupo-strip > b:first-child{display:block;letter-spacing:.02em}
+    .cupo-strip span{display:block;line-height:1.5}
+    .cupo-strip small{display:block;margin-top:2px;padding-top:6px;border-top:1px solid currentColor;border-top-color:color-mix(in srgb,currentColor 22%,transparent)}
+    .flete-hint{margin:2px 0 14px;padding:8px 12px;border-radius:12px;background:var(--st-wa-bg);line-height:1.5}
+    .flete-hint.difiere{background:var(--st-soon-bg)}
     /* ═══ Fotos en el pedido y vitrina de productos ═══ */
     .fv-ico{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:var(--texto-suave)}
     .fv-ico svg,.fv-sinfoto svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -3417,6 +3431,24 @@
     .shop-prev img{width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--linea)}
     .shop-link{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin:8px 0;text-decoration:none}
     #shopPanel{margin-top:10px}
+
+    /* Probador / mitad: pequeños y dentro de la columna del producto (aprovecha el espacio junto a la foto) */
+    .cart-body .cart-extras{margin-top:8px;padding-top:0;border-top:0;gap:6px}
+    .cart-body .cart-ext{padding:3px 10px;min-height:28px;font-size:11px}
+    .cart-body .cart-ext-info{flex-basis:100%;margin-left:0;font-size:10.5px;line-height:1.3}
+
+    /* Foto grande: siempre por encima de la vitrina; un toque la amplía */
+    #fotoModal{z-index:90}
+    .fv-img{cursor:zoom-in}
+    .fv-sheet.grande{max-width:min(96vw,900px)}
+    .fv-sheet.grande .fv-img{max-height:80vh;cursor:zoom-out}
+    .fvg-img{cursor:zoom-in}
+
+    /* Buscador del pedido: lo agotado se puede elegir igual, pero se ve distinto */
+    .cart-results{max-height:min(420px,55vh)}
+    .cart-result.sin-stock{background:var(--st-soon-bg,#F6E9D8)}
+    .cart-result.sin-stock small{color:var(--st-soon-text,#8A5A1F);font-weight:600}
+    .cart-result.sin-stock .rs-foto{opacity:.7}
   </style>
 </head>
 <body>
@@ -3593,6 +3625,7 @@
                 <button type="button" class="chip" data-ent-dias="-2" data-ent-in="packEntregaFecha">+2</button>
                 <button type="button" class="chip" data-ent-dias="-3" data-ent-in="packEntregaFecha">+3</button>
                 <button type="button" class="chip" data-ent-dias="-5" data-ent-in="packEntregaFecha">+5</button>
+                <button type="button" class="chip" data-ent-cal="packEntregaFecha">📅 Otro día</button>
               </div>
             </div>
             <label class="ent-check"><input type="checkbox" id="packEntregaConf"><span>El cliente <b>ya lo recibió</b> (fecha confirmada)</span></label>
@@ -4385,6 +4418,7 @@
             <button type="button" class="chip" data-ent-dias="1" data-ent-in="repackFecha">Ayer</button>
             <button type="button" class="chip" data-ent-dias="0" data-ent-in="repackFecha">Hoy</button>
             <button type="button" class="chip" data-ent-dias="-1" data-ent-in="repackFecha">Mañana</button>
+            <button type="button" class="chip" data-ent-cal="repackFecha">📅 Otro día</button>
           </div>
         </div>
         <div id="repackPlazoBox" style="display:none">
@@ -4423,6 +4457,7 @@
           <div class="ent-plazo" id="gsDescChips">
             <button type="button" class="chip" data-d="0">Sin descuento</button><button type="button" class="chip" data-d="3">3 %</button><button type="button" class="chip" data-d="5">5 %</button><button type="button" class="chip" data-d="7">7 %</button><button type="button" class="chip" data-d="10">10 %</button>
           </div>
+          <div class="cost-wrap cost-compact" style="margin-top:8px;max-width:190px"><input id="gsDescOtro" type="text" inputmode="decimal" autocomplete="off" placeholder="Otro %  (ej. 8)" aria-label="Otro porcentaje de descuento"></div>
           <p class="pg-descinfo" id="gsDescInfo"></p></div>
       </div>
       <div class="field"><label class="lbl" for="gsMonto" id="gsMontoLbl">Valor</label>
@@ -4743,7 +4778,7 @@
   <div class="modal" id="fotoModal" role="dialog" aria-modal="true" aria-labelledby="fvNombre">
     <div class="sheet fv-sheet">
       <button type="button" class="fv-x" id="fvCerrar" aria-label="Cerrar foto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <div class="fv-img" id="fvImg"></div>
+      <div class="fv-img" id="fvImg" title="Toca para ampliar"></div>
       <h3 id="fvNombre"></h3>
       <p class="fv-meta" id="fvMeta"></p>
       <p class="fv-precio" id="fvPrecio"></p>
@@ -4791,6 +4826,19 @@
       <div id="recibosList" style="margin-top:12px"></div>
       <p id="recibosEmpty" class="cart-empty" style="display:none">Aún no hay pagos registrados.</p>
       <button class="btn-ghost" id="recibosCerrarBtn" type="button" style="width:100%;margin-top:12px">Cerrar</button>
+    </div>
+  </div>
+
+  <div class="modal" id="abEditModal">
+    <div class="sheet">
+      <h3>Corregir abono</h3>
+      <p class="cfg-hint" id="abEditInfo"></p>
+      <div class="field"><label class="lbl" for="abEditMonto">Valor del abono</label><input id="abEditMonto" type="text" inputmode="numeric" autocomplete="off"></div>
+      <div class="field"><label class="lbl" for="abEditFecha">Fecha</label><input id="abEditFecha" type="date"></div>
+      <div class="field"><label class="lbl">Método</label><div class="segmented" id="abEditMetodo"><button type="button" class="seg" data-v="Efectivo">Efectivo</button><button type="button" class="seg" data-v="Transferencia">Transferencia</button></div></div>
+      <button class="btn-solid" id="abEditGuardar" type="button" style="width:100%;min-height:48px;margin-top:6px">Guardar cambios</button>
+      <button class="btn-ghost" id="abEditEliminar" type="button" style="width:100%;margin-top:8px;color:var(--terracota-txt)">Eliminar este abono</button>
+      <button class="btn-ghost" id="abEditCerrar" type="button" style="width:100%;margin-top:8px">Cancelar</button>
     </div>
   </div>
 
@@ -6893,7 +6941,7 @@
       list.forEach(function(p){
         var low = isLow(p);
         html+=''
-          +'<div class="swipe-item" data-sku="'+safe(p.sku)+'">'
+          +'<div class="swipe-item'+(QR_ON?'':' sw2')+'" data-sku="'+safe(p.sku)+'">'
           +  (MODO_CLIENTE ? '' : '<div class="swipe-back" aria-hidden="true">'
           +    (QR_ON ? '<button class="sw-act" data-qr="'+safe(p.sku)+'" aria-label="Código QR"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="17" y2="14"/><line x1="21" y1="14" x2="21" y2="17"/><line x1="14" y1="18" x2="14" y2="21"/><line x1="18" y1="21" x2="21" y2="21"/></svg><span>QR</span></button>' : '')
           +    '<button class="sw-act edit" data-edit="'+safe(p.sku)+'" aria-label="Editar"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Editar</span></button>'
@@ -8011,12 +8059,12 @@
           +    '<div class="cart-qty"><button data-act="minus" data-idx="'+idx+'" type="button">&minus;</button><span>'+it.cantidad+'</span><button data-act="plus" data-idx="'+idx+'" type="button">+</button></div>'
           +    '<div class="cart-sub">'+cop(sub)+'</div>'
           +  '</div>'
-          +  '</div></div>'
           +  '<div class="cart-extras">'
-          +    '<button class="cart-ext'+(it.probFull?' on':'')+'" data-act="probfull" data-idx="'+idx+'" type="button">+1 probador · $0</button>'
-          +    '<button class="cart-ext'+(it.probHalf?' on half':'')+'" data-act="probhalf" data-idx="'+idx+'" type="button">+1 a mitad</button>'
+          +    '<button class="cart-ext'+(it.probFull?' on':'')+'" data-act="probfull" data-idx="'+idx+'" type="button" title="Un producto de regalo, a $0">+1 probador</button>'
+          +    '<button class="cart-ext'+(it.probHalf?' on half':'')+'" data-act="probhalf" data-idx="'+idx+'" type="button" title="Un producto a mitad de precio">+1 a mitad</button>'
           +    (extra?('<span class="cart-ext-info">Entrega '+entregadas+' un · remisión '+facTxt+'</span>'):'')
           +  '</div>'
+          +  '</div></div>'
           +'</div>';
       });
       var tmp=document.createElement('div'); tmp.innerHTML=html;
@@ -9687,37 +9735,38 @@
       var abono = toNum(o.abono), saldo = toNum(o.saldo);
       var plazoReal = plazoDePedido(o);
       return waUnir([
-        [ on('saludo') ? '¡Hola *' + (cli.nombre || '') + '*! ✨' : '',
-          on('gracias') ? 'Gracias por tu compra en *KAÉM Beauty House*.' : '' ],
-        [ on('resumen') ? 'Resumen de tu pedido *' + id + '*:' : '',
+        [ on('saludo') ? ('Hola ' + waPrimerNombre(cli.nombre) + ' 🤍').replace('Hola  ', 'Hola ') : '',
+          on('gracias') ? 'Gracias por tu compra en KAÉM, de verdad.' : '' ],
+        [ on('resumen') ? 'Te dejo el resumen de tu pedido *' + id + '*:' : '',
           on('productos') ? items : '',
           on('flete') ? '• *Flete:* ' + fleteTexto(o.flete) : '',
           (on('credito') && esCred) ? '• *Crédito a ' + plazoReal + ' días*' : '',
           on('total') ? '• *Total: ' + cop(o.total) + '*' : '',
           (on('saldo') && esCred) ? ('• Abono: ' + cop(abono) + ' · *Saldo: ' + cop(saldo || Math.max(0, toNum(o.total) - abono)) + '*') : '' ],
-        on('pago') ? ['💳 *Datos de pago*', waLlavesTexto()] : '',
-        on('cierre') ? 'Cualquier novedad escríbenos por aquí. 🤍' : ''
+        on('pago') ? ['Para pagar, estos son los datos:', waLlavesTexto()] : '',
+        on('cierre') ? 'Cualquier cosa me escribes por aquí, con gusto te ayudo.' : ''
       ]);
     }
+    /** «vence el 30 de octubre» / «venció el 12 de octubre» */
+    function waVenceTexto(c){ return (c.vencido ? 'venció el ' : 'vence el ') + carteraFechaLarga(c.fechaVencimiento); }
     function waTextoCobro(c, fuente){
       var on = function(k){ return waOn('cobro', k, fuente); };
-      var nombre = waPrimerNombre(c.cliente) || 'Hola';
-      var fraseFecha = c.vencido ? ('ya está vencido desde el ' + carteraFechaLarga(c.fechaVencimiento))
-                                 : ('está próximo a vencer, el ' + carteraFechaLarga(c.fechaVencimiento));
-      var p1 = [];
-      if(on('saludo')) p1.push('¡Hola, ' + nombre + '! ✨ Espero que estés teniendo un excelente día. Te saludamos de KAÉM Beauty House 🌸.');
+      var nombre = waPrimerNombre(c.cliente), est = waVenceTexto(c), id = c.idRemision;
+      var saludo = on('saludo') ? ('Hola ' + nombre + ' 🤍 te escribo de KAÉM.').replace('Hola  ', 'Hola ') : '';
+      var cuerpo = [];
       var abonoOn = on('abono') && c.abonado > 0;
-      if(abonoOn) p1.push('Te escribimos para agradecerte el abono de ' + cop(c.abonado) + ' en tu remisión #' + c.idRemision + ' 🌸.');
+      if(abonoOn) cuerpo.push('Gracias por tu abono de ' + cop(c.abonado) + ' en la remisión #' + id + '.');
       if(on('saldo')){
-        p1.push(c.abonado > 0
-          ? ((abonoOn ? 'El saldo restante es de ' : 'El saldo restante de tu remisión #' + c.idRemision + ' es de ') + cop(c.saldoPendiente) + ' y ' + fraseFecha + '.')
-          : ('Te escribimos para recordarte amablemente que el saldo pendiente de tu remisión #' + c.idRemision + ' por un valor de ' + cop(c.saldoPendiente) + ' ' + fraseFecha + '.'));
+        cuerpo.push(abonoOn || c.abonado > 0
+          ? ('Te quedan ' + cop(c.saldoPendiente) + ' pendientes (' + est + ').')
+          : ('Te escribo por tu remisión #' + id + ': tienes ' + cop(c.saldoPendiente) + ' pendientes (' + est + ').'));
       }
-      if(on('acuerdo') && c.proximoAbono) p1.push('Habíamos acordado un abono para el ' + carteraFechaLarga(c.proximoAbono) + '.');
+      if(on('acuerdo') && c.proximoAbono) cuerpo.push('Quedamos en que abonabas el ' + carteraFechaLarga(c.proximoAbono) + '.');
       return waUnir([
-        p1.join(' '),
-        on('pago') ? ['💳 *Datos de pago*', waLlavesTexto()] : '',
-        on('cierre') ? 'Si ya realizaste la transferencia o pago, por favor ignora este mensaje o envíanos el comprobante por este medio. ¡Agradecemos mucho tu confianza y preferencia! 💕' : ''
+        saludo,
+        cuerpo.join(' '),
+        on('cierre') ? '¿Me cuentas cuándo alcanzas a pagarlo? Si ya lo hiciste, mándame el comprobante por aquí y listo.' : '',
+        on('pago') ? ['Para pagar, estos son los datos:', waLlavesTexto()] : ''
       ]);
     }
     /* Detal: cercano y cálido (primera impresión) · Mayorista/Distribuidor: formal y profesional. Sin emojis de manos ni caras amarillas. */
@@ -9734,12 +9783,12 @@
       ]);
       return waUnir([
         on('titulo') ? '*Catálogo KAÉM Beauty House* · ' + n.nombre : '',
-        on('saludo') ? 'Cordial saludo. Ponemos a su disposición nuestro catálogo con sus precios de *' + n.nombre.toLowerCase() + '*, para que arme su pedido de forma ágil y con el inventario al día.' : '',
-        on('pasos') ? ['*Cómo funciona:*', '1. Ingrese y consulte las referencias disponibles.', '2. Seleccione tonos y cantidades (con carga rápida de 6 y 12 unidades).', '3. Envíe su pedido: confirmamos disponibilidad, pago y despacho por este medio.'] : '',
-        on('beneficios') ? '• Inventario actualizado en tiempo real\n• Información de cada producto para su punto de venta\n• Despachos a todo el país' : '',
+        on('saludo') ? 'Hola, te comparto nuestro catálogo con tus precios de *' + n.nombre.toLowerCase() + '*. Míralo con calma y arma tu pedido con el inventario al día.' : '',
+        on('pasos') ? ['*Así funciona:*', '1. Entras y ves las referencias disponibles.', '2. Eliges tonos y cantidades (hay carga rápida de 6 y 12 unidades).', '3. Envías el pedido y te confirmamos disponibilidad, pago y despacho por aquí.'] : '',
+        on('beneficios') ? '• Inventario al día\n• Información de cada producto para tu punto de venta\n• Despachos a todo el país' : '',
         [ on('minimo') ? waMinimoNivel(n) : '', on('envio') ? waEnvioNivel(n) : '' ],
-        'Este enlace es personal y oficial de su cuenta con KAÉM.',
-        'Acceda aquí:'
+        'Este enlace es personal: es tu acceso directo a KAÉM.',
+        'Entra aquí:'
       ]);
     }
     function waTextoCatalogoBreve(nivel, url, fuente){
@@ -9750,10 +9799,10 @@
         return waUnir([ [l1, url], [ on('minimo') ? waMinimoNivel(n) : '', on('envio') ? waEnvioNivel(n) : '' ],
           on('confianza') ? '🔒 Enlace oficial y seguro. Tu pedido llega directo a mí y te confirmo todo por aquí antes de cobrarte nada. Cualquier duda, escríbeme 💌' : '' ]);
       }
-      var l2 = on('saludo') ? 'Cordial saludo. Le compartimos el catálogo de KAÉM Beauty House' : 'Catálogo KAÉM Beauty House';
-      if(on('nivel')) l2 += on('saludo') ? ' con sus precios de ' + n.nombre.toLowerCase() + ':' : ' · precios de ' + n.nombre.toLowerCase();
+      var l2 = on('saludo') ? 'Hola, te comparto el catálogo de KAÉM Beauty House' : 'Catálogo KAÉM Beauty House';
+      if(on('nivel')) l2 += on('saludo') ? ' con tus precios de ' + n.nombre.toLowerCase() + ':' : ' · precios de ' + n.nombre.toLowerCase();
       return waUnir([ [l2, url], [ on('minimo') ? waMinimoNivel(n) : '', on('envio') ? waEnvioNivel(n) : '' ],
-        on('confianza') ? 'Enlace oficial: su pedido llega directamente a nuestro equipo y confirmamos disponibilidad y pago antes de despachar.' : '' ]);
+        on('confianza') ? 'Es un enlace oficial: tu pedido llega directo a nuestro equipo y te confirmamos disponibilidad y pago antes de despachar.' : '' ]);
     }
 
     /* ═══ MENSAJES DE WHATSAPP · texto propio con {variables} ═══
@@ -9789,7 +9838,7 @@
         return '• ' + (Number(it.cantidad)||0) + 'x ' + (it.nombre || it.sku || '') + rot;
       }).join('\n');
     }
-    function waBloquePago(){ return ['💳 *Datos de pago*', waLlavesTexto()].join('\n'); }
+    function waBloquePago(){ return ['Para pagar, estos son los datos:', waLlavesTexto()].join('\n'); }
 
     var WA_MSGS = {
       pedido: { titulo:'Envío de remisión', campos:'pedido',
@@ -9805,29 +9854,28 @@
         defecto:function(o, c){ return waTextoPedido(o, c); },
         plantilla:function(c){ var on = function(k){ return waOn('pedido', k, c); };
           return waUnir([
-            [ on('saludo')?'¡Hola *{cliente}*! ✨':'', on('gracias')?'Gracias por tu compra en *KAÉM Beauty House*.':'' ],
-            [ on('resumen')?'Resumen de tu pedido *{remision}*:':'', on('productos')?'{productos}':'', on('flete')?'• *Flete:* {flete}':'', on('credito')?'{credito}':'', on('total')?'• *Total: {total}*':'', on('saldo')?'{saldo}':'' ],
-            on('pago')?'{bloque_pago}':'', on('cierre')?'Cualquier novedad escríbenos por aquí. 🤍':'' ]); },
+            [ on('saludo')?'Hola {nombre} 🤍':'', on('gracias')?'Gracias por tu compra en KAÉM, de verdad.':'' ],
+            [ on('resumen')?'Te dejo el resumen de tu pedido *{remision}*:':'', on('productos')?'{productos}':'', on('flete')?'• *Flete:* {flete}':'', on('credito')?'{credito}':'', on('total')?'• *Total: {total}*':'', on('saldo')?'{saldo}':'' ],
+            on('pago')?'{bloque_pago}':'', on('cierre')?'Cualquier cosa me escribes por aquí, con gusto te ayudo.':'' ]); },
         muestra:{ remision:'RV-010', fecha:'20/10/2026', cliente:{ nombre:'MARÍA GÓMEZ', ciudad:'Bogotá' }, metodoPago:'Crédito', flete:15000, total:265000, abono:100000, saldo:165000, fechaVencimiento:'19/11/2026',
                   items:[ { cantidad:3, nombre:'Base líquida · Arena' }, { cantidad:2, nombre:'Lip gloss · Rose' } ] } },
       cobro: { titulo:'Recordatorio de cobro', campos:'cobro',
         uso:'Al recordar un cobro desde Cartera (uno por uno o en lote).',
-        vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['remision','N.º de remisión'],['saldo','Saldo pendiente'],['abonado','Lo abonado hasta hoy'],['vence','Fecha de vencimiento'],['estado_pago','«ya está vencido desde…» o «está próximo a vencer…»'],
+        vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['remision','N.º de remisión'],['saldo','Saldo pendiente'],['abonado','Lo abonado hasta hoy'],['vence','Fecha de vencimiento'],['estado_pago','«vence el…» o «venció el…»'],
               ['frase_abono','Frase de agradecimiento del abono (si hubo)'],['frase_saldo','Frase completa del saldo'],['frase_acuerdo','Frase del abono acordado (si hay)'],['proximo_abono','Fecha del próximo abono acordado'],['bloque_pago','Bloque con los datos de pago']],
         valores:function(c){
-          var nombre = waPrimerNombre(c.cliente) || 'Hola', id = c.idRemision;
-          var est = c.vencido ? ('ya está vencido desde el ' + carteraFechaLarga(c.fechaVencimiento)) : ('está próximo a vencer, el ' + carteraFechaLarga(c.fechaVencimiento));
-          var fSaldo = c.abonado>0 ? ('El saldo restante de tu remisión #'+id+' es de '+cop(c.saldoPendiente)+' y '+est+'.') : ('Te escribimos para recordarte amablemente que el saldo pendiente de tu remisión #'+id+' por un valor de '+cop(c.saldoPendiente)+' '+est+'.');
+          var nombre = waPrimerNombre(c.cliente), id = c.idRemision;
+          var est = waVenceTexto(c);
+          var fSaldo = c.abonado>0 ? ('Te quedan '+cop(c.saldoPendiente)+' pendientes ('+est+').') : ('Te escribo por tu remisión #'+id+': tienes '+cop(c.saldoPendiente)+' pendientes ('+est+').');
           return { nombre:nombre, cliente:c.cliente||'', remision:id, saldo:cop(c.saldoPendiente), abonado:cop(c.abonado||0), vence:carteraFechaLarga(c.fechaVencimiento), estado_pago:est,
-                   frase_abono:c.abonado>0 ? ('Te escribimos para agradecerte el abono de '+cop(c.abonado)+' en tu remisión #'+id+' 🌸.') : '',
-                   frase_saldo:fSaldo, frase_saldo_corta:c.abonado>0 ? ('El saldo restante es de '+cop(c.saldoPendiente)+' y '+est+'.') : fSaldo,
-                   frase_acuerdo:c.proximoAbono ? ('Habíamos acordado un abono para el '+carteraFechaLarga(c.proximoAbono)+'.') : '', proximo_abono:c.proximoAbono ? carteraFechaLarga(c.proximoAbono) : '', bloque_pago:waBloquePago() };
+                   frase_abono:c.abonado>0 ? ('Gracias por tu abono de '+cop(c.abonado)+' en la remisión #'+id+'.') : '',
+                   frase_saldo:fSaldo, frase_saldo_corta:fSaldo,
+                   frase_acuerdo:c.proximoAbono ? ('Quedamos en que abonabas el '+carteraFechaLarga(c.proximoAbono)+'.') : '', proximo_abono:c.proximoAbono ? carteraFechaLarga(c.proximoAbono) : '', bloque_pago:waBloquePago() };
         },
         defecto:function(c, cp){ return waTextoCobro(c, cp); },
         plantilla:function(c){ var on = function(k){ return waOn('cobro', k, c); };
-          var p1 = [ on('saludo')?'¡Hola, {nombre}! ✨ Espero que estés teniendo un excelente día. Te saludamos de KAÉM Beauty House 🌸.':'', on('abono')?'{frase_abono}':'',
-                     on('saldo')?(on('abono')?'{frase_saldo_corta}':'{frase_saldo}'):'', on('acuerdo')?'{frase_acuerdo}':'' ].filter(Boolean).join(' ');
-          return waUnir([ p1, on('pago')?'{bloque_pago}':'', on('cierre')?'Si ya realizaste la transferencia o pago, por favor ignora este mensaje o envíanos el comprobante por este medio. ¡Agradecemos mucho tu confianza y preferencia! 💕':'' ]); },
+          var p1 = [ on('abono')?'{frase_abono}':'', on('saldo')?(on('abono')?'{frase_saldo_corta}':'{frase_saldo}'):'', on('acuerdo')?'{frase_acuerdo}':'' ].filter(Boolean).join(' ');
+          return waUnir([ on('saludo')?'Hola {nombre} 🤍 te escribo de KAÉM.':'', p1, on('cierre')?'¿Me cuentas cuándo alcanzas a pagarlo? Si ya lo hiciste, mándame el comprobante por aquí y listo.':'', on('pago')?'{bloque_pago}':'' ]); },
         muestra:{ cliente:'MARÍA GÓMEZ', idRemision:'RV-010', abonado:100000, saldoPendiente:165000, vencido:false, fechaVencimiento:'2026-10-30', proximoAbono:'2026-10-15' } },
       cupo: { titulo:'Cupo de crédito', campos:null,
         uso:'Al tocar WhatsApp en un cliente de Cupos.',
@@ -9836,26 +9884,26 @@
           var c = CP.cfg||finCfgLocal().cupo, plazo = CP.plazo||30, mora = (f.estado==='mora'||f.estado==='bloqueado');
           var est = f.manualBloqueado?'Crédito pausado':(mora?'En mora, ponte al día para reactivarlo':(f.estado==='atencion'?'Tienes un pago por regularizar':'Al día ✅'));
           return { nombre:waPrimerNombre(f.nombre)||'Hola', cupo:cop(f.cupo), usado:cop(f.usado), disponible:cop(f.disponible), estado:est, plazo:String(plazo), aumento:cop(c.aumento), aumento_pronto:cop(c.aumento+c.prontoExtra), bloque_pago:waBloquePago(),
-                   aviso_mora:mora ? ('Tienes remisiones vencidas'+(f.moraDias?(' ('+f.moraDias+' días)'):'')+'. En cuanto te pongas al día, tu cupo vuelve a estar disponible 💕.\n'+waLlavesTexto()) : '' };
+                   aviso_mora:mora ? ('Ojo: tienes remisiones vencidas'+(f.moraDias?(' ('+f.moraDias+' días)'):'')+'. Apenas te pongas al día, tu cupo vuelve a quedar libre.\n'+waLlavesTexto()) : '' };
         },
         defecto:function(f){ return waTextoCupo(f); },
-        plantilla:function(){ return waUnir([ '¡Hola, {nombre}! ✨ Te cuento cómo va tu cupo de crédito en KAÉM Beauty House 🌸.', ['💳 *Tu cupo*','Cupo: {cupo}','En uso: {usado}','Disponible: {disponible}','Estado: {estado}'], '{aviso_mora}',
-            ['📌 *Cómo funciona*','• Tu cupo es el tope para armar pedidos a crédito, con {plazo} días desde que recibes.','• Si pagas a tiempo, tu cupo sube {aumento}; si pagas rápido, sube {aumento_pronto}.','• Si te atrasas, el cupo baja o se pausa hasta que te pongas al día.'],
-            'Es una dinámica interna de confianza de KAÉM, no un crédito financiero. ¡Gracias por tu confianza y por crecer con nosotros! 💕' ]); },
+        plantilla:function(){ return waUnir([ 'Hola {nombre} 🤍 te cuento cómo va tu cupo de crédito en KAÉM.', ['• Cupo: {cupo}','• En uso: {usado}','• Disponible: {disponible}','• Estado: {estado}'], '{aviso_mora}',
+            'Cómo funciona: con tu cupo armas pedidos a crédito, con {plazo} días desde que recibes. Si pagas a tiempo, sube {aumento}; si pagas rápido, sube {aumento_pronto}. Si te atrasas, baja o se pausa hasta que te pongas al día.',
+            'Es un cupo de confianza de KAÉM, no un crédito financiero. Gracias por crecer con nosotros.' ]); },
         muestra:{ nombre:'MARÍA GÓMEZ', cupo:1200000, usado:450000, disponible:750000, estado:'ok', manualBloqueado:false, moraDias:0 } },
       reactivar: { titulo:'Cliente que dejó de comprar', campos:null,
         uso:'Al escribirle a un cliente que se alejó (Estadísticas → Clientes).',
         vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['dias','Días sin comprar']],
         valores:function(x){ return { nombre:waPrimerNombre(x.nombre), cliente:x.nombre||'', dias:String(x.diasSinComprar||'') }; },
         defecto:function(x){ return waLlenar(WA_MSGS.reactivar.plantilla(), WA_MSGS.reactivar.valores(x)); },
-        plantilla:function(){ return 'Hola {nombre} 💛 ¿Cómo estás? Hace un tiempo no te vemos por KAÉM Beauty House y queremos que conozcas las novedades antes que nadie. ¿Te cuento cuáles llegaron?'; },
+        plantilla:function(){ return 'Hola {nombre}, ¿cómo vas? 🤍 Hace rato no te vemos por KAÉM y me acordé de ti. Llegaron novedades que creo que te van a gustar, ¿te cuento cuáles?'; },
         muestra:{ nombre:'MARÍA GÓMEZ', diasSinComprar:55 } },
       cliente: { titulo:'Saludo a un cliente', campos:null,
         uso:'Al tocar WhatsApp en la ficha de un cliente (módulo Clientes).',
         vars:[['nombre','Primer nombre'],['cliente','Nombre completo'],['ciudad','Ciudad']],
         valores:function(c){ return { nombre:waPrimerNombre(c.nombre), cliente:c.nombre||'', ciudad:c.ciudad||'' }; },
         defecto:function(c){ return waLlenar(WA_MSGS.cliente.plantilla(), WA_MSGS.cliente.valores(c)); },
-        plantilla:function(){ return 'Hola {nombre}, te escribimos de KAÉM Beauty House.'; },
+        plantilla:function(){ return 'Hola {nombre} 🤍 te escribo de KAÉM Beauty House.'; },
         muestra:{ nombre:'MARÍA GÓMEZ', ciudad:'Bogotá' } },
       catalogo: { titulo:'Catálogo · Compartir (bienvenida)', campos:'catalogo',
         uso:'Al tocar «Compartir» en un enlace de catálogo (Ajustes → Catálogo virtual). El mismo texto sirve para los tres catálogos: usa {nivel} para que cambie.',
@@ -9863,18 +9911,18 @@
         valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n) }; },
         defecto:function(d, c){ return waTextoCatalogo(d.nivel, c); },
         plantilla:function(){ return waUnir([ '*Catálogo KAÉM Beauty House* · {nivel}',
-            'Cordial saludo. Ponemos a su disposición nuestro catálogo con sus precios de *{nivel_minusculas}*, para que arme su pedido de forma ágil y con el inventario al día.',
-            ['*Cómo funciona:*','1. Ingrese y consulte las referencias disponibles.','2. Seleccione tonos y cantidades (con carga rápida de 6 y 12 unidades).','3. Envíe su pedido: confirmamos disponibilidad, pago y despacho por este medio.'],
-            '• Inventario actualizado en tiempo real\n• Información de cada producto para su punto de venta\n• Despachos a todo el país', ['{minimo}','{envio}'],
-            'Este enlace es personal y oficial de su cuenta con KAÉM.', ['Acceda aquí:','{link}'] ]); },
+            'Hola, te comparto nuestro catálogo con tus precios de *{nivel_minusculas}*. Míralo con calma y arma tu pedido con el inventario al día.',
+            ['*Así funciona:*','1. Entras y ves las referencias disponibles.','2. Eliges tonos y cantidades (hay carga rápida de 6 y 12 unidades).','3. Envías el pedido y te confirmamos disponibilidad, pago y despacho por aquí.'],
+            '• Inventario al día\n• Información de cada producto para tu punto de venta\n• Despachos a todo el país', ['{minimo}','{envio}'],
+            'Este enlace es personal: es tu acceso directo a KAÉM.', ['Entra aquí:','{link}'] ]); },
         muestra:{ nivel:'DISTRIB', url:'https://kaembeautyhouse.github.io/kaem/catalogo.html?k=…' } },
       catalogoBreve: { titulo:'Catálogo · WhatsApp breve', campos:'catalogoBreve',
         uso:'Al tocar «WhatsApp breve» en un enlace de catálogo.',
         vars:[['nivel','Detal, Distribuidor o Mayorista'],['nivel_minusculas','El nivel en minúsculas'],['link','Enlace del catálogo'],['minimo','Pedido mínimo del nivel'],['envio','Condiciones de envío del nivel']],
         valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n) }; },
         defecto:function(d, c){ return waTextoCatalogoBreve(d.nivel, d.url, c); },
-        plantilla:function(){ return waUnir([ ['Cordial saludo. Le compartimos el catálogo de KAÉM Beauty House con sus precios de {nivel_minusculas}:','{link}'], ['{minimo}','{envio}'],
-            'Enlace oficial: su pedido llega directamente a nuestro equipo y confirmamos disponibilidad y pago antes de despachar.' ]); },
+        plantilla:function(){ return waUnir([ ['Hola, te comparto el catálogo de KAÉM Beauty House con tus precios de {nivel_minusculas}:','{link}'], ['{minimo}','{envio}'],
+            'Es un enlace oficial: tu pedido llega directo a nuestro equipo y te confirmamos disponibilidad y pago antes de despachar.' ]); },
         muestra:{ nivel:'DISTRIB', url:'https://kaembeautyhouse.github.io/kaem/catalogo.html?k=…' } }
     };
     /** El mensaje listo para enviar: el texto propio (si lo hay) con sus variables, o el predeterminado de siempre. */
@@ -10041,11 +10089,19 @@
       var q=fnorm(e.target.value), box=$('cartSearchResults');
       if(!q){ box.innerHTML=''; return; }
       var terms=q.split(' ').filter(Boolean), qc=q.replace(/\s+/g,'');
-      var matches=STATE.products.filter(function(p){ var s=p._s||'',c=p._c||''; return terms.every(function(t){ return s.indexOf(t)>=0||c.indexOf(t)>=0||fuzzyTok(s,t); })||(qc.length>=3&&c.indexOf(qc)>=0); }).slice(0,8);
-      var html=''; matches.forEach(function(p){
-        var d=(p.disponibleReal!=null?p.disponibleReal:(p.disponible!=null?p.disponible:(Number(p.stock)||0)));
-        html+='<div class="cart-result con-foto" data-sku="'+safe(p.sku)+'"><i class="rs-foto">'+fotoMini(p,96)+'</i><div><span>'+safe(p.producto)+(p.tono?(' <b class="card-tono">'+safe(p.tono)+'</b>'):'')+'</span><small>'+safe(p.marca)+' · '+safe(p.sku)+' · disp. '+d+'</small></div></div>';
+      var matches=STATE.products.filter(function(p){ var s=p._s||'',c=p._c||''; return terms.every(function(t){ return s.indexOf(t)>=0||c.indexOf(t)>=0||fuzzyTok(s,t); })||(qc.length>=3&&c.indexOf(qc)>=0); });
+      function dispDe(p){ return (p.disponibleReal!=null?p.disponibleReal:(p.disponible!=null?p.disponible:(Number(p.stock)||0))); }
+      // Orden: primero los que empiezan por lo escrito, luego los que tienen stock, luego A-Z (los agotados salen igual, al final de su grupo)
+      function rango(p){ var n=fnorm(p.producto||''); return (n.indexOf(q)===0 ? 0 : (terms.every(function(t){ return n.indexOf(t)>=0; }) ? 1 : 2)); }
+      matches.sort(function(a,b){
+        return rango(a)-rango(b) || ((dispDe(b)>0?1:0)-(dispDe(a)>0?1:0)) || String(a.producto).localeCompare(String(b.producto),'es') || String(a.tono).localeCompare(String(b.tono),'es');
       });
+      var total=matches.length, MAXR=40; matches=matches.slice(0,MAXR);
+      var html=''; matches.forEach(function(p){
+        var d=dispDe(p);
+        html+='<div class="cart-result con-foto'+(d<=0?' sin-stock':'')+'" data-sku="'+safe(p.sku)+'"><i class="rs-foto">'+fotoMini(p,96)+'</i><div><span>'+safe(p.producto)+(p.tono?(' <b class="card-tono">'+safe(p.tono)+'</b>'):'')+'</span><small>'+safe(p.marca)+' · '+safe(p.sku)+' · '+(d<=0?'sin stock':'disp. '+d)+'</small></div></div>';
+      });
+      if(total>MAXR) html+='<div class="cart-result muted">Mostrando '+MAXR+' de '+total+' · escribe más para afinar</div>';
       box.innerHTML=html||'<div class="cart-result muted">Sin coincidencias</div>';
     });
     $('cartSearchResults').addEventListener('click', function(e){ var it=e.target.closest?e.target.closest('[data-sku]'):null; if(!it||!it.getAttribute('data-sku')) return; addToCart(it.getAttribute('data-sku')); $('cartSearch').value=''; $('cartSearchResults').innerHTML=''; });
@@ -10071,7 +10127,7 @@
     });
 
     Array.prototype.forEach.call($('nivelSeg').querySelectorAll('.seg'), function(s){ s.addEventListener('click', function(){ CART.nivelTocado=true; CART.nivelAuto=false; setNivel(s.dataset.nivel); }); });
-    Array.prototype.forEach.call($('pagoSeg').querySelectorAll('.seg'), function(s){ s.addEventListener('click', function(){ setPago(s.dataset.pago); haptic(10); }); });
+    Array.prototype.forEach.call($('pagoSeg').querySelectorAll('.seg'), function(s){ s.addEventListener('click', function(){ PG.pago=true; setPago(s.dataset.pago); haptic(10); }); });
     $('vencInput').addEventListener('change', markDirty);
     $('vencInput').addEventListener('input', function(){ _vencTocado=true; });
     $('descInput').addEventListener('input', function(e){
@@ -11736,7 +11792,12 @@
       w.appendChild(inp); fbRefrescar(id);
       inp.addEventListener('input', function(){ fbRefrescar(id); }); inp.addEventListener('change', function(){ fbRefrescar(id); });
     });
+    // Calendario: el botón «Otro día» (y un toque sobre la fecha) abre el selector para elegir cualquier día, pasado o futuro
+    function entAbrirCalendario(inp){ if(!inp) return; try{ if(inp.showPicker){ inp.showPicker(); return; } }catch(e){} try{ inp.focus(); inp.click(); }catch(e2){} }
+    ['packEntregaFecha','repackFecha'].forEach(function(id){ var i=$(id); if(i) i.addEventListener('click', function(){ entAbrirCalendario(i); }); });
     document.addEventListener('click', function(e){
+      var cal = e.target.closest ? e.target.closest('[data-ent-cal]') : null;
+      if(cal){ haptic(8); entAbrirCalendario($(cal.getAttribute('data-ent-cal'))); return; }
       var b = e.target.closest ? e.target.closest('[data-ent-dias]') : null; if(!b) return;
       var inp = $(b.getAttribute('data-ent-in')); if(!inp) return;
       var d = new Date(); d.setDate(d.getDate() - parseInt(b.getAttribute('data-ent-dias'),10));
@@ -11804,7 +11865,7 @@
       $('repackSub').textContent = (cli.nombre||'')+' · '+(o.remision||o.id)+' · venta del '+(o.fecha||'');
       var base = dmyToISO(o.fechaEntrega) || dmyToISO(kaemFmtFecha(o.packingFecha)) || isoOf(new Date());
       $('repackFecha').value = base; $('repackFecha').removeAttribute('max'); $('repackFecha').min = dmyToISO(o.fecha) || ''; fbRefrescar('repackFecha');
-      $('repackPlazoBox').style.display = inf.cred ? 'block' : 'none';
+      $('repackPlazoBox').style.display = 'none';   // el plazo ya viene del pedido; aquí solo se elige la fecha
       if(inf.cred) repackChipsPlazo();
       repackHint();
       $('packHistModal').classList.remove('show');
@@ -11859,7 +11920,8 @@
             +'<span class="rec-cli">'+safe(p.cliente||p.idRemision)+'</span>'
             +'<span class="rec-meta">'+safe(kaemFmtFecha(p.fecha)||p.fecha||'')+' · '+safe(p.idRemision)+(p.metodo?(' · '+safe(p.metodo)):'')+'</span>'
             +'</div><span class="rec-monto">'+cop(p.monto)+'</span>'
-            +'<button type="button" class="ab-recibo" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'">Recibo</button></div>';
+            +'<button type="button" class="ab-recibo" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'">Recibo</button>'
+            +'<button type="button" class="ab-recibo ab-edit" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'" data-monto="'+Math.round(p.monto)+'" data-fecha="'+safe(p.fecha)+'" data-metodo="'+safe(p.metodo)+'" data-cli="'+safe(p.cliente||'')+'">Editar</button></div>';
         }).join('');
       }).withFailureHandler(function(){
         $('recibosList').innerHTML=''; $('recibosEmpty').textContent='Sin conexión · no se pudo consultar.'; $('recibosEmpty').style.display='block';
@@ -11876,10 +11938,40 @@
     $('recibosModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
     $('recibosList').addEventListener('click', function(e){
       var b = e.target.closest ? e.target.closest('.ab-recibo') : null; if(!b) return;
+      if(b.classList.contains('ab-edit')){ abEditAbrir(b.getAttribute('data-id'), parseInt(b.getAttribute('data-idx'),10), b.dataset, 'recibos'); return; }
       var id = b.getAttribute('data-id'), idx = parseInt(b.getAttribute('data-idx'),10);
       toast('Preparando recibo…','info');
       prepararRecibo(id, idx, generarReciboPago);
     });
+
+    /* ——— Corregir o eliminar un abono ya registrado ——— */
+    var ABED = { id:'', idx:-1, metodo:'', desde:'' };
+    function abEditAbrir(id, idx, d, desde){
+      ABED = { id:id, idx:idx, metodo:d.metodo||'', desde:desde };
+      $('abEditInfo').textContent = 'Remisión '+id+(d.cli?(' · '+d.cli):'')+'. Cambia el valor si se registró mal, o elimínalo si quedó repetido.';
+      $('abEditMonto').value = d.monto||''; $('abEditFecha').value = String(d.fecha||'').slice(0,10);
+      Array.prototype.forEach.call($('abEditMetodo').querySelectorAll('.seg'), function(s){ s.classList.toggle('active', s.getAttribute('data-v')===ABED.metodo); });
+      $('abEditModal').classList.add('show'); haptic(10);
+    }
+    $('abEditMetodo').addEventListener('click', function(e){ var s=e.target.closest('.seg'); if(!s) return; ABED.metodo=s.getAttribute('data-v'); Array.prototype.forEach.call($('abEditMetodo').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x===s); }); });
+    $('abEditCerrar').addEventListener('click', function(){ $('abEditModal').classList.remove('show'); });
+    $('abEditModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
+    function abEditEnviar(eliminar){
+      var monto = parseInt(String($('abEditMonto').value).replace(/\D/g,''),10)||0;
+      if(!eliminar && !(monto>0)){ toast('Escribe el valor del abono.','error'); return; }
+      if(eliminar && !window.confirm('¿Eliminar este abono? El saldo de la remisión vuelve a subir.')) return;
+      $('abEditModal').classList.remove('show'); toast(eliminar?'Eliminando abono…':'Guardando cambios…','info');
+      google.script.run.withSuccessHandler(function(res){
+        if(res && res.ok){
+          beep('success'); toast(res.message||'Listo.','success');
+          CARTERA.ts=0; try{ carteraCargar(true); }catch(e){}
+          if(ABED.desde==='recibos') cargarRecibos($('recibosMes').value, false); else cargarAbonos(ABED.id);
+        } else { toast((res&&res.message)||'No se pudo guardar.','error'); beep('error'); }
+      }).withFailureHandler(function(){ toast('Esto necesita internet · conéctate e intenta de nuevo.','error'); })
+        .editarAbono({ idRemision:ABED.id, indice:ABED.idx, monto:monto, metodoPago:ABED.metodo, fecha:String($('abEditFecha').value||''), eliminar:!!eliminar, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+    }
+    $('abEditGuardar').addEventListener('click', function(){ abEditEnviar(false); });
+    $('abEditEliminar').addEventListener('click', function(){ abEditEnviar(true); });
 
     function cargarAbonos(id){
       google.script.run.withSuccessHandler(function(r){
@@ -11889,7 +11981,8 @@
           h+='<div class="ab-row"><span>'+safe(kaemFmtFecha(a.fecha)||a.fecha||'')+'<small>'+safe(a.metodo)
             +(a.operador?(' · '+safe(a.operador)):'')+'</small></span>'
             +'<span class="ab-monto">'+cop(a.monto)+'</span>'
-            +'<button type="button" class="ab-recibo" data-idx="'+i+'" title="Generar recibo de este pago">Recibo</button></div>';
+            +'<button type="button" class="ab-recibo" data-idx="'+i+'" title="Generar recibo de este pago">Recibo</button>'
+            +'<button type="button" class="ab-recibo ab-edit" data-idx="'+i+'" data-monto="'+Math.round(a.monto)+'" data-fecha="'+safe(a.fecha||'')+'" data-metodo="'+safe(a.metodo||'')+'"'+(a.descuento?' disabled':'')+'>Editar</button></div>';
         });
         h+='</div>';
         $('pagoHistorial').innerHTML=h;
@@ -11900,6 +11993,7 @@
       var b = e.target.closest ? e.target.closest('.ab-recibo') : null; if(!b) return;
       var id = $('pagoHistorial').getAttribute('data-id');
       var idx = parseInt(b.getAttribute('data-idx'),10);
+      if(b.classList.contains('ab-edit')){ abEditAbrir(id, idx, b.dataset, 'pago'); return; }
       toast('Preparando recibo…','info');
       prepararRecibo(id, idx, generarReciboPago);
     });
@@ -12573,7 +12667,7 @@
        vertical: si el movimiento es más vertical que horizontal, se cede el
        control a la lista para no entorpecer el scroll. */
     (function(){
-      var ANCHO = 246;             // ancho total del panel de acciones
+      var ANCHO = 246;             // ancho total del panel de acciones (164 si no hay botón de código: se ajusta por fila)
       var lista = $('productList'); if(!lista) return;
       var x0=0, y0=0, dx=0, activo=null, decidido=false, horizontal=false;
 
@@ -12588,7 +12682,7 @@
         if(!esMovil() || e.touches.length!==1) return;
         var item = e.target.closest ? e.target.closest('.swipe-item') : null;
         if(!item || e.target.closest('.swipe-back')) return;
-        activo=item; decidido=false; horizontal=false; dx=0;
+        activo=item; decidido=false; horizontal=false; dx=0; ANCHO = item.classList.contains('sw2') ? 164 : 246;
         x0=e.touches[0].clientX; y0=e.touches[0].clientY;
         item.classList.remove('pista');
       }, {passive:true});
@@ -12812,9 +12906,13 @@
     /* ═══════ ESTADÍSTICAS DEL NEGOCIO ═══════ */
     function abrirStats(){
       $('statsModal').classList.add('show');
-      ST_R = null;
+      // Siempre desde cero: se descarta lo que había (en memoria y guardado), se vacía la pantalla y todo se pide de nuevo saltando la memoria del servidor
+      ST_R = null; BI.datos = null; FIN.datos = null; FIN.ts = 0; window.__finTs = 0; BI.cargando = false; FIN.cargando = false;
+      try{ localStorage.removeItem('kaem_fin'); }catch(e){}
       $('statsFecha').textContent='';
-      BI.tab='resumen'; biTabsPintar(); biPintar(); biCargar(false); finCargar(false);
+      $('biBody').innerHTML = '<p class="hist-empty">Calculando tus números desde cero…</p>';
+      BI.tab='resumen'; biTabsPintar();
+      biCargar(true); finCargar(true);
       abrirStatsSoloDetalle();
     }
     function abrirStatsSoloDetalle(){
@@ -12824,7 +12922,7 @@
         pintarStats(r);
       }).withFailureHandler(function(){
         ST_R = false; if(({ ventas:1, rent:1, inv:1 })[BI.tab]) biPintar(true);
-      }).obtenerEstadisticas({});
+      }).obtenerEstadisticas({ sinCache:true });
     }
     function stFila(i, nombre, sub, num, pct){
       return '<div class="st-row"><span class="st-rank">'+(i+1)+'</span>'
@@ -12905,7 +13003,7 @@
       }).withFailureHandler(function(){
         FIN.cargando=false;
         if($('statsModal').classList.contains('show') && !FIN.datos && ({ resumen:1, dinero:1, gastos:1 })[BI.tab]) $('biBody').innerHTML='<p class="hist-empty">Sin conexión · no se pudieron calcular las finanzas.<br><br><button class="btn-ghost" type="button" data-biretry="1" style="width:100%">Reintentar</button></p>';
-      }).obtenerFinanzas({});
+      }).obtenerFinanzas(forzar ? { sinCache:true } : {});
     }
     var FIN_EGR = [['proveedores','Pagos a proveedores'],['prestamos','Cuotas de préstamos'],['personalDeuda','Deudas personales'],['viaticos','Viáticos'],['personal','Gastos personales'],['operacion','Operación'],['mercancia','Compras de mercancía']];
     function finBarras(filas, color){
@@ -13461,7 +13559,10 @@
     }
     function gsCalcMerc(){
       var m=$('gsMonto'), info=$('gsDescInfo'), merc=GS.tipo==='MERCANCIA', bruto=pgNum($('gsBruto').value);
-      Array.prototype.forEach.call($('gsDescChips').querySelectorAll('.chip'), function(b){ b.classList.toggle('on', +b.getAttribute('data-d')===GS.pct); });
+      var enChip=false;
+      Array.prototype.forEach.call($('gsDescChips').querySelectorAll('.chip'), function(b){ var on=+b.getAttribute('data-d')===GS.pct; if(on) enChip=true; b.classList.toggle('on', on); });
+      // Un porcentaje que no está en los botones (ej. 8 %) queda escrito en «Otro %»
+      if(document.activeElement!==$('gsDescOtro')) $('gsDescOtro').value = (!enChip && GS.pct>0) ? String(GS.pct).replace('.',',') : '';
       if(merc && bruto>0){
         var desc=Math.round(bruto*GS.pct/100), neto=bruto-desc; m.value=neto.toLocaleString('es-CO'); m.readOnly=true;
         info.textContent = desc>0 ? ('Descuento '+cop(desc)+' ('+GS.pct+' %) · pagaste '+cop(neto)+'. Ese ahorro es ganancia para KAÉM.') : ('Pagaste '+cop(neto)+' (sin descuento).');
@@ -13509,7 +13610,11 @@
       $('gsQuick').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-t]'):null; if(b) gsAbrirForm(null, b.getAttribute('data-t')); });
       $('gsTipoSeg').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-t]'):null; if(!b) return; GS.tipo=b.getAttribute('data-t'); GS.sub=GS_TIPOS[GS.tipo].sub[0]; haptic(8); gsPintarTipo(); });
       $('gsSubChips').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-s]'):null; if(!b) return; GS.sub=b.getAttribute('data-s'); haptic(8); gsPintarTipo(); });
-      $('gsDescChips').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-d]'):null; if(!b) return; GS.pct=+b.getAttribute('data-d'); haptic(8); gsCalcMerc(); });
+      $('gsDescChips').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-d]'):null; if(!b) return; GS.pct=+b.getAttribute('data-d'); $('gsDescOtro').value=''; haptic(8); gsCalcMerc(); });
+      $('gsDescOtro').addEventListener('input', function(){
+        var v=parseFloat(String(this.value).replace(',','.').replace(/[^0-9.]/g,''));
+        GS.pct = isNaN(v) ? 0 : Math.min(100, Math.max(0, Math.round(v*100)/100)); gsCalcMerc();
+      });
       $('gsBruto').addEventListener('input', gsCalcMerc);
       $('gsCiudad').addEventListener('input', function(){ var d=GS_CIUDADES[this.value.trim().toUpperCase()]; if(d && !$('gsDepto').value) $('gsDepto').value=d; });
       $('gsCiudad').addEventListener('change', function(){ var d=GS_CIUDADES[this.value.trim().toUpperCase()]; if(d) $('gsDepto').value=d; });
@@ -13671,14 +13776,11 @@
       nombre=nombre.charAt(0).toUpperCase()+nombre.slice(1).toLowerCase();
       var mora=(f.estado==='mora'||f.estado==='bloqueado'), est=f.manualBloqueado?'Crédito pausado':(mora?'En mora, ponte al día para reactivarlo':(f.estado==='atencion'?'Tienes un pago por regularizar':'Al día ✅'));
       return waUnir([
-        '¡Hola, '+nombre+'! ✨ Te cuento cómo va tu cupo de crédito en KAÉM Beauty House 🌸.',
-        ['💳 *Tu cupo*','Cupo: '+cop(f.cupo),'En uso: '+cop(f.usado),'Disponible: '+cop(f.disponible),'Estado: '+est],
-        mora ? ['Tienes remisiones vencidas'+(f.moraDias?(' ('+f.moraDias+' días)'):'')+'. En cuanto te pongas al día, tu cupo vuelve a estar disponible 💕.','',waLlavesTexto()] : '',
-        ['📌 *Cómo funciona*',
-         '• Tu cupo es el tope para armar pedidos a crédito, con '+plazo+' días desde que recibes.',
-         '• Si pagas a tiempo, tu cupo sube '+cop(c.aumento)+'; si pagas rápido, sube '+cop(c.aumento+c.prontoExtra)+'.',
-         '• Si te atrasas, el cupo baja o se pausa hasta que te pongas al día.'],
-        'Es una dinámica interna de confianza de KAÉM, no un crédito financiero. ¡Gracias por tu confianza y por crecer con nosotros! 💕'
+        'Hola '+nombre+' 🤍 te cuento cómo va tu cupo de crédito en KAÉM.',
+        ['• Cupo: '+cop(f.cupo),'• En uso: '+cop(f.usado),'• Disponible: '+cop(f.disponible),'• Estado: '+est],
+        mora ? ['Ojo: tienes remisiones vencidas'+(f.moraDias?(' ('+f.moraDias+' días)'):'')+'. Apenas te pongas al día, tu cupo vuelve a quedar libre.','',waLlavesTexto()] : '',
+        ['Cómo funciona: con tu cupo armas pedidos a crédito, con '+plazo+' días desde que recibes. Si pagas a tiempo, sube '+cop(c.aumento)+'; si pagas rápido, sube '+cop(c.aumento+c.prontoExtra)+'. Si te atrasas, baja o se pausa hasta que te pongas al día.'],
+        'Es un cupo de confianza de KAÉM, no un crédito financiero. Gracias por crecer con nosotros.'
       ]);
     }
     function cpWhatsApp(f){
@@ -14225,7 +14327,7 @@
       $('nivelSeg').classList.toggle('pg-pend', !PG.nivel);
       pgSeg('pgFlete', PG.flete); $('fleteRow').style.display = PG.flete==='valor' ? '' : 'none';
       $('pagoSeg').classList.toggle('pg-pend', !PG.pago);
-      if(!PG.pago) $('creditoBox').style.display='none';
+      $('creditoBox').style.display = (PG.pago && CART.metodo==='Crédito') ? 'block' : 'none';
       pgSeg('pgAbono', PG.abono); $('abonoRow').style.display = PG.abono==='si' ? '' : 'none';
       pgSeg('pgDesc', PG.desc); $('pgDescWrap').style.display = PG.desc==='con' ? '' : 'none';
     }
@@ -14333,17 +14435,20 @@
     /* ——— Ventana de foto ——— */
     function fotoAbrir(sku){
       var p = findProduct(sku); if(!p) return;
-      var u = fotoUrl(p, 900), box = $('fvImg');
+      var u = fotoUrl(p, 1400), box = $('fvImg');
+      $('fotoModal').querySelector('.fv-sheet').classList.remove('grande');
       box.innerHTML = u ? '<img src="'+safe(u)+'" alt="'+safe(p.producto)+'" decoding="async">' : '<div class="fv-sinfoto">'+ICO_FOTO+'<span>Este producto aún no tiene foto</span></div>';
       var im = box.querySelector('img'); if(im) im.onerror = function(){ box.innerHTML = '<div class="fv-sinfoto">'+ICO_FOTO+'<span>No se pudo cargar la foto</span></div>'; };
       $('fvNombre').textContent = (p.producto||'') + (p.tono ? ' · '+p.tono : '');
-      $('fvMeta').textContent = [p.marca, p.sku].filter(Boolean).join(' · ');
+      $('fvMeta').textContent = p.marca || '';
       $('fvPrecio').innerHTML = '<b>'+cop(fotoPrecioNivel(p))+'</b><small>Precio '+safe(CART.nivel)+'</small>';
       $('fotoModal').classList.add('show'); haptic(8);
       setTimeout(function(){ $('fvCerrar').focus(); }, 60);
     }
     function fotoCerrar(){ $('fotoModal').classList.remove('show'); }
     $('fvCerrar').addEventListener('click', fotoCerrar);
+    // Tocar la foto grande la amplía (otro toque la vuelve a su tamaño)
+    $('fvImg').addEventListener('click', function(){ if(this.querySelector('img')) $('fotoModal').querySelector('.fv-sheet').classList.toggle('grande'); });
     $('fotoModal').addEventListener('click', function(e){ if(e.target===this) fotoCerrar(); });
 
     /* ——— Vitrina ——— */
@@ -14431,6 +14536,7 @@
     });
     $('galGrid').addEventListener('click', function(e){
       var card = e.target.closest('.fvg-card'); if(!card) return;
+      if(e.target.closest('.fvg-img')){ fotoAbrir(card.getAttribute('data-sku')); return; }
       var b = e.target.closest('[data-act]'); if(!b) return;
       var sku = card.getAttribute('data-sku'), a = b.getAttribute('data-act');
       if(a==='mas') galCambiar(sku, galPaso());
