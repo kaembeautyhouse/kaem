@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-30-06",
-  "servidor": "2026.10.33",
-  "fecha": "2026-10-30",
+  "app": "2026-10-31-01",
+  "servidor": "2026.10.34",
+  "fecha": "2026-10-31",
   "novedades": [
+    "Correcciones en devoluciones con probador, plazos de crédito, remisiones anuladas y escaneo en Empaque. Botones más fáciles de tocar y tarjetas uniformes según la guía de estilo.",
     "Estadísticas con plan de la semana: a quién cobrar, a quién escribirle, qué reponer y qué liberar, con nombres y montos. Cálculos corregidos y Alertas y Estadísticas ya dan las mismas cifras. Inicio sin píldoras.",
     "Inicio: cada tarjeta muestra su conteo (por empacar, vencidas, por reponer…). Las cifras de dinero siguen ocultas.",
     "Modo oscuro revisado (botones y cifras que casi no se veían), mensajes de WhatsApp plegados en Ajustes y catálogos web con textos más claros.",
