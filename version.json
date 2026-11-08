@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-08-01",
-  "servidor": "2026.10.37",
+  "app": "2026-11-08-02",
+  "servidor": "2026.10.38",
   "fecha": "2026-11-08",
   "novedades": [
+    "ESSENTIAL se ve como una sola marca, con sus márgenes por línea (Brayan, San Angel #1 y #2). Se corrigió la edición de precios de un producto.",
     "Ajustes: la barra de Guardar solo aparece cuando hay cambios sin guardar, y la vista de escritorio queda ordenada con la lista y el panel cada uno con su propio desplazamiento.",
     "Catálogo: aprobar un pedido ya no puede duplicar la venta y se respeta el precio que vio el cliente.",
     "Correcciones en Cupos, Pagos y pedidos guardados sin señal. Pantallas de carga y mejor contraste.",

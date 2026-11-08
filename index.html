@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-01';
+    const APP_VERSION = '2026-11-08-02';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -381,7 +381,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.34', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.38', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -3557,6 +3557,10 @@
     .btn-solid.wa{background:#557161}
     .stock-badge span{color:color-mix(in srgb,var(--texto-suave) 70%,var(--texto))}
     .estado-pill[data-state="ok"] .led-txt{color:color-mix(in srgb,var(--salvia-txt) 75%,var(--texto))}
+
+    /* Marca con varias líneas de margen (ESSENTIAL) en Estadísticas */
+    .inv-lineas{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--linea);font-size:12.5px;color:var(--texto-suave)}
+    .inv-lineas b{color:var(--espresso);font-weight:600}
   </style>
 </head>
 <body>
@@ -3641,6 +3645,11 @@
         <div class="field" id="f-marca">
           <label class="lbl" for="marca">Marca</label>
           <select id="marca"><option value="" disabled selected>Selecciona una marca</option></select>
+        </div>
+        <div class="field" id="f-linea" style="display:none">
+          <label class="lbl" for="marcaLinea">Margen (línea)</label>
+          <select id="marcaLinea"></select>
+          <p class="cfg-hint" style="margin:6px 2px 0">Entre paréntesis: distribuidor / mayorista / detal. De este margen salen los precios.</p>
         </div>
         <div class="field" id="f-costo">
           <label class="lbl" for="costo">Precio costo base</label>
@@ -4268,6 +4277,11 @@
       <div class="field" id="fe-marca">
         <label class="lbl" for="editMarca">Marca</label>
         <select id="editMarca"></select>
+      </div>
+      <div class="field" id="fe-linea" style="display:none">
+        <label class="lbl" for="editMarcaLinea">Margen (línea)</label>
+        <select id="editMarcaLinea"></select>
+        <p class="cfg-hint" style="margin:6px 2px 0">Cambiarla recalcula los precios de este producto con los márgenes de esa línea.</p>
       </div>
       <div class="field" id="fe-tono">
         <label class="lbl" for="editTono">Tono / color <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional)</span></label>
@@ -5171,8 +5185,12 @@
         <div class="cfg-sec-body">
       <div class="field"><label class="lbl" for="cfgMarcaSel">Marca</label>
         <select id="cfgMarcaSel"><option value="">➕ Crear marca nueva…</option></select></div>
+      <div class="field" id="cfgLineaWrap" style="display:none"><label class="lbl" for="cfgLineaSel">Línea de margen</label>
+        <select id="cfgLineaSel"></select></div>
       <div class="field" id="cfgMarcaNombreWrap"><label class="lbl" for="cfgMarcaNombre">Nombre de la marca nueva</label>
         <input id="cfgMarcaNombre" type="text" autocomplete="off" placeholder="Ej: BIOAQUA"></div>
+      <div class="field" id="cfgLineaNombreWrap" style="display:none"><label class="lbl" for="cfgLineaNombre">Nombre de la línea nueva</label>
+        <input id="cfgLineaNombre" type="text" autocomplete="off" placeholder="Ej: San Angel #3"></div>
       <div class="cfg-margenes">
         <div class="cfg-grid-3">
         <div class="field"><label class="lbl" for="cfgMarcaDist">Distribuidor %</label>
@@ -5184,7 +5202,8 @@
         </div>
       </div>
       <button class="btn-ghost" id="cfgAddMarcaBtn" type="button" style="width:100%">Agregar marca</button>
-      <p class="cfg-hint">Los márgenes definen los precios Distribuidor, Mayorista y Detal de esa marca. Elige una marca existente para corregir sus márgenes.</p>
+      <button class="btn-ghost" id="cfgAddLineaBtn" type="button" style="width:100%;margin-top:8px;display:none">＋ Agregar otra línea de margen a esta marca</button>
+      <p class="cfg-hint">Los márgenes definen los precios Distribuidor, Mayorista y Detal de esa marca. Elige una marca existente para corregir sus márgenes. Una marca puede tener varias <b>líneas</b> con márgenes distintos (p. ej. ESSENTIAL: Brayan, San Angel #1…): se ve una sola marca, y cada producto lleva la línea de la que salen sus precios.</p>
         </div>
       </details>
       <p class="cfg-grupo">Comunicación</p>
@@ -5415,7 +5434,7 @@
     var $ = function(id){ return document.getElementById(id); };
     var FALLBACK_BRANDS = ['HI-ZIS','ENCHANTE','KIAKA','ELAYA','CAROLINE COSMETICS','OG'];
 
-    var STATE = { products:[], brands:[], marca:'', soloDisp:false, margenes:(function(){ try{ return JSON.parse(localStorage.getItem('kaem_margenes')||'{}'); }catch(e){ return {}; } })(), thresholds:{Mayor:24,Menor:6}, filter:'', tab:'hub' };
+    var STATE = { products:[], brands:[], marca:'', soloDisp:false, margenes:(function(){ try{ return JSON.parse(localStorage.getItem('kaem_margenes')||'{}'); }catch(e){ return {}; } })(), lineas:(function(){ try{ return JSON.parse(localStorage.getItem('kaem_lineas')||'{}'); }catch(e){ return {}; } })(), thresholds:{Mayor:24,Menor:6}, filter:'', tab:'hub' };
 
     /* ——————— utilidades ——————— */
     /* ——— Núcleo de utilidades (fuente única · DRY) ——— */
@@ -5439,6 +5458,8 @@
         ean:          trimStr(pick('EAN','EAN_FABRICA','EANFABRICA','BARCODE')),
         producto:     trimStr(pick('PRODUCTO')),
         marca:        trimStr(pick('MARCA')),
+        lineaClave:   trimStr(raw.lineaClave),   // solo las marcas con varias líneas de margen (ESSENTIAL)
+        linea:        trimStr(raw.linea),
         tono:         trimStr(pick('TONO','TONO_VARIANTE','TONOVARIANTE')),
         tieneTonos:   (String(pick('TIENETONOS','TIENE_TONOS')).toUpperCase()==='TRUE'),
 
@@ -5454,7 +5475,7 @@
         disponibleReal: toNum(pick('STOCK','STOCK_ACTUAL')) - toNum(pick('RESERVADO','STOCK_RESERVADO'))   // sin recortar: negativo = vendido sin stock
       };
       // Índice normalizado: producto, marca, SKU interno, tono y EAN de fábrica
-      var s=fnorm(out.producto+' '+out.marca+' '+out.sku+' '+out.tono+' '+out.ean);
+      var s=fnorm(out.producto+' '+out.marca+' '+out.sku+' '+out.tono+' '+out.ean+' '+out.linea);
       out._s=s; out._c=s.replace(/\s+/g,'');                  // spaced + compacto (hi-zis ≈ hizis)
       return out;
     }
@@ -5651,11 +5672,13 @@
       if(data){
         STATE.brands = (data.brands&&data.brands.length)?data.brands:FALLBACK_BRANDS;
         STATE.margenes = data.margenes || STATE.margenes || {};
+        STATE.lineas = data.lineas || STATE.lineas || {};
         STATE.thresholds = data.thresholds||STATE.thresholds;
         STATE.products = normalizeProducts(data.products); window.__kaemCatalogoOk = true;
         saveCache(STATE.products);
         try{ localStorage.setItem('kaem_brands', JSON.stringify(STATE.brands)); }catch(e){}
         try{ localStorage.setItem('kaem_margenes', JSON.stringify(STATE.margenes)); }catch(e){}
+        try{ localStorage.setItem('kaem_lineas', JSON.stringify(STATE.lineas)); }catch(e){}
         if(window.kaemLed) window.kaemLed('ok');
       } else {
         if(_bootPintado){
@@ -5689,6 +5712,7 @@
       sel.innerHTML = '<option value="" disabled selected>Selecciona una marca</option>';
       STATE.brands.forEach(function(b){ var o=document.createElement('option'); o.value=b; o.textContent=b; sel.appendChild(o); });
       if(cur) sel.value=cur;
+      if(sel.id==='marca') pintarLineaRegistro();   // marca con varias líneas (ESSENTIAL): aparece el selector de línea
     }
 
     function refreshData(cb){
@@ -5794,6 +5818,7 @@
           STATE.products=normalizeProducts(res.products); saveCache(STATE.products);
           if(res.brands && res.brands.length){ STATE.brands=res.brands; try{ localStorage.setItem('kaem_brands', JSON.stringify(STATE.brands)); }catch(e){} fillBrandSelect($('marca')); fillBrandSelect($('editMarca')); }
           if(res.margenes){ STATE.margenes=res.margenes; try{ localStorage.setItem('kaem_margenes', JSON.stringify(STATE.margenes)); }catch(e){} }
+          if(res.lineas){ STATE.lineas=res.lineas; try{ localStorage.setItem('kaem_lineas', JSON.stringify(STATE.lineas)); }catch(e){} }
           renderConsult(); renderAlerts();
           try{ AUTOCARGA.renovar(); }catch(e){}                       // Packing, Cartera, Pagos y Alertas se renuevan solos, escalonados
           if(STATE.tab==='historial') renderHistory();
@@ -6879,50 +6904,131 @@
       if(actual && (STATE.brands||[]).indexOf(actual)>=0) sel.value=actual;
       aplicarModoMarca();
     }
+    /* ——— Líneas de margen: una marca (ESSENTIAL) con varios márgenes. El producto lleva la clave de su línea, y de ella salen sus precios ——— */
+    function lineasDeMarca(m){ var l=(STATE.lineas||{})[m]; return (l && l.length>1) ? l : []; }
+    function textoLinea(l){ return (l.linea||l.clave)+' ('+l.distribuidor+'/'+l.mayorista+'/'+l.detal+')'; }
+    /** Muestra el selector de línea solo si la marca elegida tiene más de una; sin elegir queda la principal (la que se llama como la marca). */
+    function pintarLineaSel(selMarca, wrap, selLinea, claveActual){
+      var m=selMarca.value, ls=lineasDeMarca(m);
+      if(!ls.length){ wrap.style.display='none'; selLinea.innerHTML=''; return; }
+      selLinea.innerHTML=ls.map(function(l){ return '<option value="'+safe(l.clave)+'">'+safe(textoLinea(l))+'</option>'; }).join('');
+      var principal=ls.filter(function(l){ return String(l.clave).toUpperCase()===String(m).toUpperCase(); })[0]||ls[0];
+      var existe=claveActual && ls.some(function(l){ return l.clave===claveActual; });
+      selLinea.value=existe?claveActual:principal.clave;
+      wrap.style.display='block';
+    }
+    /** Un pedido o remisión antiguo puede traer guardada la clave de una línea (SAN ANGEL IMP #1): se muestra siempre la marca (ESSENTIAL). */
+    function marcaMostrada(m){
+      var t=String(m==null?'':m).trim(); if(!t) return t;
+      var U=t.toUpperCase(), L=STATE.lineas||{};
+      for(var v in L){ if(!Object.prototype.hasOwnProperty.call(L,v)) continue;
+        if(String(v).toUpperCase()===U) return v;
+        for(var i=0;i<L[v].length;i++) if(String(L[v][i].clave).toUpperCase()===U) return v; }
+      return t;
+    }
+    function lineaElegida(wrap, selLinea){ return (wrap && wrap.style.display!=='none' && selLinea.value) ? selLinea.value : ''; }
+    function pintarLineaRegistro(){ var w=$('f-linea'); if(w) pintarLineaSel($('marca'), w, $('marcaLinea'), ''); }
+
+    /* ——— Ajustes → Marcas ——— */
+    var CFG_LINEA_NUEVA=false;
+    function lineasCfg(m){ return (STATE.lineas||{})[m]||[]; }
+    function margenesDeLinea(m, clave){
+      var l=lineasCfg(m).filter(function(x){ return x.clave===clave; })[0];
+      if(l) return { distribuidor:l.distribuidor, mayorista:l.mayorista, detal:l.detal };
+      return (STATE.margenes||{})[m]||{};
+    }
+    /** La clave de la línea que se está editando; '__nueva' si se va a crear una; la propia marca si solo tiene una. */
+    function lineaCfgActual(){
+      var m=$('cfgMarcaSel').value; if(!m) return '';
+      var ls=lineasCfg(m);
+      if(CFG_LINEA_NUEVA) return '__nueva';
+      if(ls.length>1) return $('cfgLineaSel').value||ls[0].clave;
+      return ls.length?ls[0].clave:m;
+    }
     function aplicarModoMarca(){
-      var sel=$('cfgMarcaSel'), m=sel?sel.value:'';
-      var esNueva=!m;
+      var sel=$('cfgMarcaSel'), m=sel?sel.value:'', esNueva=!m, ls=lineasCfg(m), multi=!esNueva && ls.length>1;
+      if(esNueva) CFG_LINEA_NUEVA=false;
+      // Una marca con varias líneas muestra su selector; las demás tienen un botón para agregarles otra
+      var lsel=$('cfgLineaSel');
+      $('cfgLineaWrap').style.display=multi?'block':'none';
+      if(multi){
+        var prev=CFG_LINEA_NUEVA?'__nueva':lsel.value;
+        lsel.innerHTML=ls.map(function(l){ return '<option value="'+safe(l.clave)+'">'+safe(l.linea||l.clave)+'</option>'; }).join('')+'<option value="__nueva">➕ Nueva línea…</option>';
+        var hay=[].some.call(lsel.options, function(o){ return o.value===prev; });
+        lsel.value=hay?prev:ls[0].clave; CFG_LINEA_NUEVA=(lsel.value==='__nueva');
+      }
+      var nueva=!esNueva && CFG_LINEA_NUEVA;
+      $('cfgAddLineaBtn').style.display=(!esNueva && !multi && !CFG_LINEA_NUEVA)?'block':'none';
       $('cfgMarcaNombreWrap').style.display=esNueva?'block':'none';
-      $('cfgAddMarcaBtn').textContent=esNueva?'Agregar marca':'Actualizar márgenes';
-      if(esNueva){
-        $('cfgMarcaNombre').value=''; $('cfgMarcaDist').value=''; $('cfgMarcaMay').value=''; $('cfgMarcaDetal').value='';
+      $('cfgLineaNombreWrap').style.display=nueva?'block':'none';
+      $('cfgAddMarcaBtn').textContent=esNueva?'Agregar marca':(nueva?'Agregar línea':'Actualizar márgenes');
+      if(esNueva||nueva){
+        if(esNueva) $('cfgMarcaNombre').value='';
+        $('cfgLineaNombre').value=''; $('cfgMarcaDist').value=''; $('cfgMarcaMay').value=''; $('cfgMarcaDetal').value='';
       } else {
-        var g=(STATE.margenes||{})[m]||{};
+        var g=margenesDeLinea(m, lineaCfgActual());
         $('cfgMarcaDist').value = g.distribuidor!=null?String(g.distribuidor):'';
         $('cfgMarcaMay').value  = g.mayorista!=null?String(g.mayorista):'';
         $('cfgMarcaDetal').value= g.detal!=null?String(g.detal):'';
       }
     }
-    $('cfgMarcaSel').addEventListener('change', function(){ haptic(8); aplicarModoMarca(); });
+    $('cfgMarcaSel').addEventListener('change', function(){ haptic(8); CFG_LINEA_NUEVA=false; aplicarModoMarca(); });
+    $('cfgLineaSel').addEventListener('change', function(){ haptic(8); CFG_LINEA_NUEVA=($('cfgLineaSel').value==='__nueva'); aplicarModoMarca(); });
+    $('cfgAddLineaBtn').addEventListener('click', function(){ haptic(8); CFG_LINEA_NUEVA=true; aplicarModoMarca(); $('cfgLineaNombre').focus(); });
 
+    /** Vuelve a leer marcas, líneas, márgenes y productos juntos (refreshData solo trae los productos). */
+    function recargarMarcas(cb){
+      google.script.run.withSuccessHandler(function(d){
+        if(d && d.ok && d.products){
+          STATE.products=normalizeProducts(d.products); saveCache(STATE.products);
+          if(d.brands && d.brands.length){ STATE.brands=d.brands; try{ localStorage.setItem('kaem_brands', JSON.stringify(STATE.brands)); }catch(e){} fillBrandSelect($('marca')); fillBrandSelect($('editMarca')); }
+          if(d.margenes){ STATE.margenes=d.margenes; try{ localStorage.setItem('kaem_margenes', JSON.stringify(STATE.margenes)); }catch(e){} }
+          if(d.lineas){ STATE.lineas=d.lineas; try{ localStorage.setItem('kaem_lineas', JSON.stringify(STATE.lineas)); }catch(e){} }
+          renderConsult(); renderAlerts();
+        }
+        if(cb) cb(!!(d && d.ok));
+      }).withFailureHandler(function(){ if(cb) cb(false); }).getInitialData();
+    }
     function agregarMarcaUI(){
-      var sel=$('cfgMarcaSel').value;
-      var nombre = sel || String($('cfgMarcaNombre').value||'').trim();
+      var m=$('cfgMarcaSel').value, lc=lineaCfgActual(), enLinea=!!m && lc==='__nueva';
+      var nombre = m || String($('cfgMarcaNombre').value||'').trim();
+      var linea = enLinea ? String($('cfgLineaNombre').value||'').trim() : '';
       var pd=parseFloat(String($('cfgMarcaDist').value||'').replace(',','.'));
       var pm=parseFloat(String($('cfgMarcaMay').value||'').replace(',','.'));
       var pt=parseFloat(String($('cfgMarcaDetal').value||'').replace(',','.'));
       if(!nombre){ toast('Escribe el nombre de la marca.','error'); return; }
+      if(enLinea && !linea){ toast('Escribe el nombre de la línea.','error'); return; }
       if(!isFinite(pd)||!isFinite(pm)||!isFinite(pt)){ toast('Escribe los tres márgenes: distribuidor, mayorista y detal.','error'); return; }
       if([pd,pm,pt].some(function(v){ return v<0||v>100; })){ toast('Los márgenes deben ir entre 0 y 100.','error'); return; }
       var b=$('cfgAddMarcaBtn'); var etiqueta=b.textContent; b.disabled=true; b.textContent='Guardando…';
+      var envio={ distribuidor:pd, mayorista:pm, detal:pt, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
+      if(enLinea){ envio.padre=m; envio.linea=linea; } else envio.marca = m ? lc : nombre;
+      var l0=m?lineasCfg(m)[0]:null, esDeLineas = !!m && (enLinea || lineasCfg(m).length>1 || (l0 && l0.clave!==m));
       google.script.run
         .withSuccessHandler(function(res){
           b.disabled=false; b.textContent=etiqueta;
           if(res&&res.ok){
-            var m=(res.marca||nombre).trim();
-            if(STATE.brands.indexOf(m)===-1){ STATE.brands.push(m); STATE.brands.sort(); }
+            if(esDeLineas){
+              // Una línea de una marca (ESSENTIAL…): se vuelve a leer todo, porque cambian las líneas, los márgenes y los precios
+              CFG_LINEA_NUEVA=false; $('cfgLineaNombre').value='';
+              recargarMarcas(function(){ pintarSelectorMarcas(); });
+              toast(res.message||'Guardado.','success'); haptic(20);
+              return;
+            }
+            var m2=(res.marca||nombre).trim();
+            if(STATE.brands.indexOf(m2)===-1){ STATE.brands.push(m2); STATE.brands.sort(); }
             STATE.margenes=STATE.margenes||{};
-            STATE.margenes[m]={ distribuidor:pd, mayorista:pm, detal:pt };
+            STATE.margenes[m2]={ distribuidor:pd, mayorista:pm, detal:pt };
             fillBrandSelect($('marca')); pintarSelectorMarcas();
             $('cfgMarcaNombre').value='';
-            if(!sel){ $('cfgMarcaDist').value=''; $('cfgMarcaMay').value=''; $('cfgMarcaDetal').value=''; }
-            toast(res.message||('Marca "'+m+'" guardada.'),'success'); haptic(20);
+            if(!m){ $('cfgMarcaDist').value=''; $('cfgMarcaMay').value=''; $('cfgMarcaDetal').value=''; }
+            toast(res.message||('Marca "'+m2+'" guardada.'),'success'); haptic(20);
             // Los precios de venta salen de estos márgenes: hay que releer el catálogo.
             if(res.actualizada) refreshData();
           } else { toast((res&&res.message)||'No se pudo guardar la marca.','error'); haptic(40); }
         })
         .withFailureHandler(function(err){ b.disabled=false; b.textContent=etiqueta; toast('Sin conexión · la marca no se guardó.','error'); console.error(err); })
-        .addBrand({ marca:nombre, distribuidor:pd, mayorista:pm, detal:pt, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+        .addBrand(envio);
     }
     Array.prototype.forEach.call($('cfgAvisoPagosSeg').querySelectorAll('.seg'), function(s){
       s.addEventListener('click', function(){ segEstado('cfgAvisoPagosSeg','avisopg', s.dataset.avisopg==='on'); haptic(8); });
@@ -7465,7 +7571,7 @@
       clearErr('sku');
     });
     nameInput.addEventListener('input', function(){ clearErr('producto'); });
-    brandSelect.addEventListener('change', function(){ clearErr('marca'); });
+    brandSelect.addEventListener('change', function(){ clearErr('marca'); pintarLineaRegistro(); });
     costInput.addEventListener('input', function(e){
       var d=e.target.value.replace(/\D/g,''); costRaw=d?parseInt(d,10):0;
       e.target.value=d?d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; clearErr('costo');
@@ -7532,6 +7638,7 @@
       if(!a || !b) return false;
       if(String(a.producto||'').trim().toUpperCase() !== String(b.producto||'').trim().toUpperCase()) return false;
       if(String(a.marca||'').trim().toUpperCase() !== String(b.marca||'').trim().toUpperCase()) return false;
+      if(String(a.lineaClave||'') !== String(b.lineaClave||'')) return false;   // otra línea = otro alta (si no, el reintento devolvería el resultado anterior)
       var ta=(a.variantes||[]).map(function(v){return v.tono;}).join('|');
       var tb=(b.variantes||[]).map(function(v){return v.tono;}).join('|');
       return ta===tb;
@@ -7541,7 +7648,7 @@
     var pendingPayload=null;
     function submitProduct(){
       var base={
-        producto:nameInput.value.trim(), marca:brandSelect.value,
+        producto:nameInput.value.trim(), marca:brandSelect.value, lineaClave:lineaElegida($('f-linea'), $('marcaLinea')),
         costo:costRaw,
         ean:String($('eanFabrica')?$('eanFabrica').value:'').replace(/\s+/g,'').trim()
       };
@@ -7599,11 +7706,12 @@
       fillBrandSelect($('editMarca')); $('editMarca').value=p.marca||'';
       // Una marca que ya no está en la lista de marcas (producto antiguo) se conserva: antes quedaba vacía y obligaba a elegir otra
       if(p.marca && $('editMarca').value!==p.marca){ var op=document.createElement('option'); op.value=p.marca; op.textContent=p.marca; $('editMarca').appendChild(op); $('editMarca').value=p.marca; }
+      pintarLineaSel($('editMarca'), $('fe-linea'), $('editMarcaLinea'), p.lineaClave||'');   // ESSENTIAL: la línea que tiene hoy
       editCostRaw=Math.round(Number(p.costo)||0); $('editCosto').value= editCostRaw?String(editCostRaw).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):'';
       EDIT_PRECIOS={};
       ['distribuidor','mayorista','detal'].forEach(function(k){
         var v=Math.round(Number(p[k])||0); EDIT_PRECIOS[k]={ orig:v, val:v, propio:(p.propios||[]).indexOf(k)>=0, reset:false };
-        $('editP-'+k).value= v?String(v).replace(/B(?=(d{3})+(?!d))/g,'.'):''; pintarEditPrecio(k);
+        $('editP-'+k).value= v?String(v).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; pintarEditPrecio(k);
       });
       EDIT_STOCK_BASE=Math.round(Number(p.stock)||0);
       setEditStockModo(modoInicial==='sumar'||modoInicial==='restar'||modoInicial==='exacto' ? modoInicial : 'sumar');
@@ -7622,8 +7730,8 @@
       $('epReset-'+k).hidden = !(s.propio && !s.reset);
     }
     ['distribuidor','mayorista','detal'].forEach(function(k){
-      $('editP-'+k).addEventListener('input', function(e){ var d=e.target.value.replace(/D/g,''); var s=EDIT_PRECIOS[k]; if(!s) return; s.val=d?parseInt(d,10):0; s.reset=false; e.target.value=d?d.replace(/B(?=(d{3})+(?!d))/g,'.'):''; pintarEditPrecio(k); });
-      $('epReset-'+k).addEventListener('click', function(){ var s=EDIT_PRECIOS[k]; if(!s) return; s.reset=true; $('editP-'+k).value=s.orig?String(s.orig).replace(/B(?=(d{3})+(?!d))/g,'.'):''; haptic(8); pintarEditPrecio(k); });
+      $('editP-'+k).addEventListener('input', function(e){ var d=e.target.value.replace(/\D/g,''); var s=EDIT_PRECIOS[k]; if(!s) return; s.val=d?parseInt(d,10):0; s.reset=false; e.target.value=d?d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; pintarEditPrecio(k); });
+      $('epReset-'+k).addEventListener('click', function(){ var s=EDIT_PRECIOS[k]; if(!s) return; s.reset=true; $('editP-'+k).value=s.orig?String(s.orig).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; haptic(8); pintarEditPrecio(k); });
     });
     $('editCosto').addEventListener('input', function(e){ var d=e.target.value.replace(/\D/g,''); editCostRaw=d?parseInt(d,10):0; e.target.value=d?d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; });
     function getEditStock(){ var n=parseInt(String($('editStock').value).replace(/\D/g,''),10); return (isNaN(n)||n<0)?0:n; }
@@ -7662,6 +7770,7 @@
     $('editMinus').addEventListener('click', function(){ setEditStock(getEditStock()-1); haptic(10); });
     $('editStock').addEventListener('input', function(e){ e.target.value=e.target.value.replace(/\D/g,''); actualizarEditStockPreview(); });
     $('editStock').addEventListener('blur', function(){ setEditStock(getEditStock()); });
+    $('editMarca').addEventListener('change', function(){ pintarLineaSel($('editMarca'), $('fe-linea'), $('editMarcaLinea'), ''); });
     $('editCancelBtn').addEventListener('click', function(){ $('editModal').classList.remove('show'); });
     $('editAddTonoBtn').addEventListener('click', function(){
       var p=findProduct(editSkuKey); if(!p) return;
@@ -7669,7 +7778,7 @@
       $('editModal').classList.remove('show'); abrirNuevoTono(); haptic(10);
     });
     $('editSaveBtn').addEventListener('click', function(){
-      var payload={ sku:editSkuKey, producto:$('editProducto').value.trim(), tono:$('editTono').value.trim(), marca:$('editMarca').value, costo:editCostRaw, stock:getEditStockFinal(), operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
+      var payload={ sku:editSkuKey, producto:$('editProducto').value.trim(), tono:$('editTono').value.trim(), marca:$('editMarca').value, lineaClave:lineaElegida($('fe-linea'), $('editMarcaLinea')), costo:editCostRaw, stock:getEditStockFinal(), operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
       // Sumar / dar de baja viajan como DIFERENCIA: el servidor la aplica sobre el stock real del momento
       if(EDIT_STOCK_MODO==='sumar') payload.stockDelta = getEditStock();
       else if(EDIT_STOCK_MODO==='restar') payload.stockDelta = -getEditStock();
@@ -8677,7 +8786,7 @@
           if(esFull && !padre.probFull){ padre.probFull=1; return; }
           if(esHalf && !padre.probHalf){ padre.probHalf=1; return; }
         }
-        CART.items.push({ sku:it.sku, nombre:it.nombre||(pr?pr.producto:it.sku), marca:it.marca||(pr?pr.marca:''),
+        CART.items.push({ sku:it.sku, nombre:it.nombre||(pr?pr.producto:it.sku), marca:marcaMostrada(it.marca)||(pr?pr.marca:''),
                  distribuidor:pr?pr.distribuidor:0, mayorista:pr?pr.mayorista:0, detal:pr?pr.detal:0,
                  stock:pr?pr.stock:0, precio:precio, cantidad:cant, probFull:0, probHalf:0, manual:true, costoFijo:Math.round(Number(it.costo)||0) });
       });
@@ -9550,7 +9659,7 @@
         var prob = it.esProbador, cant = toNum(kaemFirst(it.cantidad, it.cant, 0)), pu = toNum(kaemFirst(it.precio, it.valorUnitario, it.valorUnit, it.unitario, 0));
         var tot = (it.subtotal != null || it.total != null || it.valorTotal != null) ? toNum(kaemFirst(it.subtotal, it.total, it.valorTotal)) : cant * pu;
         calcSub += tot; nUni += cant; if (!prob) nProd++;
-        var sku = String(kaemFirst(it.sku, it.codigo, '')).trim(), nom = String(kaemFirst(it.nombre, it.producto, it.descripcion, '')).trim(), mar = String(kaemFirst(it.marca, it.brand, '')).trim();
+        var sku = String(kaemFirst(it.sku, it.codigo, '')).trim(), nom = String(kaemFirst(it.nombre, it.producto, it.descripcion, '')).trim(), mar = String(kaemFirst(it.marca, it.brand, '')).trim(); if (typeof marcaMostrada === 'function') mar = marcaMostrada(mar);
         if ((!mar || !nom) && sku && typeof findProduct === 'function'){ var pr = findProduct(sku); if (pr){ if (!mar) mar = String(pr.marca || '').trim(); if (!nom) nom = String(pr.producto || '').trim(); } }
         R.filas.push({ prob:prob, n:prob ? '' : nProd, nombre:nom || '—', marca:mar, sku:sku, cant:cant, pu:pu, tot:tot });
       });
@@ -10528,7 +10637,7 @@
         return {
           sku: String(it.sku || '').trim(),
           nombre: String(it.nombre || (pr ? pr.producto : '') || it.sku || '').trim(),
-          marca: String(it.marca || (pr ? pr.marca : '') || '').trim(),
+          marca: marcaMostrada(String(it.marca || (pr ? pr.marca : '') || '').trim()),
           cantidad_solicitada: Math.max(1, Math.floor(Number(it.cantidad) || 0)),
           cantidad_escaneada: 0
         };
@@ -13574,6 +13683,14 @@
       return h || '<p class="hist-empty">Aún no hay ventas suficientes este mes para calcular la rentabilidad.</p>';
     }
     /* Inventario por marca, con sus márgenes */
+    /* Marca con varias líneas de margen (ESSENTIAL): el detalle de cada una */
+    function stLineasHtml(m){
+      if(!m.lineas || !m.lineas.length) return '';
+      return '<div class="inv-lineas">'+m.lineas.map(function(l){
+        var c=l.configurado||{};
+        return '<span><b>'+safe(l.linea)+'</b> · '+biMil(l.unidades)+' un. · margen detal '+(l.margenDetalPct!=null?l.margenDetalPct+'%':'—')+(c.detal?' <em>(config. '+c.detal+'%)</em>':'')+'</span>';
+      }).join('')+'</div>';
+    }
     function stInvMarcasHtml(r){
       var inv = r.inventario || {}, h = '';
       // ——— Inventario por marca, con sus márgenes ———
@@ -13593,7 +13710,7 @@
             +(m.margenDistribuidorPct!=null?'<span>Margen distribuidor <b>'+m.margenDistribuidorPct+'%</b>'+cfg('distribuidor')+'</span>':'<span>Distribuidor: <b>sin precio</b></span>')
             +(m.margenDetalPct!=null?'<span>Margen detal <b>'+m.margenDetalPct+'%</b>'+cfg('detal')+'</span>':'<span>Detal: <b>sin precio</b></span>')
             +'<span>Ganancia potencial <b>'+(m.margenDistribuidorPct!=null?abrevCop(m.utilidadDistribuidor):'—')+'</b> <em>dist.</em> · <b>'+(m.margenDetalPct!=null?abrevCop(m.utilidadDetal):'—')+'</b> <em>detal</em></span>'
-            +(m.sinPrecioDist?'<span>⚠️ '+m.sinPrecioDist+' sin precio distribuidor</span>':'')+'</div></div>';
+            +(m.sinPrecioDist?'<span>⚠️ '+m.sinPrecioDist+' sin precio distribuidor</span>':'')+'</div>'+stLineasHtml(m)+'</div>';
         });
         h+='<button type="button" class="btn-ghost" id="invMarcasCsv" style="width:100%;margin:2px 0 8px">Descargar inventario por marca (CSV)</button>';
       }
