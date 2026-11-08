@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-10-31-04';
+    const APP_VERSION = '2026-11-08-01';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3117,7 +3117,10 @@
     /* ═══ Ajustes · categorías + sección, con barra de guardado fija ═══ */
     .screens > #configModal .cfg-sheet > *{max-width:1120px !important;margin-left:auto !important;margin-right:auto !important;width:100%;box-sizing:border-box}
     .cfg-sheet{padding-bottom:0 !important}
-    .cfg-head{display:flex;flex-direction:column;gap:12px;margin:6px auto 16px}
+    .cfg-head{display:flex;flex-direction:row;align-items:center;gap:10px;margin:6px auto 16px}
+    .cfg-head .cfg-buscar{flex:1 1 auto;min-width:0;width:auto}
+    .cfg-x{margin-left:auto;flex:0 0 46px;width:46px;height:46px;border-radius:50%;border:1px solid var(--linea);background:var(--blanco);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--espresso)}
+    .cfg-x svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
     .cfg-head h3{margin:0;font:500 clamp(26px,4vw,34px)/1.1 'Fraunces',serif}
     .cfg-head p{margin:4px 0 0;font-size:13.5px;line-height:1.4;color:var(--texto-suave)}
     .cfg-buscar{margin:0}
@@ -3156,19 +3159,28 @@
     .cfg-card .cfg-sec-body{padding:0;border:0;background:transparent}
     .cfg-card .field{margin-bottom:16px}
     .cfg-card .cfg-hint{margin:6px 2px 14px;font-size:12.5px;line-height:1.5}
-    .cfg-bar{position:sticky;bottom:0;z-index:6;display:flex;align-items:center;gap:12px;margin-top:20px !important;padding:12px 14px calc(env(safe-area-inset-bottom,0px) + 12px);border:1px solid var(--linea);border-bottom:0;border-radius:18px 18px 0 0;
+    .cfg-bar{position:sticky;bottom:0;z-index:6;display:none;align-items:center;gap:12px;margin-top:20px !important;padding:12px 14px calc(env(safe-area-inset-bottom,0px) + 12px);border:1px solid var(--linea);border-bottom:0;border-radius:18px 18px 0 0;
       background:color-mix(in srgb,var(--crema) 90%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);box-shadow:0 -8px 24px -16px rgba(44,33,30,.25)}
+    /* La barra de guardar solo aparece cuando hay cambios sin guardar */
+    .cfg-bar.on{display:flex;animation:cfgBarIn .22s cubic-bezier(.2,.8,.2,1)}
+    @keyframes cfgBarIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
     .cfg-bar .modal-actions{display:flex;gap:8px;margin:0 0 0 auto;padding:0;flex:0 0 auto}
     .cfg-bar .btn-ghost,.cfg-bar .btn-solid{width:auto;min-width:96px;min-height:46px;padding:0 20px}
     .cfg-estado{font-size:12.5px;color:var(--texto-suave);min-width:0}
     .cfg-estado.sucio{color:var(--terracota-txt);font-weight:700}
-    @media (max-width:520px){ .cfg-estado{display:none} .cfg-bar .modal-actions{width:100%} .cfg-bar .btn-ghost,.cfg-bar .btn-solid{flex:1} }
+    @media (max-width:520px){ .cfg-bar{flex-wrap:wrap;justify-content:center} .cfg-estado{width:100%;text-align:center} .cfg-bar .modal-actions{width:100%} .cfg-bar .btn-ghost,.cfg-bar .btn-solid{flex:1} }
     @media (min-width:900px){
-      .cfg-head{flex-direction:row;align-items:flex-end;justify-content:space-between}
-      .cfg-buscar{width:340px;flex:0 0 340px}
-      .cfg-layout{display:grid;grid-template-columns:304px minmax(0,1fr);gap:24px;align-items:start}
-      .cfg-nav{position:sticky;top:0;max-height:calc(100dvh - 230px);overflow-y:auto;padding-bottom:8px}
-      .cfg-panel{display:block}
+      .cfg-head{align-items:flex-end;justify-content:flex-start}
+      .cfg-head .cfg-buscar{flex:0 0 304px;width:304px}
+      .cfg-x{display:none}
+      /* Escritorio: la pantalla no se desplaza; la lista y el panel tienen cada uno su propio desplazamiento */
+      .screens > #configModal .cfg-sheet{height:100%;overflow:hidden;padding-bottom:24px !important}
+      .cfg-layout{display:grid;grid-template-columns:304px minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:24px;align-items:stretch;min-height:0;flex:1 1 0}
+      .cfg-nav{position:static;max-height:none;height:100%;overflow-y:auto;padding:2px 6px 8px 2px;scrollbar-width:thin}
+      .cfg-panel{display:block;min-height:0;overflow-y:auto;padding:2px 6px 104px 2px;scrollbar-width:thin}
+      .cfg-sec-head p{display:block !important}
+      /* La barra de guardar flota abajo, debajo del panel (no de la lista), y solo si hay cambios */
+      .screens > #configModal .cfg-sheet > .cfg-bar{position:absolute;left:calc(max(32px,(100% - 1120px) / 2) + 328px);right:calc(max(32px,(100% - 1120px) / 2) + 6px);bottom:24px;margin:0 !important;width:auto;border:1px solid var(--linea);border-radius:20px;padding:12px 14px 12px 22px;background:var(--blanco);box-shadow:0 14px 44px -14px rgba(44,33,30,.38)}
       .cfg-back{display:none}
       .cfg-en-sec .cfg-nav{display:block}
       .cfg-en-sec .cfg-buscar{display:flex}
@@ -3424,7 +3436,7 @@
     .cfg-sheet{display:flex;flex-direction:column;min-height:100%}
     .cfg-layout{flex:1 1 auto}
     .cfg-bar{margin-top:auto !important}
-    .cfg-sec-head p{display:none}
+    .cfg-sec-head p{display:none}   /* en escritorio vuelve a mostrarse (36-ajustes.css) */
     .cfg-sec-head h4{margin-bottom:14px}
     .cfg-bar .btn-solid:disabled{opacity:.45}
     /* Estadísticas: el título ya está en la barra superior; calificaciones compactas también en celular */
@@ -14386,7 +14398,8 @@
       });
       var cab = document.createElement('header'); cab.className = 'cfg-head';
       cab.innerHTML = '<div class="search-bar cfg-buscar"><svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
-        + '<input id="cfgBuscar" type="search" autocomplete="off" placeholder="Buscar: plazo, WhatsApp, PIN…" aria-label="Buscar un ajuste"></div>';
+        + '<input id="cfgBuscar" type="search" autocomplete="off" placeholder="Buscar: plazo, WhatsApp, PIN…" aria-label="Buscar un ajuste"></div>'
+        + '<button type="button" class="cfg-x" id="cfgX" aria-label="Cerrar ajustes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
       var lay = document.createElement('div'); lay.className = 'cfg-layout';
       var nav = document.createElement('nav'); nav.className = 'cfg-nav'; nav.id = 'cfgNav'; nav.setAttribute('aria-label','Secciones de ajustes');
       var panel = document.createElement('div'); panel.className = 'cfg-panel'; panel.id = 'cfgPanel';
@@ -14413,11 +14426,12 @@
       });
       nav.appendChild(vacio);
       lay.appendChild(nav); lay.appendChild(panel);
-      var barra = document.createElement('div'); barra.className = 'cfg-bar'; barra.innerHTML = '<span class="cfg-estado" id="cfgEstado" role="status">Todo guardado</span>';
+      var barra = document.createElement('div'); barra.className = 'cfg-bar'; barra.innerHTML = '<span class="cfg-estado" id="cfgEstado" role="status">Tienes cambios sin guardar</span>';
       if(acciones) barra.appendChild(acciones);
       hoja.appendChild(cab); hoja.appendChild(lay); hoja.appendChild(barra);
       nav.addEventListener('click', function(e){ var b = e.target.closest ? e.target.closest('.cfg-nav-i') : null; if(b){ haptic(8); cfgIr(+b.getAttribute('data-i')); } });
       $('cfgBack').addEventListener('click', function(){ haptic(8); cfgVolver(); });
+      $('cfgX').addEventListener('click', function(){ haptic(8); $('cfgCloseBtn').click(); });   // el mismo Cerrar de la barra (que avisa si hay cambios sin guardar)
       $('cfgBuscar').addEventListener('input', cfgBuscar);
       var m = $('configModal');
       ['input','change','click'].forEach(function(ev){ m.addEventListener(ev, cfgMarcarSucio); });
@@ -14465,7 +14479,8 @@
       _cfgSucioT = setTimeout(function(){
         var el = $('cfgEstado'); if(!el) return;
         var s = cfgHayCambios();
-        el.textContent = s ? 'Tienes cambios sin guardar' : 'Todo guardado'; el.classList.toggle('sucio', s);
+        el.classList.toggle('sucio', s);
+        var barra = el.parentNode; if(barra) barra.classList.toggle('on', s);   // sin cambios no se muestra nada
         var g = $('cfgSaveBtn'); if(g && g.textContent==='Guardar') g.disabled = !!_cfgBase && !s;
       }, ya === true ? 0 : 160);
     }

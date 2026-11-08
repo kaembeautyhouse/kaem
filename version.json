@@ -1,8 +1,9 @@
 {
-  "app": "2026-10-31-04",
+  "app": "2026-11-08-01",
   "servidor": "2026.10.37",
-  "fecha": "2026-10-31",
+  "fecha": "2026-11-08",
   "novedades": [
+    "Ajustes: la barra de Guardar solo aparece cuando hay cambios sin guardar, y la vista de escritorio queda ordenada con la lista y el panel cada uno con su propio desplazamiento.",
     "Catálogo: aprobar un pedido ya no puede duplicar la venta y se respeta el precio que vio el cliente.",
     "Correcciones en Cupos, Pagos y pedidos guardados sin señal. Pantallas de carga y mejor contraste.",
     "Correcciones en devoluciones con probador, plazos de crédito, remisiones anuladas y escaneo en Empaque. Botones más fáciles de tocar y tarjetas uniformes según la guía de estilo.",
