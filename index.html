@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-02';
+    const APP_VERSION = '2026-11-08-03';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -381,7 +381,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.38', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.39', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -3561,6 +3561,13 @@
     /* Marca con varias líneas de margen (ESSENTIAL) en Estadísticas */
     .inv-lineas{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--linea);font-size:12.5px;color:var(--texto-suave)}
     .inv-lineas b{color:var(--espresso);font-weight:600}
+
+    /* Ajustes → Marcas: revisión de precios por línea */
+    .rev-grupo{margin:12px 0 0;padding:12px 14px;border:1px solid var(--linea);border-radius:14px;background:var(--blanco)}
+    .rev-linea{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0}
+    .rev-linea.mal span:last-child{color:var(--terracota-txt);font-weight:600}
+    .rev-linea.ok span:last-child{color:var(--salvia-txt)}
+    .rev-ej{font-size:12px;color:var(--texto-suave);padding:2px 0 2px 10px;border-left:2px solid var(--terracota);margin:2px 0}
   </style>
 </head>
 <body>
@@ -5203,6 +5210,15 @@
       </div>
       <button class="btn-ghost" id="cfgAddMarcaBtn" type="button" style="width:100%">Agregar marca</button>
       <button class="btn-ghost" id="cfgAddLineaBtn" type="button" style="width:100%;margin-top:8px;display:none">＋ Agregar otra línea de margen a esta marca</button>
+      <div class="cfg-lineas-herr" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--linea)">
+        <p class="cfg-sub" style="margin:0 0 8px">Revisar y ordenar</p>
+        <button class="btn-ghost" id="cfgRevPreciosBtn" type="button" style="width:100%">Revisar que los precios sigan a su línea</button>
+        <div id="cfgRevPrecios" aria-live="polite"></div>
+        <div id="cfgUnificarWrap" style="display:none;margin-top:12px">
+          <button class="btn-ghost" id="cfgUnificarBtn" type="button" style="width:100%">Poner el nombre de las líneas en toda la hoja</button>
+          <p class="cfg-hint">Cambia, por ejemplo, «SAN ANGEL IMP #1» por «San Angel #1» en la tabla de marcas, en todos los productos y en Pagos y Gastos. Los precios no se mueven: la app lo comprueba y, si alguno cambiara, lo deshace todo.</p>
+        </div>
+      </div>
       <p class="cfg-hint">Los márgenes definen los precios Distribuidor, Mayorista y Detal de esa marca. Elige una marca existente para corregir sus márgenes. Una marca puede tener varias <b>líneas</b> con márgenes distintos (p. ej. ESSENTIAL: Brayan, San Angel #1…): se ve una sola marca, y cada producto lleva la línea de la que salen sus precios.</p>
         </div>
       </details>
@@ -6948,6 +6964,7 @@
     function aplicarModoMarca(){
       var sel=$('cfgMarcaSel'), m=sel?sel.value:'', esNueva=!m, ls=lineasCfg(m), multi=!esNueva && ls.length>1;
       if(esNueva) CFG_LINEA_NUEVA=false;
+      pintarHerramientasLineas();
       // Una marca con varias líneas muestra su selector; las demás tienen un botón para agregarles otra
       var lsel=$('cfgLineaSel');
       $('cfgLineaWrap').style.display=multi?'block':'none';
@@ -6975,6 +6992,51 @@
     $('cfgMarcaSel').addEventListener('change', function(){ haptic(8); CFG_LINEA_NUEVA=false; aplicarModoMarca(); });
     $('cfgLineaSel').addEventListener('change', function(){ haptic(8); CFG_LINEA_NUEVA=($('cfgLineaSel').value==='__nueva'); aplicarModoMarca(); });
     $('cfgAddLineaBtn').addEventListener('click', function(){ haptic(8); CFG_LINEA_NUEVA=true; aplicarModoMarca(); $('cfgLineaNombre').focus(); });
+    /* ——— Revisar precios y poner el nombre de cada línea en toda la hoja ——— */
+    function nombresPorUnificar(){
+      var L=STATE.lineas||{}, n=0;
+      Object.keys(L).forEach(function(v){
+        var ls=L[v]; if(!ls || ls.length<2) return;
+        ls.forEach(function(l){
+          var nombre=String(l.linea||'').trim(), c=String(l.clave).toUpperCase();
+          if(nombre && c!==nombre.toUpperCase() && c!==String(v).toUpperCase()) n++;
+        });
+      });
+      return n;
+    }
+    function pintarHerramientasLineas(){ var w=$('cfgUnificarWrap'); if(w) w.style.display=nombresPorUnificar()?'block':'none'; }
+    function revPreciosHtml(r){
+      var h='<p class="cfg-hint" style="margin-top:10px"><b>'+safe(r.message)+'</b><br>Fórmula de la hoja: '+safe(r.formula)+'.</p>';
+      (r.grupos||[]).forEach(function(g){
+        h+='<div class="rev-grupo"><b>'+safe(g.marca)+'</b>';
+        g.lineas.forEach(function(l){
+          if(!l.productos) return;
+          var nombre=g.lineas.length>1 ? safe(l.linea)+' ' : '';
+          h+='<div class="rev-linea '+(l.conDiferencia?'mal':'ok')+'"><span>'+nombre+'('+l.margenes.join('/')+') · '+l.productos+(l.productos===1?' producto':' productos')+'</span>'
+            +'<span>'+(l.conDiferencia?('⚠️ '+l.conDiferencia+' con precio distinto'):'✓ todo en orden')+'</span></div>';
+          (l.ejemplos||[]).forEach(function(e){ h+='<div class="rev-ej">'+safe(e.producto)+' <small>'+safe(e.sku)+'</small> · '+safe(e.nivel)+': tiene '+cop(e.actual)+' y le toca '+cop(e.esperado)+'</div>'; });
+        });
+        h+='</div>';
+      });
+      return h;
+    }
+    $('cfgRevPreciosBtn').addEventListener('click', function(){
+      var b=$('cfgRevPreciosBtn'), et=b.textContent, box=$('cfgRevPrecios'); b.disabled=true; b.textContent='Revisando los precios…';
+      google.script.run.withSuccessHandler(function(r){
+        b.disabled=false; b.textContent=et;
+        box.innerHTML = (r && r.ok) ? revPreciosHtml(r) : '<p class="cfg-hint">'+safe((r&&r.message)||'No se pudo revisar.')+'</p>';
+      }).withFailureHandler(function(){ b.disabled=false; b.textContent=et; box.innerHTML='<p class="cfg-hint">Sin conexión · no se pudo revisar.</p>'; }).revisarPreciosLineas();
+    });
+    $('cfgUnificarBtn').addEventListener('click', function(){
+      if(!window.confirm('Voy a poner el nombre de cada línea (por ejemplo «San Angel #1») también en la tabla de marcas, en los productos y en Pagos y Gastos.\n\nLos precios no se mueven: lo compruebo y, si alguno cambiara, lo deshago todo.\n\n¿Continuar?')) return;
+      var b=$('cfgUnificarBtn'), et=b.textContent; b.disabled=true; b.textContent='Cambiando los nombres…';
+      google.script.run.withSuccessHandler(function(res){
+        b.disabled=false; b.textContent=et;
+        if(res && res.ok){ toast(res.message||'Listo.','success'); haptic(20); recargarMarcas(function(){ pintarSelectorMarcas(); }); }
+        else { toast((res&&res.message)||'No se pudo cambiar.','error'); haptic(40); }
+      }).withFailureHandler(function(){ b.disabled=false; b.textContent=et; toast('Sin conexión · no se cambió nada.','error'); })
+        .unificarNombresLineas({ operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+    });
 
     /** Vuelve a leer marcas, líneas, márgenes y productos juntos (refreshData solo trae los productos). */
     function recargarMarcas(cb){
