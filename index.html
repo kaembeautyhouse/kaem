@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-03';
+    const APP_VERSION = '2026-11-08-04';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4820,6 +4820,7 @@
       <div id="audLista"></div>
       <div id="audPreciosBox" style="display:none;margin-top:14px">
         <button class="btn-solid" id="audPrecios" type="button" style="width:100%;min-height:48px">Corregir precios en Shopify (la App manda)</button>
+        <button class="btn-solid" id="audDatos" type="button" style="width:100%;margin-top:8px;min-height:48px">Poner nombres, marcas y costos como en la App</button>
         <button class="btn-ghost" id="audPreciosAuto" type="button" style="width:100%;margin-top:8px;min-height:44px"></button>
         <p class="cfg-hint" id="audPreciosMsg" aria-live="polite"></p>
       </div>
@@ -5326,6 +5327,8 @@
         <button class="btn-ghost" id="cfgShopLimpiarBtn" type="button">Limpiar cola</button>
       </div>
       <button class="btn-ghost" id="cfgShopAuditBtn" type="button" style="width:100%;margin-top:8px">🔎 Auditoría App ↔ Shopify (SKU, tonos y fotos)</button>
+      <button class="btn-ghost" id="cfgShopPermBtn" type="button" style="width:100%;margin-top:8px">🔐 Revisar permisos y qué se copia a Shopify</button>
+      <div id="cfgShopPerm" aria-live="polite"></div>
       <button class="btn-solid" id="cfgShopResyncBtn" type="button" style="width:100%;margin-top:8px">Resincronizar catálogo completo → Shopify</button>
       <p class="cfg-hint">Pone en cola el disponible de <b>todos</b> los productos de la App de una sola vez, para que Shopify quede al día con la realidad de la App. Úsalo la primera vez que actives esto, o si sospechas que se desincronizaron.</p>
         </div>
@@ -6279,7 +6282,7 @@
             +(x.skuApp?'<small>SKU App: '+safe(x.skuApp)+'</small>':'')+'<div class="accion">👉 '+safe(x.accion)+'</div></div>';
         }).join('') || '<p class="cart-empty">✨ Todo coincide.</p>';
         if(r.urlHoja){ $('audHoja').href=r.urlHoja; $('audHoja').style.display='block'; }
-        AUD_AUTO = !!r.preciosAuto; $('audPreciosBox').style.display = ((r.faltantes && r.faltantes.precio) || AUD_AUTO) ? 'block' : 'none';
+        AUD_AUTO = !!r.preciosAuto; $('audPreciosBox').style.display = 'block'; $('audPreciosMsg').textContent='';
         $('audPrecios').style.display = (r.faltantes && r.faltantes.precio) ? '' : 'none'; $('audPrecios').textContent = 'Corregir ' + ((r.faltantes && r.faltantes.precio) || 0) + ' precios en Shopify (la App manda)';
         audAutoPintar();
         beep('success');
@@ -6295,7 +6298,7 @@
       var b=$('audPrecios'), msg=$('audPreciosMsg'); b.disabled=true; msg.textContent='Comparando precios…';
       google.script.run.withSuccessHandler(function(r){
         if(!r || !r.ok){ b.disabled=false; msg.textContent=(r&&r.message)||'No se pudo comparar.'; return; }
-        if(!r.total){ b.disabled=false; msg.textContent='Todos los precios ya coinciden ✓'; return; }
+        if(!r.total){ b.disabled=false; b.style.display='none'; msg.textContent='Todos los precios ya coinciden ✓'; return; }
         var ej=(r.muestra||[]).slice(0,3).map(function(x){ return '• '+x.producto+': '+cop(x.de)+' → '+cop(x.a); }).join('\n');
         if(!window.confirm('Se cambiarán '+r.total+' precios en Shopify para que sean iguales a los de la App (el precio Detal).\n\n'+ej+(r.total>3?'\n…':'')+'\n\n¿Aplicar?')){ b.disabled=false; msg.textContent='Sin cambios.'; return; }
         msg.textContent='Corrigiendo precios en Shopify… (puede tardar un minuto)';
@@ -6305,6 +6308,32 @@
         }).withFailureHandler(function(){ b.disabled=false; msg.textContent='Se cortó la conexión. Repite la auditoría para ver qué quedó.'; })
           .sincronizarPreciosShopify({ aplicar:true, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
       }).withFailureHandler(function(){ b.disabled=false; msg.textContent='Sin conexión con el servidor.'; }).sincronizarPreciosShopify({ aplicar:false });
+    });
+    $('audDatos').addEventListener('click', function(){
+      var b=$('audDatos'), msg=$('audPreciosMsg'), op={ operador:String((AJUSTES&&AJUSTES.operador)||'').trim() }; b.disabled=true; msg.textContent='Comparando nombres, marcas y costos…';
+      google.script.run.withSuccessHandler(function(r){
+        if(!r || !r.ok){ b.disabled=false; msg.textContent=(r&&r.message)||'No se pudo comparar.'; return; }
+        if(!r.total){ b.disabled=false; msg.textContent='Nombres, marcas, costos y tonos ya coinciden ✓'; return; }
+        var ej=(r.muestra||[]).slice(0,3).map(function(x){ return '• '+x.de+' → '+x.a; }).join('\n');
+        if(!window.confirm(r.message+'\n\n'+ej+((r.muestra||[]).length>2?'\n…':'')+'\n\nEl nombre queda como «Nombre Con Iniciales MARCA». ¿Aplicar en Shopify?')){ b.disabled=false; msg.textContent='Sin cambios.'; return; }
+        msg.textContent='Actualizando Shopify… (puede tardar un minuto)';
+        google.script.run.withSuccessHandler(function(r2){
+          b.disabled=false; msg.textContent=(r2&&r2.message)||'Listo.';
+          if(r2 && (r2.ok || r2.aplicados)){ toast(r2.message||'Listo','success'); beep('success'); } else { toast((r2&&r2.message)||'No se pudo actualizar.','error'); beep('error'); }
+        }).withFailureHandler(function(){ b.disabled=false; msg.textContent='Se cortó la conexión. Repite para ver qué quedó.'; }).sincronizarDatosShopify({ aplicar:true, operador:op.operador });
+      }).withFailureHandler(function(){ b.disabled=false; msg.textContent='Sin conexión con el servidor.'; }).sincronizarDatosShopify({ aplicar:false });
+    });
+    $('cfgShopPermBtn').addEventListener('click', function(){
+      var b=$('cfgShopPermBtn'), box=$('cfgShopPerm'), et=b.textContent; b.disabled=true; b.textContent='Revisando…';
+      google.script.run.withSuccessHandler(function(r){
+        b.disabled=false; b.textContent=et;
+        if(!r || !r.ok){ box.innerHTML='<p class="cfg-hint">'+safe((r&&r.message)||'No se pudo revisar.')+'</p>'; return; }
+        box.innerHTML='<p class="cfg-hint"><b>'+safe(r.message)+'</b></p>'
+          + (r.items||[]).map(function(i){ return '<div class="rev-linea '+(i.ok?'ok':'mal')+'"><span>'+safe(i.que)+' <small>('+safe(i.scope)+')</small></span><span>'+(i.ok?'✓':'⚠️ falta')+'</span></div>'; }).join('')
+          + '<p class="cfg-hint" style="margin-top:10px"><b>Qué pasa en Shopify cuando haces algo en la App</b></p>'
+          + (r.copia||[]).map(function(i){ return '<div class="rev-ej"><b>'+safe(i.que)+':</b> '+safe(i.como)+'</div>'; }).join('')
+          + '<p class="cfg-hint">Cola de stock automática: '+(r.colaAutomatica?'activa ✓':'⚠️ apagada')+' · Corrección automática de precios y datos: '+(r.preciosAuto?'activa ✓':'apagada (se activa en la auditoría)')+'.</p>';
+      }).withFailureHandler(function(){ b.disabled=false; b.textContent=et; box.innerHTML='<p class="cfg-hint">Sin conexión · no se pudo revisar.</p>'; }).shopifyPermisosEstado();
     });
     $('audPreciosAuto').addEventListener('click', function(){
       google.script.run.withSuccessHandler(function(r){ if(r && r.ok){ AUD_AUTO=!!r.preciosAuto; audAutoPintar(); toast(r.message,'success'); } else toast((r&&r.message)||'No se pudo cambiar.','error'); })
@@ -7857,7 +7886,8 @@
         setLoading(false);
         if(!res||!res.ok){ toast((res&&res.message)||'No se pudo editar.','error'); beep('error'); return; }
         $('editModal').classList.remove('show'); beep('success'); haptic(20);
-        toast('Producto actualizado · '+editSkuKey+' · stock: '+((res.product&&res.product.stock!=null)?res.product.stock:payload.stock),'success'); refreshData();
+        toast('Producto actualizado · '+editSkuKey+' · stock: '+((res.product&&res.product.stock!=null)?res.product.stock:payload.stock)+((res.shopify&&res.shopify.aplicados)?' · Shopify al día':''),'success'); refreshData();
+        if(res.shopify && res.shopify.ok===false) setTimeout(function(){ toast(res.shopify.message||'Shopify no recibió el cambio.','error'); },900);
       }).withFailureHandler(function(){ setLoading(false); toast('Sin conexión · no se completó. Revisa el internet e intenta de nuevo.','error'); beep('error'); }).updateProduct(payload);
     });
 
@@ -7873,7 +7903,8 @@
       google.script.run.withSuccessHandler(function(res){
         setLoading(false); $('deleteModal').classList.remove('show');
         if(!res||!res.ok){ toast((res&&res.message)||'No se pudo eliminar.','error'); beep('error'); return; }
-        beep('success'); toast('Producto eliminado · '+deleteSkuKey,'info'); refreshData();
+        beep('success'); toast('Producto eliminado · '+deleteSkuKey+((res.shopify&&res.shopify.accion)?' · '+res.shopify.message:''),'info'); refreshData();
+        if(res.shopify && res.shopify.ok===false) setTimeout(function(){ toast(res.shopify.message||'Shopify no recibió el cambio.','error'); },900);
       }).withFailureHandler(function(){ setLoading(false); toast('Sin conexión · no se completó. Revisa el internet e intenta de nuevo.','error'); beep('error'); }).deleteProduct({sku:deleteSkuKey, operador:String((AJUSTES&&AJUSTES.operador)||'').trim()});
     });
 
