@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-08-04",
-  "servidor": "2026.10.44",
+  "app": "2026-11-08-05",
+  "servidor": "2026.10.45",
   "fecha": "2026-11-08",
   "novedades": [
+    "Editar producto → Shopify: botón «Poner el nombre guardado de la App también en Shopify» (y aviso al guardar con otro nombre). La App ya no pisa los nombres de Shopify que tienen formato o que editaste allá; este botón es la forma de mandarlos a propósito.",
     "Shopify copia lo que haces en la App: los nombres se envían como «Nombre Con Iniciales MARCA», y al editar un producto (nombre, marca, costo, precio, tono) o eliminarlo, Shopify se actualiza también. Auditoría: botón para poner nombres, marcas y costos como en la App; «Corregir precios» ya no se queda con un número viejo; y en Ajustes → Shopify, «Revisar permisos y qué se copia a Shopify».",
     "Ajustes → Marcas: botón para revisar los precios por línea y otro para poner el nombre de cada línea (San Angel #1…) en toda la hoja, sin mover precios.",
     "ESSENTIAL se ve como una sola marca, con sus márgenes por línea (Brayan, San Angel #1 y #2). Se corrigió la edición de precios de un producto.",

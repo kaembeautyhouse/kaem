@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-04';
+    const APP_VERSION = '2026-11-08-05';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4312,6 +4312,7 @@
         <div id="shopPanel" hidden>
           <p class="cfg-hint" id="shopEstado" aria-live="polite"></p>
           <a class="btn-ghost shop-link" id="shopEnlace" href="#" target="_blank" rel="noopener" hidden>Abrir en Shopify</a>
+          <button type="button" class="btn-ghost" id="shopNombreBtn" style="width:100%;min-height:44px;margin-top:8px" hidden>Poner el nombre guardado de la App también en Shopify</button>
           <div id="shopForm" hidden>
             <div id="shopDescWrap"><label class="lbl" for="shopDesc">Descripción <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional: puedes completarla en Shopify)</span></label>
             <textarea id="shopDesc" rows="3" maxlength="4000" placeholder="Para qué sirve, beneficios, modo de uso…"></textarea></div>
@@ -7878,6 +7879,7 @@
         if(sp.reset){ precios[kp]=null; hayP=true; }
         else if(sp.val!==sp.orig){ if(!(sp.val>0)){ toast('Revisa el precio '+kp+': debe ser mayor a cero.','error'); beep('error'); return; } precios[kp]=sp.val; hayP=true; } }
       if(hayP) payload.precios=precios;
+      var skuGuardado=editSkuKey, pPrev=findProduct(editSkuKey), prevNombre=pPrev?String(pPrev.producto||'').trim().toUpperCase():'';
       if(!payload.producto){ toast('Escribe el nombre.','error'); beep('error'); return; }
       if(!payload.marca){ toast('Selecciona una marca.','error'); beep('error'); return; }
       if(!payload.costo||payload.costo<=0){ toast('Revisa el costo: debe ser un número mayor a cero.','error'); beep('error'); return; }
@@ -7887,6 +7889,7 @@
         if(!res||!res.ok){ toast((res&&res.message)||'No se pudo editar.','error'); beep('error'); return; }
         $('editModal').classList.remove('show'); beep('success'); haptic(20);
         toast('Producto actualizado · '+editSkuKey+' · stock: '+((res.product&&res.product.stock!=null)?res.product.stock:payload.stock)+((res.shopify&&res.shopify.aplicados)?' · Shopify al día':''),'success'); refreshData();
+        if(res.shopify && !res.shopify.omitido && prevNombre && String(payload.producto||'').trim().toUpperCase()!==prevNombre) setTimeout(function(){ toast('¿Cambias también el nombre en Shopify?','info',9000,{ accion:'Sí, cambiarlo', fn:function(){ shopPonerNombre(skuGuardado,null); } }); },1800);
         if(res.shopify && res.shopify.ok===false) setTimeout(function(){ toast(res.shopify.message||'Shopify no recibió el cambio.','error'); },900);
       }).withFailureHandler(function(){ setLoading(false); toast('Sin conexión · no se completó. Revisa el internet e intenta de nuevo.','error'); beep('error'); }).updateProduct(payload);
     });
@@ -14962,7 +14965,7 @@
     function shopReiniciar(){
       SHOP.foto=null; SHOP.estado=null; SHOP.enviando=false;
       var p=$('shopPanel'); if(!p) return;
-      p.hidden=true; $('shopForm').hidden=true; $('shopEstado').textContent=''; $('shopDesc').value=''; $('shopPrev').innerHTML=''; $('shopEnlace').hidden=true;
+      p.hidden=true; $('shopNombreBtn').hidden=true; $('shopForm').hidden=true; $('shopEstado').textContent=''; $('shopDesc').value=''; $('shopPrev').innerHTML=''; $('shopEnlace').hidden=true;
       $('fe-shopify').style.display = AJUSTES.shopifyActivo ? '' : 'none';
     }
     function shopAbrirPanel(){
@@ -14971,7 +14974,7 @@
       google.script.run.withSuccessHandler(function(r){
         if(sku!==editSkuKey) return;
         if(!r||!r.ok){ $('shopEstado').textContent=(r&&r.message)||'No se pudo consultar Shopify.'; return; }
-        SHOP.estado=r;
+        SHOP.estado=r; $('shopNombreBtn').hidden=!r.enShopify;
         if(r.faltanPermisos && r.faltanPermisos.length){ $('shopEstado').textContent='Al token de Shopify le faltan permisos: '+r.faltanPermisos.join(', ')+'. Agrégalos en el Dev Dashboard de Shopify y vuelve a abrir este panel.'; return; }
         var t=r.tonos?(' (con '+r.tonos+' tonos)'):'';
         if(r.completo){
@@ -15031,6 +15034,16 @@
         toast(r.message||'Listo en Shopify','success',7000, r.urlAdmin?{ accion:'Abrir en Shopify', fn:function(){ window.open(r.urlAdmin,'_blank','noopener'); } }:null);
       }).withFailureHandler(function(){ fin(); toast('Se cortó la conexión. Abre el panel de nuevo para ver si alcanzó a crearse antes de repetir.','error',7000); }).crearEnShopify(datos);
     });
+    // Nombre: la App ya no pisa un nombre de Shopify que tenga formato o que se editó allá; este botón lo manda a propósito
+    function shopPonerNombre(sku, btn){
+      var txt=btn&&btn.textContent; if(btn){ btn.disabled=true; btn.textContent='Cambiando el nombre en Shopify…'; }
+      google.script.run.withSuccessHandler(function(r){
+        if(btn){ btn.disabled=false; btn.textContent=txt; }
+        if(r&&r.ok){ beep('success'); haptic(20); toast(r.message||'Listo','success',6000); } else { beep('error'); toast((r&&r.message)||'No se pudo cambiar el nombre en Shopify.','error',7000); }
+      }).withFailureHandler(function(){ if(btn){ btn.disabled=false; btn.textContent=txt; } toast('Sin conexión · no se cambió el nombre en Shopify.','error'); })
+        .shopifyActualizarNombre({ sku:sku, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+    }
+    $('shopNombreBtn').addEventListener('click', function(){ shopPonerNombre(editSkuKey, $('shopNombreBtn')); });
     // Después de registrar un producto nuevo: aviso con botón directo
     function shopOfrecerTrasRegistro(res){
       try{
