@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-12';
+    const APP_VERSION = '2026-11-09-01';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3699,6 +3699,14 @@
     /* modo oscuro: los íconos café/arena se aclaran para que se lean (Ajustes e Inicio) */
     :root.theme-dark .cfg-nav-grp.tono-2,:root.theme-dark .hub-card.t-esp{--tone:#C9A27F;--tone-txt:#E3C6A5}
     :root.theme-dark .cfg-nav-grp.tono-3,:root.theme-dark .hub-card.t-arena{--tone:#B8A58C;--tone-txt:#D8C8B2}
+
+    /* ═══ Inventario: el precio Detal destaca sin pesar (contorno espresso en vez de bloque oscuro), «Eliminar» discreto, agotado en rojo ═══ */
+    :root:not(.theme-dark) .price.detal{background:var(--blanco);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--espresso) 38%,transparent)}
+    :root:not(.theme-dark) .price.detal small{color:var(--texto-suave)}
+    :root:not(.theme-dark) .price.detal b{color:var(--espresso);font-weight:600}
+    .card-actions .act.danger{border-color:transparent;background:transparent;font-weight:500;flex:0 1 auto;padding-left:14px;padding-right:14px}
+    .stock-badge.agotado b{font-size:13px;letter-spacing:.02em;padding:3px 0}
+    .stock-badge.agotado{background:var(--rosa)}
   </style>
 </head>
 <body>
@@ -7404,9 +7412,9 @@
           +    '</div>'
           +    (MODO_CLIENTE
               ? (function(){ var d=(p.disponibleReal!=null?p.disponibleReal:(p.disponible!=null?p.disponible:(Number(p.stock)||0))); return '<div class="stock-badge'+(d<=5?' low':'')+'"><b style="font-size:13px">'+(d<=0?'Agotado':(d<=5?'Últimas':'Hay'))+'</b><span>'+(d<=0?'sin stock':(d<=5?'unidades':'disponible'))+'</span></div>'; })()
-              : '<div class="stock-badge'+(low?' low':'')+'"><b>'+ (p.disponibleReal!=null?p.disponibleReal:(p.disponible!=null?p.disponible:(Number(p.stock)||0))) +'</b><span>Disponible</span>'
+              : (function(){ var d=(p.disponibleReal!=null?p.disponibleReal:(p.disponible!=null?p.disponible:(Number(p.stock)||0))); return '<div class="stock-badge'+(low?' low':'')+(d<=0?' agotado':'')+'"><b>'+(d<=0?'Agotado':d)+'</b><span>'+(d<=0?'sin stock':(low?'Stock bajo':'Disponible'))+'</span>'
                 +      (p.reservado>0?('<i class="badge-res">'+p.reservado+' reserv.</i>'):'')
-                +    '</div>')
+                +    '</div>'; })())
           +  '</div>'
           +  '<div class="price-grid"'+(MODO_CLIENTE?' style="grid-template-columns:1fr"':'')+'>'
           +    ((VER_COSTO && !MODO_CLIENTE)?('<div class="price"><small>Costo</small><b>'+cop(p.costo)+'</b></div>'):'')
