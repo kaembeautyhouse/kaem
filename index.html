@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-09-01';
+    const APP_VERSION = '2026-11-09-02';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3707,6 +3707,21 @@
     .card-actions .act.danger{border-color:transparent;background:transparent;font-weight:500;flex:0 1 auto;padding-left:14px;padding-right:14px}
     .stock-badge.agotado b{font-size:13px;letter-spacing:.02em;padding:3px 0}
     .stock-badge.agotado{background:var(--rosa)}
+
+    /* ═══ Nuevo producto: tres tarjetas (Producto, Existencias, Códigos opcionales) en vez de una lista larga ═══ */
+    .reg-card{background:var(--blanco);border:1px solid var(--linea);border-radius:18px;padding:16px 16px 6px;margin-top:14px}
+    .reg-card .field{margin-bottom:14px}
+    .reg-card .field input:not(.stepper input),.reg-card .field select{background:var(--crema-2)}
+    .reg-t{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin:0 0 14px;color:var(--espresso);display:flex;align-items:baseline;gap:8px}
+    .reg-t small{font-family:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--texto-suave)}
+    .reg-cod{padding-bottom:16px}
+    .reg-cod > summary{cursor:pointer;list-style:none;margin:0;min-height:28px}
+    .reg-cod > summary::-webkit-details-marker{display:none}
+    .reg-cod > summary::after{content:'+';margin-left:auto;color:var(--texto-suave);font-size:20px;font-weight:400}
+    .reg-cod[open] > summary{margin-bottom:14px}
+    .reg-cod[open] > summary::after{content:'−'}
+    .reg-cod .field:last-child{margin-bottom:0}
+    #screen-registrar .btn-primary{margin-top:18px}
   </style>
 </head>
 <body>
@@ -3774,16 +3789,8 @@
           Escanear código
         </button>
 
-        <div class="field" id="f-ean">
-          <label class="lbl" for="eanFabrica">Código de fábrica (EAN)</label>
-          <input id="eanFabrica" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Opcional">
-          <p class="cfg-hint">Si la marca no trae código, déjalo vacío.</p>
-        </div>
-        <div class="field" id="f-sku">
-          <label class="lbl" for="sku">SKU interno</label>
-          <input id="sku" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Se genera solo">
-          <p class="cfg-hint">Vacío = se genera solo. O escribe el tuyo (ej. CAR-LIP-01).</p>
-        </div>
+        <div class="reg-card">
+          <h3 class="reg-t">Producto</h3>
         <div class="field" id="f-producto">
           <label class="lbl" for="producto">Nombre del producto</label>
           <input id="producto" type="text" autocomplete="off" placeholder="Ej: Base líquida">
@@ -3801,6 +3808,10 @@
           <label class="lbl" for="costo">Precio costo base</label>
           <div class="cost-wrap"><span class="sign">$</span><input id="costo" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></div>
         </div>
+        </div>
+
+        <div class="reg-card">
+          <h3 class="reg-t">Existencias</h3>
         <div class="field row-field" id="f-tonos">
           <label class="lbl inline">¿Tiene tonos o colores?</label>
           <div class="segmented" role="group" aria-label="Tiene tonos">
@@ -3833,6 +3844,22 @@
             <button type="button" class="chip mult" data-mult="2">×2</button>
           </div>
         </div>
+
+        </div>
+
+        <details class="reg-card reg-cod">
+          <summary class="reg-t">Códigos <small>opcional</small></summary>
+        <div class="field" id="f-ean">
+          <label class="lbl" for="eanFabrica">Código de fábrica (EAN)</label>
+          <input id="eanFabrica" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Opcional">
+          <p class="cfg-hint">Si la marca no trae código, déjalo vacío.</p>
+        </div>
+        <div class="field" id="f-sku">
+          <label class="lbl" for="sku">SKU interno</label>
+          <input id="sku" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Se genera solo">
+          <p class="cfg-hint">Vacío = se genera solo. O escribe el tuyo (ej. CAR-LIP-01).</p>
+        </div>
+        </details>
 
         <button class="btn-primary" id="saveBtn" type="button"><span class="spin"></span><span id="saveLabel">Guardar producto</span></button>
       </section>
@@ -7939,7 +7966,7 @@
     function onSaveError(){ setLoading(false); toast('Sin conexión · no se completó. Revisa el internet e intenta de nuevo.','error'); beep('error'); }
     function resetForm(){
       skuInput.value=''; nameInput.value=''; costInput.value=''; costRaw=0; setQty(1); pendingPayload=null;
-      var ean=$('eanFabrica'); if(ean) ean.value='';
+      var ean=$('eanFabrica'); if(ean) ean.value=''; var dtr=document.querySelector('.reg-cod'); if(dtr) dtr.open=false;
       var tl=$('tonosList'); if(tl) tl.innerHTML='';
       setTonos(false);
       skuInput.focus();
@@ -8262,7 +8289,7 @@
           switchTab('registrar');
           // En registro, un código escaneado es el EAN de fábrica si el campo existe
           var campoEan=$('eanFabrica');
-          if(campoEan){ campoEan.value=code; }
+          if(campoEan){ campoEan.value=code; var dtc=campoEan.closest('details'); if(dtc) dtc.open=true; }
           else { $('sku').value=code; clearErr('sku'); }
           $('producto').focus();
         }
@@ -12657,7 +12684,7 @@
 
     /* ——————— UI helpers ——————— */
     function setLoading(on){ var b=$('saveBtn'); b.classList.toggle('loading',on); b.disabled=on; $('saveLabel').textContent=on?'Guardando…':'Guardar producto'; $('overlay').classList.toggle('show',on); }
-    function markErr(field){ var el=$('f-'+field); if(!el) return; el.classList.add('field-error'); var i=el.querySelector('input,select'); if(i) i.focus(); }
+    function markErr(field){ var el=$('f-'+field); if(!el) return; el.classList.add('field-error'); var dt=el.closest('details'); if(dt) dt.open=true; var i=el.querySelector('input,select'); if(i) i.focus(); }
     function clearErr(field){ var el=$('f-'+field); if(el) el.classList.remove('field-error'); }
     /* ——— Avisos (toast) ———
        Tarjeta con icono de color, la frase principal en negrita, barra de tiempo, botón para cerrar y, si se quiere, un botón de acción.
