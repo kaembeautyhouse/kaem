@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-11';
+    const APP_VERSION = '2026-11-08-12';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3690,6 +3690,15 @@
       #cpList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
       #cpList > .cp-card{margin-bottom:0}
     }
+
+    /* ═══ Ajustes: aire entre grupos y íconos en tonos cálidos (café y arena) en vez de gris frío ═══ */
+    #cfgNav .cfg-nav-bloque + .cfg-nav-bloque{margin-top:22px}
+    #cfgNav .cfg-nav-bloque > .cfg-nav-g{margin:0 4px 8px}
+    .cfg-nav-grp.tono-2{--tone:#8B6B58;--tone-txt:#5E4638}
+    .cfg-nav-grp.tono-3{--tone:#B8A58C;--tone-txt:#6B5A47}
+    /* modo oscuro: los íconos café/arena se aclaran para que se lean (Ajustes e Inicio) */
+    :root.theme-dark .cfg-nav-grp.tono-2,:root.theme-dark .hub-card.t-esp{--tone:#C9A27F;--tone-txt:#E3C6A5}
+    :root.theme-dark .cfg-nav-grp.tono-3,:root.theme-dark .hub-card.t-arena{--tone:#B8A58C;--tone-txt:#D8C8B2}
   </style>
 </head>
 <body>

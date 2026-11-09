@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-08-11",
+  "app": "2026-11-08-12",
   "servidor": "2026.10.45",
   "fecha": "2026-11-08",
   "novedades": [
+    "Ajustes con más aire entre grupos e íconos en tonos cálidos; en modo oscuro los íconos de Inicio y Ajustes se ven con buen contraste.",
     "Historial, Clientes y Cupos más claros: botones de Historial con menos peso («Eliminar» discreto), etiqueta «Compró» y avatares cálidos en Clientes, barra de Cupos que solo cambia de color con uso alto, y Cupos en dos columnas en computador.",
     "Alertas con la hora de actualización más clara, tarjetas de Pagos más limpias en el celular y filtros de Gastos y Cupos que ya no se cortan.",
     "Cartera más clara: etiqueta y barra de color en cada remisión (Al día, Por vencer, Vencida), contadores serenos cuando todo está al día, «Recordar» discreto si no urge y fecha de vencimiento en dos líneas en el celular.",
