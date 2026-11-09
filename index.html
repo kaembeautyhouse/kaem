@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-07';
+    const APP_VERSION = '2026-11-08-08';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3597,6 +3597,40 @@
       .ped-col-b{position:sticky;top:12px}
       #screen-pedidos > .ped-head{width:min(100%,1180px) !important}
     }
+
+    /* ═══ Empaque: la tarea principal manda (productos), fecha de entrega más serena, filas más cómodas, progreso en unidades y cola + detalle en escritorio ═══ */
+    #packEntregaBox{border:1px solid var(--linea);background:var(--blanco);box-shadow:none;padding:12px 14px}
+    #packEntregaBox > label.lbl{font-size:14.5px!important;margin-bottom:4px}
+    #packEntregaBox .ent-nota{margin:0 0 10px;font-size:12px}
+    #packEntregaBox .fecha-btn{min-height:52px;padding:0 14px;border-radius:14px;background:var(--crema-2);color:var(--espresso);box-shadow:none;border:1px solid var(--linea)}
+    #packEntregaBox .fecha-btn .fb-ico{font-size:22px}
+    #packEntregaBox .fecha-btn .fb-txt b{font-size:16px}
+    #packEntregaBox .ent-chips .chip{min-height:40px;font-size:14px;font-weight:500}
+    #packEntregaBox .ent-check{font-size:13px}
+    .chk-row{padding:15px 14px;border-radius:16px}
+    .chk-box{width:32px;height:32px;border-radius:11px}
+    .chk-box svg{width:18px;height:18px}
+    .chk-name{font-size:15.5px}
+    .chk-sub{font-size:12px}
+    .chk-step{width:36px;height:36px}
+    .chk-num{font-size:15px;min-width:50px}
+    .chk-row.done .chk-name{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--salvia-txt) 50%,transparent)}
+    .chk-count.ok{color:var(--salvia-txt);font-weight:600}
+    #screen-packing .empty svg{stroke:var(--cobre,#C9985F);stroke-width:1.4}
+    .pack-sug-it.on{border-color:var(--espresso);box-shadow:0 0 0 1px var(--espresso)}
+    .pk-col-b::before{content:none}
+    @media (min-width:1100px){
+      #screen-packing.screen > *{width:min(100%,1180px) !important}
+      #screen-packing > .pk-cols{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(0,1.2fr);gap:22px;align-items:start}
+      /* la cola de pedidos sigue visible aun con un pedido abierto */
+      #screen-packing.con-pedido #packEmpty{display:block !important;padding:0;text-align:left}
+      #screen-packing.con-pedido #packEmpty > svg,#screen-packing.con-pedido #packEmptyTxt{display:none}
+      #screen-packing.con-pedido .pack-sug{margin-top:0}
+      #screen-packing.con-pedido .pack-sug::before{content:"Pedidos por empacar";font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--texto-suave);margin:0 2px 2px}
+      #screen-packing:not(.con-pedido) .pk-col-b{display:flex;align-items:center;justify-content:center;min-height:240px;border:1.5px dashed var(--linea);border-radius:18px;color:var(--texto-suave);font-size:14px}
+      #screen-packing:not(.con-pedido) .pk-col-b::before{content:"Elige un pedido de la lista para empezar a empacarlo.";text-align:center;padding:0 20px}
+      .pk-col-a{position:sticky;top:12px}
+    }
   </style>
 </head>
 <body>
@@ -3742,12 +3776,14 @@
         </button>
         <p id="packAntig" class="pack-antig"></p>
 
+        <div class="pk-cols"><div class="pk-col-a">
         <div id="packEmpty" class="empty">
           <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>
           <div id="packEmptyTxt">Selecciona un pedido para empezar a empacarlo.</div>
           <div id="packSugeridos" class="pack-sug"></div>
         </div>
 
+        </div><div class="pk-col-b">
         <div id="packHud" style="display:none">
           <div class="chk-head">
             <div class="chk-head-top">
@@ -3786,6 +3822,7 @@
           <button class="btn-primary" id="packFinishBtn" type="button"><span class="spin"></span><span id="packFinishLabel">Pedido listo</span></button>
           <button class="btn-ghost" id="packResetBtn" type="button" style="width:100%;margin-top:10px">Desmarcar todo</button>
         </div>
+        </div></div>
       </section>
 
       <!-- ————— CARTERA · CUENTAS POR COBRAR ————— -->
@@ -10777,6 +10814,7 @@
       }).filter(function(it){ return it.sku; });
 
       packRestaurarProgreso();
+      packMarcarCola(ref);
       $('packEmpty').style.display = 'none';
       $('packHud').style.display = 'block'; $('screen-packing').classList.add('con-pedido');
       $('packCliente').textContent = (o.cliente && o.cliente.nombre) ? o.cliente.nombre : '';
@@ -10786,8 +10824,10 @@
       packEnfocar();
       haptic(12);
     }
+    // resalta en la cola (escritorio) el pedido que se está empacando
+    function packMarcarCola(ref){ Array.prototype.forEach.call(document.querySelectorAll('#packSugeridos .pack-sug-it'), function(b){ b.classList.toggle('on', !!ref && b.getAttribute('data-ref')===ref); }); }
     function packLimpiar(){
-      PACK.pedido = null; PACK.items = [];
+      PACK.pedido = null; PACK.items = []; packMarcarCola('');
       $('packHud').style.display = 'none'; $('screen-packing').classList.remove('con-pedido');
       $('packEmpty').style.display = 'block';
       packGuardarProgreso();
@@ -10825,8 +10865,10 @@
 
     function packRender(){
       var r = packResumen();
-      $('packProgText').textContent = r.lineasOK + ' de ' + r.lineas;
-      $('packBarFill').style.width = (r.lineas ? Math.round((r.lineasOK / r.lineas) * 100) : 0) + '%';
+      // progreso en unidades (lo que realmente se empaca); al completar, el contador se pone en salvia
+      $('packProgText').textContent = r.completo ? 'Todo listo ✓' : (r.unidOK + ' de ' + r.unidTotal + ' un.');
+      $('packProgText').classList.toggle('ok', !!r.completo);
+      $('packBarFill').style.width = r.pct + '%';
 
       var cont = $('packList');
       cont.innerHTML = '';

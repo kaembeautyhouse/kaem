@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-08-07",
+  "app": "2026-11-08-08",
   "servidor": "2026.10.45",
   "fecha": "2026-11-08",
   "novedades": [
+    "Empaque más claro: progreso en unidades («1 de 3 un.» y «Todo listo»), filas de producto más cómodas, fecha de entrega más discreta y, en computador, la lista de pedidos a la izquierda y el detalle a la derecha.",
     "Pedidos más claro: puntos naranjas en lo que falta elegir, bloques Cliente y Condiciones en tarjetas, carrito vacío con guía y, en computador, dos columnas con el botón Guardar siempre a la vista.",
     "Pantalla de Inicio más cálida: tarjetas en café y arena (sin gris frío), línea cobre en Pedidos, y el panel «Lo importante de hoy» llega hasta el final en computador.",
     "Editar producto → Shopify: botón «Poner el nombre guardado de la App también en Shopify» (y aviso al guardar con otro nombre). La App ya no pisa los nombres de Shopify que tienen formato o que editaste allá; este botón es la forma de mandarlos a propósito.",
