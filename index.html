@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-06';
+    const APP_VERSION = '2026-11-08-07';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3579,6 +3579,24 @@
       .hub-main{align-items:stretch}
       .hub-side{position:relative;top:auto;height:0;min-height:100%;max-height:none}
     }
+
+    /* ═══ Pedidos: opciones pendientes sin pista falsa, puntos de «falta elegir», bloques en tarjeta, carrito vacío y 2 columnas en escritorio ═══ */
+    .pg-pend .seg.active{color:var(--texto-suave);font-weight:500}
+    .pg-pendiente > .lbl::after,.section-title.pg-pendiente::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--terracota);margin-left:8px;vertical-align:middle;position:relative;top:-1px}
+    .ped-card{background:var(--blanco);border:1px solid var(--linea);border-radius:18px;padding:12px 14px 6px;margin:0 0 14px;box-shadow:0 8px 24px -16px rgba(44,33,30,.14)}
+    .ped-card > .section-title{font-size:20px;margin:2px 0 10px}
+    .ped-card .pg-two{margin-bottom:10px}
+    .ped-cond .row-field{padding:2px 0}
+    .ped-card .kv{background:var(--crema-2)}
+    .cart-empty{text-align:center;padding:26px 16px;border:1.5px dashed var(--linea);border-radius:18px;background:color-mix(in srgb,var(--blanco) 55%,transparent);margin:0 0 14px}
+    .cart-empty svg{width:34px;height:34px;fill:none;stroke:var(--cobre,#C9985F);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 6px}
+    .cart-empty b{display:block;font-family:'Fraunces',serif;font-weight:500;font-size:18px;color:var(--espresso)}
+    .cart-empty span{display:block;margin-top:2px;font-size:13.5px;color:var(--texto-suave)}
+    @media (min-width:1100px){
+      #screen-pedidos > .ped-cols{width:min(100%,1180px) !important;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:22px;align-items:start}
+      .ped-col-b{position:sticky;top:12px}
+      #screen-pedidos > .ped-head{width:min(100%,1180px) !important}
+    }
   </style>
 </head>
 <body>
@@ -4061,6 +4079,7 @@
 
         <div id="draftBar" class="draft-bar" style="display:none"></div>
 
+        <div class="ped-cols"><div class="ped-col ped-col-a">
         <div class="field row-field">
           <label class="lbl inline">Lista de precios</label>
           <div class="segmented segmented-3" id="nivelSeg" role="group" aria-label="Nivel de precio">
@@ -4089,8 +4108,9 @@
 
         <button type="button" class="gal-btn" id="galBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>Mostrar productos al cliente</button>
         <div id="cartList"></div>
-        <p id="cartEmpty" class="cart-empty">El carrito está vacío. Escanea o busca productos.</p>
+        <div id="cartEmpty" class="cart-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><b>Tu pedido está vacío</b><span>Busca o escanea un producto para empezar.</span></div>
 
+        <div class="ped-card ped-cli">
         <h3 class="section-title">Cliente</h3>
         <div class="pg-two" id="pgCli" role="group" aria-label="Cliente del pedido">
           <button type="button" class="pg-op" data-m="nuevo"><b>Crear cliente nuevo</b><small>Primera compra</small></button>
@@ -4116,6 +4136,10 @@
         </div>
         <div class="field"><label class="lbl" for="orderNotes">Notas / Observaciones del Pedido</label>
           <textarea id="orderNotes" rows="3" autocomplete="off" placeholder="Ej. Entregar después de las 5 p. m. · Empaque de regalo"></textarea></div>
+        </div>
+        </div><div class="ped-col ped-col-b">
+        <div class="ped-card ped-cond">
+        <h3 class="section-title">Condiciones del pedido</h3>
 
 <div class="field row-field pg-row" id="pgFleteRow"><label class="lbl inline">Flete / Envío</label><div class="segmented" id="pgFlete" role="group" aria-label="Flete / Envío"><button type="button" class="seg" data-v="gratis">Gratis</button><button type="button" class="seg" data-v="valor">Con valor</button></div></div>
         <div class="field row-field" id="fleteRow" style="display:none">
@@ -4149,6 +4173,7 @@
           <div class="cost-wrap cost-compact"><input id="descInput" type="text" inputmode="numeric" autocomplete="off" class="desc-inline" maxlength="3" placeholder="0"><span class="sign">%</span></div>
         </div>
 
+        </div>
         <div class="kv math totals">
           <div><span>Subtotal productos</span><span id="tSubtotal">$0</span></div>
           <div id="tDescRow"><span>Descuento</span><span id="tDesc">Sin descuento</span></div>
@@ -4186,6 +4211,7 @@
           <button class="btn-solid wa" id="orderWaBtn" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enviar WhatsApp</span></button>
         </div>
         <button class="btn-ghost ped-hist" id="historyBtn" type="button">Ver pedidos guardados (Historial)</button>
+        </div></div>
       </section>
 
     </div>
@@ -14751,6 +14777,10 @@
       $('creditoBox').style.display = (PG.pago && CART.metodo==='Crédito') ? 'block' : 'none';
       pgSeg('pgAbono', PG.abono); $('abonoRow').style.display = PG.abono==='si' ? '' : 'none';
       pgSeg('pgDesc', PG.desc); $('pgDescWrap').style.display = PG.desc==='con' ? '' : 'none';
+      // punto terracota junto a lo que aún falta elegir (solo señal visual; la validación no cambia)
+      var pm=function(el,on){ if(el) el.classList.toggle('pg-pendiente', !!on && !editingRef); };
+      pm($('pgCli').previousElementSibling, !PG.cli); pm($('nivelSeg').parentNode, !PG.nivel); pm($('pgFleteRow'), !PG.flete);
+      pm($('pagoSeg').parentNode, !PG.pago); pm($('pgAbonoRow'), !PG.abono && CART.metodo==='Crédito'); pm($('pgDescRow'), !PG.desc);
     }
     function pgFalta(idEl, msg){
       var el=$(idEl); if(el){ el.classList.remove('pg-falta'); void el.offsetWidth; el.classList.add('pg-falta'); try{ el.scrollIntoView({block:'center', behavior:'smooth'}); }catch(e){} setTimeout(function(){ el.classList.remove('pg-falta'); }, 2200); }
