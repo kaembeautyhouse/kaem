@@ -1,6 +1,6 @@
 {
   "app": "2026-11-08-04",
-  "servidor": "2026.10.43",
+  "servidor": "2026.10.44",
   "fecha": "2026-11-08",
   "novedades": [
     "Shopify copia lo que haces en la App: los nombres se envían como «Nombre Con Iniciales MARCA», y al editar un producto (nombre, marca, costo, precio, tono) o eliminarlo, Shopify se actualiza también. Auditoría: botón para poner nombres, marcas y costos como en la App; «Corregir precios» ya no se queda con un número viejo; y en Ajustes → Shopify, «Revisar permisos y qué se copia a Shopify».",
