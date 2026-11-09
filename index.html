@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-08';
+    const APP_VERSION = '2026-11-08-09';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3630,6 +3630,29 @@
       #screen-packing:not(.con-pedido) .pk-col-b{display:flex;align-items:center;justify-content:center;min-height:240px;border:1.5px dashed var(--linea);border-radius:18px;color:var(--texto-suave);font-size:14px}
       #screen-packing:not(.con-pedido) .pk-col-b::before{content:"Elige un pedido de la lista para empezar a empacarlo.";text-align:center;padding:0 20px}
       .pk-col-a{position:sticky;top:12px}
+    }
+
+    /* ═══ Cartera: contadores serenos en cero, barra y etiqueta de estado por remisión, «Recordar» discreto si está al día, fecha en dos líneas y fila de contadores compacta en escritorio ═══ */
+    .car-kpi.cero b{color:var(--salvia-txt)}
+    .car-kpi.cero small{color:var(--salvia-txt)}
+    .car-card{position:relative;overflow:hidden;padding-left:19px}
+    .car-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--salvia)}
+    .car-card.soon::before{background:var(--st-soon-border)}
+    .car-card.late::before{background:var(--rojo)}
+    .car-card.espera::before{background:var(--piedra)}
+    .car-chip{display:inline-block;vertical-align:middle;margin-left:6px;padding:2px 9px;border-radius:99px;font:700 10.5px/1.5 'Jost',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:var(--st-wa-bg);color:var(--st-wa-text);border:1px solid var(--st-wa-border)}
+    .car-card.soon .car-chip{background:var(--st-soon-bg);color:var(--st-soon-text);border-color:var(--st-soon-border)}
+    .car-card.late .car-chip{background:var(--st-late-bg);color:var(--st-late-text);border-color:var(--st-late-border)}
+    .car-card.espera .car-chip{background:var(--st-espera-bg);color:var(--texto-suave);border-color:var(--st-espera-border)}
+    .car-card.ok .car-btn.wa{background:transparent;border-color:var(--linea);color:var(--texto-suave);font-weight:500}
+    @media (max-width:699px){
+      .car-meta{flex-direction:column;align-items:flex-start;gap:2px}
+      .car-venc{font-size:11.5px}
+    }
+    @media (min-width:1100px){
+      .car-kpis{flex-wrap:nowrap !important}
+      .car-kpis > .car-kpi.total{flex:1.7 1 0 !important;text-align:left;display:flex;flex-direction:column;justify-content:center}
+      .car-kpis > .car-kpi{padding-top:12px;padding-bottom:12px}
     }
   </style>
 </head>
@@ -11293,6 +11316,10 @@
       $('carRemis').textContent = (k.remisiones||0) + (k.remisiones===1?' remisión':' remisiones');
       $('carPorVencer').textContent = k.porVencer || 0;
       $('carVencidos').textContent  = k.vencidos  || 0;
+      // en cero, los contadores se ven serenos (salvia) y dicen «Al día»; la alarma solo si hay alguna
+      var kp=$('carPorVencer').parentNode, kv=$('carVencidos').parentNode, svv=kv.querySelector('small');
+      kp.classList.toggle('cero', !(k.porVencer>0)); kv.classList.toggle('cero', !(k.vencidos>0));
+      if(svv) svv.textContent = (k.vencidos>0) ? 'toca para verlas' : 'todo al día';
       var pe = k.porEntregar || 0;
       $('carPorEntregar').textContent = pe;
       $('carPorEntregarBox').style.display = pe ? 'block' : 'none';
@@ -11323,7 +11350,7 @@
         card.className = 'car-card ' + estado;
         card.innerHTML =
           '<div class="car-top">'
-        +   '<div><div class="car-cli">'+safe(c.cliente||'Sin nombre')+'</div>'
+        +   '<div><div class="car-cli">'+safe(c.cliente||'Sin nombre')+' <span class="car-chip">'+(c.porEntregar?'Sin empacar':(c.vencido?'Vencida':(c.porVencer?'Por vencer':'Al día')))+'</span></div>'
         +       '<div class="car-rem">Remisión #'+safe(c.idRemision)
         +         (c.abonado>0?(' · <span class="car-abonado">abonó '+cop(c.abonado)+'</span>'):'')+'</div></div>'
         +   '<div class="car-saldo"><b>'+cop(c.saldoPendiente)+'</b><span>Saldo</span></div>'

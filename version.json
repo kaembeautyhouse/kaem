@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-08-08",
+  "app": "2026-11-08-09",
   "servidor": "2026.10.45",
   "fecha": "2026-11-08",
   "novedades": [
+    "Cartera más clara: etiqueta y barra de color en cada remisión (Al día, Por vencer, Vencida), contadores serenos cuando todo está al día, «Recordar» discreto si no urge y fecha de vencimiento en dos líneas en el celular.",
     "Empaque más claro: progreso en unidades («1 de 3 un.» y «Todo listo»), filas de producto más cómodas, fecha de entrega más discreta y, en computador, la lista de pedidos a la izquierda y el detalle a la derecha.",
     "Pedidos más claro: puntos naranjas en lo que falta elegir, bloques Cliente y Condiciones en tarjetas, carrito vacío con guía y, en computador, dos columnas con el botón Guardar siempre a la vista.",
     "Pantalla de Inicio más cálida: tarjetas en café y arena (sin gris frío), línea cobre en Pedidos, y el panel «Lo importante de hoy» llega hasta el final en computador.",
