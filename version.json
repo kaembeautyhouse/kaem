@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-09-03",
+  "app": "2026-11-09-04",
   "servidor": "2026.10.45",
   "fecha": "2026-11-09",
   "novedades": [
+    "Editar producto más claro (precios en tarjeta, «Cambiar SKU» y «Añadir tono» como enlaces), aviso de versión nueva con la misma tipografía de la app, y en Clientes la ficha ya no queda vacía al ensanchar la ventana.",
     "Estadísticas más uniforme: todos los rótulos de las tarjetas con el mismo estilo, títulos de sección iguales, leyenda del gráfico más discreta y textos de apoyo mejor repartidos.",
     "Nuevo producto más ordenado: tarjetas Producto (nombre, marca y costo), Existencias (tonos y cantidad) y Códigos opcionales, que se abre al escanear o si hay un error en ellos.",
     "Inventario más claro: el precio Detal destaca con un contorno suave en vez de un bloque oscuro, lo agotado dice «Agotado», lo que queda poco dice «Stock bajo» y «Eliminar» pasa a ser discreto.",
