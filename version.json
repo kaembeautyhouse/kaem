@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-08-10",
+  "app": "2026-11-08-11",
   "servidor": "2026.10.45",
   "fecha": "2026-11-08",
   "novedades": [
+    "Historial, Clientes y Cupos más claros: botones de Historial con menos peso («Eliminar» discreto), etiqueta «Compró» y avatares cálidos en Clientes, barra de Cupos que solo cambia de color con uso alto, y Cupos en dos columnas en computador.",
     "Alertas con la hora de actualización más clara, tarjetas de Pagos más limpias en el celular y filtros de Gastos y Cupos que ya no se cortan.",
     "Cartera más clara: etiqueta y barra de color en cada remisión (Al día, Por vencer, Vencida), contadores serenos cuando todo está al día, «Recordar» discreto si no urge y fecha de vencimiento en dos líneas en el celular.",
     "Empaque más claro: progreso en unidades («1 de 3 un.» y «Todo listo»), filas de producto más cómodas, fecha de entrega más discreta y, en computador, la lista de pedidos a la izquierda y el detalle a la derecha.",

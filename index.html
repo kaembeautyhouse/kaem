@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-10';
+    const APP_VERSION = '2026-11-08-11';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3666,6 +3666,30 @@
       #gsFiltro,#cpFiltro{display:flex;flex-wrap:wrap;width:100%;overflow:visible}
       #gsFiltro .seg,#cpFiltro .seg{flex:1 1 auto;text-align:center}
     }
+
+    /* ═══ Historial · Clientes · Cupos ═══ */
+    /* Historial: WhatsApp suave, «Eliminar» discreto y aparte; rótulos de contadores como en Cartera */
+    .hist-actions button.hact-wa{background:var(--st-wa-bg);border-color:var(--st-wa-border);color:var(--st-wa-text);font-weight:600}
+    .hist-actions button.hact-wa:active{background:color-mix(in srgb,var(--st-wa-bg) 80%,var(--salvia))}
+    .hist-actions button.hact-danger{flex:0 1 auto;min-width:0;border-color:transparent;background:transparent;color:var(--rojo-txt);font-weight:500;padding-left:10px;padding-right:10px;margin-left:auto}
+    .his-kpi span,.cli-kpi span{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--texto-suave);font-weight:600}
+    /* Clientes: avatares cálidos, etiqueta de lo comprado, lista más ancha y panel a todo el alto */
+    .cli-av{background:color-mix(in srgb,var(--terracota) 14%,var(--blanco));color:var(--terracota-txt)}
+    .cli-side .cli-sl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1px}
+    @media (min-width:1100px){
+      .cli-layout{display:grid;grid-template-columns:minmax(380px,.9fr) minmax(0,1.1fr);gap:20px;align-items:start}
+      .cli-detalle{min-height:320px}
+      .cli-n{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+    }
+    /* Cupos: la barra solo cambia de color cuando el uso es alto; WhatsApp discreto si está al día; 2 columnas en escritorio */
+    .cp-bar i{background:var(--salvia)}
+    .cp-bar i.medio{background:#D9A95F}
+    .cp-bar i.alto{background:var(--terracota)}
+    .cp-card.est-ok .car-btn.wa{background:transparent;border-color:var(--linea);color:var(--texto-suave);font-weight:500}
+    @media (min-width:1100px){
+      #cpList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+      #cpList > .cp-card{margin-bottom:0}
+    }
   </style>
 </head>
 <body>
@@ -6763,7 +6787,7 @@
       if(!c.completo) tags += '<i class="cli-tag inc">Incompleto</i>';
       var meta = [c.ciudad, cliTel(c.telefono)].filter(Boolean).join(' · ');
       var lado = CLIENTES.enriquecido && c.nCompras != null
-        ? '<span class="cli-side"><b>' + (c.compras ? abrevCop(c.compras) : '—') + '</b><small>' + cliHace(c.dias) + '</small></span>'
+        ? '<span class="cli-side"><small class="cli-sl">compró</small><b>' + (c.compras ? abrevCop(c.compras) : '—') + '</b><small>' + cliHace(c.dias) + '</small></span>'
         : '<span class="cli-side"><b>' + c.pedidos + '</b><small>' + (c.pedidos === 1 ? 'pedido' : 'pedidos') + '</small></span>';
       return '<button type="button" class="cli-item' + (cliKey(c) === CLIENTES.sel ? ' sel' : '') + '" data-i="' + i + '" style="--i:' + Math.min(i, 12) + '">'
         + '<span class="cli-av" aria-hidden="true">' + safe(cliIni(c.nombre)) + '</span>'
@@ -14207,7 +14231,7 @@
       return '<div class="car-card cp-card est-'+f.estado+(f.manualBloqueado?' est-bloqueado':'')+'">'
         +'<div class="car-top"><div><div class="car-cli">'+safe(f.nombre)+'</div><div class="car-rem">'+sub+'</div></div>'
         +(tienda?'<span class="cp-nivel n-'+safe(f.nivel.replace(/\s/g,'').toLowerCase())+'">'+safe(f.nivel)+'</span>':'<span class="cp-nivel n-nuevo">Sin cupo</span>')+'</div>'
-        +'<div class="cp-bar"><i style="width:'+pct+'%"></i></div>'
+        +'<div class="cp-bar"><i class="'+(pct>=90?'alto':(pct>=70?'medio':''))+'" style="width:'+pct+'%"></i></div>'
         +'<div class="cp-nums"><span>Usa <b>'+cop(f.usado)+'</b></span><span>Cupo <b>'+cop(f.cupo)+(tienda?'':'*')+'</b></span><span>Disponible <b>'+cop(f.disponible)+'</b></span></div>'
         +'<p class="cp-estado e-'+f.estado+'">'+(tienda?safe(cpEstadoTxt(f)):'Propuesta según lo que ha comprado ('+cop(f.compras)+' en '+f.pedidos+(f.pedidos===1?' pedido':' pedidos')+')')+'</p>'
         +'<div class="car-acts">'+acts+'</div></div>';
