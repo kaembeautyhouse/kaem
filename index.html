@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-09-02';
+    const APP_VERSION = '2026-11-09-03';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3722,6 +3722,14 @@
     .reg-cod[open] > summary::after{content:'−'}
     .reg-cod .field:last-child{margin-bottom:0}
     #screen-registrar .btn-primary{margin-top:18px}
+
+    /* ═══ Estadísticas: un solo estilo de rótulos (mayúscula pequeña), títulos de sección iguales y leyenda del gráfico discreta ═══ */
+    .bi-kpi span,.fin-kpi span{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--texto-suave);line-height:1.3}
+    .bi-kpi b{margin:6px 0 4px}
+    .fin-sec,.st-sec-tit{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--texto-suave);margin:20px 2px 10px}
+    .bi-leyenda{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;font-size:11.5px;color:var(--texto-suave);margin:8px 2px 2px}
+    .bi-leyenda .bi-sw{margin-right:-8px}
+    .bi-kpi small,.fin-kpi small{text-wrap:balance}
   </style>
 </head>
 <body>
