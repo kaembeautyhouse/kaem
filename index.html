@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-09';
+    const APP_VERSION = '2026-11-08-10';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3653,6 +3653,18 @@
       .car-kpis{flex-wrap:nowrap !important}
       .car-kpis > .car-kpi.total{flex:1.7 1 0 !important;text-align:left;display:flex;flex-direction:column;justify-content:center}
       .car-kpis > .car-kpi{padding-top:12px;padding-bottom:12px}
+    }
+
+    /* ═══ Pagos: tarjetas de categoría más limpias en celular (la nota larga se oculta; el ahorro se conserva) ═══ */
+    @media (max-width:699px){
+      .pg-cat{min-height:0;padding:11px 10px}
+      .pg-cat span:not(.ahorro):last-child{display:none}
+    }
+
+    /* ═══ Gastos y Cupos: los filtros se acomodan en dos líneas en celular en vez de cortarse al lado ═══ */
+    @media (max-width:699px){
+      #gsFiltro,#cpFiltro{display:flex;flex-wrap:wrap;width:100%;overflow:visible}
+      #gsFiltro .seg,#cpFiltro .seg{flex:1 1 auto;text-align:center}
     }
   </style>
 </head>
@@ -7695,10 +7707,17 @@
       SIN_ROTACION:   {t:'Sin rotación',       c:'u5'}
     };
 
+    // «dd/MM/yyyy HH:mm» del servidor → «· actualizado hoy 10:09 p. m.» (o «8 nov 10:09 p. m.»)
+    function alActualizado(g){
+      var m=/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/.exec(String(g||'')); if(!m) return g?(' · '+g):'';
+      var d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]), h=new Date(), hora=d.toLocaleTimeString('es-CO',{hour:'numeric',minute:'2-digit'}).replace(/s/g,' ');
+      var dif=Math.round((new Date(h.getFullYear(),h.getMonth(),h.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+      return ' · actualizado '+(dif===0?'hoy':(dif===1?'ayer':d.toLocaleDateString('es-CO',{day:'numeric',month:'short'})))+' '+hora;
+    }
     function pintarAlertas(){
       var r=window.ALERTAS.datos; if(!r) return;
       var res=r.resumen||{};
-      $('alertSub').textContent='Según las ventas de los últimos '+(r.ventanaDias||60)+' días · '+(r.generado||'');
+      $('alertSub').textContent='Últimos '+(r.ventanaDias||60)+' días'+alActualizado(r.generado);
 
       // KPIs: lo que cuesta dinero de verdad
       $('alertKpis').innerHTML=
