@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-08-05';
+    const APP_VERSION = '2026-11-08-06';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3568,6 +3568,17 @@
     .rev-linea.mal span:last-child{color:var(--terracota-txt);font-weight:600}
     .rev-linea.ok span:last-child{color:var(--salvia-txt)}
     .rev-ej{font-size:12px;color:var(--texto-suave);padding:2px 0 2px 10px;border-left:2px solid var(--terracota);margin:2px 0}
+
+    /* ═══ Inicio: tonos cálidos (café y arena en vez de gris frío) + línea cobre en Pedidos ═══ */
+    .hub-card.t-esp{--tone:#8B6B58;--tone-txt:#5E4638}
+    .hub-card.t-arena{--tone:#B8A58C;--tone-txt:#6B5A47}
+    #hubGrid .hub-card.big::after{content:"";position:absolute;left:14px;right:14px;bottom:0;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#C9985F 25%,#E8C29E 50%,#C9985F 75%,transparent);opacity:.9;pointer-events:none}
+
+    /* Escritorio: el panel «Lo importante de hoy» llega hasta el final de las tarjetas (sin hueco debajo); si hay mucho contenido, se desplaza por dentro */
+    @media (min-width:1024px){
+      .hub-main{align-items:stretch}
+      .hub-side{position:relative;top:auto;height:0;min-height:100%;max-height:none}
+    }
   </style>
 </head>
 <body>
@@ -14322,7 +14333,7 @@
     function hubConteos(D){
       var k=D.k||{}, cr=D.cpRes, mora=cr?((cr.enMora||0)+(cr.bloqueados||0)):0, nPed=D.cola.length+D.cat.length, N={};
       var cobrar=(typeof CARTERA!=='undefined' && CARTERA.creditos) ? CARTERA.creditos.length : 0;
-      N.pedidos = nPed ? { t:nPed+' por revisar', urg:1 } : { t:'' };
+      N.pedidos = nPed ? { t:nPed+' por revisar', urg:1 } : { t:'Crear una venta' };
       N.consultar = D.prod ? (D.ago ? { t:hubPlural(D.ago,'agotado','agotados') } : { t:D.disp+' disponibles' }) : { t:'' };
       N.cartera = k.vencidos ? { t:hubPlural(k.vencidos,'vencida','vencidas'), urg:1 } : (k.porVencer ? { t:k.porVencer+' por vencer', urg:1 } : { t:cobrar?(cobrar+' por cobrar'):'' });
       N.packing = D.pk.length ? { t:D.pk.length+' por empacar', urg:D.atras>0 } : (D.pc.length ? { t:D.pc.length+' por confirmar', urg:1 } : { t:'' });
