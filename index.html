@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-08';
+    const APP_VERSION = '2026-11-10-09';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -398,10 +398,10 @@
         obtenerAlertas:1, obtenerEstadisticas:1, obtenerBI:1, sugerenciaReposicion:1, obtenerClientes:1,
         listarClientes:1, obtenerAbonos:1, obtenerPagosRecientes:1, obtenerAuditoria:1, obtenerPedido:1,
         listarUbicacionesShopify:1, listarObligaciones:1, listarPedidosCatalogo:1, obtenerDevoluciones:1, estadoSesiones:1,
-        auditarInventario:1, diagnosticoConexion:1, lote:1, refrescarTodo:1, listarGastos:1, obtenerFinanzas:1, obtenerCupos:1, obtenerCupoCliente:1
+        auditarInventario:1, revisarDatos:1, diagnosticoConexion:1, lote:1, refrescarTodo:1, listarGastos:1, obtenerFinanzas:1, obtenerCupos:1, obtenerCupoCliente:1
       };
       // Lecturas que NO se agrupan: el catálogo (camino crítico del arranque, va solo y de primero) y las pesadas
-      var NO_AGRUPAR = { getInitialData:1, refrescarTodo:1, obtenerEstadisticas:1, obtenerBI:1, obtenerFinanzas:1, obtenerCupos:1, diagnosticoConexion:1, auditarInventario:1, lote:1 };
+      var NO_AGRUPAR = { getInitialData:1, refrescarTodo:1, obtenerEstadisticas:1, obtenerBI:1, obtenerFinanzas:1, obtenerCupos:1, diagnosticoConexion:1, auditarInventario:1, revisarDatos:1, lote:1 };
       var LOTE_OK = true, LOTE_MAX = 6;
 
       // ——— Fila de peticiones ———
@@ -3777,7 +3777,7 @@
       #editModal .sheet{max-width:980px}
       #editModal .ep-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:36px;align-items:start}
       #editModal .ep-colA,#editModal .ep-colB{display:block;min-width:0}
-      #nuevoTonoModal .sheet,#gsModal .sheet,#pgEditModal .sheet,#cpEditModal .sheet,#devolModal .sheet,#catRevModal .sheet,#cliValModal .sheet,#pgPagarModal .sheet,#entregaModal .sheet,#recibosModal .sheet,#catInboxModal .sheet,#skuLoteModal .sheet,#audModal .sheet,#invRevModal .sheet,#conexionModal .sheet{max-width:780px}
+      #nuevoTonoModal .sheet,#gsModal .sheet,#pgEditModal .sheet,#cpEditModal .sheet,#devolModal .sheet,#catRevModal .sheet,#cliValModal .sheet,#pgPagarModal .sheet,#entregaModal .sheet,#recibosModal .sheet,#catInboxModal .sheet,#skuLoteModal .sheet,#audModal .sheet,#invRevModal .sheet,#datosRevModal .sheet,#conexionModal .sheet{max-width:780px}
       /* Formularios largos (gastos y pagos): dos columnas para no tener que bajar tanto */
       #gsModal .sheet,#pgEditModal .sheet{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-content:start;max-width:820px}
       #gsModal .sheet > h3,#pgEditModal .sheet > h3,#gsModal .sheet > .modal-actions,#pgEditModal .sheet > .modal-actions,#gsModal .sheet > button,#pgEditModal .sheet > button,#pgResumen,#gsViaBox,#gsMercBox,#pgProvBox,#pgPrestBox,#pgCuotasBox,#gsModal .sheet > p,#pgEditModal .sheet > p{grid-column:1 / -1}
@@ -5108,6 +5108,15 @@
       <button class="btn-ghost" id="conCerrar" type="button" style="width:100%;margin-top:14px">Cerrar</button>
     </div>
   </div>
+  <!-- Revisión de datos (solo lee) -->
+  <div class="modal" id="datosRevModal" style="z-index:85">
+    <div class="sheet">
+      <h3>Revisión de datos</h3>
+      <p class="cfg-hint" id="datosRevSub">Revisando…</p>
+      <div id="datosRevLista"></div>
+      <button class="btn-ghost" id="datosRevCerrar" type="button" style="width:100%;margin-top:14px">Cerrar</button>
+    </div>
+  </div>
   <!-- Revisión de inventario y reservas -->
   <div class="modal" id="invRevModal" style="z-index:85">
     <div class="sheet">
@@ -5628,6 +5637,7 @@
         <button class="btn-ghost" id="cfgConexionBtn" type="button">Probar conexión completa</button>
         <button class="btn-ghost" id="cfgInvRevBtn" type="button">Revisar inventario y reservas</button>
       </div>
+      <button class="btn-ghost" id="cfgDatosRevBtn" type="button" style="width:100%;margin-top:8px">Revisar datos (fechas, ceros, repetidos)</button>
       <p class="cfg-hint"><b>Conexión:</b> mide la velocidad del servidor y revisa la salud de la hoja, los disparadores y la seguridad. <b>Inventario:</b> compara lo reservado de cada producto con lo que piden los pedidos por empacar y corrige diferencias.</p>
       <button class="btn-ghost" id="cfgBaseBtn" type="button" style="width:100%;margin-top:8px">Ordenar y revisar la base de datos</button>
       <p class="cfg-hint">Ordena las pestañas por grupos y colores, crea la hoja <b>LEEME</b> (qué es cada hoja) y limpia lo que solo crece. No toca tus datos.</p>
@@ -6751,6 +6761,23 @@
       }).withFailureHandler(function(){ b.disabled=false; b.textContent='Corregir ahora'; toast('No hay conexión con el servidor. Intenta de nuevo.','error'); })
         .corregirInventario({ corregirStock: $('invRevDup').checked });
     });
+    $('cfgDatosRevBtn').addEventListener('click', function(){
+      $('datosRevSub').textContent='Leyendo productos, pedidos y clientes… (no se cambia nada)'; $('datosRevLista').innerHTML='';
+      $('datosRevModal').classList.add('show');
+      google.script.run.withSuccessHandler(function(r){
+        if(!r || !r.ok){ $('datosRevSub').textContent=(r&&r.message)||'No se pudo revisar los datos.'; return; }
+        $('datosRevSub').textContent=r.message;
+        var por={}; (r.problemas||[]).forEach(function(p){ (por[p.tipo]=por[p.tipo]||[]).push(p); });
+        var h=Object.keys(por).map(function(t){
+          return '<p class="lbl" style="margin:12px 0 4px">'+safe(t)+' ('+(r.tipos&&r.tipos[t]||por[t].length)+')</p>'
+            +por[t].slice(0,40).map(function(p){ return '<div class="aud-item"><b>'+safe(p.ref||p.hoja)+'</b><small>'+safe(p.hoja)+' · fila '+p.fila+' · '+safe(p.columna)+(p.valor!==''?' · «'+safe(p.valor)+'»':'')+'</small>'
+              +(p.ayuda?'<div class="accion">'+safe(p.ayuda)+'</div>':'')+'</div>'; }).join('');
+        }).join('');
+        if(r.recortado) h+='<p class="cfg-hint">…hay más; arregla estos y vuelve a revisar.</p>';
+        $('datosRevLista').innerHTML=h || '<p class="cart-empty">✨ Todo en orden.</p>';
+      }).withFailureHandler(function(){ $('datosRevSub').textContent='No hay conexión con el servidor.'; }).revisarDatos();
+    });
+    $('datosRevCerrar').addEventListener('click', function(){ $('datosRevModal').classList.remove('show'); });
     $('invRevCerrar').addEventListener('click', function(){ $('invRevModal').classList.remove('show'); });
     $('cfgWipeBtn').addEventListener('click', limpiarTodoYReiniciar);
     $('cfgVerCosto').addEventListener('change', function(e){ setVerCosto(e.target.checked); haptic(10); });
