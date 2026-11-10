@@ -1,6 +1,6 @@
 {
   "app": "2026-11-10-08",
-  "servidor": "2026.10.56",
+  "servidor": "2026.10.57",
   "fecha": "2026-11-10",
   "novedades": [
     "Tablet: en Pedidos, las tarjetas de productos ya no se meten debajo del panel «Condiciones del pedido» (con letras anchas se pasaban unos píxeles); si no caben dos por fila, pasan a una. Clientes sin celular y con documento genérico (222222222222) ya no se funden en Estadísticas, el panel BI ni Cupos.",
