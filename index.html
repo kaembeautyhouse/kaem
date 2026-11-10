@@ -3343,12 +3343,15 @@
     .fvg-chips::-webkit-scrollbar{display:none}
     .fvg-chip{flex:0 0 auto;min-height:40px;padding:0 14px;border:0;border-radius:99px;background:var(--crema-2);color:var(--espresso);font:500 13.5px 'Jost',sans-serif;white-space:nowrap;cursor:pointer}
     .fvg-chip.on{background:var(--espresso);color:var(--crema-2)}
-    .fvg-disp{margin-left:auto;border:1.5px solid var(--linea);background:var(--blanco)}
+    .fvg-disp{border:1.5px solid var(--linea);background:var(--blanco)}
     .fvg-disp.on{border-color:var(--espresso)}
     .fvg-scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 2px 14px;-webkit-overflow-scrolling:touch}
     .fvg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (min-width:640px){ .fvg-grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
     @media (min-width:900px){ .fvg-grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
+    /* Escritorio: la vitrina ocupa casi toda la pantalla y muestra más productos a la vez */
+    @media (min-width:1000px){ .fvg-sheet{max-width:min(1600px,97vw);height:96vh;max-height:96vh;padding:18px 22px 0} .fvg-grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
+    @media (min-width:1400px){ .fvg-grid{grid-template-columns:repeat(6,minmax(0,1fr))} }
     .fvg-card{display:flex;flex-direction:column;gap:6px;padding:8px;border:1.5px solid var(--linea);border-radius:16px;background:var(--blanco);transition:border-color .2s}
     .fvg-card.en{border-color:var(--salvia-txt)}
     .fvg-img{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:var(--crema-2)}
@@ -3365,6 +3368,7 @@
     .fvg-ctl button{min-width:48px;height:44px;border:0;border-radius:12px;font:700 16px 'Jost',sans-serif;cursor:pointer}
     .fvg-mas{flex:1;background:var(--espresso);color:var(--crema-2)}
     .fvg-menos{width:48px;background:var(--crema-2);color:var(--espresso)}
+    .fvg-mas:disabled{opacity:.45;cursor:not-allowed}
     .fvg-ctl button:active{transform:scale(.96)}
     .fvg-q{min-width:28px;text-align:center;font-family:'Fraunces',serif;font-size:18px;font-weight:600}
     .fvg-ctl [hidden]{display:none}
@@ -4328,7 +4332,7 @@
           </div>
         </div>
 
-<div class="field row-field pg-row" id="pgDescRow"><label class="lbl inline">Descuento</label><div class="segmented" id="pgDesc" role="group" aria-label="Descuento"><button type="button" class="seg" data-v="sin">Sin descuento</button><button type="button" class="seg" data-v="con">Con descuento</button></div></div>
+<div class="field row-field pg-row" id="pgDescRow"><label class="lbl inline">Descuento</label><div class="segmented" id="pgDesc" role="group" aria-label="Descuento"><button type="button" class="seg" data-v="sin">NO</button><button type="button" class="seg" data-v="con">SÍ</button></div></div>
         <div class="field row-field" id="pgDescWrap" style="display:none">
           <label class="lbl inline" for="descInput">¿Cuánto descuento?</label>
           <div class="cost-wrap cost-compact"><input id="descInput" type="text" inputmode="numeric" autocomplete="off" class="desc-inline" maxlength="3" placeholder="0"><span class="sign">%</span></div>
@@ -4577,7 +4581,7 @@
       <h3 id="cliNivelTit">Asignar nivel</h3>
       <p id="cliNivelInfo"></p>
       <div class="segmented segmented-3 cd-tipo" id="cliNivelSeg" role="group" aria-label="Nivel a asignar">
-        <button type="button" class="seg" data-t="DETAL">Detal</button><button type="button" class="seg active" data-t="DISTRIBUIDOR">Distribuidor</button><button type="button" class="seg" data-t="MAYORISTA">Mayorista</button>
+        <button type="button" class="seg active" data-t="DISTRIBUIDOR">Distribuidor</button><button type="button" class="seg" data-t="MAYORISTA">Mayorista</button><button type="button" class="seg" data-t="DETAL">Detal</button>
       </div>
       <p class="cfg-hint">Solo se llenan los clientes que no tienen nivel. Los que ya lo tienen no se tocan.</p>
       <div class="modal-actions">
@@ -5443,12 +5447,7 @@
           <button type="button" class="seg active" data-cat="on">Activo</button>
         </div></div>
       <p class="cfg-sub">Enlaces para compartir</p>
-      <div class="cfg-enl"><b>Detal <small>cliente final</small></b>
-        <div class="seg-btns seg-btns-3">
-          <button class="btn-solid" id="cfgCatCompDet" type="button">Compartir</button>
-          <button class="btn-ghost" id="cfgCatBreveDet" type="button">WhatsApp breve</button>
-          <button class="btn-ghost" id="cfgCatCopDet" type="button">Copiar enlace</button>
-        </div></div>
+      <p class="cfg-hint"><b>Compartir</b>: mensaje de bienvenida para un cliente nuevo (saludo, cómo funciona y el enlace) que se abre directo en WhatsApp. <b>WhatsApp breve</b>: mensaje corto para clientes con los que ya trabajas.</p>
       <div class="cfg-enl"><b>Distribuidor <small>tiendas y comercios</small></b>
         <div class="seg-btns seg-btns-3">
           <button class="btn-solid" id="cfgCatCompDist" type="button">Compartir</button>
@@ -5460,6 +5459,12 @@
           <button class="btn-solid" id="cfgCatCompMay" type="button">Compartir</button>
           <button class="btn-ghost" id="cfgCatBreveMay" type="button">WhatsApp breve</button>
           <button class="btn-ghost" id="cfgCatCopMay" type="button">Copiar enlace</button>
+        </div></div>
+      <div class="cfg-enl"><b>Detal <small>cliente final</small></b>
+        <div class="seg-btns seg-btns-3">
+          <button class="btn-solid" id="cfgCatCompDet" type="button">Compartir</button>
+          <button class="btn-ghost" id="cfgCatBreveDet" type="button">WhatsApp breve</button>
+          <button class="btn-ghost" id="cfgCatCopDet" type="button">Copiar enlace</button>
         </div></div>
       <p class="cfg-sub">Descuento del catálogo Detal</p>
       <div class="field row-field"><label class="lbl inline">Descuento</label>
@@ -6779,7 +6784,7 @@
        Cada cliente sale de sus pedidos (se agrupan por teléfono). El servidor suma compras, deuda y cupo, y guarda aparte
        lo que no viaja en los pedidos (nivel, notas y teléfonos alternos). Esta pantalla solo LEE lo que listarClientes devuelve. */
     var CLIENTES = { lista: [], busqueda: '', filtro: 'todos', orden: 'reciente', sel: '', cargado: false, cargando: false, enriquecido: true };
-    var CLI_TIPOS = [['', 'Sin nivel'], ['DETAL', 'Detal'], ['DISTRIBUIDOR', 'Distribuidor'], ['MAYORISTA', 'Mayorista']];
+    var CLI_TIPOS = [['', 'Sin nivel'], ['DISTRIBUIDOR', 'Distribuidor'], ['MAYORISTA', 'Mayorista'], ['DETAL', 'Detal']];
     var CLI_INACTIVO_DIAS = 60;
     var CLI_MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
@@ -10232,14 +10237,14 @@
         { k:'saludo',     t:'Saludo y nivel',    d:true },
         { k:'pasos',      t:'Cómo funciona',     d:true },
         { k:'beneficios', t:'Beneficios',        d:true },
-        { k:'minimo',     t:'Pedido mínimo',     d:false },
-        { k:'envio',      t:'Condiciones de envío', d:false } ] },
+        { k:'minimo',     t:'Pedido mínimo',     d:true },
+        { k:'envio',      t:'Condiciones de envío', d:true } ] },
       catalogoBreve: { titulo:'Catálogo · WhatsApp breve', campos:[
         { k:'saludo', t:'Saludo',            d:true },
         { k:'nivel',  t:'Nivel de precios',  d:true },
         { k:'minimo', t:'Pedido mínimo',     d:false },
         { k:'envio',  t:'Condiciones de envío', d:false },
-        { k:'confianza', t:'Seguridad y confianza', d:true } ] }
+        { k:'confianza', t:'Seguridad y confianza', d:false } ] }
     };
     function waCamposDe(txt){ try{ var o = typeof txt==='string' ? (txt ? JSON.parse(txt) : {}) : (txt||{}); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
     /** ¿La parte k del mensaje pl va? (elección guardada o, si no hay, la predeterminada) */
@@ -10336,16 +10341,19 @@
         '🔒 Este es tu enlace personal de KAÉM, seguro y directo conmigo.',
         '🔗 Entra aquí y cuéntame qué te enamora:'
       ]);
+      var porRef = waPorRef(n);
       return waUnir([
-        on('titulo') ? '*Catálogo KAÉM Beauty House* · ' + n.nombre : '',
-        on('saludo') ? 'Hola, te comparto nuestro catálogo con tus precios de *' + n.nombre.toLowerCase() + '*. Míralo con calma y arma tu pedido con el inventario al día.' : '',
-        on('pasos') ? ['*Así funciona:*', '1. Entras y ves las referencias disponibles.', '2. Eliges tonos y cantidades (hay carga rápida de 6 y 12 unidades).', '3. Envías el pedido y te confirmamos disponibilidad, pago y despacho por aquí.'] : '',
-        on('beneficios') ? '• Inventario al día\n• Información de cada producto para tu punto de venta\n• Despachos a todo el país' : '',
+        on('titulo') ? '*¡Bienvenido a KAÉM Beauty House!* · ' + n.nombre : '',
+        on('saludo') ? 'Hola, un gusto saludarte y gracias por tu interés en trabajar con nosotros. Te comparto nuestro catálogo con tus precios de *' + n.nombre.toLowerCase() + '*, con el inventario al día.' : '',
+        on('pasos') ? ['*Así funciona:*', '1. Entras con tu enlace personal y ves las referencias disponibles hoy, con foto, tonos y tu precio de ' + n.nombre.toLowerCase() + '.', '2. Eliges tonos y cantidades' + porRef + ' (hay carga rápida de 6 y 12 unidades).', '3. Envías el pedido y te confirmamos disponibilidad, pago y despacho por aquí antes de enviar.'] : '',
+        on('beneficios') ? '• Precios de ' + n.nombre.toLowerCase() + ' para tu punto de venta\n• Información de cada producto\n• Despachos a todo el país' : '',
         [ on('minimo') ? waMinimoNivel(n) : '', on('envio') ? waEnvioNivel(n) : '' ],
         'Este enlace es personal: es tu acceso directo a KAÉM.',
         'Entra aquí:'
       ]);
     }
+    /** « de a 2 unidades por referencia» (solo si el nivel pide más de 1) */
+    function waPorRef(n){ return n.porRef>1 ? (' · se piden de a ' + n.porRef + ' unidades por referencia') : ''; }
     function waTextoCatalogoBreve(nivel, url, fuente){
       var on = function(k){ return waOn('catalogoBreve', k, fuente); }, n = CAT_NIVEL_INFO[nivel], detal = nivel==='DETAL';
       if(detal){
@@ -10354,8 +10362,8 @@
         return waUnir([ [l1, url], [ on('minimo') ? waMinimoNivel(n) : '', on('envio') ? waEnvioNivel(n) : '' ],
           on('confianza') ? '🔒 Enlace oficial y seguro. Tu pedido llega directo a mí y te confirmo todo por aquí antes de cobrarte nada. Cualquier duda, escríbeme 💌' : '' ]);
       }
-      var l2 = on('saludo') ? 'Hola, te comparto el catálogo de KAÉM Beauty House' : 'Catálogo KAÉM Beauty House';
-      if(on('nivel')) l2 += on('saludo') ? ' con tus precios de ' + n.nombre.toLowerCase() + ':' : ' · precios de ' + n.nombre.toLowerCase();
+      var l2 = on('saludo') ? 'Hola, te dejo el catálogo actualizado de KAÉM' : 'Catálogo KAÉM';
+      if(on('nivel')) l2 += on('saludo') ? ' con tus precios de ' + n.nombre.toLowerCase() + ':' : ' · ' + n.nombre.toLowerCase();
       return waUnir([ [l2, url], [ on('minimo') ? waMinimoNivel(n) : '', on('envio') ? waEnvioNivel(n) : '' ],
         on('confianza') ? 'Es un enlace oficial: tu pedido llega directo a nuestro equipo y te confirmamos disponibilidad y pago antes de despachar.' : '' ]);
     }
@@ -10469,22 +10477,22 @@
         muestra:{ nombre:'MARÍA GÓMEZ', ciudad:'Bogotá' } },
       catalogo: { titulo:'Catálogo · Compartir (bienvenida)', campos:'catalogo',
         uso:'Al tocar «Compartir» en un enlace de catálogo (Ajustes → Catálogo virtual). El mismo texto sirve para los tres catálogos: usa {nivel} para que cambie.',
-        vars:[['nivel','Detal, Distribuidor o Mayorista'],['nivel_minusculas','El nivel en minúsculas'],['link','Enlace del catálogo'],['minimo','Pedido mínimo del nivel'],['envio','Condiciones de envío del nivel']],
-        valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n) }; },
+        vars:[['nivel','Detal, Distribuidor o Mayorista'],['nivel_minusculas','El nivel en minúsculas'],['link','Enlace del catálogo'],['minimo','Pedido mínimo del nivel'],['envio','Condiciones de envío del nivel'],['por_ref','«de a 2 unidades por referencia» (solo Distribuidor)']],
+        valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n), por_ref:waPorRef(n) }; },
         defecto:function(d, c){ return waTextoCatalogo(d.nivel, c); },
-        plantilla:function(){ return waUnir([ '*Catálogo KAÉM Beauty House* · {nivel}',
-            'Hola, te comparto nuestro catálogo con tus precios de *{nivel_minusculas}*. Míralo con calma y arma tu pedido con el inventario al día.',
-            ['*Así funciona:*','1. Entras y ves las referencias disponibles.','2. Eliges tonos y cantidades (hay carga rápida de 6 y 12 unidades).','3. Envías el pedido y te confirmamos disponibilidad, pago y despacho por aquí.'],
-            '• Inventario al día\n• Información de cada producto para tu punto de venta\n• Despachos a todo el país', ['{minimo}','{envio}'],
+        plantilla:function(c){ var on = function(k){ return waOn('catalogo', k, c); }; return waUnir([ on('titulo')?'*¡Bienvenido a KAÉM Beauty House!* · {nivel}':'',
+            on('saludo')?'Hola, un gusto saludarte y gracias por tu interés en trabajar con nosotros. Te comparto nuestro catálogo con tus precios de *{nivel_minusculas}*, con el inventario al día.':'',
+            on('pasos')?['*Así funciona:*','1. Entras con tu enlace personal y ves las referencias disponibles hoy, con foto, tonos y tu precio de {nivel_minusculas}.','2. Eliges tonos y cantidades{por_ref} (hay carga rápida de 6 y 12 unidades).','3. Envías el pedido y te confirmamos disponibilidad, pago y despacho por aquí antes de enviar.']:'',
+            on('beneficios')?'• Precios de {nivel_minusculas} para tu punto de venta\n• Información de cada producto\n• Despachos a todo el país':'', [ on('minimo')?'{minimo}':'', on('envio')?'{envio}':'' ],
             'Este enlace es personal: es tu acceso directo a KAÉM.', ['Entra aquí:','{link}'] ]); },
         muestra:{ nivel:'DISTRIB', url:'https://kaembeautyhouse.github.io/kaem/catalogo.html?k=…' } },
       catalogoBreve: { titulo:'Catálogo · WhatsApp breve', campos:'catalogoBreve',
         uso:'Al tocar «WhatsApp breve» en un enlace de catálogo.',
-        vars:[['nivel','Detal, Distribuidor o Mayorista'],['nivel_minusculas','El nivel en minúsculas'],['link','Enlace del catálogo'],['minimo','Pedido mínimo del nivel'],['envio','Condiciones de envío del nivel']],
-        valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n) }; },
+        vars:[['nivel','Detal, Distribuidor o Mayorista'],['nivel_minusculas','El nivel en minúsculas'],['link','Enlace del catálogo'],['minimo','Pedido mínimo del nivel'],['envio','Condiciones de envío del nivel'],['por_ref','«de a 2 unidades por referencia» (solo Distribuidor)']],
+        valores:function(d){ var n = CAT_NIVEL_INFO[d.nivel]; return { nivel:n.nombre, nivel_minusculas:n.nombre.toLowerCase(), link:d.url||'', minimo:waMinimoNivel(n), envio:waEnvioNivel(n), por_ref:waPorRef(n) }; },
         defecto:function(d, c){ return waTextoCatalogoBreve(d.nivel, d.url, c); },
-        plantilla:function(){ return waUnir([ ['Hola, te comparto el catálogo de KAÉM Beauty House con tus precios de {nivel_minusculas}:','{link}'], ['{minimo}','{envio}'],
-            'Es un enlace oficial: tu pedido llega directo a nuestro equipo y te confirmamos disponibilidad y pago antes de despachar.' ]); },
+        plantilla:function(c){ var on = function(k){ return waOn('catalogoBreve', k, c); }; return waUnir([ ['Hola, te dejo el catálogo actualizado de KAÉM con tus precios de {nivel_minusculas}:','{link}'], [ on('minimo')?'{minimo}':'', on('envio')?'{envio}':'' ],
+            on('confianza')?'Es un enlace oficial: tu pedido llega directo a nuestro equipo y te confirmamos disponibilidad y pago antes de despachar.':'' ]); },
         muestra:{ nivel:'DISTRIB', url:'https://kaembeautyhouse.github.io/kaem/catalogo.html?k=…' } }
     };
     /** El mensaje listo para enviar: el texto propio (si lo hay) con sus variables, o el predeterminado de siempre. */
@@ -12760,6 +12768,7 @@
       version: '4.1',
       state:   STATE,                      // catálogo, marcas, umbrales, filtro, pestaña
       cart:    CART,                       // pedido en edición
+      get ajustes(){ return AJUSTES; },    // ajustes de la app (se reemplaza al cargar: por eso es un getter)
       pedido:  pedState,                   // consecutivos PED / REM
       api: {
         url:  API_URL,
@@ -13066,8 +13075,8 @@
       if(modo==='enlace'){ copiarTexto(url, function(){ toast('Enlace '+nombre+' copiado ✓','success'); haptic(12); }); return; }
       if(modo==='breve'){ var tb = waMensaje('catalogoBreve', { nivel:nivel, url:url }); if(waCustom('catalogoBreve') && !waUsaLink('catalogoBreve')) tb += '\n' + url; waAbrir('', tb); haptic(12); return; }
       var texto = waMensaje('catalogo', { nivel:nivel, url:url }), conLink = waUsaLink('catalogo');
-      if(navigator.share){ navigator.share(conLink ? { title:'Catálogo KAÉM · '+nombre, text:texto } : { title:'Catálogo KAÉM · '+nombre, text:texto, url:url }).catch(function(){}); return; }
-      copiarTexto(conLink ? texto : (texto+'\n'+url), function(){ toast('Mensaje con el enlace '+nombre+' copiado ✓ Pégalo en WhatsApp.','success'); haptic(12); });
+      // Bienvenida para un cliente nuevo: se abre directo en WhatsApp (elige el contacto allá) con el mensaje y el enlace ya escritos
+      waAbrir('', conLink ? texto : (texto+'\n'+url)); haptic(12);
     }
     function catConfigurar(datos, msg){
       datos.operador=String((AJUSTES&&AJUSTES.operador)||'').trim();
@@ -15084,6 +15093,18 @@
 
     /* ——— Vitrina ——— */
     function galPaso(){ return CART.nivel==='Distribuidor' ? 2 : 1; }
+    /* Cuántas unidades suma el botón «+» ahora mismo (0 = no hay más para agregar):
+       · Distribuidor pide de a 2: «+2». Si ya quedó una impar (porque se restó 1), «+1» la completa a par.
+       · Si solo queda 1 unidad en bodega, el botón es «+1» (la última se puede vender sola).
+       · Con inventario estricto, nunca pasa de lo disponible. Restar siempre resta 1. */
+    function galSiguiente(p, q){
+      var paso = galPaso(), d = Math.max(0, fotoDisp(p)), rest = d - q, add = paso;
+      if(paso>1 && q%paso!==0) add = paso - (q%paso);
+      if(rest>0 && add>rest) add = rest;
+      if(rest<=0 && AJUSTES.inventarioEstricto) return 0;
+      return add;
+    }
+    function galTxtMas(add){ return add>0 ? '+'+add : 'Máx.'; }
     function galCant(sku){ for(var i=0;i<CART.items.length;i++) if(CART.items[i].sku===sku) return CART.items[i].cantidad; return 0; }
     function galFiltrar(){
       var q = fnorm(GAL.q||''), terms = q.split(' ').filter(Boolean), qc = q.replace(/\s+/g,'');
@@ -15098,7 +15119,7 @@
       return r;
     }
     function galTarjeta(p){
-      var d = fotoDisp(p), q = galCant(p.sku), paso = galPaso();
+      var d = fotoDisp(p), q = galCant(p.sku), add = galSiguiente(p, q);
       var est = d<=0 ? 'out' : (d<=(STATE.thresholds&&STATE.thresholds.Menor||6) ? 'low' : 'ok');
       return '<div class="fvg-card'+(q?' en':'')+'" data-sku="'+safe(p.sku)+'">'
         + '<div class="fvg-img">'+fotoMini(p, 420)+'</div>'
@@ -15107,7 +15128,7 @@
         + '<div class="fvg-ctl">'
         +   '<button type="button" class="fvg-menos" data-act="menos" aria-label="Quitar una unidad"'+(q?'':' hidden')+'>&minus;</button>'
         +   '<span class="fvg-q"'+(q?'':' hidden')+'>'+q+'</span>'
-        +   '<button type="button" class="fvg-mas" data-act="mas" aria-label="Agregar '+paso+(paso===1?' unidad':' unidades')+'">+'+paso+'</button>'
+        +   '<button type="button" class="fvg-mas" data-act="mas" aria-label="'+(add>0?'Agregar '+add+(add===1?' unidad':' unidades'):'No hay más disponibles')+'"'+(add>0?'':' disabled')+'>'+galTxtMas(add)+'</button>'
         + '</div></div>';
     }
     function galPintar(){
@@ -15124,13 +15145,15 @@
     }
     function galMarcas(){
       var h = '<button type="button" class="fvg-chip'+(!GAL.marca?' on':'')+'" data-m="">Todas</button>';
-      (STATE.brands||[]).forEach(function(m){ h += '<button type="button" class="fvg-chip'+(GAL.marca===m?' on':'')+'" data-m="'+safe(m)+'">'+safe(m)+'</button>'; });
       h += '<button type="button" class="fvg-chip fvg-disp'+(GAL.soloDisp?' on':'')+'" data-d="1" aria-pressed="'+GAL.soloDisp+'">Solo con stock</button>';
+      // Marcas de la A a la Z (sin importar mayúsculas ni tildes)
+      (STATE.brands||[]).slice().sort(function(a,b){ return String(a).localeCompare(String(b),'es',{sensitivity:'base'}); })
+        .forEach(function(m){ h += '<button type="button" class="fvg-chip'+(GAL.marca===m?' on':'')+'" data-m="'+safe(m)+'">'+safe(m)+'</button>'; });
       $('galMarcas').innerHTML = h;
     }
     function galAbrir(){
       GAL.pagina = 1;
-      $('galNivel').textContent = 'Lista ' + CART.nivel + (CART.nivel==='Distribuidor' ? ' · de a 2' : '');
+      $('galNivel').textContent = 'Lista ' + CART.nivel + (CART.nivel==='Distribuidor' ? ' · de a 2 (restar quita 1)' : '');
       galMarcas(); galPintar();
       $('galModal').classList.add('show'); haptic(10);
     }
@@ -15153,6 +15176,8 @@
       var sku = card.getAttribute('data-sku'), q = galCant(sku);
       card.classList.toggle('en', q>0);
       card.querySelector('.fvg-menos').hidden = !q; var sq = card.querySelector('.fvg-q'); sq.hidden = !q; sq.textContent = q;
+      var pr = findProduct(sku), mas = card.querySelector('.fvg-mas');
+      if(pr && mas){ var ad = galSiguiente(pr, q); mas.textContent = galTxtMas(ad); mas.disabled = !ad; mas.setAttribute('aria-label', ad ? 'Agregar '+ad+(ad===1?' unidad':' unidades') : 'No hay más disponibles'); }
     }
     $('galBtn').addEventListener('click', galAbrir);
     $('galCerrar').addEventListener('click', galCerrar);
@@ -15170,7 +15195,7 @@
       if(e.target.closest('.fvg-img')){ fotoAbrir(card.getAttribute('data-sku')); return; }
       var b = e.target.closest('[data-act]'); if(!b) return;
       var sku = card.getAttribute('data-sku'), a = b.getAttribute('data-act');
-      if(a==='mas') galCambiar(sku, galPaso());
+      if(a==='mas'){ var pp = findProduct(sku); if(!pp) return; var ad = galSiguiente(pp, galCant(sku)); if(!ad){ toast('Ya agregaste todo lo disponible de '+pp.producto,'info'); return; } galCambiar(sku, ad); }
       else if(a==='menos') galCambiar(sku, -1);
       galRefrescarTarjeta(card); galBarra();
     });

@@ -1,8 +1,11 @@
 {
-  "app": "2026-11-10-02",
+  "app": "2026-11-10-01",
   "servidor": "2026.10.47",
   "fecha": "2026-11-10",
   "novedades": [
+    "Vitrina «Mostrar productos al cliente»: en Distribuidor suma de a 2, el botón cambia a +1 cuando queda una impar o la última unidad, restar siempre quita 1, con inventario estricto no pasa de lo disponible (Máx.). Las marcas salen de la A a la Z con «Todas» y «Solo con stock» primero, y en escritorio la ventana ocupa casi toda la pantalla.",
+    "Catálogo virtual: los enlaces van en orden Distribuidor, Mayorista y Detal. «Compartir» es ahora un mensaje de bienvenida para clientes nuevos (saludo, cómo funciona y el enlace) que se abre directo en WhatsApp; «WhatsApp breve» es un resumen corto para clientes de siempre.",
+    "Descuento del pedido: los botones ahora dicen NO y SÍ.",
     "Revisión general: textos de estado, conteos del Inicio y avatares de Clientes ya se leen bien en modo oscuro; el pedido guiado y los pagos no comparten nombres internos; la base se ordena con tablas de diseño uniforme.",
     "Editar producto más claro (precios en tarjeta, «Cambiar SKU» y «Añadir tono» como enlaces), aviso de versión nueva con la misma tipografía de la app, y en Clientes la ficha ya no queda vacía al ensanchar la ventana.",
     "Estadísticas más uniforme: todos los rótulos de las tarjetas con el mismo estilo, títulos de sección iguales, leyenda del gráfico más discreta y textos de apoyo mejor repartidos.",
