@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-07';
+    const APP_VERSION = '2026-11-10-08';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -2280,8 +2280,10 @@
       #screen-pedidos > *, #screen-cartera > *, #screen-pagos > *{max-width:1080px}
       .cli-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
       .cli-grid .field:first-child{grid-column:1 / -1}
-      #cartList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
-      #cartList .cart-row{margin:0}
+      /* Dos tarjetas por fila solo si caben (360 px cada una): en una tablet, con la columna del pedido más angosta, pasan a UNA por fila en vez de salirse por debajo del panel de condiciones */
+      #cartList{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:12px;align-items:stretch}
+      #cartList .cart-row{margin:0;min-width:0}
+      #cartList .cart-name,#cartList .cart-sku{overflow-wrap:anywhere}
       /* La lista recibe display por código al mostrarse/ocultarse: la grilla aplica solo si está visible */
       #carList:not([style*="none"]), #pgList:not([style*="none"]){display:grid!important;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
       #carList > *, #pgList > *{margin:0}
