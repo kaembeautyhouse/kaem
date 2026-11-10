@@ -1,6 +1,6 @@
 {
   "app": "2026-11-10-06",
-  "servidor": "2026.10.48",
+  "servidor": "2026.10.49",
   "fecha": "2026-11-10",
   "novedades": [
     "Ventanas largas (Editar producto, pagos…): Cancelar y Guardar se quedan pegados abajo mientras desplazas. Filtros de 5 opciones (Gastos, Cupos) mejor repartidos en el celular. Catálogos web: los nombres que venían TODOS EN MAYÚSCULAS se muestran «Con Iniciales». Servidor: cerrar un pedido en Empaque (y otras acciones que buscan un pedido) lee solo 3 columnas en vez de toda la hoja de pedidos: mucho más rápido cuando haya miles de pedidos.",
