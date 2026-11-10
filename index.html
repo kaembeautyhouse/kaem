@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-03';
+    const APP_VERSION = '2026-11-10-06';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -2280,7 +2280,7 @@
       #screen-pedidos > *, #screen-cartera > *, #screen-pagos > *{max-width:1080px}
       .cli-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
       .cli-grid .field:first-child{grid-column:1 / -1}
-      #cartList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+      #cartList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
       #cartList .cart-row{margin:0}
       /* La lista recibe display por código al mostrarse/ocultarse: la grilla aplica solo si está visible */
       #carList:not([style*="none"]), #pgList:not([style*="none"]){display:grid!important;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
@@ -3748,7 +3748,24 @@
     #editModal .ep-row .ep-reset{grid-area:rst;margin-top:6px}
     #editModal #fe-stock{border-top:1px solid var(--linea);padding-top:16px;margin-top:6px}
 
+    /* Barra flotante de Pedidos (celular y tableta: sin menú inferior): se pega abajo de la pantalla mientras el botón Guardar no se ve */
+    .ped-barra{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 0;padding:10px 10px 10px 16px;border:1px solid var(--linea);border-radius:18px;background:color-mix(in srgb,var(--blanco) 94%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 8px 26px rgba(44,33,30,.16)}
+    .ped-barra[hidden]{display:none}
+    .ped-barra .pb-t{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+    .ped-barra .pb-t small{font-size:12px;color:var(--texto-suave)}
+    .ped-barra .pb-t b{font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:var(--espresso)}
+    .ped-barra .btn-primary{width:auto;min-width:130px;min-height:46px;padding:0 20px;margin:0}
+    @media (min-width:1100px){ .ped-barra{display:none !important} }
     .consult-mas{padding:18px 0 28px;text-align:center;font-size:12.5px;color:var(--texto-suave)}
+    /* Filtros de 5 opciones en el celular: 3 arriba y 2 abajo repartidas parejo (antes la última quedaba sola, centrada, en una segunda fila) */
+    @media (max-width:600px){
+      .segmented:has(> .seg:nth-child(5):last-child){display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%}
+      .segmented:has(> .seg:nth-child(5):last-child) > .seg{grid-column:span 2;white-space:nowrap;padding-left:6px;padding-right:6px}
+      .segmented:has(> .seg:nth-child(5):last-child) > .seg:nth-child(n+4){grid-column:span 3}
+    }
+    /* Ventanas largas (Editar producto, pagos…): los botones de abajo (Cancelar / Guardar) se quedan pegados al borde mientras se baja, para no tener que ir hasta el final a buscarlos */
+    .sheet > .modal-actions{position:sticky;bottom:0;z-index:3;margin:12px -20px -22px;padding:12px 20px 16px;background:var(--blanco);border-top:1px solid var(--linea)}
+    @media (max-width:700px){ .sheet > .modal-actions{margin-bottom:calc(-22px - env(safe-area-inset-bottom,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))} }
   </style>
 </head>
 <body>
@@ -4379,6 +4396,8 @@
         </div>
         <button class="btn-ghost ped-hist" id="historyBtn" type="button">Ver pedidos guardados (Historial)</button>
         </div></div>
+        <!-- Barra flotante (solo celular): total y Guardar siempre a mano mientras se arma un pedido largo -->
+        <div class="ped-barra" id="pedBarra" hidden><div class="pb-t"><small id="pbUnid">0 unidades</small><b id="pbTotal">$0</b></div><button class="btn-primary" id="pbGuardar" type="button">Guardar pedido</button></div>
       </section>
 
     </div>
@@ -7083,7 +7102,8 @@
       var b = e.target.closest('[data-f]'); if(!b) return;
       CLIENTES.filtro = (CLIENTES.filtro === b.getAttribute('data-f') && b.getAttribute('data-f') !== 'todos') ? 'todos' : b.getAttribute('data-f'); haptic(8); clientesRender();
     });
-    $('cliSearch').addEventListener('input', function(e){ CLIENTES.busqueda = e.target.value; clientesRender(); });
+    var __cliT = null;
+    $('cliSearch').addEventListener('input', function(e){ CLIENTES.busqueda = e.target.value; clearTimeout(__cliT); __cliT = setTimeout(clientesRender, 120); });
     $('cliOrden').addEventListener('change', function(e){ CLIENTES.orden = e.target.value; clientesRender(); });
     $('cliDetalle').addEventListener('click', function(e){
       var t = e.target.closest('.seg[data-t]');
@@ -8541,6 +8561,7 @@
       $('orderSaveBtn').style.display=g?'none':'';
       $('orderActionsRow').style.display=g?'':'none';
       $('orderNewBtn').style.display=(g||ed||CART.items.length)?'':'none';
+      try{ pedBarraPintar(); }catch(e){}
       if($('orderEditHint')){ $('orderEditHint').style.display=(!g&&ed)?'':'none'; $('orderEditHint').textContent='Estás cambiando '+(id||'este pedido')+'. Toca «Actualizar pedido» para que quede; no se crea uno nuevo.'; }
     }
 
@@ -8793,6 +8814,7 @@
       if(cred){ $('tAbono').textContent=cop(t.abono); $('tSaldo').textContent=cop(t.saldo); }
       try{ cupoPintarStrip(); }catch(e){}
       try{ pgPintar(); }catch(e){}
+      try{ pedBarraPintar(); }catch(e){}
     }
     function applyNivelUI(nivel){ CART.nivel=nivel; Array.prototype.forEach.call($('nivelSeg').querySelectorAll('.seg'), function(s){ s.classList.toggle('active', s.dataset.nivel===nivel); }); }
     function setNivel(nivel, silent){
@@ -9306,7 +9328,12 @@
     }
     // Búsqueda: cliente, remisión, teléfono, NIT, productos, ciudad, fecha o total (sin tildes ni mayúsculas; todas las palabras deben aparecer)
     function histNorm(s){ return String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+    var HIST_TX = (typeof WeakMap==='function') ? new WeakMap() : null;
     function histTexto(o){
+      var tx = HIST_TX && HIST_TX.get(o); if(tx!==undefined) return tx;
+      tx = histTextoCalc(o); if(HIST_TX) HIST_TX.set(o, tx); return tx;
+    }
+    function histTextoCalc(o){
       var c=o.cliente||{};
       return histNorm([o.remision,o.id,o.fecha,c.nombre,c.telefono,c.nit,c.ciudad,o.metodoPago,o.estado,o.total,String(o.total||'').replace(/\B(?=(\d{3})+(?!\d))/g,'.'),o.notas,
         (o.items||[]).map(function(it){ return (it.nombre||'')+' '+(it.sku||''); }).join(' ')].join(' '));
@@ -9332,6 +9359,24 @@
         + k(cobrar>0?'tono-deuda':'', 'Por cobrar', abrevCop(cobrar), nCob?(nCob+(nCob===1?' pedido a crédito':' pedidos a crédito')):'todo pagado')
         + k('his-gan'+(gan<0?' tono-mal':''), 'Ganancia', (gan<0?'− ':'')+abrevCop(Math.abs(gan)), 'neta, con envíos');
     }
+    /* Paginado: con cientos de pedidos, pintar todas las filas en cada tecla era lo más lento del Historial. Se pintan 30 y al llegar al final se agregan 30 más. */
+    var HISP = { list:[], n:0, lim:30, paso:30, obs:null };
+    function histReinicio(){ HISP.lim=HISP.paso; try{ var sc=$('screen-historial'); if(sc) sc.scrollTop=0; }catch(e){} }
+    function histCentinela(){
+      var c=$('historyList'), viejo=$('histMas'); if(viejo) viejo.remove();
+      if(HISP.obs){ HISP.obs.disconnect(); HISP.obs=null; }
+      if(HISP.n>=HISP.list.length) return;
+      if(!('IntersectionObserver' in window)){ HISP.lim=HISP.list.length; histFiltrar(); return; }
+      var m=document.createElement('div'); m.id='histMas'; m.className='consult-mas'; m.style.gridColumn='1 / -1'; m.textContent='Mostrando '+HISP.n+' de '+HISP.list.length+'…'; c.appendChild(m);
+      HISP.obs=new IntersectionObserver(function(es){
+        if(!es[0].isIntersecting) return;
+        var hasta=Math.min(HISP.list.length, HISP.n+HISP.paso), h=HISP.list.slice(HISP.n, hasta).map(histRowHTML).join('');
+        var tmp=document.createElement('div'); tmp.innerHTML=h; var fr=document.createDocumentFragment(); while(tmp.firstChild) fr.appendChild(tmp.firstChild);
+        HISP.n=hasta; HISP.lim=Math.max(HISP.lim, hasta); c.insertBefore(fr, m);
+        if(HISP.n>=HISP.list.length){ m.remove(); HISP.obs.disconnect(); HISP.obs=null; } else m.textContent='Mostrando '+HISP.n+' de '+HISP.list.length+'…';
+      }, { rootMargin:'900px 0px' });
+      HISP.obs.observe(m);
+    }
     function histFiltrar(){
       var q=histNorm($('histBuscar').value).trim().split(/\s+/).filter(Boolean), list=$('historyList'), cont=$('histConteo');
       if(!HIST_VIEW.length){ $('hisKpis').innerHTML=''; return; }
@@ -9349,21 +9394,24 @@
                 cobrar:function(a,b){ return (histPendiente(b)?Number(b.saldo)||0:-1)-(histPendiente(a)?Number(a.saldo)||0:-1); } };
       res=res.slice().sort(por[HISV.orden]||por.reciente);
       $('hisKpis').innerHTML=histKpiHtml(res);
-      list.innerHTML = res.length ? res.map(histRowHTML).join('')
+      HISP.list = res; HISP.n = Math.min(res.length, HISP.lim);
+      list.innerHTML = res.length ? res.slice(0, HISP.n).map(histRowHTML).join('')
         : '<p class="hist-empty">'+(q.length?('Ningún pedido coincide con “'+safe($('histBuscar').value.trim())+'”.'):'No hay pedidos con este filtro.')+'</p>';
+      histCentinela();
       var filtrado = q.length || HISV.filtro!=='todos' || HISV.periodo!=='todo';
       cont.style.display = filtrado ? '' : 'none'; cont.textContent = res.length+' de '+HIST_VIEW.length+' pedidos';
     }
-    $('histBuscar').addEventListener('input', histFiltrar);
-    $('hisOrden').addEventListener('change', function(e){ HISV.orden=e.target.value; histFiltrar(); });
+    var __histT=null;
+    $('histBuscar').addEventListener('input', function(){ histReinicio(); clearTimeout(__histT); __histT=setTimeout(histFiltrar,120); });
+    $('hisOrden').addEventListener('change', function(e){ HISV.orden=e.target.value; histReinicio(); histFiltrar(); });
     $('hisFiltro').addEventListener('click', function(e){
       var b=e.target.closest?e.target.closest('[data-f]'):null; if(!b) return;
-      HISV.filtro=b.getAttribute('data-f');
+      HISV.filtro=b.getAttribute('data-f'); histReinicio();
       Array.prototype.forEach.call($('hisFiltro').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x===b); }); haptic(8); histFiltrar();
     });
     $('hisPeriodo').addEventListener('click', function(e){
       var b=e.target.closest?e.target.closest('[data-p]'):null; if(!b) return;
-      HISV.periodo=b.getAttribute('data-p');
+      HISV.periodo=b.getAttribute('data-p'); histReinicio();
       Array.prototype.forEach.call($('hisPeriodo').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x===b); }); haptic(8); histFiltrar();
     });
     function paintHistory(arr, fallo){
@@ -9705,12 +9753,12 @@
       var histHtml = '';
       if(hist.length || inicial>0){
         histHtml = '<div class="rc-hist no-break"><span class="rc-hist-t">Pagos anteriores de esta remisión</span>'
+          + (inicial>0 ? '<div class="rc-hist-row"><span>Abono inicial al hacer el pedido</span><b>'+formatCOP(inicial)+'</b></div>' : '')
           + hist.map(function(a){
               return '<div class="rc-hist-row"><span>'+safe(kaemFmtFecha(a.fecha)||a.fecha||'')
                    + (a.metodo?(' · '+safe(a.metodo)):'')+'</span><b>'+formatCOP(a.monto)+'</b></div>';
             }).join('')
           + (histRestantes>0 ? '<div class="rc-hist-mas">+ '+histRestantes+' pago'+(histRestantes===1?'':'s')+' más</div>' : '')
-          + (inicial>0 ? '<div class="rc-hist-row"><span>Abono inicial al hacer el pedido</span><b>'+formatCOP(inicial)+'</b></div>' : '')
           + '</div>';
       }
 
@@ -15021,7 +15069,7 @@
         if(PGD.abono==='si' && !getAbono()) return pgFalta('abonoRow', 'Escribe cuánto abona o elige No.');
       }
       if(!PGD.desc) return pgFalta('pgDescRow', 'Indica si el pedido lleva descuento.');
-      if(PGD.desc==='con' && !(parseInt(String($('descInput').value).replace(/\D/g,''),10)>0)) return pgFalta('pgDescWrap', 'Escribe el porcentaje de descuento o elige Sin descuento.');
+      if(PGD.desc==='con' && !(parseInt(String($('descInput').value).replace(/\D/g,''),10)>0)) return pgFalta('pgDescWrap', 'Escribe el porcentaje de descuento o elige No.');
       return null;
     }
     function pgLimpiarCliente(){ ['cliNombre','clientNit','cliTel','cliDir','cliCiudad'].forEach(function(id){ $(id).value=''; }); }
@@ -15071,6 +15119,23 @@
       if(v==='no') $('abonoInput').value=''; else setTimeout(function(){ $('abonoInput').focus(); }, 60);
       updateTotals(); markDirty();
     });
+    /* Barra flotante de Pedidos: total y Guardar siempre a mano. Se oculta si el botón Guardar de abajo ya se ve, si el pedido está vacío o ya quedó guardado. */
+    var PB = { guardarVisible:false, obs:null };
+    function pedBarraPintar(){
+      var b=$('pedBarra'); if(!b) return;
+      var n=0; CART.items.forEach(function(it){ n+=Number(it.cantidad)||0; });
+      var guardado=$('orderSavedBox').style.display!=='none';
+      b.hidden = !CART.items.length || guardado || PB.guardarVisible;
+      if(b.hidden) return;
+      $('pbUnid').textContent = n+(n===1?' unidad':' unidades')+' · '+CART.items.length+(CART.items.length===1?' producto':' productos');
+      $('pbTotal').textContent = $('tTotal').textContent;
+      $('pbGuardar').textContent = $('orderSaveLabel').textContent || 'Guardar pedido';
+    }
+    $('pbGuardar').addEventListener('click', function(){ $('orderSaveBtn').click(); });
+    if('IntersectionObserver' in window){
+      PB.obs = new IntersectionObserver(function(es){ PB.guardarVisible = es[0].isIntersecting; pedBarraPintar(); }, { rootMargin:'0px 0px -90px 0px' });
+      PB.obs.observe($('orderSaveBtn'));
+    }
     $('pgDesc').addEventListener('click', function(e){
       var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PGD.desc=v;
       if(v==='sin') $('descInput').value='';

@@ -221,7 +221,7 @@
   function aplicar(r){
     CAT = r; VAR = {};
     if(!CAT.envio) CAT.envio = { gratisDesde: 0, amGratis:false, tarifa:15000, ciudadesAM:[] };
-    r.productos.forEach(function(g){ g.variantes.forEach(function(v){ VAR[v.sku] = { g:g, v:v }; }); });
+    r.productos.forEach(function(g){ g.nombre = KC.titulo(g.nombre); g.variantes.forEach(function(v){ VAR[v.sku] = { g:g, v:v }; }); });
     var c = leer(K_CAR) || {}; CARRITO = {};
     Object.keys(c).forEach(function(s){ if(VAR[s] && c[s]>0){ var t=topeDe(s); if(t>=CAT.minPorRef) CARRITO[s]=Math.min(c[s], t); } });
     $('nivel').textContent = '✨ Catálogo ' + r.nivel;

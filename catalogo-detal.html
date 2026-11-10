@@ -501,7 +501,7 @@
   }
   function aplicar(r, refresco){
     CAT = r; VAR = {};
-    r.productos.forEach(function(g, i){ g.i = i; g.variantes.forEach(function(v){ VAR[v.sku] = { g:g, v:v }; }); });
+    r.productos.forEach(function(g, i){ g.i = i; g.nombre = KC.titulo(g.nombre); g.variantes.forEach(function(v){ VAR[v.sku] = { g:g, v:v }; }); });
     var c = leer(K_CAR) || {}; CARRITO = {};
     Object.keys(c).forEach(function(s){ if(VAR[s] && c[s]>0) CARRITO[s]=Math.min(c[s], topeDe(s)); });
     var cli = leer('kaem_cliente') || {}; CIUDAD_CLI = String(cli.ciudad||'');

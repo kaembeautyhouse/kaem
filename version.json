@@ -1,8 +1,11 @@
 {
-  "app": "2026-11-10-03",
-  "servidor": "2026.10.47",
+  "app": "2026-11-10-06",
+  "servidor": "2026.10.48",
   "fecha": "2026-11-10",
   "novedades": [
+    "Ventanas largas (Editar producto, pagos…): Cancelar y Guardar se quedan pegados abajo mientras desplazas. Filtros de 5 opciones (Gastos, Cupos) mejor repartidos en el celular. Catálogos web: los nombres que venían TODOS EN MAYÚSCULAS se muestran «Con Iniciales». Servidor: cerrar un pedido en Empaque (y otras acciones que buscan un pedido) lee solo 3 columnas en vez de toda la hoja de pedidos: mucho más rápido cuando haya miles de pedidos.",
+    "Historial más rápido: con muchos pedidos pinta de a 30 y agrega más al bajar; la búsqueda espera a que dejes de teclear y las tarjetas de arriba siguen contando todos los pedidos. En el recibo de pago, el abono inicial ahora aparece primero en «Pagos anteriores» (en orden).",
+    "Pedidos en el celular: una barra flotante abajo muestra las unidades y el total y deja Guardar siempre a mano mientras armas un pedido largo (se esconde cuando el botón de abajo ya se ve). En escritorio, las tarjetas del pedido quedan del mismo alto.",
     "Inventario más rápido: con cientos de productos la lista pinta de a 40 tarjetas y agrega más sola al bajar, y la búsqueda espera a que dejes de teclear. Los avisos «Agregado» ya no se apilan tapando la pantalla al meter varios productos seguidos.",
     "Vitrina «Mostrar productos al cliente»: en Distribuidor suma de a 2, el botón cambia a +1 cuando queda una impar o la última unidad, restar siempre quita 1, con inventario estricto no pasa de lo disponible (Máx.). Las marcas salen de la A a la Z con «Todas» y «Solo con stock» primero, y en escritorio la ventana ocupa casi toda la pantalla.",
     "Catálogo virtual: los enlaces van en orden Distribuidor, Mayorista y Detal. «Compartir» es ahora un mensaje de bienvenida para clientes nuevos (saludo, cómo funciona y el enlace) que se abre directo en WhatsApp; «WhatsApp breve» es un resumen corto para clientes de siempre.",

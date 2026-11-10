@@ -7,6 +7,24 @@
   var $ = KC.$ = function(id){ return document.getElementById(id); };
   KC.cop = function(n){ return '$' + Math.round(n||0).toLocaleString('es-CO'); };
   var esc = KC.esc = function(v){ return String(v==null?'':v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  /* Nombre para mostrar: si viene TODO en mayúsculas (como se registra en la App) se escribe «Con Iniciales», igual que en Shopify. Uno ya escrito con minúsculas se respeta. */
+  KC.titulo = function(n){
+    var t = String(n==null?'':n).replace(/\s+/g,' ').trim();
+    if(!/[A-ZÀ-Þ]/.test(t) || t !== t.toUpperCase()) return t;
+    var MIN = {DE:1,DEL:1,LA:1,LAS:1,EL:1,LOS:1,Y:1,E:1,O:1,CON:1,SIN:1,PARA:1,POR:1,EN:1,A:1,AL:1,UN:1,UNA:1}, SIG = {SPF:1,BB:1,CC:1,HD:1,UV:1,LED:1,PH:1,SOS:1,DD:1,AHA:1,BHA:1,PDRN:1,USB:1,DIY:1}, U = {ML:'ml',G:'g',GR:'g',KG:'kg',MG:'mg',OZ:'oz',CM:'cm',MM:'mm',L:'L'};
+    var primero = true, antesNum = false;
+    return t.split(/(\s+|[-\/(),])/).map(function(tk){
+      if(!/[A-Za-zÀ-ÿ0-9]/.test(tk)) return tk;
+      var up = tk.toUpperCase(), m = /^(\d+(?:[.,]\d+)?)(ML|G|GR|KG|MG|OZ|CM|MM|L)$/.exec(up), s;
+      if(m) s = m[1] + U[m[2]];
+      else if(antesNum && /^(ML|G|GR|KG|MG|OZ|CM|MM)$/.test(up)) s = up === 'GR' ? 'g' : up.toLowerCase();
+      else if(SIG[up]) s = up;
+      else if(MIN[up] && !primero) s = tk.toLowerCase();
+      else s = tk.toLowerCase().replace(/(^|['’])([a-zà-ÿ])/g, function(x,p,c){ return p + c.toUpperCase(); });
+      primero = false; antesNum = /^\d+(?:[.,]\d+)?$/.test(up);
+      return s;
+    }).join('');
+  };
   KC.guardar = function(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
   KC.leer = function(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } };
   KC.vibrar = function(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} };
