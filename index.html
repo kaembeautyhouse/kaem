@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-09';
+    const APP_VERSION = '2026-11-10-10';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -6945,7 +6945,9 @@
       var gr = {}, vistos = {}, res = [];
       CLIENTES.lista.forEach(function(c){
         var ks = [], nn = cliNormNombre(c.nombre), nit = String(c.nit || '').replace(/\D/g, '');
-        if(nn.length >= 4) ks.push('n:' + nn); if(nit.length >= 5) ks.push('i:' + nit);
+        // Un documento genérico (222222222222, el del catálogo Detal) lo usan clientes distintos: no sirve para detectar repetidos
+        var nitGenerico = nit.length >= 6 && /^(\d)\1+$/.test(nit);
+        if(nn.length >= 4) ks.push('n:' + nn); if(nit.length >= 5 && !nitGenerico) ks.push('i:' + nit);
         ks.forEach(function(k){ (gr[k] = gr[k] || []).push(c); });
       });
       Object.keys(gr).forEach(function(k){

@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-10-09",
+  "app": "2026-11-10-10",
   "servidor": "2026.10.59",
   "fecha": "2026-11-10",
   "novedades": [
+    "Clientes: los clientes del catálogo Detal (documento 222222222222) ya no aparecen como «posibles duplicados», así nadie los une por error. Dos clientes con el mismo NIT real siguen avisándose.",
     "Ajustes → «Revisar datos (fechas, ceros, repetidos)»: lee tus hojas y te lista, sin cambiar nada, textos que Sheets volvió fecha, tonos que perdieron el cero, SKU repetidos, productos con stock y sin precio o costo y pedidos ilegibles. El tono ahora siempre se guarda como texto.",
     "Tablet: en Pedidos, las tarjetas de productos ya no se meten debajo del panel «Condiciones del pedido» (con letras anchas se pasaban unos píxeles); si no caben dos por fila, pasan a una. Clientes sin celular y con documento genérico (222222222222) ya no se funden en Estadísticas, el panel BI ni Cupos.",
     "Escritorio: las ventanas (Editar producto, Registrar gasto, Nuevo compromiso de pago, cobros…) salen más grandes y ordenadas; Editar producto y los formularios largos usan dos columnas. En el celular siguen igual. Los botones Cancelar y Guardar quedan pegados al borde de abajo de la ventana.",
