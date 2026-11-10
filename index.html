@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-02';
+    const APP_VERSION = '2026-11-10-03';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3747,6 +3747,8 @@
     #editModal .ep-row .ep-est{grid-area:est;align-self:start;margin-top:2px}
     #editModal .ep-row .ep-reset{grid-area:rst;margin-top:6px}
     #editModal #fe-stock{border-top:1px solid var(--linea);padding-top:16px;margin-top:6px}
+
+    .consult-mas{padding:18px 0 28px;text-align:center;font-size:12.5px;color:var(--texto-suave)}
   </style>
 </head>
 <body>
@@ -5655,6 +5657,7 @@
   (function(){
     "use strict";
     var $ = function(id){ return document.getElementById(id); };
+    var CONSULT = { list:[], n:0, lim:40, paso:40, obs:null };   // Consultar pinta de a 40 tarjetas (se declara aquí: el arranque instantáneo ya la usa)
     var FALLBACK_BRANDS = ['HI-ZIS','ENCHANTE','KIAKA','ELAYA','CAROLINE COSMETICS','OG'];
 
     var STATE = { products:[], brands:[], marca:'', soloDisp:false, margenes:(function(){ try{ return JSON.parse(localStorage.getItem('kaem_margenes')||'{}'); }catch(e){ return {}; } })(), lineas:(function(){ try{ return JSON.parse(localStorage.getItem('kaem_lineas')||'{}'); }catch(e){ return {}; } })(), thresholds:{Mayor:24,Menor:6}, filter:'', tab:'hub' };
@@ -5840,7 +5843,7 @@
         { n:'Gastos',  acc:['listarGastos'],            fn:function(){ gsCargar(false); }, blando:true },
         { n:'Cupos',   acc:['obtenerCupos'],            fn:function(){ cpCargar(false); }, blando:true }
       ];
-      var activa = false, timer = null, oculto = 0;
+      var activa = false, oculto = 0;
       MODS.forEach(function(m){ m.desde = 0; m.okTs = 0; m.intentos = 0; m.proximo = 0; m.lanzado = 0; });
       function cargado(m){
         if(m.okTs > m.desde) return true;
@@ -5877,7 +5880,7 @@
       window.addEventListener('kaem-reconectado', function(){ MODS.forEach(function(m){ m.proximo = 0; }); });
       window.addEventListener('online', function(){ MODS.forEach(function(m){ m.proximo = 0; }); });
       return {
-        iniciar:function(){ if(activa) return; activa = true; timer = setInterval(tick, 2500); setTimeout(tick, 400); },
+        iniciar:function(){ if(activa) return; activa = true; setInterval(tick, 2500); setTimeout(tick, 400); },
         estado:function(){ return MODS.map(function(m){ return m.n+': '+(cargado(m)?'listo':('pendiente · intento '+m.intentos)); }); },
         renovar:renovarTodo
       };
@@ -6990,7 +6993,6 @@
 
     function cdStat(k, v, s, cls){ return '<div class="cd-stat' + (cls ? ' ' + cls : '') + '"><span>' + k + '</span><b>' + v + '</b>' + (s ? '<small>' + s + '</small>' : '') + '</div>'; }
     function cliDetalleHtml(c){
-      var n1 = String(c.nombre || '').trim().split(/\s+/)[0] || '';
       var badges = '';
       if(c.tipo) badges += '<i class="cli-tag tipo">' + safe(cliTipoNombre(c.tipo)) + '</i>';
       if(c.cupoEstado === 'mora' || c.cupoEstado === 'bloqueado') badges += '<i class="cli-tag mora">Cupo ' + (c.cupoEstado === 'mora' ? 'en mora' : 'bloqueado') + '</i>';
@@ -7346,7 +7348,8 @@
     });
 
     /* ——————— CONSULTAR ——————— */
-    $('searchInput').addEventListener('input', function(e){ STATE.filter=e.target.value; renderConsult(); });
+    var __buscaT=null;
+    $('searchInput').addEventListener('input', function(e){ STATE.filter=e.target.value; consultReinicio(); clearTimeout(__buscaT); __buscaT=setTimeout(renderConsult,120); });
     function getFiltered(){
       var qs=fnorm(STATE.filter);
       var base=STATE.products;
@@ -7384,9 +7387,9 @@
     }
     $('marcaChips').addEventListener('click', function(e){
       var d=e.target.closest?e.target.closest('[data-disp]'):null;
-      if(d){ STATE.soloDisp=!STATE.soloDisp; haptic(8); pintarMarcaChips(); renderConsult(); return; }
+      if(d){ STATE.soloDisp=!STATE.soloDisp; consultReinicio(); haptic(8); pintarMarcaChips(); renderConsult(); return; }
       var b=e.target.closest?e.target.closest('[data-marca]'):null; if(!b) return;
-      STATE.marca=b.getAttribute('data-marca')||'';
+      STATE.marca=b.getAttribute('data-marca')||''; consultReinicio();
       haptic(8); pintarMarcaChips(); renderConsult();
     });
     // El tono se compara en orden natural ("2 Rose" antes que "10 Wine")
@@ -7451,10 +7454,41 @@
         c.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><div>'+(STATE.products.length?'Ningún producto coincide con la búsqueda.':(sinCatalogoAun_()?'⏳ Conectando con el servidor de Google… Si estuvo inactivo puede tardar hasta un minuto. La app lo intenta sola: no hace falta tocar nada.':'Registra tu primer producto en la pestaña Registrar.'))+'</div></div>';
         return;
       }
-      var html='';
-      list.forEach(function(p){
+      // Se pintan de a CONSULT.paso tarjetas (con 700+ productos, pintarlas todas en cada tecla era lo más lento de la app); al llegar al final se agregan más solas
+      CONSULT.list = list; CONSULT.n = Math.min(list.length, CONSULT.lim);
+      var html=''; for(var i=0;i<CONSULT.n;i++) html+=consultFila(list[i]);
+      // Inserción con DocumentFragment (un solo reflow → scroll fluido). Los clics se delegan.
+      var tmp=document.createElement('div'); tmp.innerHTML=html;
+      var frag=document.createDocumentFragment();
+      while(tmp.firstChild) frag.appendChild(tmp.firstChild);
+      c.innerHTML=''; c.appendChild(frag);
+      consultCentinela();
+      if(window.kaemPistaSwipe) window.kaemPistaSwipe();
+    }
+    /* Al acercarse al final de la lista se agregan las siguientes tarjetas (sin botón «Ver más»). Sin IntersectionObserver se pintan todas. */
+    function consultCentinela(){
+      var c=$('productList'), viejo=$('consultMas'); if(viejo) viejo.remove();
+      if(CONSULT.obs){ CONSULT.obs.disconnect(); CONSULT.obs=null; }
+      if(CONSULT.n>=CONSULT.list.length) return;
+      if(!('IntersectionObserver' in window)){ CONSULT.lim=CONSULT.list.length; renderConsult(); return; }
+      var m=document.createElement('div'); m.id='consultMas'; m.className='consult-mas'; m.textContent='Mostrando '+CONSULT.n+' de '+CONSULT.list.length+'…'; c.appendChild(m);
+      CONSULT.obs=new IntersectionObserver(function(es){
+        if(!es[0].isIntersecting) return;
+        var hasta=Math.min(CONSULT.list.length, CONSULT.n+CONSULT.paso), h='';
+        for(var i=CONSULT.n;i<hasta;i++) h+=consultFila(CONSULT.list[i]);
+        var tmp=document.createElement('div'); tmp.innerHTML=h; var fr=document.createDocumentFragment(); while(tmp.firstChild) fr.appendChild(tmp.firstChild);
+        CONSULT.n=hasta; CONSULT.lim=Math.max(CONSULT.lim, hasta); c.insertBefore(fr, m);
+        if(CONSULT.n>=CONSULT.list.length){ m.remove(); CONSULT.obs.disconnect(); CONSULT.obs=null; } else m.textContent='Mostrando '+CONSULT.n+' de '+CONSULT.list.length+'…';
+        if(window.kaemPistaSwipe) window.kaemPistaSwipe();
+      }, { rootMargin:'900px 0px' });
+      CONSULT.obs.observe(m);
+    }
+    /* Cambió la búsqueda o un filtro: se vuelve a las primeras tarjetas y arriba de la lista (si no, al achicarse la lista el final quedaba a la vista y cargaba más sin querer) */
+    function consultReinicio(){ CONSULT.lim=CONSULT.paso; try{ var sc=$('screen-consultar'); if(sc) sc.scrollTop=0; window.scrollTo(0,0); }catch(e){} }
+    /* HTML de UNA tarjeta de Consultar */
+    function consultFila(p){
         var low = isLow(p);
-        html+=''
+        return ''
           +'<div class="swipe-item'+(QR_ON?'':' sw2')+'" data-sku="'+safe(p.sku)+'">'
           +  (MODO_CLIENTE ? '' : '<div class="swipe-back" aria-hidden="true">'
           +    (QR_ON ? '<button class="sw-act" data-qr="'+safe(p.sku)+'" aria-label="Código QR"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="17" y2="14"/><line x1="21" y1="14" x2="21" y2="17"/><line x1="14" y1="18" x2="14" y2="21"/><line x1="18" y1="21" x2="21" y2="21"/></svg><span>QR</span></button>' : '')
@@ -7484,14 +7518,8 @@
           +    '<button class="act danger" data-del="'+safe(p.sku)+'"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Eliminar</button>'
           +  '</div>')
           +'</div></div>';
-      });
-      // Inserción con DocumentFragment (un solo reflow → scroll fluido). Los clics se delegan.
-      var tmp=document.createElement('div'); tmp.innerHTML=html;
-      var frag=document.createDocumentFragment();
-      while(tmp.firstChild) frag.appendChild(tmp.firstChild);
-      c.innerHTML=''; c.appendChild(frag);
-      if(window.kaemPistaSwipe) window.kaemPistaSwipe();
     }
+
     // Sin 'rotación': lo bajo se define por unidades disponibles reales.
     function isLow(p){ var d=(p.disponible!=null)?p.disponible:(Number(p.stock)||0); return d<=3; }
 
@@ -8007,7 +8035,7 @@
       var p=findProduct(sku); if(!p){ toast('No se encontró ese producto. Actualiza el catálogo e intenta de nuevo.','error'); return; }
       editSkuKey=p.sku; try{ shopReiniciar(); }catch(e){}
       $('editSku').textContent='SKU · '+p.sku+(p.tono?('  ·  '+p.tono):'');
-      $('editProducto').value=p.producto||''; $('editTono').value=p.tono||''; EDIT_TONO_ORIG=String(p.tono||'').trim();
+      $('editProducto').value=p.producto||''; $('editTono').value=p.tono||'';
       fillBrandSelect($('editMarca')); $('editMarca').value=p.marca||'';
       // Una marca que ya no está en la lista de marcas (producto antiguo) se conserva: antes quedaba vacía y obligaba a elegir otra
       if(p.marca && $('editMarca').value!==p.marca){ var op=document.createElement('option'); op.value=p.marca; op.textContent=p.marca; $('editMarca').appendChild(op); $('editMarca').value=p.marca; }
@@ -8024,7 +8052,7 @@
       ['fe-producto','fe-marca','fe-costo','fe-stock','fe-tono'].forEach(function(f){ var el=$(f); if(el) el.classList.remove('field-error'); });
       $('editModal').classList.add('show');
     }
-    var editCostRaw=0, EDIT_TONO_ORIG='';
+    var editCostRaw=0;
     var EDIT_STOCK_BASE=0, EDIT_STOCK_MODO='exacto';
     var EDIT_PRECIOS={};
     function pintarEditPrecio(k){
@@ -8297,7 +8325,7 @@
       setTimeout(function(){ isProcessingScan=false; }, 1500);   // libera la bandera
     }
     function applyScan(code){
-      if(scanTarget==='search'){ switchTab('consultar'); $('searchInput').value=code; STATE.filter=code; renderConsult(); }
+      if(scanTarget==='search'){ switchTab('consultar'); $('searchInput').value=code; STATE.filter=code; consultReinicio(); renderConsult(); }
       else if(scanTarget==='cart'){
         switchTab('pedidos');
         var m=findMatches(code);
@@ -8310,7 +8338,7 @@
         // Antes de asumir "producto nuevo": ¿ese código ya existe en el catálogo?
         var mReg=findMatches(code);
         if(mReg.length){
-          switchTab('consultar'); $('searchInput').value=code; STATE.filter=code; renderConsult();
+          switchTab('consultar'); $('searchInput').value=code; STATE.filter=code; consultReinicio(); renderConsult();
           toast(mReg.length===1
             ? ('Ese código ya existe: '+(mReg[0].producto||code)+'. Toca el lápiz para agregar stock.')
             : (mReg.length+' tonos ya usan este código — elige cuál reabastecer.'), 'info');
@@ -8523,7 +8551,7 @@
       if(ex){ ex.cantidad++; CART.items.splice(CART.items.indexOf(ex),1); CART.items.unshift(ex); }
       else { CART.items.unshift({ sku:p.sku, nombre:(p.producto||'')+(p.tono?(' · '+p.tono):''), marca:p.marca, distribuidor:p.distribuidor, mayorista:p.mayorista, detal:p.detal, stock:p.stock, precio:priceForLevel(p,CART.nivel), cantidad:1, probFull:0, probHalf:0, manual:false }); }
       beep('success'); haptic(20); flash();
-      renderCart(); toast('Agregado · '+p.producto,'success',1600);
+      renderCart(); toast('Agregado · '+p.producto,'success',1600,{ grupo:'pedido' });
       // Queda de primero y visible: se ajustan las unidades sin buscarlo en toda la lista
       var fila=$('cartList').firstElementChild;
       if(fila){ fila.classList.remove('recien'); void fila.offsetWidth; fila.classList.add('recien'); try{ fila.scrollIntoView({ block:'nearest', behavior:'smooth' }); }catch(e){} }
@@ -9436,7 +9464,6 @@
        ═══════════════════════════════════════════════════════════════════════ */
 
     /* Geometría A4 (mm). Banda inferior de 25 mm reservada para el pie legal. */
-    var PDF = { W:210, H:297, mTop:7, mSide:7, mBottom:25, footSide:9 };
 
     /* Texto legal — UN solo párrafo continuo, sin numeración. El rótulo va como
        encabezado en negrita (abajo), por eso aquí arranca en "Revisar…". */
@@ -9623,7 +9650,6 @@
     function fleteTexto(v, sinEmoji){ var n=toNum(v); return n>0 ? cop(n) : (sinEmoji ? 'GRATIS' : 'GRATIS ✨'); }
     function orderForOutput(){ return lastOrder || currentOrderPayload(); }
 
-    var PDF_REM_ID = '';
 
     /* Espera a que TODAS las imágenes del nodo estén cargadas (o fallen) antes de
        rasterizar. Sin esto, el logo o el QR pueden salir en blanco en móvil. */
@@ -10108,7 +10134,7 @@
       if (!d.items || !d.items.length){ toast('El pedido no tiene productos.','error'); return; }
       var Ctor = obtenerJsPDF_(), H2C = window.html2canvas;
       if (typeof Ctor !== 'function' || typeof H2C !== 'function'){ toast('El generador de PDF aún se está cargando. Intenta de nuevo en unos segundos.','error'); return; }
-      var R = remDatos_(d); PDF_REM_ID = R.id; haptic(15); toast('Preparando la remisión…','info',2500);
+      var R = remDatos_(d); haptic(15); toast('Preparando la remisión…','info',2500);
       var stage = document.createElement('div');
       stage.setAttribute('aria-hidden', 'true');
       stage.style.cssText = 'position:fixed; left:-10000px; top:0; margin:0; padding:0; background:#ffffff; z-index:-1;';
@@ -10646,7 +10672,7 @@
       setActionsEnabled(false);
       $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
       CART.nivelTocado=false; CART.nivelAuto=false; pgReiniciar(); rentOcultar();
-      setDraftId(); renderCart(); pintarDrafts(); haptic(12); if(silencio!==true) toast('Pedido nuevo, listo para llenar','info');
+      setDraftId(); renderCart(); pintarDrafts(); haptic(12); if(silencio!==true) toast('Pedido nuevo, listo para llenar','info',null,{ grupo:'pedido' });
     }
 
     function onEnterPedidos(){ rentOcultar(); renderPending(); if(!pedState.remisionId && !pedState.draftId) setDraftId(); try{ catPedCargar(false); }catch(e){} }
@@ -11074,7 +11100,7 @@
       if(!raw) return;
       if(!PACK.pedido){ toast('Selecciona primero un pedido para empacar.', 'error'); return; }
 
-      var norm = cleanSku(raw), idx = -1;
+      var idx = -1;
       // El mismo SKU puede estar dos veces (producto y probador): se toma primero la línea que falte por marcar
       var coincide = function(s, cod){ return cleanSku(s) === cleanSku(cod) || String(s).trim() === String(cod).trim(); };
       for(var i = 0; i < PACK.items.length; i++){
@@ -12731,11 +12757,14 @@
       var vivos=Array.prototype.filter.call(wrap.querySelectorAll('.toast'), function(t){ return !t.__cerrado; });
       // El mismo aviso ya está en pantalla (ej. varios módulos sin conexión al arrancar): no se repite, solo se reinicia su tiempo.
       for(var i=0;i<vivos.length;i++){ if(vivos[i].__msg===msg){ vivos[i].__reiniciar(dur); return; } }
+      // Avisos del mismo grupo (p. ej. «Agregado» al meter varios productos seguidos) se reemplazan entre sí: no se apilan tapando la pantalla
+      if(opts.grupo) vivos.forEach(function(t){ if(t.__grupo===opts.grupo) cerrar(t); });
+      vivos=vivos.filter(function(t){ return !t.__cerrado; });
       if(vivos.length>=3) cerrar(vivos[0]);
       // La primera frase (hasta un punto, « · », « — » o «:») es el título; el resto, el detalle
       var partes = msg.match(/^([\s\S]{6,72}?)(?:\s[·—–]\s|\.\s+|:\s+)([\s\S]+)$/), titulo = partes ? partes[1] : msg, detalle = partes ? partes[2] : '';
       var el=document.createElement('div');
-      el.className='toast '+type; el.__msg=msg; el.setAttribute('role', type==='error'?'alert':'status');
+      el.className='toast '+type; el.__msg=msg; el.__grupo=opts.grupo||''; el.setAttribute('role', type==='error'?'alert':'status');
       el.innerHTML='<span class="t-ico" aria-hidden="true"><svg viewBox="0 0 24 24">'+(TOAST_ICO[type]||TOAST_ICO.info)+'</svg></span>'
         +'<span class="t-txt"><b>'+safe(titulo)+'</b>'+(detalle?'<small>'+safe(detalle)+'</small>':'')
         +(opts.accion?'<button type="button" class="t-acc">'+safe(opts.accion)+'</button>':'')+'</span>'
