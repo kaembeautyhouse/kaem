@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-06';
+    const APP_VERSION = '2026-11-10-07';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3764,8 +3764,24 @@
       .segmented:has(> .seg:nth-child(5):last-child) > .seg:nth-child(n+4){grid-column:span 3}
     }
     /* Ventanas largas (Editar producto, pagos…): los botones de abajo (Cancelar / Guardar) se quedan pegados al borde mientras se baja, para no tener que ir hasta el final a buscarlos */
-    .sheet > .modal-actions{position:sticky;bottom:0;z-index:3;margin:12px -20px -22px;padding:12px 20px 16px;background:var(--blanco);border-top:1px solid var(--linea)}
-    @media (max-width:700px){ .sheet > .modal-actions{margin-bottom:calc(-22px - env(safe-area-inset-bottom,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))} }
+    .sheet > .modal-actions{position:sticky;bottom:-22px;z-index:3;margin:12px -20px -22px;padding:12px 20px 16px;background:var(--blanco);border-top:1px solid var(--linea)}
+    @media (max-width:700px){ .sheet > .modal-actions{bottom:calc(-22px - env(safe-area-inset-bottom,0px));margin-bottom:calc(-22px - env(safe-area-inset-bottom,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))} }
+
+    /* Escritorio: las ventanas (Editar producto, pagos, gastos…) salen más grandes y ordenadas; en el celular siguen igual */
+    .ep-cols,.ep-colA,.ep-colB{display:contents}
+    @media (min-width:1024px){
+      .modal .sheet:not(.fvg-sheet):not(.fv-sheet):not(.cfg-sheet){max-width:640px;padding:28px 32px;max-height:90vh}
+      .sheet > .modal-actions{bottom:-28px;margin:14px -32px -28px;padding:14px 32px 18px}
+      #editModal .sheet{max-width:980px}
+      #editModal .ep-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:36px;align-items:start}
+      #editModal .ep-colA,#editModal .ep-colB{display:block;min-width:0}
+      #nuevoTonoModal .sheet,#gsModal .sheet,#pgEditModal .sheet,#cpEditModal .sheet,#devolModal .sheet,#catRevModal .sheet,#cliValModal .sheet,#pgPagarModal .sheet,#entregaModal .sheet,#recibosModal .sheet,#catInboxModal .sheet,#skuLoteModal .sheet,#audModal .sheet,#invRevModal .sheet,#conexionModal .sheet{max-width:780px}
+      /* Formularios largos (gastos y pagos): dos columnas para no tener que bajar tanto */
+      #gsModal .sheet,#pgEditModal .sheet{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-content:start;max-width:820px}
+      #gsModal .sheet > h3,#pgEditModal .sheet > h3,#gsModal .sheet > .modal-actions,#pgEditModal .sheet > .modal-actions,#gsModal .sheet > button,#pgEditModal .sheet > button,#pgResumen,#gsViaBox,#gsMercBox,#pgProvBox,#pgPrestBox,#pgCuotasBox,#gsModal .sheet > p,#pgEditModal .sheet > p{grid-column:1 / -1}
+      #deleteModal .sheet,#operadorModal .sheet,#cliNivelModal .sheet,#qrModal .sheet,#skuModal .sheet,#cpInicialModal .sheet{max-width:520px}
+    }
+    @media (min-width:1500px){ #editModal .sheet{max-width:1080px} #nuevoTonoModal .sheet,#gsModal .sheet,#pgEditModal .sheet,#cpEditModal .sheet,#devolModal .sheet,#catRevModal .sheet{max-width:860px} }
   </style>
 </head>
 <body>
@@ -4500,6 +4516,7 @@
       <h3>Editar producto</h3>
       <p class="ssku" id="editSku"></p>
       <button class="btn-ghost" id="editSkuBtn" type="button" style="width:100%;margin:-4px 0 12px;min-height:40px">✎ Cambiar SKU (también en el historial)</button>
+      <div class="ep-cols"><div class="ep-colA">
       <div class="field" id="fe-producto">
         <label class="lbl" for="editProducto">Nombre</label>
         <input id="editProducto" type="text" autocomplete="off">
@@ -4523,6 +4540,7 @@
         <label class="lbl" for="editCosto">Precio costo base</label>
         <div class="cost-wrap"><span class="sign">$</span><input id="editCosto" type="text" inputmode="numeric" autocomplete="off"></div>
       </div>
+      </div><div class="ep-colB">
       <div class="field" id="fe-precios">
         <span class="lbl">Precios de venta</span>
         <div class="ep-row" id="ep-distribuidor"><label class="lbl" for="editP-distribuidor">Distribuidor</label><div class="cost-wrap cost-compact"><span class="sign">$</span><input id="editP-distribuidor" type="text" inputmode="numeric" autocomplete="off" data-k="distribuidor"></div><span class="ep-est" id="epEst-distribuidor"></span><button type="button" class="ep-reset" id="epReset-distribuidor" data-k="distribuidor" hidden>Volver a la marca</button></div>
@@ -4568,6 +4586,7 @@
         </div>
         <p class="stk-result" id="editStockPreview" aria-live="polite"></p>
       </div>
+      </div></div>
       <div class="modal-actions">
         <button class="btn-ghost" id="editCancelBtn" type="button">Cancelar</button>
         <button class="btn-solid" id="editSaveBtn" type="button">Guardar cambios</button>
