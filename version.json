@@ -1,8 +1,9 @@
 {
   "app": "2026-11-10-06",
-  "servidor": "2026.10.50",
+  "servidor": "2026.10.51",
   "fecha": "2026-11-10",
   "novedades": [
+    "Tonos con número («04», «2.5», «03»): ya no pierden el cero al guardarse; se guardan como texto. Los tonos que ya quedaron como «4» hay que volver a escribirlos una vez.",
     "Ventanas largas (Editar producto, pagos…): Cancelar y Guardar se quedan pegados abajo mientras desplazas. Filtros de 5 opciones (Gastos, Cupos) mejor repartidos en el celular. Catálogos web: los nombres que venían TODOS EN MAYÚSCULAS se muestran «Con Iniciales». Servidor: cerrar un pedido en Empaque (y otras acciones que buscan un pedido) lee solo 3 columnas en vez de toda la hoja de pedidos: mucho más rápido cuando haya miles de pedidos.",
     "Historial más rápido: con muchos pedidos pinta de a 30 y agrega más al bajar; la búsqueda espera a que dejes de teclear y las tarjetas de arriba siguen contando todos los pedidos. En el recibo de pago, el abono inicial ahora aparece primero en «Pagos anteriores» (en orden).",
     "Pedidos en el celular: una barra flotante abajo muestra las unidades y el total y deja Guardar siempre a mano mientras armas un pedido largo (se esconde cuando el botón de abajo ya se ve). En escritorio, las tarjetas del pedido quedan del mismo alto.",
