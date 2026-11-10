@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-09-04';
+    const APP_VERSION = '2026-11-10-02';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3549,14 +3549,14 @@
 
     /* Contraste AA en textos pequeños (claro y oscuro) */
     .bi-dot,.cli-badge{background:#A5573F}
-    .hub-card .hc-n{color:color-mix(in srgb,var(--texto-suave) 70%,var(--texto))}
+    .hub-card .hc-n{color:color-mix(in srgb,var(--texto-suave) 70%,var(--espresso))}
     .hub-card .hc-n.urg{color:var(--terracota-txt)}
-    .cli-av{color:color-mix(in srgb,var(--salvia-txt) 80%,var(--texto))}
-    .estado-pill[data-state="sync"] .led-txt,.estado-pill[data-state="ok-pend"] .led-txt{color:color-mix(in srgb,var(--st-soon-text) 75%,var(--texto))}
-    .cp-nums span{color:color-mix(in srgb,var(--texto-suave) 70%,var(--texto))}
+    .cli-av{color:color-mix(in srgb,var(--salvia-txt) 80%,var(--espresso))}
+    .estado-pill[data-state="sync"] .led-txt,.estado-pill[data-state="ok-pend"] .led-txt{color:color-mix(in srgb,var(--st-soon-text) 75%,var(--espresso))}
+    .cp-nums span{color:color-mix(in srgb,var(--texto-suave) 70%,var(--espresso))}
     .btn-solid.wa{background:#557161}
-    .stock-badge span{color:color-mix(in srgb,var(--texto-suave) 70%,var(--texto))}
-    .estado-pill[data-state="ok"] .led-txt{color:color-mix(in srgb,var(--salvia-txt) 75%,var(--texto))}
+    .stock-badge span{color:color-mix(in srgb,var(--texto-suave) 70%,var(--espresso))}
+    .estado-pill[data-state="ok"] .led-txt{color:color-mix(in srgb,var(--salvia-txt) 75%,var(--espresso))}
 
     /* Marca con varias líneas de margen (ESSENTIAL) en Estadísticas */
     .inv-lineas{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--linea);font-size:12.5px;color:var(--texto-suave)}
@@ -8355,7 +8355,7 @@
        carrito. Ahora se guarda con nombre y se retoma después. Viven solo en
        este dispositivo (no se sincronizan): son borradores, no ventas. */
     // Pasos del pedido guiado (cliente, nivel, flete, pago, abono, descuento): cada uno debe tocarse antes de guardar
-    var PG={cli:'',elegido:false,nivel:false,flete:'',pago:false,abono:'',desc:''};
+    var PGD={cli:'',elegido:false,nivel:false,flete:'',pago:false,abono:'',desc:''};
     function loadDrafts(){ try{ return JSON.parse(localStorage.getItem('kaem_drafts')||'[]'); }catch(e){ return []; } }
     function saveDrafts(a){ try{ localStorage.setItem('kaem_drafts', JSON.stringify(a.slice(0,8))); }catch(e){} }
 
@@ -8617,7 +8617,7 @@
       c.innerHTML=''; c.appendChild(frag);
       updateTotals(); markDirty();
     }
-    function getFlete(){ if(PG.flete==='gratis') return 0; var d=String($('fleteInput').value).replace(/[^0-9]/g,''); return d?parseInt(d,10):0; }
+    function getFlete(){ if(PGD.flete==='gratis') return 0; var d=String($('fleteInput').value).replace(/[^0-9]/g,''); return d?parseInt(d,10):0; }
 
     // ═══ POLÍTICA DE ENVÍO (fija · manual v5.1) — misma regla que el catálogo y el servidor ═══
     //   Área Metropolitana (Bucaramanga, Floridablanca, Girón, Piedecuesta): Detal, Mayorista y Distribuidor SIEMPRE gratis;
@@ -8663,8 +8663,8 @@
     function getDescPct(){
       var el=$('descInput');
       var v=el ? parseInt(String(el.value).replace(/[^0-9]/g,''),10) : NaN;
-      if(PG.desc==='sin') return 0;
-      if(PG.desc==='con') return isNaN(v) ? 0 : Math.max(0, Math.min(100, v));
+      if(PGD.desc==='sin') return 0;
+      if(PGD.desc==='con') return isNaN(v) ? 0 : Math.max(0, Math.min(100, v));
       if(isNaN(v)) v = parseInt(AJUSTES && AJUSTES.descuentoDefecto, 10) || 0;
       return Math.max(0, Math.min(100, v));
     }
@@ -8746,7 +8746,7 @@
       var t=computeTotals();
       try{ pintarRentabilidad(t); }catch(e){ console.error('Rentabilidad:', e); }
       $('tSubtotal').textContent=cop(t.subtotal);
-      $('tFlete').textContent= t.flete ? cop(t.flete) : (PG.flete==='gratis' ? 'Gratis' : 'Por definir');
+      $('tFlete').textContent= t.flete ? cop(t.flete) : (PGD.flete==='gratis' ? 'Gratis' : 'Por definir');
       $('tTotal').textContent=cop(t.total);
       // La fila queda siempre visible — 'Sin descuento' en reposo, el monto real
       // en cuanto se escribe un %. Antes el campo estaba escondido del todo
@@ -8848,7 +8848,7 @@
         notas:$('orderNotes').value.trim(),
         operador:String(AJUSTES.operador||'').trim(),
         estado:(t.saldo<=0?'Pagado':'Pendiente'),
-        clienteNuevo:(PG.cli==='nuevo' && !editingRef)
+        clienteNuevo:(PGD.cli==='nuevo' && !editingRef)
       };
     }
     function validateOrder(p){
@@ -10695,7 +10695,7 @@
     });
 
     Array.prototype.forEach.call($('nivelSeg').querySelectorAll('.seg'), function(s){ s.addEventListener('click', function(){ CART.nivelTocado=true; CART.nivelAuto=false; setNivel(s.dataset.nivel); }); });
-    Array.prototype.forEach.call($('pagoSeg').querySelectorAll('.seg'), function(s){ s.addEventListener('click', function(){ PG.pago=true; setPago(s.dataset.pago); haptic(10); }); });
+    Array.prototype.forEach.call($('pagoSeg').querySelectorAll('.seg'), function(s){ s.addEventListener('click', function(){ PGD.pago=true; setPago(s.dataset.pago); haptic(10); }); });
     $('vencInput').addEventListener('change', markDirty);
     $('vencInput').addEventListener('input', function(){ _vencTocado=true; });
     $('descInput').addEventListener('input', function(e){
@@ -12483,7 +12483,7 @@
     $('repackGuardarBtn').addEventListener('click', function(){ repackGuardar(false); });
     $('repackConfirmarBtn').addEventListener('click', function(){ repackGuardar(true); });
 
-    var MESES_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    // MESES_ES ya está definido en 17-pdf-remision-motor.js (misma lista)
     function mesLargo(ym){ var p=String(ym).split('-'); return (MESES_ES[(+p[1])-1]||ym)+' '+p[0]; }
     function cargarRecibos(mes, primera){
       $('recibosList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('recibosEmpty').style.display='none'; $('recibosTotal').style.display='none';
@@ -14919,10 +14919,10 @@
     /* ═══════ PEDIDO GUIADO ═══════
        Cliente (nuevo o existente), nivel, flete, pago, abono y descuento se eligen con un toque. El pedido no sale si falta alguno.
        Cliente existente → entra con su nivel. Cliente nuevo → el nivel es obligatorio y queda en su ficha (clienteNuevo).
-       Estado en PG (definido en pedidos en pausa). Los pedidos ya guardados, los de catálogo y los pausados se infieren de sus campos. */
+       Estado en PGD (definido en pedidos en pausa). Los pedidos ya guardados, los de catálogo y los pausados se infieren de sus campos. */
     function pgNivelNombre(n){ n=String(n||'').toUpperCase(); return n==='DETAL'?'Detal':n==='MAYORISTA'?'Mayorista':n==='DISTRIBUIDOR'?'Distribuidor':''; }
-    function pgSnap(){ return { cli:PG.cli, elegido:PG.elegido, nivel:PG.nivel, flete:PG.flete, pago:PG.pago, abono:PG.abono, desc:PG.desc }; }
-    function pgCopiar(o){ ['cli','elegido','nivel','flete','pago','abono','desc'].forEach(function(k){ PG[k]=o[k]; }); pgPintar(); }
+    function pgSnap(){ return { cli:PGD.cli, elegido:PGD.elegido, nivel:PGD.nivel, flete:PGD.flete, pago:PGD.pago, abono:PGD.abono, desc:PGD.desc }; }
+    function pgCopiar(o){ ['cli','elegido','nivel','flete','pago','abono','desc'].forEach(function(k){ PGD[k]=o[k]; }); pgPintar(); }
     function pgBuscarPorTel(tel){
       var k=telKey(tel); if(!k) return null; var arr=loadClients();
       for(var i=0;i<arr.length;i++){
@@ -14932,35 +14932,35 @@
       }
       return null;
     }
-    function pgReiniciar(){ PG.cli=''; PG.elegido=false; PG.nivel=false; PG.flete=''; PG.pago=false; PG.abono=''; PG.desc=''; if($('pgBuscar')) $('pgBuscar').value=''; if($('pgRes')) $('pgRes').innerHTML=''; pgPintar(); }
+    function pgReiniciar(){ PGD.cli=''; PGD.elegido=false; PGD.nivel=false; PGD.flete=''; PGD.pago=false; PGD.abono=''; PGD.desc=''; if($('pgBuscar')) $('pgBuscar').value=''; if($('pgRes')) $('pgRes').innerHTML=''; pgPintar(); }
     function pgInferir(){
       var hay=!!pgBuscarPorTel($('cliTel').value);
-      PG.cli = hay ? 'existente' : 'nuevo'; PG.elegido=true; PG.nivel=true; PG.pago=true;
-      PG.flete = (parseInt(String($('fleteInput').value).replace(/\D/g,''),10)||0) > 0 ? 'valor' : 'gratis'; FLETE_MANUAL=true;
-      PG.abono = (CART.metodo==='Crédito' && (parseInt(String($('abonoInput').value).replace(/\D/g,''),10)||0) > 0) ? 'si' : 'no';
-      PG.desc  = (parseInt(String($('descInput').value).replace(/\D/g,''),10)||0) > 0 ? 'con' : 'sin';
+      PGD.cli = hay ? 'existente' : 'nuevo'; PGD.elegido=true; PGD.nivel=true; PGD.pago=true;
+      PGD.flete = (parseInt(String($('fleteInput').value).replace(/\D/g,''),10)||0) > 0 ? 'valor' : 'gratis'; FLETE_MANUAL=true;
+      PGD.abono = (CART.metodo==='Crédito' && (parseInt(String($('abonoInput').value).replace(/\D/g,''),10)||0) > 0) ? 'si' : 'no';
+      PGD.desc  = (parseInt(String($('descInput').value).replace(/\D/g,''),10)||0) > 0 ? 'con' : 'sin';
       pgPintar();
     }
     function pgSeg(id, val){ Array.prototype.forEach.call($(id).querySelectorAll('.seg'), function(s){ s.classList.toggle('active', !!val && s.getAttribute('data-v')===val); }); }
     function pgPintar(){
       if(!$('pgCli')) return;
-      Array.prototype.forEach.call($('pgCli').querySelectorAll('.pg-op'), function(b){ b.classList.toggle('on', b.getAttribute('data-m')===PG.cli); b.setAttribute('aria-pressed', b.getAttribute('data-m')===PG.cli); });
-      $('pgExist').style.display = PG.cli==='existente' ? 'block' : 'none';
-      $('pgGrid').style.display = (PG.cli==='nuevo' || (PG.cli==='existente' && PG.elegido)) ? '' : 'none';
+      Array.prototype.forEach.call($('pgCli').querySelectorAll('.pg-op'), function(b){ b.classList.toggle('on', b.getAttribute('data-m')===PGD.cli); b.setAttribute('aria-pressed', b.getAttribute('data-m')===PGD.cli); });
+      $('pgExist').style.display = PGD.cli==='existente' ? 'block' : 'none';
+      $('pgGrid').style.display = (PGD.cli==='nuevo' || (PGD.cli==='existente' && PGD.elegido)) ? '' : 'none';
       var chip=$('pgChip');
-      if(PG.cli==='existente' && PG.elegido){ chip.style.display='block'; chip.textContent = PG.nivel ? 'Cliente existente · lista de precios '+CART.nivel : 'Este cliente aún no tiene nivel: elígelo en «Lista de precios».'; chip.className='pg-chip'+(PG.nivel?'':' falta'); }
-      else if(PG.cli==='nuevo'){ chip.style.display='block'; chip.textContent = PG.nivel ? 'Cliente nuevo · quedará guardado como '+CART.nivel : 'Cliente nuevo · elige su nivel en «Lista de precios».'; chip.className='pg-chip'+(PG.nivel?'':' falta'); }
+      if(PGD.cli==='existente' && PGD.elegido){ chip.style.display='block'; chip.textContent = PGD.nivel ? 'Cliente existente · lista de precios '+CART.nivel : 'Este cliente aún no tiene nivel: elígelo en «Lista de precios».'; chip.className='pg-chip'+(PGD.nivel?'':' falta'); }
+      else if(PGD.cli==='nuevo'){ chip.style.display='block'; chip.textContent = PGD.nivel ? 'Cliente nuevo · quedará guardado como '+CART.nivel : 'Cliente nuevo · elige su nivel en «Lista de precios».'; chip.className='pg-chip'+(PGD.nivel?'':' falta'); }
       else chip.style.display='none';
-      $('nivelSeg').classList.toggle('pg-pend', !PG.nivel);
-      pgSeg('pgFlete', PG.flete); $('fleteRow').style.display = PG.flete==='valor' ? '' : 'none';
-      $('pagoSeg').classList.toggle('pg-pend', !PG.pago);
-      $('creditoBox').style.display = (PG.pago && CART.metodo==='Crédito') ? 'block' : 'none';
-      pgSeg('pgAbono', PG.abono); $('abonoRow').style.display = PG.abono==='si' ? '' : 'none';
-      pgSeg('pgDesc', PG.desc); $('pgDescWrap').style.display = PG.desc==='con' ? '' : 'none';
+      $('nivelSeg').classList.toggle('pg-pend', !PGD.nivel);
+      pgSeg('pgFlete', PGD.flete); $('fleteRow').style.display = PGD.flete==='valor' ? '' : 'none';
+      $('pagoSeg').classList.toggle('pg-pend', !PGD.pago);
+      $('creditoBox').style.display = (PGD.pago && CART.metodo==='Crédito') ? 'block' : 'none';
+      pgSeg('pgAbono', PGD.abono); $('abonoRow').style.display = PGD.abono==='si' ? '' : 'none';
+      pgSeg('pgDesc', PGD.desc); $('pgDescWrap').style.display = PGD.desc==='con' ? '' : 'none';
       // punto terracota junto a lo que aún falta elegir (solo señal visual; la validación no cambia)
       var pm=function(el,on){ if(el) el.classList.toggle('pg-pendiente', !!on && !editingRef); };
-      pm($('pgCli').previousElementSibling, !PG.cli); pm($('nivelSeg').parentNode, !PG.nivel); pm($('pgFleteRow'), !PG.flete);
-      pm($('pagoSeg').parentNode, !PG.pago); pm($('pgAbonoRow'), !PG.abono && CART.metodo==='Crédito'); pm($('pgDescRow'), !PG.desc);
+      pm($('pgCli').previousElementSibling, !PGD.cli); pm($('nivelSeg').parentNode, !PGD.nivel); pm($('pgFleteRow'), !PGD.flete);
+      pm($('pagoSeg').parentNode, !PGD.pago); pm($('pgAbonoRow'), !PGD.abono && CART.metodo==='Crédito'); pm($('pgDescRow'), !PGD.desc);
     }
     function pgFalta(idEl, msg){
       var el=$(idEl); if(el){ el.classList.remove('pg-falta'); void el.offsetWidth; el.classList.add('pg-falta'); try{ el.scrollIntoView({block:'center', behavior:'smooth'}); }catch(e){} setTimeout(function(){ el.classList.remove('pg-falta'); }, 2200); }
@@ -14968,29 +14968,29 @@
     }
     function pgValidar(){
       if(editingRef) return null;
-      if(!PG.cli) return pgFalta('pgCli', 'Elige si el cliente es nuevo o ya existe.');
-      if(PG.cli==='existente' && !PG.elegido) return pgFalta('pgExist', 'Busca y selecciona el cliente de la lista.');
-      if(!PG.nivel) return pgFalta('nivelSeg', 'Elige la lista de precios (nivel) del cliente.');
-      if(PG.cli==='nuevo'){
+      if(!PGD.cli) return pgFalta('pgCli', 'Elige si el cliente es nuevo o ya existe.');
+      if(PGD.cli==='existente' && !PGD.elegido) return pgFalta('pgExist', 'Busca y selecciona el cliente de la lista.');
+      if(!PGD.nivel) return pgFalta('nivelSeg', 'Elige la lista de precios (nivel) del cliente.');
+      if(PGD.cli==='nuevo'){
         var ya=pgBuscarPorTel($('cliTel').value);
         if(ya) return pgFalta('pgCli', 'Ese teléfono ya es de '+(ya.nombre||'un cliente')+'. Usa «Seleccionar cliente existente» para no duplicarlo.');
       }
-      if(!PG.flete) return pgFalta('pgFleteRow', 'Elige el flete: gratis o con valor.');
-      if(PG.flete==='valor' && !getFlete()) return pgFalta('fleteRow', 'Escribe el valor del flete o elige Gratis.');
-      if(!PG.pago) return pgFalta('pagoSeg', 'Elige la condición de pago: contado o crédito.');
+      if(!PGD.flete) return pgFalta('pgFleteRow', 'Elige el flete: gratis o con valor.');
+      if(PGD.flete==='valor' && !getFlete()) return pgFalta('fleteRow', 'Escribe el valor del flete o elige Gratis.');
+      if(!PGD.pago) return pgFalta('pagoSeg', 'Elige la condición de pago: contado o crédito.');
       if(CART.metodo==='Crédito'){
-        if(!PG.abono) return pgFalta('pgAbonoRow', 'Indica si hay abono inicial: No o Sí.');
-        if(PG.abono==='si' && !getAbono()) return pgFalta('abonoRow', 'Escribe cuánto abona o elige No.');
+        if(!PGD.abono) return pgFalta('pgAbonoRow', 'Indica si hay abono inicial: No o Sí.');
+        if(PGD.abono==='si' && !getAbono()) return pgFalta('abonoRow', 'Escribe cuánto abona o elige No.');
       }
-      if(!PG.desc) return pgFalta('pgDescRow', 'Indica si el pedido lleva descuento.');
-      if(PG.desc==='con' && !(parseInt(String($('descInput').value).replace(/\D/g,''),10)>0)) return pgFalta('pgDescWrap', 'Escribe el porcentaje de descuento o elige Sin descuento.');
+      if(!PGD.desc) return pgFalta('pgDescRow', 'Indica si el pedido lleva descuento.');
+      if(PGD.desc==='con' && !(parseInt(String($('descInput').value).replace(/\D/g,''),10)>0)) return pgFalta('pgDescWrap', 'Escribe el porcentaje de descuento o elige Sin descuento.');
       return null;
     }
     function pgLimpiarCliente(){ ['cliNombre','clientNit','cliTel','cliDir','cliCiudad'].forEach(function(id){ $(id).value=''; }); }
     function pgResultados(){
       var q=fnorm($('pgBuscar').value||''), arr=loadClients().slice().reverse();
       var r=arr.filter(function(c){ return c.nombre && (!q || fnorm([c.nombre,c.telefono,c.alternos,c.nit].join(' ')).indexOf(q)>=0); }).slice(0,8);
-      PG.res=r;
+      PGD.res=r;
       $('pgRes').innerHTML = r.length ? r.map(function(c,i){
         var n=pgNivelNombre(c.nivel);
         return '<button type="button" class="pg-it" data-i="'+i+'"><b>'+safe(c.nombre)+'</b><small>'+safe([c.telefono,c.ciudad].filter(Boolean).join(' · '))+'</small><i class="'+(n?'':'sin')+'">'+safe(n||'Sin nivel')+'</i></button>';
@@ -14999,26 +14999,26 @@
     function pgElegir(c){
       $('cliNombre').value=String(c.nombre||'').toUpperCase(); $('clientNit').value=String(c.nit||'').toUpperCase(); $('cliTel').value=String(c.telefono||'');
       $('cliDir').value=String(c.direccion||'').toUpperCase(); $('cliCiudad').value=String(c.ciudad||'').toUpperCase();
-      PG.elegido=true; var n=pgNivelNombre(c.nivel);
-      if(n){ setNivel(n, true); CART.nivelTocado=true; PG.nivel=true; }
-      else { PG.nivel=false; toast('Este cliente aún no tiene nivel · elígelo en «Lista de precios»','info'); }
+      PGD.elegido=true; var n=pgNivelNombre(c.nivel);
+      if(n){ setNivel(n, true); CART.nivelTocado=true; PGD.nivel=true; }
+      else { PGD.nivel=false; toast('Este cliente aún no tiene nivel · elígelo en «Lista de precios»','info'); }
       $('pgRes').innerHTML=''; $('pgBuscar').value='';
       try{ cupoConsultarCliente(); }catch(e){}
       updateTotals(); markDirty(); haptic(12);
     }
     $('pgCli').addEventListener('click', function(e){
       var b=e.target.closest('.pg-op'); if(!b) return; var m=b.getAttribute('data-m'); haptic(10);
-      if(m!==PG.cli){ PG.cli=m; PG.elegido=false; PG.nivel=false; CART.nivelTocado=false; pgLimpiarCliente(); markDirty(); }
+      if(m!==PGD.cli){ PGD.cli=m; PGD.elegido=false; PGD.nivel=false; CART.nivelTocado=false; pgLimpiarCliente(); markDirty(); }
       if(m==='existente'){ pgResultados(); setTimeout(function(){ $('pgBuscar').focus(); }, 60); } else setTimeout(function(){ $('cliNombre').focus(); }, 60);
       updateTotals();
     });
     $('pgBuscar').addEventListener('input', pgResultados);
-    $('pgRes').addEventListener('click', function(e){ var b=e.target.closest('.pg-it'); if(!b) return; var c=(PG.res||[])[+b.getAttribute('data-i')]; if(c) pgElegir(c); });
-    $('nivelSeg').addEventListener('click', function(e){ if(e.target.closest('.seg')){ PG.nivel=true; pgPintar(); } });
-    $('pagoSeg').addEventListener('click', function(e){ if(!e.target.closest('.seg')) return; PG.pago=true; if(CART.metodo!=='Crédito'){ PG.abono=''; $('abonoInput').value=''; } updateTotals(); });
+    $('pgRes').addEventListener('click', function(e){ var b=e.target.closest('.pg-it'); if(!b) return; var c=(PGD.res||[])[+b.getAttribute('data-i')]; if(c) pgElegir(c); });
+    $('nivelSeg').addEventListener('click', function(e){ if(e.target.closest('.seg')){ PGD.nivel=true; pgPintar(); } });
+    $('pagoSeg').addEventListener('click', function(e){ if(!e.target.closest('.seg')) return; PGD.pago=true; if(CART.metodo!=='Crédito'){ PGD.abono=''; $('abonoInput').value=''; } updateTotals(); });
     $('pgFlete').addEventListener('click', function(e){
       var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10);
-      PG.flete=v; FLETE_MANUAL=true;
+      PGD.flete=v; FLETE_MANUAL=true;
       if(v==='gratis') $('fleteInput').value='';
       else if(!getFlete()){
         var sub=0; CART.items.forEach(function(it){ sub+=subCarrito(it); });
@@ -15027,14 +15027,14 @@
       }
       updateTotals(); markDirty();
     });
-    $('fleteHint').addEventListener('click', function(e){ if(e.target && e.target.id==='fletePolBtn'){ PG.flete = getFlete()>0 ? 'valor' : 'gratis'; if(PG.flete==='gratis') $('fleteInput').value=''; FLETE_MANUAL=true; updateTotals(); } });
+    $('fleteHint').addEventListener('click', function(e){ if(e.target && e.target.id==='fletePolBtn'){ PGD.flete = getFlete()>0 ? 'valor' : 'gratis'; if(PGD.flete==='gratis') $('fleteInput').value=''; FLETE_MANUAL=true; updateTotals(); } });
     $('pgAbono').addEventListener('click', function(e){
-      var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PG.abono=v;
+      var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PGD.abono=v;
       if(v==='no') $('abonoInput').value=''; else setTimeout(function(){ $('abonoInput').focus(); }, 60);
       updateTotals(); markDirty();
     });
     $('pgDesc').addEventListener('click', function(e){
-      var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PG.desc=v;
+      var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PGD.desc=v;
       if(v==='sin') $('descInput').value='';
       else { var d=parseInt(AJUSTES && AJUSTES.descuentoDefecto,10)||0; if(!(parseInt($('descInput').value,10)>0) && d>0) $('descInput').value=String(d); setTimeout(function(){ $('descInput').focus(); }, 60); }
       updateTotals(); markDirty();
