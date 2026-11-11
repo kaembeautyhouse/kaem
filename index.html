@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-10';
+    const APP_VERSION = '2026-11-10-11';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -13022,7 +13022,10 @@
     }
     function lockReiniciar(msg){ LOCK.valor=''; lockPintar(); if(msg) lockError(msg, true); }
     // ——— PIN local (huella cifrada, nunca el PIN) para desbloquear sin internet ———
-    var LOCK_FALLOS_LOCAL=0;   // tras 5 fallos locales se exige verificación en el servidor
+    // Tras 5 fallos locales se exige verificación en el servidor (que sí tiene bloqueos). El conteo se guarda en el equipo:
+    // antes vivía solo en memoria y recargar la página daba 5 intentos nuevos, sin límite, sin pasar por el servidor.
+    function lockFallosLeer(){ try{ return parseInt(localStorage.getItem('kaem_pin_fallos_local')||'0',10)||0; }catch(e){ return 0; } }
+    function lockFallosFijar(n){ try{ if(n>0) localStorage.setItem('kaem_pin_fallos_local', String(n)); else localStorage.removeItem('kaem_pin_fallos_local'); }catch(e){} }
     function lockHash(pin, sal){
       return crypto.subtle.digest('SHA-256', new TextEncoder().encode('KAEM|'+sal+'|'+pin)).then(function(b){
         return Array.prototype.map.call(new Uint8Array(b), function(x){ return (x<16?'0':'')+x.toString(16); }).join('');
@@ -13048,7 +13051,7 @@
       LOCK.ocupado=true; lockError('Verificando…');
       google.script.run.withSuccessHandler(function(r){
         LOCK.ocupado=false;
-        if(r && r.ok){ lockGuardarLocal(v); LOCK_FALLOS_LOCAL=0; lockEntrar(r.token||''); }
+        if(r && r.ok){ lockGuardarLocal(v); lockFallosFijar(0); lockEntrar(r.token||''); }
         else lockReiniciar((r&&r.message)||'PIN incorrecto');
       }).withFailureHandler(function(){ LOCK.ocupado=false; lockReiniciar(navigator.onLine===false ? 'Sin internet · conéctate e intenta de nuevo' : 'El servidor no respondió · intenta de nuevo en un momento'); })
         .verificarPin({ pin:v, operador:String((AJUSTES&&AJUSTES.operador)||'').trim(),
@@ -13060,10 +13063,10 @@
         // Verificación LOCAL e instantánea si este celular ya entró antes con un pase válido.
         // Si el servidor rechazó el pase (PIN cambiado en otro equipo), siempre va al servidor.
         var local=null; try{ local=JSON.parse(localStorage.getItem('kaem_pin_local')||'null'); }catch(e){}
-        if(local && local.h && lockToken() && !LOCK.desdeRechazo && LOCK_FALLOS_LOCAL<5 && window.crypto && crypto.subtle){
+        if(local && local.h && lockToken() && !LOCK.desdeRechazo && lockFallosLeer()<5 && window.crypto && crypto.subtle){
           lockHash(v, local.sal).then(function(h){
-            if(h===local.h){ LOCK_FALLOS_LOCAL=0; lockEntrar(''); }
-            else { LOCK_FALLOS_LOCAL++; lockReiniciar('PIN incorrecto'); }
+            if(h===local.h){ lockFallosFijar(0); lockEntrar(''); }
+            else { lockFallosFijar(lockFallosLeer()+1); lockReiniciar('PIN incorrecto'); }
           }).catch(function(){ lockVerificarServidor(v); });
           return;
         }

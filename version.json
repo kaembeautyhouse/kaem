@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-10-10",
+  "app": "2026-11-10-11",
   "servidor": "2026.10.59",
   "fecha": "2026-11-10",
   "novedades": [
+    "Seguridad: los intentos fallidos del PIN en un equipo ahora se cuentan aunque se recargue la página; tras 5 fallos la app exige que el servidor verifique el PIN (que tiene sus propios bloqueos).",
     "Clientes: los clientes del catálogo Detal (documento 222222222222) ya no aparecen como «posibles duplicados», así nadie los une por error. Dos clientes con el mismo NIT real siguen avisándose.",
     "Ajustes → «Revisar datos (fechas, ceros, repetidos)»: lee tus hojas y te lista, sin cambiar nada, textos que Sheets volvió fecha, tonos que perdieron el cero, SKU repetidos, productos con stock y sin precio o costo y pedidos ilegibles. El tono ahora siempre se guarda como texto.",
     "Tablet: en Pedidos, las tarjetas de productos ya no se meten debajo del panel «Condiciones del pedido» (con letras anchas se pasaban unos píxeles); si no caben dos por fila, pasan a una. Clientes sin celular y con documento genérico (222222222222) ya no se funden en Estadísticas, el panel BI ni Cupos.",
