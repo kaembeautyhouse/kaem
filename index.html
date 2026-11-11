@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-11';
+    const APP_VERSION = '2026-11-10-12';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -10108,8 +10108,10 @@
       var venceRaw = kaemFirst(d.fechaVencimiento, d.vencimiento, '') || kaemFechaMas30(fechaObj);
       R.vence = R.credito ? (kaemFmtFecha(venceRaw) || String(venceRaw)) : '';
       R.venceLarga = R.credito ? kaemFechaLarga(venceRaw) : '';
-      R.condTxt = R.credito ? ('Crédito ' + plazoCreditoActual() + ' días · Vence ' + (R.vence || '—')) : 'Contado';
-      R.condL1 = R.credito ? ('Crédito ' + plazoCreditoActual() + ' días') : 'Contado'; R.condL2 = R.credito ? ('Vence ' + (R.vence || '—')) : '';
+      // Los días de crédito son los de ESTE pedido (no los de Ajustes de hoy): al reimprimir una remisión vieja no debe cambiar el plazo escrito
+      var plazoRem = R.credito ? plazoDePedido(d) : 0;
+      R.condTxt = R.credito ? ('Crédito ' + plazoRem + ' días · Vence ' + (R.vence || '—')) : 'Contado';
+      R.condL1 = R.credito ? ('Crédito ' + plazoRem + ' días') : 'Contado'; R.condL2 = R.credito ? ('Vence ' + (R.vence || '—')) : '';
       R.nivel = String(kaemFirst(d.nivel, d.nivelPrecio, 'Detal')).trim() || 'Detal';
       R.whatsapp = remEsDetalOMayor_(R.nivel) ? '318 130 5060' : '311 207 9880';
       R.politica = remEsDetalOMayor_(R.nivel) ? POLITICA_PDF_DETAL : POLITICA_PDF;
