@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-10-12",
+  "app": "2026-11-10-13",
   "servidor": "2026.10.59",
   "fecha": "2026-11-10",
   "novedades": [
+    "Historial: el total «Vendido» (y el ticket promedio) ya no cuenta el flete, igual que Estadísticas y el panel BI. El total de cada pedido sigue mostrando el valor completo de su remisión.",
     "Remisión PDF: los días de crédito que se imprimen son los de ese pedido (antes tomaba los de Ajustes de hoy, y al reimprimir una remisión vieja podía decir un plazo que no coincidía con su fecha de pago).",
     "Seguridad: los intentos fallidos del PIN en un equipo ahora se cuentan aunque se recargue la página; tras 5 fallos la app exige que el servidor verifique el PIN (que tiene sus propios bloqueos).",
     "Clientes: los clientes del catálogo Detal (documento 222222222222) ya no aparecen como «posibles duplicados», así nadie los une por error. Dos clientes con el mismo NIT real siguen avisándose.",

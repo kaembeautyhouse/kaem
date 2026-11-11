@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-12';
+    const APP_VERSION = '2026-11-10-13';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -9402,7 +9402,8 @@
     function histGanNeta(o){ try{ return gananciaPedido(o).neta; }catch(e){ return 0; } }
     function histKpiHtml(res){
       var vend=0, cobrar=0, gan=0, nCob=0;
-      res.forEach(function(o){ vend+=Number(o.total)||0; if(histPendiente(o)){ cobrar+=Number(o.saldo)||0; nCob++; } gan+=histGanNeta(o); });
+      res.forEach(function(o){ vend+=Math.max(0,(Number(o.total)||0)-(Number(o.flete)||0));   // «Vendido» sin flete: el mismo criterio de Estadísticas y del panel BI
+           if(histPendiente(o)){ cobrar+=Number(o.saldo)||0; nCob++; } gan+=histGanNeta(o); });
       var k=function(cls, lbl, val, sub){ return '<div class="his-kpi'+(cls?' '+cls:'')+'"><span>'+lbl+'</span><b>'+val+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</div>'; };
       return k('', 'Pedidos', res.length, res.length? 'ticket '+abrevCop(vend/res.length) : '')
         + k('', 'Vendido', abrevCop(vend), 'en el filtro actual')
