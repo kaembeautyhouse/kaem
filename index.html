@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-19';
+    const APP_VERSION = '2026-11-10-20';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -2584,6 +2584,8 @@
     .bi-tr span:not(:first-child){text-align:right}
     .bi-tr .pos{color:#4C7A43;font-weight:600}.bi-tr .neg{color:var(--terracota-txt);font-weight:600}
     .bi-nota{margin:8px 2px;font-size:12.5px;line-height:1.45;color:var(--texto-suave)}.bi-nota b{color:var(--espresso)}.bi-nota.late{color:var(--terracota-txt)}
+    .bi-nota.bi-aviso{color:var(--terracota-txt);font-weight:600}
+    .rent-exacta{margin:8px 2px 0;font-size:12px;line-height:1.4;color:var(--texto-suave)}
     .bi-vacio{text-align:center;color:var(--texto-suave);padding:18px 8px;font-size:14px}
     .bi-sup{margin:12px 2px 4px;font-size:12.5px;color:var(--texto-suave)}.bi-sup summary{cursor:pointer;padding:8px 0;font-weight:500}.bi-sup li{margin:5px 0 5px 16px;line-height:1.45}
     .bi-abc{display:flex;gap:3px;height:34px;border-radius:9px;overflow:hidden}
@@ -13872,6 +13874,7 @@
         +'<tr><td><b>Ganancia operativa</b></td><td><b class="'+(M.gananciaOperativa<0?'neg':'pos')+'">'+biSig(M.gananciaOperativa)+'</b></td></tr>'
         +'<tr><td>Retiros personales (gastos y deudas propias)</td><td>'+biSig(-M.retiros)+'</td></tr>'
         +'<tr><td><b>Resultado final</b></td><td><b class="'+(M.resultado<0?'neg':'pos')+'">'+biSig(M.resultado)+'</b></td></tr></table>'
+        +((M.ventas>0 && !(M.egr.operacion>0) && !(M.egr.viaticos>0))?'<p class="bi-nota bi-aviso">⚠ Este mes no hay gastos de operación ni viáticos registrados. Si hubo gasolina, empaques o viáticos de ruta, regístralos en Gastos: sin ellos la ganancia operativa y el resultado final salen más altos de lo real.</p>':'')
         +'<p class="bi-nota">El costo de la mercancía ya está en el margen de los productos; por eso las compras de mercancía no se restan otra vez aquí (sí salen de la caja).</p></div>';
       h+='<p class="fin-sec">Lo que debes</p><div class="fin-hero">'
         + finKpi('Proveedores', abrevCop(cat.Proveedores.deuda), biPl(cat.Proveedores.n,'factura','facturas')+(cat.Proveedores.vencidos?(' · '+biPl(cat.Proveedores.vencidos,'vencida','vencidas')):''), cat.Proveedores.vencidos?'neg':'')
@@ -14147,6 +14150,7 @@
           +  '<div class="'+(Mo.neta<0?'late':'ok')+'"><small>Ganancia neta</small><b>'+(Mo.neta<0?'− ':'')+cop(Math.abs(Mo.neta))+'</b><small>'+Mo.margenNeto+' %'
           +     (dlt!=null?(' · <span class="st-delta '+(dlt>=0?'up':'down')+'">'+(dlt>=0?'▲ +':'▼ ')+dlt+' pts</span>'):'')+'</small></div>'
           +'</div>'
+          +(Mo.lineas>0?('<p class="rent-exacta">'+(Mo.sinCosto>0?('⚠ '+biPl(Mo.sinCosto,'línea','líneas')+' sin costo: la ganancia sale más alta de lo real. '):'')+'Costo exacto en '+Math.round(100*Mo.congeladas/Mo.lineas)+' % de las líneas del mes'+(Mo.congeladas<Mo.lineas?' (el resto usa el costo de hoy del catálogo)':'')+'.</p>'):'')
           +'<div class="rent-st-lineas">'
           +  '<div><span>Ganancia en productos (antes de envíos)</span><b>'+cop(Mo.bruta)+' · '+Mo.margenBruto+' %</b></div>'
           +  '<div><span>Fletes cobrados a clientes</span><b>+ '+cop(Mo.fleteCobrado)+'</b></div>'
