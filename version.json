@@ -1,9 +1,8 @@
 {
-  "app": "2026-11-10-18",
-  "servidor": "2026.10.61",
+  "app": "2026-11-10-19",
+  "servidor": "2026.10.60",
   "fecha": "2026-11-10",
   "novedades": [
-    "Editar producto: nuevo campo «Costo real (con descuento del proveedor)». Lo que de verdad pagas: la ganancia, el inventario valorizado y Estadísticas lo usan; los precios de venta siguen saliendo del costo base y no se mueven. Los pedidos ya hechos conservan el costo con que se vendieron.",
     "Historial → Detalle de un pedido: nuevo «Ver costo y ganancia de cada producto» con el costo de cada línea, su ganancia y un aviso ⚠ si el costo con que se vendió es distinto al que hoy tiene el catálogo. Sirve para cuadrar la ganancia con la cuenta manual.",
     "Pedidos: en la lista de clientes guardada en cada equipo, los clientes sin celular que usan el documento genérico (222222222222) ya no se funden en uno solo ni se mezclan sus datos de dirección y ciudad al autocompletar.",
     "Inicio: las cifras de ventas de hoy, la semana y el mes (tarjeta Estadísticas) ya no cuentan el flete, igual que Estadísticas, el panel BI y el Historial.",

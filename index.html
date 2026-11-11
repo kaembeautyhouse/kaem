@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-18';
+    const APP_VERSION = '2026-11-10-19';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4547,11 +4547,6 @@
         <label class="lbl" for="editCosto">Precio costo base</label>
         <div class="cost-wrap"><span class="sign">$</span><input id="editCosto" type="text" inputmode="numeric" autocomplete="off"></div>
       </div>
-      <div class="field" id="fe-costoreal">
-        <label class="lbl" for="editCostoReal">Costo real <span style="text-transform:none;letter-spacing:0;font-weight:400">(con descuento del proveedor · opcional)</span></label>
-        <div class="cost-wrap"><span class="sign">$</span><input id="editCostoReal" type="text" inputmode="numeric" autocomplete="off" placeholder="Igual al costo base"></div>
-        <p class="cfg-hint">Lo que de verdad pagas. Solo cambia la ganancia; los precios de venta no se mueven. Déjalo vacío si no hay descuento.</p>
-      </div>
       </div><div class="ep-colB">
       <div class="field" id="fe-precios">
         <span class="lbl">Precios de venta</span>
@@ -5750,7 +5745,6 @@
         tieneTonos:   (String(pick('TIENETONOS','TIENE_TONOS')).toUpperCase()==='TRUE'),
 
         costo:        toNum(pick('COSTO','PRECIO_COSTO')),
-        costoReal:    toNum(pick('COSTOREAL','COSTO_REAL')),   // lo que de verdad pagas (con descuento del proveedor); solo para la ganancia
         distribuidor: toNum(pick('DISTRIBUIDOR','PRECIO_DISTRIBUIDOR')),
         mayorista:    toNum(pick('MAYORISTA','PRECIO_MAYORISTA')),
         detal:        toNum(pick('DETAL','PRECIO_DETAL')),
@@ -8122,7 +8116,6 @@
       if(p.marca && $('editMarca').value!==p.marca){ var op=document.createElement('option'); op.value=p.marca; op.textContent=p.marca; $('editMarca').appendChild(op); $('editMarca').value=p.marca; }
       pintarLineaSel($('editMarca'), $('fe-linea'), $('editMarcaLinea'), p.lineaClave||'');   // ESSENTIAL: la línea que tiene hoy
       editCostRaw=Math.round(Number(p.costo)||0); $('editCosto').value= editCostRaw?String(editCostRaw).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):'';
-      editCostRealRaw=Math.round(Number(p.costoReal)||0); $('editCostoReal').value= editCostRealRaw?String(editCostRealRaw).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):'';
       EDIT_PRECIOS={};
       ['distribuidor','mayorista','detal'].forEach(function(k){
         var v=Math.round(Number(p[k])||0); EDIT_PRECIOS[k]={ orig:v, val:v, propio:(p.propios||[]).indexOf(k)>=0, reset:false };
@@ -8134,7 +8127,7 @@
       ['fe-producto','fe-marca','fe-costo','fe-stock','fe-tono'].forEach(function(f){ var el=$(f); if(el) el.classList.remove('field-error'); });
       $('editModal').classList.add('show');
     }
-    var editCostRaw=0, editCostRealRaw=0;
+    var editCostRaw=0;
     var EDIT_STOCK_BASE=0, EDIT_STOCK_MODO='exacto';
     var EDIT_PRECIOS={};
     function pintarEditPrecio(k){
@@ -8148,7 +8141,6 @@
       $('editP-'+k).addEventListener('input', function(e){ var d=e.target.value.replace(/\D/g,''); var s=EDIT_PRECIOS[k]; if(!s) return; s.val=d?parseInt(d,10):0; s.reset=false; e.target.value=d?d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; pintarEditPrecio(k); });
       $('epReset-'+k).addEventListener('click', function(){ var s=EDIT_PRECIOS[k]; if(!s) return; s.reset=true; $('editP-'+k).value=s.orig?String(s.orig).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; haptic(8); pintarEditPrecio(k); });
     });
-    $('editCostoReal').addEventListener('input', function(e){ var d=e.target.value.replace(/\D/g,''); editCostRealRaw=d?parseInt(d,10):0; e.target.value=d?d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; });
     $('editCosto').addEventListener('input', function(e){ var d=e.target.value.replace(/\D/g,''); editCostRaw=d?parseInt(d,10):0; e.target.value=d?d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):''; });
     function getEditStock(){ var n=parseInt(String($('editStock').value).replace(/\D/g,''),10); return (isNaN(n)||n<0)?0:n; }
     function setEditStock(n){ if(n<0)n=0; $('editStock').value=String(n); actualizarEditStockPreview(); }
@@ -8194,7 +8186,7 @@
       $('editModal').classList.remove('show'); abrirNuevoTono(); haptic(10);
     });
     $('editSaveBtn').addEventListener('click', function(){
-      var payload={ sku:editSkuKey, producto:$('editProducto').value.trim(), tono:$('editTono').value.trim(), marca:$('editMarca').value, lineaClave:lineaElegida($('fe-linea'), $('editMarcaLinea')), costo:editCostRaw, costoReal:editCostRealRaw, stock:getEditStockFinal(), operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
+      var payload={ sku:editSkuKey, producto:$('editProducto').value.trim(), tono:$('editTono').value.trim(), marca:$('editMarca').value, lineaClave:lineaElegida($('fe-linea'), $('editMarcaLinea')), costo:editCostRaw, stock:getEditStockFinal(), operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
       // Sumar / dar de baja viajan como DIFERENCIA: el servidor la aplica sobre el stock real del momento
       if(EDIT_STOCK_MODO==='sumar') payload.stockDelta = getEditStock();
       else if(EDIT_STOCK_MODO==='restar') payload.stockDelta = -getEditStock();
@@ -8207,7 +8199,6 @@
       if(!payload.producto){ toast('Escribe el nombre.','error'); beep('error'); return; }
       if(!payload.marca){ toast('Selecciona una marca.','error'); beep('error'); return; }
       if(!payload.costo||payload.costo<=0){ toast('Revisa el costo: debe ser un número mayor a cero.','error'); beep('error'); return; }
-      if(editCostRealRaw>editCostRaw){ toast('El costo real no puede ser mayor al costo base.','error'); beep('error'); return; }
       setLoading(true); haptic(15);
       google.script.run.withSuccessHandler(function(res){
         setLoading(false);
@@ -8800,7 +8791,7 @@
     /* ═══ RENTABILIDAD EN VIVO ═══
        ganancia = (productos − descuento) − costo + flete cobrado − lo que KAÉM paga por el envío.
        El costo real del envío viene de Ajustes (nacional $21.200 por defecto, manual v5.1). */
-    function costoDe_(sku){ var p=(typeof findProduct==='function')?findProduct(sku):null; return p?Math.round(toNum(p.costoReal)>0?toNum(p.costoReal):toNum(p.costo)):0; }
+    function costoDe_(sku){ var p=(typeof findProduct==='function')?findProduct(sku):null; return p?Math.round(toNum(p.costo)):0; }
     /** Costo unitario de una línea del carrito: el congelado al vender (pedido que se edita) o el actual del catálogo. */
     function costoItem_(it){ return (it && it.costoFijo>0) ? it.costoFijo : costoDe_(it && it.sku); }
     function costoEnvio_(zona){
