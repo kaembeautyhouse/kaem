@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-16';
+    const APP_VERSION = '2026-11-10-17';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -1160,6 +1160,11 @@
     .hd-gan{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--texto-suave);padding:2px 0}
     .hd-gan.tot{border-top:1px solid var(--linea);margin-top:4px;padding-top:6px;font-weight:600;color:var(--espresso);font-size:13px}
     .hd-gan-nota{margin:6px 0 0;font-size:11.5px;line-height:1.4;color:var(--terracota-txt)}
+    .hd-gan-lin{margin-top:8px;font-size:12px}
+    .hd-gan-lin summary{cursor:pointer;font-weight:600;padding:6px 0}
+    .hd-gan-tab{width:100%;border-collapse:collapse;font-size:11.5px}
+    .hd-gan-tab th,.hd-gan-tab td{padding:4px 3px;text-align:right;border-bottom:1px solid rgba(128,128,128,.2)}
+    .hd-gan-tab th:first-child,.hd-gan-tab td:first-child{text-align:left}
     .modo-cliente .hist-gan,.modo-cliente .hd-gan-box,.modo-cliente #rentBox{display:none!important}
     .hist-busca{margin:0 0 4px;box-shadow:none;border:1px solid var(--linea)}
     .rec-total{margin:10px 2px 0;font-size:13px;color:var(--texto-suave)}.rec-total b{color:var(--espresso)}
@@ -9309,19 +9314,20 @@
         (productos − descuento) − costo de lo entregado + flete cobrado − lo que cuesta el envío.
         Costo = el congelado al vender; si el pedido es viejo, el actual del catálogo (entonces es aproximada). */
     function gananciaPedido(o){
-      var costo=0, venta=0, sinCosto=0, aprox=0, uds=0;
+      var costo=0, venta=0, sinCosto=0, aprox=0, uds=0, lineas=[];
       (o.items||[]).forEach(function(it){
         var cant=Math.floor(toNum(it.cantidad)); if(!cant) return;
         var sub=(it.subtotal!=null&&it.subtotal!=='') ? toNum(it.subtotal) : cant*toNum(it.precio);
-        var fijo=Math.round(toNum(it.costo)), cu=fijo>0?fijo:costoDe_(it.sku);
+        var fijo=Math.round(toNum(it.costo)), actual=costoDe_(it.sku), cu=fijo>0?fijo:actual;
         if(!cu) sinCosto++; else if(!(fijo>0)) aprox++;
         venta+=sub; costo+=cu*cant; uds+=cant;
+        lineas.push({ nombre:it.nombre||it.sku, tono:it.tono||'', cant:cant, venta:sub, cu:cu, actual:actual, congelado:fijo>0 });
       });
       var desc=toNum(o.descuento), flete=toNum(o.flete);
       var ciudad=String((o.cliente&&o.cliente.ciudad)||'').trim();
       var am=esAreaMetro(ciudad), envio=costoEnvio_(am?'am':'nac');
       var base=Math.max(0, venta-desc), bruta=base-costo, neta=bruta+flete-envio;
-      return { venta:venta, desc:desc, base:base, costo:costo, bruta:bruta, flete:flete, envio:envio, neta:neta,
+      return { lineas:lineas, venta:venta, desc:desc, base:base, costo:costo, bruta:bruta, flete:flete, envio:envio, neta:neta,
                margen:base>0?Math.round(100*neta/base):0, sinCosto:sinCosto, aprox:aprox, sinCiudad:!ciudad, am:am, uds:uds };
     }
     function gananciaChipHTML(g){
@@ -9344,7 +9350,23 @@
         + f('Envío que te cuesta ('+(g.am?'área metropolitana':'nacional')+')', '− '+cop(g.envio))
         + f('Ganancia neta · '+g.margen+'%', (g.neta<0?'− ':'')+cop(Math.abs(g.neta)), 'tot')
         + (notas.length?('<p class="hd-gan-nota">'+notas.join(' ')+'</p>'):'')
+        + gananciaLineasHTML(g)
         + '</div>';
+    }
+    /** Costo y ganancia de cada producto del pedido: sirve para cuadrar con la cuenta manual.
+        Marca ⚠ cuando el costo con que se vendió es distinto al que hoy tiene el catálogo. */
+    function gananciaLineasHTML(g){
+      var L=g.lineas||[]; if(!L.length) return '';
+      var dif=0, filas=L.map(function(l){
+        var gan=l.venta-l.cu*l.cant, cambio=l.congelado && l.actual>0 && l.actual!==l.cu;
+        if(cambio) dif+=(l.cu-l.actual)*l.cant;
+        var nom=safe(l.nombre)+(l.tono?' · '+safe(l.tono):'')+(l.venta===0?' <em>(cortesía)</em>':'');
+        return '<tr><td>'+nom+'</td><td>'+l.cant+'</td><td>'+cop(l.cu)+(cambio?' <b title="Hoy el catálogo dice '+cop(l.actual)+'">⚠ hoy '+cop(l.actual)+'</b>':(l.congelado?'':' <em title="Pedido sin costo guardado: se usó el del catálogo">≈</em>'))+'</td><td>'+cop(l.cu*l.cant)+'</td><td>'+(gan<0?'− ':'')+cop(Math.abs(gan))+'</td></tr>';
+      }).join('');
+      return '<details class="hd-gan-lin"><summary>Ver costo y ganancia de cada producto</summary>'
+        + '<table class="hd-gan-tab"><thead><tr><th>Producto</th><th>Un.</th><th>Costo c/u</th><th>Costo total</th><th>Ganancia</th></tr></thead><tbody>'+filas+'</tbody></table>'
+        + (dif!==0 ? '<p class="hd-gan-nota">⚠ Algunos costos de este pedido son distintos a los de hoy en el catálogo: la diferencia suma '+cop(Math.abs(dif))+(dif>0?' de más':' de menos')+' en el costo. El pedido conserva el costo con que se vendió.</p>' : '')
+        + '</details>';
     }
     function histRowHTML(o){
       var items=o.items||[];

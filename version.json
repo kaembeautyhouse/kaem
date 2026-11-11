@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-10-16",
+  "app": "2026-11-10-17",
   "servidor": "2026.10.60",
   "fecha": "2026-11-10",
   "novedades": [
+    "Historial → Detalle de un pedido: nuevo «Ver costo y ganancia de cada producto» con el costo de cada línea, su ganancia y un aviso ⚠ si el costo con que se vendió es distinto al que hoy tiene el catálogo. Sirve para cuadrar la ganancia con la cuenta manual.",
     "Pedidos: en la lista de clientes guardada en cada equipo, los clientes sin celular que usan el documento genérico (222222222222) ya no se funden en uno solo ni se mezclan sus datos de dirección y ciudad al autocompletar.",
     "Inicio: las cifras de ventas de hoy, la semana y el mes (tarjeta Estadísticas) ya no cuentan el flete, igual que Estadísticas, el panel BI y el Historial.",
     "Devoluciones: un producto que aparece en el pedido con su probador ahora sale en una sola fila, y el «Valor a devolver» coincide con el que registra el servidor (antes mostraba otra cifra y los contadores se mezclaban).",
