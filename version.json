@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-10-14",
-  "servidor": "2026.10.59",
+  "app": "2026-11-10-15",
+  "servidor": "2026.10.60",
   "fecha": "2026-11-10",
   "novedades": [
+    "Inicio: las cifras de ventas de hoy, la semana y el mes (tarjeta Estadísticas) ya no cuentan el flete, igual que Estadísticas, el panel BI y el Historial.",
     "Devoluciones: un producto que aparece en el pedido con su probador ahora sale en una sola fila, y el «Valor a devolver» coincide con el que registra el servidor (antes mostraba otra cifra y los contadores se mezclaban).",
     "Historial: el total «Vendido» (y el ticket promedio) ya no cuenta el flete, igual que Estadísticas y el panel BI. El total de cada pedido sigue mostrando el valor completo de su remisión.",
     "Remisión PDF: los días de crédito que se imprimen son los de ese pedido (antes tomaba los de Ajustes de hoy, y al reimprimir una remisión vieja podía decir un plazo que no coincidía con su fecha de pago).",

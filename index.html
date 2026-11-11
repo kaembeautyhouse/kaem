@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-14';
+    const APP_VERSION = '2026-11-10-15';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -14681,7 +14681,7 @@
       if(al){ D.alN=(al.alertas||[]).filter(function(a){ return a.urgencia<=2; }).length; D.alRes=al.resumen||{}; }
       var hist=[]; try{ hist=loadHistory(); }catch(e){}
       D.hist=hist; D.vm=0; D.nv=0; var ahora=new Date();
-      hist.forEach(function(o){ var f=kaemParseFecha(o.fecha); if(f && f.getMonth()===ahora.getMonth() && f.getFullYear()===ahora.getFullYear() && String(o.estado||'').toUpperCase()!=='ELIMINADO'){ D.vm+=toNum(o.total); D.nv++; } });
+      hist.forEach(function(o){ var f=kaemParseFecha(o.fecha); if(f && f.getMonth()===ahora.getMonth() && f.getFullYear()===ahora.getFullYear() && String(o.estado||'').toUpperCase()!=='ELIMINADO'){ D.vm+=Math.max(0,toNum(o.total)-toNum(o.flete)); D.nv++; } });
       D.nCli=(CLIENTES&&CLIENTES.lista)?CLIENTES.lista.length:0;
       // Gastos y cupos: lo que ya se cargó en memoria (sin pedir nada)
       var hoyI=gsIso(new Date()), lunI=gsIso(gsLunes(new Date())), ymI=hoyI.slice(0,7);
