@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-13';
+    const APP_VERSION = '2026-11-10-14';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -13546,10 +13546,26 @@
           }).join('');
       }).withFailureHandler(function(){}).obtenerDevoluciones({ idRemision: rem });
     }
+    // Un mismo SKU puede estar en varias líneas (la normal y sus probadores): se juntan en UNA fila, igual que el servidor,
+    // que devuelve primero lo cobrado a mayor precio. Antes cada línea se pintaba aparte y compartía el contador.
+    function devolGrupos(){
+      var o = DEVOL.pedido, orden = [], por = {};
+      (o.items||[]).forEach(function(it){
+        var k = String(it.sku||'').trim(), c = Math.floor(toNum(it.cantidad)); if(!k || !(c>0)) return;
+        if(!por[k]){ por[k] = { sku:it.sku, nombre:it.nombre||it.sku, max:0, lineas:[] }; orden.push(k); }
+        por[k].max += c; por[k].lineas.push({ cant:c, precio:toNum(it.precio) });
+      });
+      return orden.map(function(k){ var g = por[k]; g.lineas.sort(function(a,b){ return b.precio - a.precio; }); g.precio = g.lineas[0].precio; return g; });
+    }
+    function devolValor(g, n){
+      var quedan = n, v = 0;
+      for(var i=0; i<g.lineas.length && quedan>0; i++){ var t = Math.min(quedan, g.lineas[i].cant); v += Math.round(g.lineas[i].precio * t); quedan -= t; }
+      return v;
+    }
     function pintarDevolItems(){
-      var o = DEVOL.pedido, h = '';
-      (o.items||[]).forEach(function(it, i){
-        var max = Math.floor(toNum(it.cantidad));
+      var h = '';
+      devolGrupos().forEach(function(it){
+        var max = it.max;
         var n = DEVOL.cant[it.sku] || 0;
         h += '<div class="devol-item">'
           +   '<span class="devol-nom">'+safe(it.nombre||it.sku)
@@ -13564,10 +13580,9 @@
       calcularDevolTotal();
     }
     function calcularDevolTotal(){
-      var o = DEVOL.pedido, total = 0;
-      (o.items||[]).forEach(function(it){
-        var n = DEVOL.cant[it.sku] || 0;
-        total += n * toNum(it.precio);
+      var total = 0;
+      devolGrupos().forEach(function(g){
+        total += devolValor(g, DEVOL.cant[g.sku] || 0);
       });
       $('devolTotal').textContent = 'Valor a devolver: ' + cop(total);
       $('devolConfirm').disabled = (total <= 0);
@@ -13591,7 +13606,7 @@
     });
     $('devolTodoBtn').addEventListener('click', function(){
       DEVOL.cant = {};
-      (DEVOL.pedido.items||[]).forEach(function(it){ DEVOL.cant[it.sku] = Math.floor(toNum(it.cantidad)); });
+      devolGrupos().forEach(function(g){ DEVOL.cant[g.sku] = g.max; });
       haptic(10); pintarDevolItems();
     });
     $('devolNadaBtn').addEventListener('click', function(){ DEVOL.cant = {}; haptic(8); pintarDevolItems(); });
@@ -13608,7 +13623,7 @@
       var motivo = $('devolMotivo').value;
       var reintegra = !SIN_REINTEGRO.test(motivo);
       var total = calcularDevolTotal();
-      var todo = (DEVOL.pedido.items||[]).every(function(it){ return (DEVOL.cant[it.sku]||0) >= Math.floor(toNum(it.cantidad)); });
+      var todo = devolGrupos().every(function(g){ return (DEVOL.cant[g.sku]||0) >= g.max; });
       if(!confirm((todo ? '¿Devolver TODA la factura por ' : '¿Registrar la devolución por ')+cop(total)+'?'+(todo ? ' (incluye quitar el envío)' : '')+'\n\n'
         + (reintegra ? 'Las unidades volverán al inventario.' : 'Las unidades NO volverán al inventario.'))) return;
 
