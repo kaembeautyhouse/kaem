@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-10-21",
-  "servidor": "2026.10.62",
+  "app": "2026-11-10-22",
+  "servidor": "2026.10.63",
   "fecha": "2026-11-10",
   "novedades": [
+    "Pagos mejorado: el descuento de la marca ahora es No/Sí y al elegir Sí se despliega el %; las facturas de proveedor eligen el plazo (de contado, 8, 15, 30, 45, 60 días u otro) y el vencimiento se calcula solo; se puede adjuntar la factura en PDF (se ve como «📎 Factura PDF» en la tarjeta); al pagar eliges «Todo lo que falta» o «Solo un abono» (el valor aparece solo con el abono). Corrección: una factura de proveedor por cuotas ahora reparte el valor entre las cuotas (antes cada cuota quedaba con el valor de toda la factura). Al registrar una compra de mercancía la app te ofrece ir a Inventario a sumar lo que llegó.",
     "Gastos → Mercancía rehecho: «¿La marca te dio descuento?» No/Sí con su %, «¿Cómo se paga?» Crédito, Transferencia, Efectivo u Otro. A crédito eliges el plazo (8, 15, 30, 45, 60 días u otro) o la fecha de pago y la compra queda en Pagos como factura de la marca; de contado queda en Gastos; y si ya tenías la factura en Pagos puedes pagarla desde aquí sin duplicarla. Se puede adjuntar la factura en PDF (se guarda en tu Drive, carpeta «KAÉM · Facturas de compra»).",
     "Estadísticas: en Rentabilidad se ve qué tan exacta es la ganancia del mes (porcentaje de líneas con costo guardado y aviso si alguna no tiene costo). En Dinero, si el mes no tiene gastos de operación ni viáticos registrados, aparece un aviso de que el resultado puede estar sobreestimado.",
     "Historial → Detalle de un pedido: nuevo «Ver costo y ganancia de cada producto» con el costo de cada línea, su ganancia y un aviso ⚠ si el costo con que se vendió es distinto al que hoy tiene el catálogo. Sirve para cuadrar la ganancia con la cuenta manual.",

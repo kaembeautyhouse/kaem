@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-21';
+    const APP_VERSION = '2026-11-10-22';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4970,12 +4970,19 @@
           <select id="pgMarca"><option value="">Elige la marca…</option></select></div>
         <div class="field"><label class="lbl" for="pgBruto">Valor de la factura (antes del descuento)</label>
           <div class="cost-wrap"><span class="sign">$</span><input id="pgBruto" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></div></div>
-        <div class="field"><label class="lbl">Descuento de la marca en esta factura</label>
-          <div class="ent-plazo" id="pgDescChips">
-            <button type="button" class="chip" data-d="0">Sin descuento</button><button type="button" class="chip" data-d="3">3 %</button><button type="button" class="chip" data-d="5">5 %</button><button type="button" class="chip" data-d="7">7 %</button><button type="button" class="chip" data-d="10">10 %</button>
+        <div class="field"><label class="lbl">¿La marca te dio descuento en esta factura?</label>
+          <div class="ent-plazo" id="pgDescSiNo"><button type="button" class="chip on" data-sn="no">No</button><button type="button" class="chip" data-sn="si">Sí</button></div>
+          <div id="pgDescPctBox" style="display:none;margin-top:8px">
+            <div class="ent-plazo" id="pgDescChips">
+              <button type="button" class="chip" data-d="3">3 %</button><button type="button" class="chip" data-d="5">5 %</button><button type="button" class="chip" data-d="7">7 %</button><button type="button" class="chip" data-d="10">10 %</button>
+            </div>
+            <div class="cost-wrap cost-compact" style="margin-top:8px;max-width:190px"><input id="pgDescPct" type="text" inputmode="decimal" autocomplete="off" placeholder="Otro %  (ej. 8)"></div>
           </div>
-          <div class="cost-wrap cost-compact" style="margin-top:8px"><input id="pgDescPct" type="text" inputmode="decimal" autocomplete="off" placeholder="Otro %"><span class="sign" style="right:12px;left:auto">%</span></div>
           <p class="pg-descinfo" id="pgDescInfo"></p></div>
+        <div class="field"><label class="lbl" for="pgFactura">Factura en PDF <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional)</span></label>
+          <input id="pgFactura" type="file" accept="application/pdf,.pdf">
+          <p class="cfg-hint" id="pgFacturaInfo">Se guarda en tu Drive, en la carpeta «KAÉM · Facturas de compra». Máximo 6 MB.</p>
+          <p class="cfg-hint" id="pgFacturaVerBox" style="display:none"><a id="pgFacturaVer" href="#" target="_blank" rel="noopener">Ver la factura guardada</a></p></div>
       </div>
       <div id="pgPrestBox" style="display:none">
         <div class="field"><label class="lbl" for="pgPrincipal">Capital recibido (lo que prestaron para invertir en KAÉM)</label>
@@ -5004,6 +5011,9 @@
         <div class="field row-field"><label class="lbl inline" for="pgCuotasPagadas">Ya pagadas</label>
           <div class="cost-wrap cost-compact"><input id="pgCuotasPagadas" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></div></div>
       </div>
+      <div class="field" id="pgPlazoBox" style="display:none"><label class="lbl">Plazo para pagar</label>
+        <div class="ent-plazo" id="pgPlazoChips"><button type="button" class="chip" data-p="0">De contado (hoy)</button><button type="button" class="chip" data-p="8">8 días</button><button type="button" class="chip" data-p="15">15 días</button><button type="button" class="chip" data-p="30">30 días</button><button type="button" class="chip" data-p="45">45 días</button><button type="button" class="chip" data-p="60">60 días</button></div>
+        <div class="cost-wrap cost-compact" style="margin-top:8px;max-width:240px"><input id="pgPlazoOtro" type="text" inputmode="numeric" autocomplete="off" placeholder="Otro (días)" aria-label="Plazo en días"></div></div>
       <div class="field"><label class="lbl" for="pgVenc" id="pgVencLbl">Vence el</label>
         <input id="pgVenc" type="date"></div>
       <div class="field"><label class="lbl" for="pgAvisar">Avisarme</label>
@@ -5029,9 +5039,12 @@
     <div class="sheet">
       <h3 id="pgPagarTitulo">Registrar pago</h3>
       <p class="pago-det" id="pgPagarDet"></p>
-      <div class="field"><label class="lbl" for="pgPagarMonto">Valor pagado</label>
-        <div class="cost-wrap"><span class="sign">$</span><input id="pgPagarMonto" type="text" inputmode="numeric" autocomplete="off"></div>
-        <p class="cfg-hint">Si pagas menos del total, queda como abono y el vencimiento sigue abierto por lo que falta.</p></div>
+      <div class="field"><label class="lbl">¿Cuánto pagas?</label>
+        <div class="ent-plazo" id="pgPagarModo"><button type="button" class="chip on" data-modo="total">Todo lo que falta</button><button type="button" class="chip" data-modo="abono">Solo un abono</button></div>
+        <p class="pago-det" id="pgPagarTotalTxt" style="margin-top:8px"></p>
+        <div id="pgPagarAbonoBox" style="display:none;margin-top:8px">
+          <div class="cost-wrap"><span class="sign">$</span><input id="pgPagarMonto" type="text" inputmode="numeric" autocomplete="off" placeholder="Valor del abono"></div>
+          <p class="cfg-hint">El vencimiento sigue abierto por lo que falta.</p></div></div>
       <div class="field"><label class="lbl" for="pgPagarMetodo">Medio de pago</label>
         <select id="pgPagarMetodo">
           <option>Transferencia</option><option>Nequi</option><option>Bancolombia</option><option>Efectivo</option>
@@ -11968,6 +11981,7 @@
       else tags.push('<span class="pg-tag">Pago único</span>');
       tags.push('<span class="pg-tag cat">'+safe(o.categoria)+(o.marca?(' · '+safe(o.marca)):'')+'</span>');
       if(o.categoria==='Proveedores' && o.descuentoValor>0) tags.push('<span class="pg-tag" style="background:var(--st-wa-bg);color:var(--st-wa-text)">−'+(Number(o.descuentoPct)||0)+' % · ahorro '+cop(o.descuentoValor)+'</span>');
+      if(o.facturaUrl) tags.push('<a class="pg-tag" href="'+safe(o.facturaUrl)+'" target="_blank" rel="noopener">📎 Factura PDF</a>');
       if(o.categoria==='Préstamo' && o.principal>0) tags.push('<span class="pg-tag">Capital '+cop(o.principal)+'</span>');
       if(o.responsable) tags.push('<span class="pg-tag cat">'+safe(o.responsable)+'</span>');
       var parcial = !archivo && o.saldoCiclo < o.monto;
@@ -12080,7 +12094,7 @@
       $('pgTipoHint').textContent = { UNICO:'Una factura o deuda puntual. Admite abonos; al completarse queda saldada.',
         RECURRENTE:'Arriendo, servicios, nómina… Al pagarlo salta solo al siguiente vencimiento.',
         CUOTAS:'Un crédito de varias cuotas. Lleva la cuenta y se cierra solo al pagar la última.' }[PG.tipo];
-      pgResumenForm();
+      pgCalcProv();
     }
     function pgResumenForm(){
       var monto=pgNum($('pgMonto').value), venc=$('pgVenc').value, frec=$('pgFrecuencia').value, txt='';
@@ -12112,16 +12126,35 @@
       $('pgCatHint').textContent = PG_CAT_HINT[c]; $('pgAcreedorLbl').textContent = PG_ACREEDOR_LBL[c];
       pgCalcProv();
     }
+    function pgLeerArchivo(file, cb){ var rd=new FileReader(); rd.onload=function(){ cb(String(rd.result||'').split(',')[1]||''); }; rd.onerror=function(){ cb(''); }; rd.readAsDataURL(file); }
+    function pgSumarDias(iso, n){ var d=pgDate(iso); d.setDate(d.getDate()+n); return pgIso(d); }
+    function pgPctForm(){ return PG.sn==='si' ? Math.min(50, parseFloat(String($('pgDescPct').value||'0').replace(',','.'))||0) : 0; }
     function pgCalcProv(){
-      var m=$('pgMonto'), info=$('pgDescInfo'), prov=PG.catForm==='Proveedores', bruto=pgNum($('pgBruto').value);
-      var pct=Math.min(50, parseFloat(String($('pgDescPct').value||'0').replace(',','.'))||0);
+      var m=$('pgMonto'), info=$('pgDescInfo'), prov=PG.catForm==='Proveedores', bruto=pgNum($('pgBruto').value), pct=pgPctForm();
+      Array.prototype.forEach.call($('pgDescSiNo').querySelectorAll('.chip'), function(b){ b.classList.toggle('on', b.getAttribute('data-sn')===PG.sn); });
+      $('pgDescPctBox').style.display = PG.sn==='si' ? 'block' : 'none';
       Array.prototype.forEach.call($('pgDescChips').querySelectorAll('.chip'), function(b){ b.classList.toggle('on', +b.getAttribute('data-d')===pct); });
-      if(prov && bruto>0){
-        var desc=Math.round(bruto*pct/100), neto=bruto-desc;
-        m.value=neto.toLocaleString('es-CO'); m.readOnly=true;
-        info.textContent = desc>0 ? ('Descuento '+cop(desc)+' ('+pct+' %) · pagas '+cop(neto)+'. Ese descuento es ganancia para KAÉM.') : ('Pagas '+cop(neto)+' (sin descuento).');
+      var nC=pgNum($('pgCuotasTotal').value);
+      if(prov && bruto>0 && PG.tipo!=='RECURRENTE'){
+        var desc=Math.round(bruto*pct/100), neto=bruto-desc, dTxt=desc>0?('Descuento '+cop(desc)+' ('+pct+' %) · '):'';
+        if(PG.tipo==='CUOTAS'){
+          if(nC>0){ var cuota=Math.ceil(neto/nC); m.value=cuota.toLocaleString('es-CO'); m.readOnly=true; info.textContent=dTxt+'total a pagar '+cop(neto)+' en '+nC+' cuotas de '+cop(cuota)+(desc>0?'. Ese descuento es ganancia para KAÉM.':'.'); }
+          else { m.readOnly=false; info.textContent=dTxt+'total a pagar '+cop(neto)+'. Escribe el total de cuotas para calcular cada una.'; }
+        } else { m.value=neto.toLocaleString('es-CO'); m.readOnly=true; info.textContent = dTxt+'total a pagar '+cop(neto)+(desc>0?'. Ese descuento es ganancia para KAÉM.':' (sin descuento).'); }
       } else { m.readOnly=false; info.textContent = prov ? 'Si no sabes el valor de la factura, escribe directo cuánto se debe en "Monto".' : ''; }
+      // Plazo para pagar: solo una factura nueva de proveedor de pago único
+      var plazoOk = prov && PG.tipo==='UNICO' && !PG.editId;
+      $('pgPlazoBox').style.display = plazoOk ? 'block' : 'none';
+      if(plazoOk){
+        var enP=false; Array.prototype.forEach.call($('pgPlazoChips').querySelectorAll('.chip'), function(b){ var on=+b.getAttribute('data-p')===PG.plazo; if(on) enP=true; b.classList.toggle('on', on); });
+        if(document.activeElement!==$('pgPlazoOtro')) $('pgPlazoOtro').value=(!enP && PG.plazo>0) ? String(PG.plazo) : '';
+      }
       pgResumenForm();
+    }
+    function pgFacturaPintar(){
+      if(PG.facturaUrl){ $('pgFacturaVer').href=PG.facturaUrl; $('pgFacturaVerBox').style.display='block'; } else $('pgFacturaVerBox').style.display='none';
+      $('pgFacturaInfo').textContent = PG.archivo ? ('📎 '+PG.archivo.nombre+' · '+Math.max(1,Math.round(PG.archivo.size/1024))+' KB · se guardará en tu Drive al tocar Guardar.')
+        : (PG.facturaUrl ? 'Ya hay una factura guardada. Si eliges otro PDF, reemplaza el enlace (el archivo anterior sigue en Drive).' : 'Se guarda en tu Drive, en la carpeta «KAÉM · Facturas de compra». Máximo 6 MB.');
     }
     function pgAbrirForm(o){
       PG.editId = o ? o.id : null;
@@ -12136,7 +12169,8 @@
       selM.innerHTML='<option value="">Elige la marca…</option>'+marcas.map(function(x){ return '<option>'+safe(x)+'</option>'; }).join('');
       selM.value = o ? (o.marca||'') : '';
       $('pgBruto').value = o && o.bruto ? Number(o.bruto).toLocaleString('es-CO') : '';
-      $('pgDescPct').value = o && o.descuentoPct ? String(o.descuentoPct) : '';
+      $('pgDescPct').value = o && o.descuentoPct ? String(o.descuentoPct) : ''; PG.sn = (o && o.descuentoPct>0) ? 'si' : 'no';
+      PG.plazo=-1; $('pgPlazoOtro').value=''; PG.facturaUrl = o ? (o.facturaUrl||'') : ''; PG.archivo=null; $('pgFactura').value=''; pgFacturaPintar();
       $('pgPrincipal').value = o && o.principal ? Number(o.principal).toLocaleString('es-CO') : '';
       $('pgMonto').value = o ? Number(o.monto).toLocaleString('es-CO') : '';
       $('pgFrecuencia').value = (o && o.frecuencia) || 'MENSUAL';
@@ -12157,23 +12191,35 @@
         cuotasTotal:pgNum($('pgCuotasTotal').value), cuotasPagadas:pgNum($('pgCuotasPagadas').value),
         avisarDias:+$('pgAvisar').value, responsable:$('pgResponsable').value, notas:$('pgNotas').value,
         marca:PG.catForm==='Proveedores' ? $('pgMarca').value : '', bruto:PG.catForm==='Proveedores' ? pgNum($('pgBruto').value) : 0,
-        descuentoPct:PG.catForm==='Proveedores' ? (parseFloat(String($('pgDescPct').value||'0').replace(',','.'))||0) : 0,
+        descuentoPct:PG.catForm==='Proveedores' ? pgPctForm() : 0,
         principal:PG.catForm==='Préstamo' ? pgNum($('pgPrincipal').value) : 0,
         operador:String((AJUSTES&&AJUSTES.operador)||'').trim()
       };
       if(PG.catForm==='Proveedores' && datos.marca && !datos.acreedor.trim()) datos.acreedor=datos.marca;
       if(PG.catForm==='Proveedores' && datos.marca && !datos.nombre.trim()) datos.nombre='Factura '+datos.marca;
       if(!datos.nombre.trim()){ toast('Escribe qué se paga.','error'); return; }
+      if(PG.catForm==='Proveedores' && PG.sn==='si' && !(datos.descuentoPct>0)){ toast('Escribe el % de descuento, o elige «No».','error'); try{ $('pgDescPct').focus(); }catch(e){} return; }
       if(!datos.monto){ toast('Escribe el monto.','error'); return; }
       if(!datos.proximoVenc){ toast('Elige la fecha de vencimiento.','error'); return; }
       if(PG.tipo==='CUOTAS' && !datos.cuotasTotal){ toast('Indica el total de cuotas.','error'); return; }
-      var b=$('pgEditSave'); b.disabled=true; b.textContent='Guardando…';
+      var b=$('pgEditSave'), libre=function(){ b.disabled=false; b.textContent='Guardar'; };
+      b.disabled=true; b.textContent='Guardando…';
+      var enviar=function(url){
+        datos.facturaUrl=url||'';
+        google.script.run.withSuccessHandler(function(r){
+          libre();
+          if(r && r.ok){ toast(r.message,'success'); beep('success'); $('pgEditModal').classList.remove('show'); PG.ts=0; pgCargar(true); }
+          else { toast((r&&r.message)||'No se pudo guardar.','error'); beep('error'); }
+        }).withFailureHandler(function(){ libre(); toast('Sin conexión · no se guardó.','error'); }).guardarObligacion(datos);
+      };
+      if(!PG.archivo){ enviar(PG.facturaUrl||''); return; }
+      b.textContent='Subiendo la factura…';
       google.script.run.withSuccessHandler(function(r){
-        b.disabled=false; b.textContent='Guardar';
-        if(r && r.ok){ toast(r.message,'success'); beep('success'); $('pgEditModal').classList.remove('show'); PG.ts=0; pgCargar(true); }
-        else { toast((r&&r.message)||'No se pudo guardar.','error'); beep('error'); }
-      }).withFailureHandler(function(){ b.disabled=false; b.textContent='Guardar'; toast('Sin conexión · no se guardó.','error'); })
-        .guardarObligacion(datos);
+        if(r && r.ok){ PG.facturaUrl=r.url; PG.archivo=null; b.textContent='Guardando…'; enviar(r.url); }
+        else if(window.confirm(((r&&r.message)||'No se pudo guardar la factura.')+'\n\n¿Guardar el pago SIN la factura?')){ b.textContent='Guardando…'; enviar(PG.facturaUrl||''); }
+        else libre();
+      }).withFailureHandler(function(){ if(window.confirm('Sin conexión al subir la factura.\n\n¿Guardar el pago SIN la factura?')){ enviar(PG.facturaUrl||''); } else libre(); })
+        .subirFactura({ base64:PG.archivo.base64, nombre:PG.archivo.nombre, marca:datos.marca, fecha:pgHoy(), total:datos.monto, operador:datos.operador });
     }
     function pgCambiarEstado(id, estado, cb){
       google.script.run.withSuccessHandler(function(r){
@@ -12191,15 +12237,23 @@
       var det=(o.tipo==='CUOTAS'?'Cuota '+(o.cuotasPagadas+1)+' de '+o.cuotasTotal+' · ':'')+'Vencimiento del '+pgCorta(o.proximoVenc)
         +' · '+pgTextoDias(pgDias(o.proximoVenc)).toLowerCase()+'. Falta pagar '+cop(o.saldoCiclo)+'.';
       $('pgPagarDet').textContent=det;
-      $('pgPagarMonto').value=Number(o.saldoCiclo).toLocaleString('es-CO');
+      PG.pagarModo='total'; $('pgPagarMonto').value='';
+      pgPagarPintar(o);
       $('pgPagarFecha').value=pgHoy();
       $('pgPagarNota').value='';
       $('pgPagarModal').classList.add('show'); haptic(10);
     }
+    function pgPagarPintar(o){
+      o=o||pgBuscar(PG.pagarId); if(!o) return;
+      Array.prototype.forEach.call($('pgPagarModo').querySelectorAll('.chip'), function(b){ b.classList.toggle('on', b.getAttribute('data-modo')===PG.pagarModo); });
+      $('pgPagarAbonoBox').style.display = PG.pagarModo==='abono' ? 'block' : 'none';
+      $('pgPagarTotalTxt').style.display = PG.pagarModo==='total' ? 'block' : 'none';
+      $('pgPagarTotalTxt').textContent = 'Se paga '+cop(o.saldoCiclo)+(o.tipo==='UNICO' ? ' y queda saldado.' : (o.tipo==='CUOTAS' ? ' y queda pagada la cuota '+Math.min(o.cuotasPagadas+1,o.cuotasTotal)+'.' : ' y salta al siguiente vencimiento.'));
+    }
     function pgRegistrarPago(){
       var o=pgBuscar(PG.pagarId); if(!o) return;
-      var monto=pgNum($('pgPagarMonto').value);
-      if(!monto){ toast('Escribe el valor pagado.','error'); return; }
+      var monto = PG.pagarModo==='total' ? o.saldoCiclo : pgNum($('pgPagarMonto').value);
+      if(!monto){ toast('Escribe el valor del abono.','error'); try{ $('pgPagarMonto').focus(); }catch(e){} return; }
       if(monto>o.saldoCiclo){ toast('El pago supera lo que falta ('+cop(o.saldoCiclo)+').','error'); return; }
       var b=$('pgPagarSave'); b.disabled=true; b.textContent='Registrando…';
       google.script.run.withSuccessHandler(function(r){
@@ -12234,8 +12288,20 @@
       b.addEventListener('click', function(){ PG.catForm=b.getAttribute('data-cat'); if(!PG.editId){ PG.tipo = PG.catForm==='Préstamo' ? 'CUOTAS' : 'UNICO'; pgPintarTipo(); } pgPintarCat(); haptic(8); });
     });
     $('pgBruto').addEventListener('input', pgCalcProv);
-    $('pgDescPct').addEventListener('input', function(){ this.value=this.value.replace(/[^\d.,]/g,'').slice(0,5); pgCalcProv(); });
-    Array.prototype.forEach.call($('pgDescChips').querySelectorAll('.chip'), function(b){ b.addEventListener('click', function(){ $('pgDescPct').value = b.getAttribute('data-d')==='0' ? '' : b.getAttribute('data-d'); pgCalcProv(); haptic(8); }); });
+    $('pgDescSiNo').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-sn]'):null; if(!b) return; PG.sn=b.getAttribute('data-sn'); if(PG.sn==='no') $('pgDescPct').value=''; haptic(8); pgCalcProv(); if(PG.sn==='si'){ try{ $('pgDescPct').focus(); }catch(x){} } });
+    $('pgPlazoChips').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-p]'):null; if(!b) return; PG.plazo=+b.getAttribute('data-p'); $('pgPlazoOtro').value=''; $('pgVenc').value=pgSumarDias(pgHoy(), PG.plazo); haptic(8); pgCalcProv(); });
+    $('pgPlazoOtro').addEventListener('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,3); var n=parseInt(this.value,10); PG.plazo=isNaN(n)?-1:n; if(PG.plazo>=0) $('pgVenc').value=pgSumarDias(pgHoy(), PG.plazo); pgCalcProv(); });
+    $('pgVenc').addEventListener('input', function(){ if(!this.value) return; var d=Math.round((pgDate(this.value)-pgDate(pgHoy()))/864e5); PG.plazo = d>=0 ? d : -1; if($('pgPlazoBox').style.display!=='none') pgCalcProv(); });
+    $('pgPagarModo').addEventListener('click', function(e){ var b=e.target.closest?e.target.closest('[data-modo]'):null; if(!b) return; PG.pagarModo=b.getAttribute('data-modo'); haptic(8); pgPagarPintar(); if(PG.pagarModo==='abono'){ try{ $('pgPagarMonto').focus(); }catch(x){} } });
+    $('pgFactura').addEventListener('change', function(){
+      var fl=this.files && this.files[0]; PG.archivo=null;
+      if(!fl){ pgFacturaPintar(); return; }
+      if(!/pdf$/i.test(fl.name) && fl.type!=='application/pdf'){ toast('La factura debe ser un PDF.','error'); this.value=''; pgFacturaPintar(); return; }
+      if(fl.size>6*1024*1024){ toast('El PDF pesa más de 6 MB. Comprímelo o súbelo a mano a Drive.','error'); this.value=''; pgFacturaPintar(); return; }
+      pgLeerArchivo(fl, function(b64){ if(!b64){ toast('No se pudo leer el archivo.','error'); return; } PG.archivo={ nombre:fl.name, base64:b64, size:fl.size }; pgFacturaPintar(); });
+    });
+    $('pgDescPct').addEventListener('input', function(){ this.value=this.value.replace(/[^\d.,]/g,'').slice(0,5); if(parseFloat(this.value.replace(',','.'))>0) PG.sn='si'; pgCalcProv(); });
+    Array.prototype.forEach.call($('pgDescChips').querySelectorAll('.chip'), function(b){ b.addEventListener('click', function(){ PG.sn='si'; $('pgDescPct').value = b.getAttribute('data-d'); pgCalcProv(); haptic(8); }); });
     $('pgMarca').addEventListener('change', function(){
       var m=this.value; if(!m) return;
       if(!$('pgAcreedor').value.trim()) $('pgAcreedor').value=m.toUpperCase();
@@ -12247,7 +12313,7 @@
     ['pgMonto','pgVenc','pgFrecuencia','pgCuotasTotal','pgCuotasPagadas'].forEach(function(id){
       $(id).addEventListener('input', pgResumenForm); $(id).addEventListener('change', pgResumenForm);
     });
-    ['pgCuotasTotal','pgCuotasPagadas'].forEach(function(id){ $(id).addEventListener('input', function(){ this.value=this.value.replace(/\D+/g,'').slice(0,3); }); });
+    ['pgCuotasTotal','pgCuotasPagadas'].forEach(function(id){ $(id).addEventListener('input', function(){ this.value=this.value.replace(/\D+/g,'').slice(0,3); pgCalcProv(); }); });
     $('pgNuevoBtn').addEventListener('click', function(){ pgAbrirForm(null); });
     Array.prototype.forEach.call($('pgTipoSeg').querySelectorAll('.seg'), function(b){
       b.addEventListener('click', function(){ PG.tipo=b.getAttribute('data-tipo'); pgPintarTipo(); haptic(8); });
@@ -14505,7 +14571,9 @@
       b.disabled=true; b.textContent='Guardando…';
       var falloRed=function(){ libre(); toast('Sin conexión · la compra NO quedó guardada.','error'); beep('error'); };
       var enviar=function(url){
-        var h=function(r){ libre(); if(r && r.ok){ gsFin(credito ? ('Quedó en Pagos: '+cop(d.monto)+' para el '+pgCorta(venc)+'.') : (rel ? (r.message||'Pago registrado en Pagos.') : r.message)); } else { toast((r&&r.message)||'No se pudo guardar.','error'); beep('error'); } };
+        var h=function(r){ libre(); if(r && r.ok){ gsFin(credito ? ('Quedó en Pagos: '+cop(d.monto)+' para el '+pgCorta(venc)+'.') : (rel ? (r.message||'Pago registrado en Pagos.') : r.message));
+          if(!rel) setTimeout(function(){ toast('¿Ya llegó la mercancía? Súmala al inventario.','info',9000,{ accion:'Ir a Inventario', fn:function(){ var n=$('nav-consultar'); if(n) n.click(); } }); },1600);
+        } else { toast((r&&r.message)||'No se pudo guardar.','error'); beep('error'); } };
         if(credito){
           var notas=['Compra del '+pgCorta(fecha), (GS.plazo>0?('crédito a '+GS.plazo+' días'):'crédito'), d.nota].filter(Boolean).join(' · ');
           google.script.run.withSuccessHandler(h).withFailureHandler(falloRed).guardarObligacion({ nombre:'COMPRA '+d.marca, acreedor:d.marca, categoria:'Proveedores', marca:d.marca, tipo:'UNICO',
