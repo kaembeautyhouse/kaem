@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-15';
+    const APP_VERSION = '2026-11-10-16';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -8884,6 +8884,8 @@
     }
 
     // ——— Clientes (autocompletado, con Cédula/NIT) ———
+    // Un documento genérico (222222222222, el del catálogo Detal) lo usan clientes distintos: no sirve de llave para reconocer a alguien
+    function nitUtil_(c){ var n=String((c&&c.nit)||'').replace(/\D/g,''); return (n.length>=6 && /^(\d)\1+$/.test(n)) ? '' : ((c&&c.nit)||''); }
     function loadClients(){ try{ return JSON.parse(localStorage.getItem('kaem_clients')||'[]'); }catch(e){ return []; } }
 
     // Directorio de clientes desde el SERVIDOR (hoja PEDIDOS): igual en todos los
@@ -8896,7 +8898,7 @@
         function meter(c){
           if(!c || (!c.nombre && !c.telefono && !c.nit)) return;
           var tk = String(c.telefono||'').replace(/\D/g,'').slice(-10);   // el teléfono es la llave del cliente
-          var k = (tk.length>=7 ? 'tel:'+tk : String(c.nit || c.nombre).trim().toLowerCase().replace(/\s+/g,''));
+          var k = (tk.length>=7 ? 'tel:'+tk : String(nitUtil_(c) || c.nombre || c.nit).trim().toLowerCase().replace(/\s+/g,''));
           if(fusion[k]===undefined){ fusion[k]=orden.length; orden.push(c); }
           else { var p=orden[fusion[k]]; for(var x in c){ if(c[x]) p[x]=c[x]; } }
         }
@@ -8922,7 +8924,7 @@
     function saveClient(c){
       if(!c.nombre && !c.telefono && !c.nit) return;
       // El teléfono es la llave: un cliente con la cédula mal escrita ya no queda duplicado
-      var llave=function(x){ var t=String(x.telefono||'').replace(/\D/g,'').slice(-10); return t.length>=7 ? 'tel:'+t : String(x.nit||x.nombre||'').trim().toLowerCase(); };
+      var llave=function(x){ var t=String(x.telefono||'').replace(/\D/g,'').slice(-10); return t.length>=7 ? 'tel:'+t : String(nitUtil_(x)||x.nombre||x.nit||'').trim().toLowerCase(); };
       var arr=loadClients(); var key=llave(c); var found=false;
       for(var i=0;i<arr.length;i++){ if(llave(arr[i])===key){ arr[i]=c; found=true; break; } }
       if(!found) arr.push(c);
