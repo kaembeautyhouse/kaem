@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-10-22';
+    const APP_VERSION = '2026-11-14-23';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -1608,6 +1608,7 @@
     .rec-row .rec-info{flex:1;min-width:0}
     .rec-row .rec-cli{display:block;font-weight:600;color:var(--espresso);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .rec-row .rec-meta{display:block;font-size:11px;color:var(--texto-suave);margin-top:1px}
+    .rec-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}.rec-tags i{font-style:normal;font-size:10.5px;line-height:1;padding:3px 7px;border-radius:999px;background:var(--st-wa-bg,#e6ece3);color:var(--st-wa-text,#4a5d49);font-weight:600}
     .rec-row .rec-monto{font-weight:600;color:var(--salvia-txt);white-space:nowrap;flex-shrink:0}
     .ab-hist-t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--terracota-txt);margin:0 0 8px}
     .ab-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;
@@ -5240,8 +5241,8 @@
 
   <div class="modal" id="recibosModal">
     <div class="sheet">
-      <h3>Recibos recientes</h3>
-      <p class="cfg-hint">Pagos registrados, esté o no la remisión ya cerrada. Elige un mes para verlos todos.</p>
+      <h3>Recibos y pagos</h3>
+      <p class="cfg-hint">Todos los pagos registrados, esté o no la remisión cerrada. Con «Recibo» generas el comprobante; con «Corregir» cambias el valor, la fecha o el método, o eliminas un pago registrado por error.</p>
       <div class="field" style="margin:10px 0 0"><label class="lbl" for="recibosMes">Mes</label><select id="recibosMes"><option value="">Últimos 40</option></select></div>
       <p class="rec-total" id="recibosTotal" style="display:none"></p>
       <div id="recibosList" style="margin-top:12px"></div>
@@ -5262,13 +5263,15 @@
 
   <div class="modal" id="abEditModal">
     <div class="sheet">
-      <h3>Corregir abono</h3>
+      <h3>Corregir pago</h3>
       <p class="cfg-hint" id="abEditInfo"></p>
-      <div class="field"><label class="lbl" for="abEditMonto">Valor del abono</label><input id="abEditMonto" type="text" inputmode="numeric" autocomplete="off"></div>
+      <p class="cfg-hint" id="abEditAviso" style="display:none;color:var(--terracota-txt)"></p>
+      <div class="field"><label class="lbl" for="abEditMonto">Valor del pago</label><input id="abEditMonto" type="text" inputmode="numeric" autocomplete="off"></div>
       <div class="field"><label class="lbl" for="abEditFecha">Fecha</label><input id="abEditFecha" type="date"></div>
       <div class="field"><label class="lbl">Método</label><div class="segmented" id="abEditMetodo"><button type="button" class="seg" data-v="Efectivo">Efectivo</button><button type="button" class="seg" data-v="Transferencia">Transferencia</button></div></div>
+      <p class="pago-rest" id="abEditPreview"></p>
       <button class="btn-solid" id="abEditGuardar" type="button" style="width:100%;min-height:48px;margin-top:6px">Guardar cambios</button>
-      <button class="btn-ghost" id="abEditEliminar" type="button" style="width:100%;margin-top:8px;color:var(--terracota-txt)">Eliminar este abono</button>
+      <button class="btn-ghost" id="abEditEliminar" type="button" style="width:100%;margin-top:8px;color:var(--terracota-txt)">Eliminar este pago</button>
       <button class="btn-ghost" id="abEditCerrar" type="button" style="width:100%;margin-top:8px">Cancelar</button>
     </div>
   </div>
@@ -12749,9 +12752,10 @@
           return '<div class="rec-row"><div class="rec-info">'
             +'<span class="rec-cli">'+safe(p.cliente||p.idRemision)+'</span>'
             +'<span class="rec-meta">'+safe(kaemFmtFecha(p.fecha)||p.fecha||'')+' · '+safe(p.idRemision)+(p.metodo?(' · '+safe(p.metodo)):'')+'</span>'
+            +abEtiquetas(p)
             +'</div><span class="rec-monto">'+cop(p.monto)+'</span>'
             +'<button type="button" class="ab-recibo" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'">Recibo</button>'
-            +'<button type="button" class="ab-recibo ab-edit" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'" data-monto="'+Math.round(p.monto)+'" data-fecha="'+safe(p.fecha)+'" data-metodo="'+safe(p.metodo)+'" data-cli="'+safe(p.cliente||'')+'">Editar</button></div>';
+            +'<button type="button" class="ab-recibo ab-edit" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'" data-monto="'+Math.round(p.monto)+'" data-fecha="'+safe(p.fecha)+'" data-metodo="'+safe(p.metodo)+'" data-cli="'+safe(p.cliente||'')+'" data-desc="'+Math.round(p.descuento||0)+'" data-saldo="'+Math.round(p.saldoRem||0)+'" data-total="'+Math.round(p.totalRem||0)+'" data-estado="'+safe(p.estadoRem||'')+'">Corregir</button></div>';
         }).join('');
       }).withFailureHandler(function(){
         $('recibosList').innerHTML=''; $('recibosEmpty').textContent='Sin conexión · no se pudo consultar.'; $('recibosEmpty').style.display='block';
@@ -12774,31 +12778,67 @@
       prepararRecibo(id, idx, generarReciboPago);
     });
 
-    /* ——— Corregir o eliminar un abono ya registrado ——— */
-    var ABED = { id:'', idx:-1, metodo:'', desde:'' };
+    /* ——— Corregir o eliminar un pago ya registrado ——— */
+    /** Etiquetas de un pago: pago total, con descuento, corregido, y si su remisión ya quedó pagada. */
+    function abEtiquetas(p){
+      var t=[];
+      if(/pago total/i.test(p.nota||'')) t.push('Pago total');
+      if(p.descuento>0) t.push('con descuento '+cop(p.descuento));
+      if(p.editado) t.push('corregido');
+      if(p.estadoRem==='PAGADO') t.push('remisión pagada');
+      return t.length ? '<span class="rec-tags">'+t.map(function(x){ return '<i>'+safe(x)+'</i>'; }).join('')+'</span>' : '';
+    }
+    var ABED = { id:'', idx:-1, metodo:'', desde:'', monto0:0, saldo:0, total:0, estado:'', desc:0 };
     function abEditAbrir(id, idx, d, desde){
-      ABED = { id:id, idx:idx, metodo:d.metodo||'', desde:desde };
-      $('abEditInfo').textContent = 'Remisión '+id+(d.cli?(' · '+d.cli):'')+'. Cambia el valor si se registró mal, o elimínalo si quedó repetido.';
-      $('abEditMonto').value = d.monto||''; $('abEditFecha').value = String(d.fecha||'').slice(0,10);
-      Array.prototype.forEach.call($('abEditMetodo').querySelectorAll('.seg'), function(s){ s.classList.toggle('active', s.getAttribute('data-v')===ABED.metodo); });
+      ABED = { id:id, idx:idx, metodo:d.metodo||'', desde:desde, monto0:parseInt(d.monto,10)||0, saldo:parseInt(d.saldo,10)||0, total:parseInt(d.total,10)||0, estado:String(d.estado||'').toUpperCase(), desc:parseInt(d.desc,10)||0, fecha0:String(d.fecha||'').slice(0,10) };
+      $('abEditInfo').textContent = 'Remisión '+id+(d.cli?(' · '+d.cli):'')+'. Cambia lo que se registró mal, o elimina el pago si quedó repetido o no era.';
+      $('abEditMonto').value = ABED.monto0 ? Number(ABED.monto0).toLocaleString('es-CO') : ''; $('abEditFecha').value = ABED.fecha0;
+      $('abEditMonto').disabled = ABED.desc>0;
+      var av=[];
+      if(ABED.estado==='PAGADO') av.push('Esta remisión está pagada por completo. Si cambias el valor o eliminas este pago, vuelve a Cartera con el saldo que quede.');
+      if(ABED.desc>0) av.push('Este pago incluye un descuento de '+cop(ABED.desc)+', por eso su valor no se cambia. Si quedó mal, elimínalo (el descuento se devuelve a la remisión) y regístralo de nuevo. La fecha y el método sí se corrigen aquí.');
+      $('abEditAviso').textContent=av.join(' '); $('abEditAviso').style.display=av.length?'block':'none';
+      Array.prototype.forEach.call($('abEditMetodo').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x.getAttribute('data-v')===ABED.metodo); });
+      abEditPrev();
       $('abEditModal').classList.add('show'); haptic(10);
     }
+    /** Qué pasará con el saldo si se guarda lo que está escrito (o si se elimina). */
+    function abEditPrev(){
+      var monto=parseInt(String($('abEditMonto').value).replace(/\D/g,''),10)||0, el=$('abEditPreview'), gb=$('abEditGuardar');
+      var hayDatos=ABED.saldo>0||ABED.estado==='PAGADO'||ABED.total>0;
+      el.className='pago-rest'; gb.disabled=false;
+      if(!hayDatos){ el.textContent=''; return; }
+      if(ABED.desc>0) monto=ABED.monto0;
+      if(!(monto>0)){ el.textContent='Escribe el valor del pago.'; gb.disabled=true; return; }
+      var nuevo=ABED.saldo+(ABED.monto0-monto);
+      if(nuevo<0){ el.className+=' err'; el.textContent='Eso es más de lo que debe el cliente. El máximo para este pago es '+cop(ABED.monto0+ABED.saldo)+'.'; gb.disabled=true; return; }
+      if(nuevo===ABED.saldo){ el.textContent='Saldo de la remisión: '+cop(ABED.saldo)+' (no cambia).'; return; }
+      el.textContent = nuevo===0 ? 'Con este valor la remisión queda pagada por completo.'
+        : ('Saldo de la remisión: de '+cop(ABED.saldo)+' pasa a '+cop(nuevo)+(ABED.estado==='PAGADO'?' y vuelve a Cartera.':'.'));
+    }
+    $('abEditMonto').addEventListener('input', function(e){ var d=e.target.value.replace(/\D/g,''); e.target.value=d?Number(d).toLocaleString('es-CO'):''; abEditPrev(); });
     $('abEditMetodo').addEventListener('click', function(e){ var s=e.target.closest('.seg'); if(!s) return; ABED.metodo=s.getAttribute('data-v'); Array.prototype.forEach.call($('abEditMetodo').querySelectorAll('.seg'), function(x){ x.classList.toggle('active', x===s); }); });
     $('abEditCerrar').addEventListener('click', function(){ $('abEditModal').classList.remove('show'); });
     $('abEditModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
     function abEditEnviar(eliminar){
       var monto = parseInt(String($('abEditMonto').value).replace(/\D/g,''),10)||0;
-      if(!eliminar && !(monto>0)){ toast('Escribe el valor del abono.','error'); return; }
-      if(eliminar && !window.confirm('¿Eliminar este abono? El saldo de la remisión vuelve a subir.')) return;
-      $('abEditModal').classList.remove('show'); toast(eliminar?'Eliminando abono…':'Guardando cambios…','info');
+      if(!eliminar && !(monto>0)){ toast('Escribe el valor del pago.','error'); return; }
+      if(eliminar){
+        var quedaria=ABED.saldo+ABED.monto0+ABED.desc;
+        var txt='¿Eliminar el pago de '+cop(ABED.monto0)+(ABED.fecha0?(' del '+(kaemFmtFecha(ABED.fecha0)||ABED.fecha0)):'')+' de la remisión '+ABED.id+'?\n\n'
+          +'El saldo pasa de '+cop(ABED.saldo)+' a '+cop(quedaria)+(ABED.desc>0?' (el descuento de '+cop(ABED.desc)+' se devuelve a la remisión)':'')+(ABED.estado==='PAGADO'?'.\nLa remisión vuelve a Cartera.':'.');
+        if(!window.confirm(txt)) return;
+      }
+      $('abEditModal').classList.remove('show'); toast(eliminar?'Eliminando el pago…':'Guardando cambios…','info');
       google.script.run.withSuccessHandler(function(res){
         if(res && res.ok){
-          beep('success'); toast(res.message||'Listo.','success');
+          beep('success'); toast(res.message||'Listo.','success'); window.__finTs=0;
           CARTERA.ts=0; try{ carteraCargar(true); }catch(e){}
+          try{ if(window.KAEM && KAEM.hub) KAEM.hub.pintar(); }catch(e){}
           if(ABED.desde==='recibos') cargarRecibos($('recibosMes').value, false); else cargarAbonos(ABED.id);
         } else { toast((res&&res.message)||'No se pudo guardar.','error'); beep('error'); }
       }).withFailureHandler(function(){ toast('Esto necesita internet · conéctate e intenta de nuevo.','error'); })
-        .editarAbono({ idRemision:ABED.id, indice:ABED.idx, monto:monto, metodoPago:ABED.metodo, fecha:String($('abEditFecha').value||''), eliminar:!!eliminar, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+        .editarAbono({ idRemision:ABED.id, indice:ABED.idx, monto:monto, montoOriginal:ABED.monto0, metodoPago:ABED.metodo, fecha:String($('abEditFecha').value||''), eliminar:!!eliminar, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
     }
     $('abEditGuardar').addEventListener('click', function(){ abEditEnviar(false); });
     $('abEditEliminar').addEventListener('click', function(){ abEditEnviar(true); });
@@ -12809,10 +12849,10 @@
         var h='<div class="ab-hist"><p class="ab-hist-t">Abonos registrados</p>';
         r.abonos.forEach(function(a,i){
           h+='<div class="ab-row"><span>'+safe(kaemFmtFecha(a.fecha)||a.fecha||'')+'<small>'+safe(a.metodo)
-            +(a.operador?(' · '+safe(a.operador)):'')+'</small></span>'
+            +(a.operador?(' · '+safe(a.operador)):'')+'</small>'+abEtiquetas({ nota:a.nota, descuento:a.descuento, editado:a.editado, estadoRem:'' })+'</span>'
             +'<span class="ab-monto">'+cop(a.monto)+'</span>'
             +'<button type="button" class="ab-recibo" data-idx="'+i+'" title="Generar recibo de este pago">Recibo</button>'
-            +'<button type="button" class="ab-recibo ab-edit" data-idx="'+i+'" data-monto="'+Math.round(a.monto)+'" data-fecha="'+safe(a.fecha||'')+'" data-metodo="'+safe(a.metodo||'')+'"'+(a.descuento?' disabled':'')+'>Editar</button></div>';
+            +'<button type="button" class="ab-recibo ab-edit" data-idx="'+i+'" data-monto="'+Math.round(a.monto)+'" data-fecha="'+safe(a.fecha||'')+'" data-metodo="'+safe(a.metodo||'')+'" data-desc="'+Math.round(a.descuento||0)+'" data-saldo="'+Math.round(r.saldo||0)+'" data-total="'+Math.round(r.total||0)+'" data-estado="'+safe(r.estado||'')+'" data-cli="'+safe(r.cliente||'')+'">Corregir</button></div>';
         });
         h+='</div>';
         $('pagoHistorial').innerHTML=h;
