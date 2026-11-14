@@ -517,8 +517,14 @@
 
   /* ——— Filtros y lista ——— */
   function tiposDe(){ var t={}, o=[]; CAT.productos.forEach(function(g){ if(g.tipo && !t[g.tipo]){ t[g.tipo]=1; o.push(g.tipo); } }); return o.sort(); }
+  /* Solo las marcas con algo disponible (y, si hay una categoría elegida, dentro de esa categoría): ninguna marca se abre vacía */
+  function marcasConStock(tipo){
+    var ok={}; CAT.productos.forEach(function(g){ if(tipo && g.tipo!==tipo) return; if(g.variantes.some(function(v){ return v.max==null || v.max>0; })) ok[g.marca]=1; });
+    return CAT.marcas.filter(function(m){ return ok[m]; });
+  }
   function pintarChips(){
-    var tipos=tiposDe(), usar = tipos.length>1 ? tipos : CAT.marcas, campo = tipos.length>1 ? 'tipo' : 'marca';
+    var tipos=tiposDe(), usar = tipos.length>1 ? tipos : marcasConStock(), campo = tipos.length>1 ? 'tipo' : 'marca';
+    if(campo==='marca' && FILTRO.marca && usar.indexOf(FILTRO.marca)<0) FILTRO.marca='';
     $('chips').setAttribute('data-campo', campo);
     var h='<button class="chip'+(!FILTRO.fav && !FILTRO[campo]?' on':'')+'" data-c="" role="tab">Todo</button>';
     usar.forEach(function(x){ h+='<button class="chip'+(FILTRO[campo]===x?' on':'')+'" data-c="'+esc(x)+'" role="tab">'+esc(x)+'</button>'; });
@@ -936,7 +942,9 @@
     var tipos=tiposDe(), opc=function(campo, valor, txt){ return '<button type="button" class="chip'+(FILTRO[campo]===valor?' on':'')+'" data-f="'+campo+'" data-v="'+esc(valor)+'">'+esc(txt)+'</button>'; };
     var h='';
     if(tipos.length) h+='<div class="f-grupo"><h3>Categoría</h3><div class="f-opc">'+opc('tipo','','Todas')+tipos.map(function(t){ return opc('tipo',t,t); }).join('')+'</div></div>';
-    h+='<div class="f-grupo"><h3>Marca</h3><div class="f-opc">'+opc('marca','','Todas')+CAT.marcas.map(function(m){ return opc('marca',m,m); }).join('')+'</div></div>'
+    var marcasOk=marcasConStock(FILTRO.tipo);
+    if(FILTRO.marca && marcasOk.indexOf(FILTRO.marca)<0) FILTRO.marca='';   // la marca elegida no tiene nada en esta categoría
+    h+='<div class="f-grupo"><h3>Marca</h3><div class="f-opc">'+opc('marca','','Todas')+marcasOk.map(function(m){ return opc('marca',m,m); }).join('')+'</div></div>'
       +'<div class="f-grupo"><h3>Ordenar por</h3><div class="f-opc">'+opc('orden','','Destacados')+opc('orden','menor','Precio: menor a mayor')+opc('orden','mayor','Precio: mayor a menor')+opc('orden','az','Nombre A–Z')+'</div></div>';
     $('hfCuerpo').innerHTML=h;
   }

@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-14-23';
+    const APP_VERSION = '2026-11-14-24';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -15591,8 +15591,11 @@
     function galMarcas(){
       var h = '<button type="button" class="fvg-chip'+(!GAL.marca?' on':'')+'" data-m="">Todas</button>';
       h += '<button type="button" class="fvg-chip fvg-disp'+(GAL.soloDisp?' on':'')+'" data-d="1" aria-pressed="'+GAL.soloDisp+'">Solo con stock</button>';
+      // Solo las marcas que tienen al menos un producto con stock disponible (se recalcula cada vez que se abre o cambia el stock)
+      var conStock={}; (STATE.products||[]).forEach(function(p){ if(fotoDisp(p)>0) conStock[p.marca]=1; });
+      if(GAL.marca && !conStock[GAL.marca]) GAL.marca='';   // la marca elegida se quedó sin stock: vuelve a «Todas»
       // Marcas de la A a la Z (sin importar mayúsculas ni tildes)
-      (STATE.brands||[]).slice().sort(function(a,b){ return String(a).localeCompare(String(b),'es',{sensitivity:'base'}); })
+      (STATE.brands||[]).filter(function(m){ return conStock[m]; }).sort(function(a,b){ return String(a).localeCompare(String(b),'es',{sensitivity:'base'}); })
         .forEach(function(m){ h += '<button type="button" class="fvg-chip'+(GAL.marca===m?' on':'')+'" data-m="'+safe(m)+'">'+safe(m)+'</button>'; });
       $('galMarcas').innerHTML = h;
     }

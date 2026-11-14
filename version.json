@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-14-23",
+  "app": "2026-11-14-24",
   "servidor": "2026.10.64",
   "fecha": "2026-11-14",
   "novedades": [
+    "Vitrina y catálogos: el selector de marcas solo muestra las marcas que tienen al menos un producto con stock disponible (se actualiza solo cuando cambia el stock). En el catálogo Detal, el filtro de marca también respeta la categoría elegida, así ninguna marca se abre vacía.",
     "Recibos y pagos: ahora SÍ se puede corregir o eliminar cualquier pago, incluso de una remisión ya pagada (antes estaba bloqueado). Si cambias o quitas un pago de una remisión pagada, vuelve a Cartera con el saldo que quede; si eliminas un pago total con descuento, el descuento se devuelve a la remisión. La ventana «Corregir pago» te muestra antes de guardar cómo queda el saldo, avisa por qué algo no se puede cambiar y al eliminar pide confirmar diciendo cuánto sube el saldo. Cada pago lleva etiquetas (pago total, con descuento, corregido, remisión pagada) y, si otro equipo cambió el mismo pago, no deja guardar para no pisarlo.",
     "Pagos mejorado: el descuento de la marca ahora es No/Sí y al elegir Sí se despliega el %; las facturas de proveedor eligen el plazo (de contado, 8, 15, 30, 45, 60 días u otro) y el vencimiento se calcula solo; se puede adjuntar la factura en PDF (se ve como «📎 Factura PDF» en la tarjeta); al pagar eliges «Todo lo que falta» o «Solo un abono» (el valor aparece solo con el abono). Corrección: una factura de proveedor por cuotas ahora reparte el valor entre las cuotas (antes cada cuota quedaba con el valor de toda la factura). Al registrar una compra de mercancía la app te ofrece ir a Inventario a sumar lo que llegó.",
     "Gastos → Mercancía rehecho: «¿La marca te dio descuento?» No/Sí con su %, «¿Cómo se paga?» Crédito, Transferencia, Efectivo u Otro. A crédito eliges el plazo (8, 15, 30, 45, 60 días u otro) o la fecha de pago y la compra queda en Pagos como factura de la marca; de contado queda en Gastos; y si ya tenías la factura en Pagos puedes pagarla desde aquí sin duplicarla. Se puede adjuntar la factura en PDF (se guarda en tu Drive, carpeta «KAÉM · Facturas de compra»).",

@@ -229,9 +229,16 @@
   }
 
   /* ——— Catálogo ——— */
+  /* Solo las marcas que tienen algo disponible para pedir (así ninguna marca se abre vacía) */
+  function marcasConStock(){
+    var ok={}; CAT.productos.forEach(function(g){ if(g.variantes.some(function(v){ return v.max==null || v.max>0; })) ok[g.marca]=1; });
+    return CAT.marcas.filter(function(m){ return ok[m]; });
+  }
   function pintarChips(){
+    var marcas=marcasConStock();
+    if(FILTRO.marca && marcas.indexOf(FILTRO.marca)<0) FILTRO.marca='';   // la marca elegida se quedó sin stock
     var h='<button class="chip'+(FILTRO.marca?'':' on')+'" data-m="">Todas</button>';
-    CAT.marcas.forEach(function(m){ h+='<button class="chip'+(FILTRO.marca===m?' on':'')+'" data-m="'+esc(m)+'">'+esc(m)+'</button>'; });
+    marcas.forEach(function(m){ h+='<button class="chip'+(FILTRO.marca===m?' on':'')+'" data-m="'+esc(m)+'">'+esc(m)+'</button>'; });
     $('chips').innerHTML=h; KC.flechasChips();
   }
   /* Tope de unidades: el catálogo no dice cuántas hay, solo avisa cuando se llega al máximo */
