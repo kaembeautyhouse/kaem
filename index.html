@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-14-25';
+    const APP_VERSION = '2026-11-14-27';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -175,7 +175,7 @@
         d.querySelector('[data-a="ok"]').addEventListener('click', function () { try { localStorage.setItem('kaem_ver_vista', APP_VERSION); } catch (e) {} d.remove(); });
         document.body.appendChild(d);
       }
-      /** Compara versiones por números («2026.10.100» > «2026.10.65», «…-24» > «…-9»): con texto plano se invertía al pasar de 99 a 100. */
+      /** Compara versiones por números («2026.10.100» > «2026.10.67», «…-24» > «…-9»): con texto plano se invertía al pasar de 99 a 100. */
       window.verCmp = function (a, b) {
         var x = String(a || '').split(/[.\-]/).map(Number), y = String(b || '').split(/[.\-]/).map(Number), n = Math.max(x.length, y.length);
         for (var i = 0; i < n; i++) { var p = x[i] || 0, q = y[i] || 0; if (p !== q) return p > q ? 1 : -1; }
@@ -6421,6 +6421,8 @@
                      +(r.agotados||0)+' agotados · '+(r.sincronizados||0)+' sincronizados.'
                      +' Automática: '+(r.automatico?'activa ✓':'no instalada')+'.';
         var ab=$('cfgShopAutoBtn'); if(ab) ab.textContent = r.automatico ? 'Automática ✓' : 'Activar automática';
+        // Sin clave en el webhook, cualquiera que conozca el enlace del servidor podría enviar un «pedido» falso y descontar inventario
+        if(r.activo && r.webhookProtegido===false) lineaCred += '⚠️ El webhook de pedidos de Shopify NO tiene clave. Protégelo: en Apps Script ejecuta ACTIVAR_CLAVE_WEBHOOK y pon la URL que muestra en Shopify → Webhooks.<br>';
         if(r.diagnostico && r.diagnostico.length){
           box.classList.add('warn');
           txt.innerHTML = lineaCred+'⚠️ '+safe(r.message)+'<br><span style="opacity:.7">'+safe(resumen)+'</span>';
@@ -9107,7 +9109,8 @@
     }
     function commitOrder(p, online, backendId){
       var editing=!!editingRef;
-      if(!editing) bumpRem();
+      // Con señal, el número que sigue ya quedó fijado arriba (el del servidor + 1): sumar otro dejaba un hueco en la numeración del primer pedido que se hacía sin señal
+      if(!editing && (!online || !p.remisionServidor)) bumpRem();
       pedState.remisionId=p.remision; pedState.draftId=null; $('pedId').textContent=p.remision;
       var entry={}; for(var k in p){ if(Object.prototype.hasOwnProperty.call(p,k)) entry[k]=p[k]; }
       entry.synced=!!online; entry.backendId=online?(backendId||null):null;
@@ -9141,11 +9144,15 @@
       var nCat=(typeof CATPED!=='undefined' && CATPED.lista) ? CATPED.lista.length : 0, nTot=n+nCat;
       var badge=$('pedBadge'); if(badge){ if(nTot){ badge.textContent=nTot; badge.classList.add('show'); } else badge.classList.remove('show'); }
     }
-    function syncPending(){
-      var q=loadPending(); if(!q.length){ toast('No hay pedidos pendientes.','info'); return; }
-      if(navigator.onLine===false){ toast('Sigues sin conexión.','error'); return; }
-      var btn=$('syncBtn'); if(btn){ btn.disabled=true; btn.textContent='Sincronizando…'; }
-      SYNC_MOTIVO='';
+    /** Envía los pedidos guardados sin señal. «silencioso» = reintento automático: no avisa si todavía no hay conexión ni pregunta nada. */
+    var SYNC_QUIET=false;
+    function syncPending(silencioso){
+      silencioso = silencioso===true;
+      var q=loadPending(); if(!q.length){ if(!silencioso) toast('No hay pedidos pendientes.','info'); return; }
+      if(navigator.onLine===false){ if(!silencioso) toast('Sigues sin conexión.','error'); return; }
+      var btn=$('syncBtn'); if(btn && btn.disabled) return;   // ya hay una sincronización en curso
+      if(btn){ btn.disabled=true; btn.textContent='Sincronizando…'; }
+      SYNC_MOTIVO=''; SYNC_QUIET=silencioso;
       syncNext(q.slice(), 0);
     }
     var SYNC_MOTIVO='';   // por qué se quedó en cola el último pedido rechazado
@@ -9153,7 +9160,7 @@
       var btn=$('syncBtn'); if(btn){ btn.disabled=false; btn.textContent='Sincronizar'; } renderPending();
       if(sent) refreshData();
       var quedan=loadPending().length, txt=sent?(sent+' pedido'+(sent!==1?'s':'')+' sincronizado'+(sent!==1?'s':'')):'';
-      if(quedan && SYNC_MOTIVO){ toast((txt?txt+' · ':'')+quedan+' sigue'+(quedan!==1?'n':'')+' pendiente'+(quedan!==1?'s':'')+'. '+SYNC_MOTIVO,'error'); beep('error'); }
+      if(quedan && SYNC_MOTIVO){ if(!SYNC_QUIET || sent){ toast((txt?txt+' · ':'')+quedan+' sigue'+(quedan!==1?'n':'')+' pendiente'+(quedan!==1?'s':'')+'. '+SYNC_MOTIVO,'error'); beep('error'); } }
       else if(sent){ toast(txt,'success'); beep('success'); }
     }
     function syncNext(queue, sent){
@@ -9173,7 +9180,7 @@
             syncNext(queue.slice(1), sent);
           } else if(res && res.cupoExcedido){
             // Se guardó sin señal, así que la pregunta del cupo llega ahora
-            if(window.confirm((order.cliente&&order.cliente.nombre?order.cliente.nombre+': ':'')+(res.message||'El pedido pasa del cupo.')+'\n\n¿Aprobar de todos modos? (queda anotado como excepción)')){
+            if(!SYNC_QUIET && window.confirm((order.cliente&&order.cliente.nombre?order.cliente.nombre+': ':'')+(res.message||'El pedido pasa del cupo.')+'\n\n¿Aprobar de todos modos? (queda anotado como excepción)')){
               order.forzarCupo=true; queueOrder(order); syncNext(queue, sent);
             } else { SYNC_MOTIVO='Pasa del cupo del cliente.'; syncNext(queue.slice(1), sent); }
           } else if(res && res.conflicto){
@@ -9191,7 +9198,7 @@
             syncNext(queue.slice(1), sent);
           }
         }
-      }).withFailureHandler(function(){ var b=$('syncBtn'); if(b){ b.disabled=false; b.textContent='Sincronizar'; } toast('Se cortó la conexión a mitad de la sincronización. Los pedidos que faltan siguen guardados en este celular: intenta de nuevo.','error'); beep('error'); renderPending(); });
+      }).withFailureHandler(function(){ var b=$('syncBtn'); if(b){ b.disabled=false; b.textContent='Sincronizar'; } if(SYNC_QUIET){ renderPending(); return; } toast('Se cortó la conexión a mitad de la sincronización. Los pedidos que faltan siguen guardados en este celular: intenta de nuevo.','error'); beep('error'); renderPending(); });
       if(order._op==='update') runner.updateOrder(order); else runner.createOrder(order);
     }
 
@@ -9606,6 +9613,7 @@
     function kaemFmtFecha(v){ var d = kaemParseFecha(v); return d ? (kaemZ(d.getDate())+'/'+kaemZ(d.getMonth()+1)+'/'+d.getFullYear()) : ''; }
     function kaemFmtHora(v){ var d = kaemParseFecha(v); return d ? (kaemZ(d.getHours())+':'+kaemZ(d.getMinutes())) : ''; }
     function kaemTieneHora(v){ if (v instanceof Date) return true; return /\d{1,2}:\d{2}/.test(String(v||'')); }
+    function kaemFechaMasN(v, n){ var d = kaemParseFecha(v) || new Date(); var x = new Date(d.getTime()); x.setDate(x.getDate()+(Number(n)>0?Number(n):30)); return kaemFmtFecha(x); }
     function kaemFechaMas30(v){ var d = kaemParseFecha(v) || new Date(); var n = new Date(d.getTime()); n.setDate(n.getDate()+30); return kaemFmtFecha(n); }
     function kaemFirst(){ for(var i=0;i<arguments.length;i++){ var v=arguments[i]; if(v!==undefined&&v!==null&&v!=='') return v; } return ''; }
 
@@ -10028,7 +10036,7 @@
         cb({
           idRemision: id, cliente: r.cliente||(c?c.cliente:'')||'', telefono: r.telefono||(c?c.telefono:'')||'', nit: r.nit||'',
           fecha: kaemFmtFecha(actual.fecha) || actual.fecha || '',
-          metodo: actual.metodo || '', monto: actual.monto, montoTotal: r.total,
+          metodo: actual.metodo || '', monto: actual.monto, montoTotal: (actual.total != null ? actual.total : r.total),
           saldoRestante: (actual.saldoDespues!=null) ? actual.saldoDespues : r.saldo,
           esTotal: (actual.saldoDespues!=null ? actual.saldoDespues<=0 : r.saldo<=0),
           operador: actual.operador || '',
@@ -10180,11 +10188,11 @@
       R.credito = /cr[eé]dito/i.test(cond);
       R.abono = toNum(kaemFirst(d.abono, d.abonoInicial, 0));
       R.saldo = (d.saldo != null) ? toNum(d.saldo) : Math.max(0, R.total - R.abono);
-      var venceRaw = kaemFirst(d.fechaVencimiento, d.vencimiento, '') || kaemFechaMas30(fechaObj);
+      var plazoRem = R.credito ? plazoDePedido(d) : 0;
+      var venceRaw = kaemFirst(d.fechaVencimiento, d.vencimiento, '') || kaemFechaMasN(fechaObj, plazoRem);
       R.vence = R.credito ? (kaemFmtFecha(venceRaw) || String(venceRaw)) : '';
       R.venceLarga = R.credito ? kaemFechaLarga(venceRaw) : '';
       // Los días de crédito son los de ESTE pedido (no los de Ajustes de hoy): al reimprimir una remisión vieja no debe cambiar el plazo escrito
-      var plazoRem = R.credito ? plazoDePedido(d) : 0;
       R.condTxt = R.credito ? ('Crédito ' + plazoRem + ' días · Vence ' + (R.vence || '—')) : 'Contado';
       R.condL1 = R.credito ? ('Crédito ' + plazoRem + ' días') : 'Contado'; R.condL2 = R.credito ? ('Vence ' + (R.vence || '—')) : '';
       R.nivel = String(kaemFirst(d.nivel, d.nivelPrecio, 'Detal')).trim() || 'Detal';
@@ -10963,6 +10971,9 @@
       if(act==='pdf') pdfFor(o); else if(act==='wa') enviarPDFCliente(o);
     });
     window.addEventListener('online', function(){ if(loadPending().length) syncPending(); });
+    // Reintento automático: el celular a veces dice «conectado» sin datos y, cuando vuelven, no avisa (no hay evento «online»).
+    // Cada minuto, con la app a la vista y pedidos esperando, se intenta enviarlos en silencio.
+    setInterval(function(){ try{ if(document.hidden || !loadPending().length) return; syncPending(true); }catch(e){} }, 60000);
 
     /* ═══════════════════════════════════════════════════════════════════
        MÓDULO 5 · CHECKLIST DE ALISTAMIENTO
