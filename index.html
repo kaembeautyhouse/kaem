@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-14-24';
+    const APP_VERSION = '2026-11-14-25';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -119,7 +119,7 @@
           if (info && info.app) {
             window.kaemVersionInfo = info;
             // Solo si la publicada es MÁS nueva (si GitHub aún sirve una copia vieja no se avisa: evita falsas alarmas)
-            if (info.app > APP_VERSION) avisarVersion(info);
+            if (verCmp(info.app, APP_VERSION) > 0) avisarVersion(info);
           }
           return info;
         }).catch(function () { comprobando = false; return null; });
@@ -175,6 +175,12 @@
         d.querySelector('[data-a="ok"]').addEventListener('click', function () { try { localStorage.setItem('kaem_ver_vista', APP_VERSION); } catch (e) {} d.remove(); });
         document.body.appendChild(d);
       }
+      /** Compara versiones por números («2026.10.100» > «2026.10.65», «…-24» > «…-9»): con texto plano se invertía al pasar de 99 a 100. */
+      window.verCmp = function (a, b) {
+        var x = String(a || '').split(/[.\-]/).map(Number), y = String(b || '').split(/[.\-]/).map(Number), n = Math.max(x.length, y.length);
+        for (var i = 0; i < n; i++) { var p = x[i] || 0, q = y[i] || 0; if (p !== q) return p > q ? 1 : -1; }
+        return 0;
+      };
       function novedadesTrasActualizar(intento) {
         var vista = null; try { vista = localStorage.getItem('kaem_ver_vista'); } catch (e) {}
         if (vista === APP_VERSION) return;
@@ -183,8 +189,8 @@
         if (ocupada && (intento || 0) < 60) { setTimeout(function () { novedadesTrasActualizar((intento || 0) + 1); }, 3000); return; }
         leerInfo().then(function (info) {
           if (!info || !info.app) return;
-          if (info.app > APP_VERSION) return;                                   // hay una más nueva: avisa la otra ventana
-          if (info.app < APP_VERSION) return;                                   // GitHub aún sirve el archivo viejo: no hay novedades fiables
+          if (verCmp(info.app, APP_VERSION) > 0) return;                         // hay una más nueva: avisa la otra ventana
+          if (verCmp(info.app, APP_VERSION) < 0) return;                         // GitHub aún sirve el archivo viejo: no hay novedades fiables
           mostrarNovedades(info, false);
         }).catch(function () {});
       }
@@ -1359,7 +1365,7 @@
     .devol-qty span{min-width:44px;text-align:center;font-weight:700;font-size:13.5px;font-variant-numeric:tabular-nums}
     .devol-modos{ display:flex; gap:8px; margin:10px 0 0; }
     .devol-modos .btn-ghost{ flex:1; padding:10px 8px; font-size:13px; }
-    .devol-modos #devolTodoBtn{ flex:2; font-weight:700; color:var(--terracota,#B86B53); }
+    .devol-modos #devolTodoBtn{ flex:2; font-weight:700; color:var(--terracota-txt,#9A5440); }
     .devol-total{margin-top:14px;padding:12px 14px;background:var(--rosa);border-radius:var(--r-md);
                  font-family:'Fraunces',serif;font-size:16px;color:var(--rojo-txt);text-align:center}
 
@@ -3495,7 +3501,6 @@
     .wa-msg:not(.ver) > :not(.wa-msg-h){display:none}
     .cfg-en-sec .cfg-head{margin:0}
     /* Contraste en ambos temas */
-    .hist-actions button.hact-wa{background:#55735C;border-color:#55735C}
     .badge-pago.pendiente{color:var(--terracota-txt)}
     .bi-abc .abc-B,.bi-abc .abc-C{color:#2C211E}
     button.fin-kpi{color:var(--espresso)}
@@ -3506,7 +3511,6 @@
     :root.theme-dark .marca-chip.marca-disp.active{background:#8FCB9B;border-color:#8FCB9B;color:#1C1714}
     :root.theme-dark .hist-gan-soon b,:root.theme-dark .bi-g-niv.bi-soon,:root.theme-dark .bi-kpi.soon b,:root.theme-dark .bi-badge.soon{color:#E0A868}
     :root.theme-dark .bi-g-niv.bi-ok,:root.theme-dark .bi-chip.ok,:root.theme-dark .bi-badge.ok,:root.theme-dark .bi-tr .pos{color:#8FCB9B}
-    :root.theme-dark .hist-actions button.hact-wa{background:#4F7057;border-color:#4F7057}
     .fecha-btn{color:var(--crema)}
     :root.theme-dark #deleteModal .btn-solid,:root.theme-dark #orderDeleteModal .btn-solid{color:#fff}
     :root.theme-dark #devolModal .btn-ghost{color:var(--terracota-txt) !important}
@@ -3792,6 +3796,11 @@
       #deleteModal .sheet,#operadorModal .sheet,#cliNivelModal .sheet,#qrModal .sheet,#skuModal .sheet,#cpInicialModal .sheet{max-width:520px}
     }
     @media (min-width:1500px){ #editModal .sheet{max-width:1080px} #nuevoTonoModal .sheet,#gsModal .sheet,#pgEditModal .sheet,#cpEditModal .sheet,#devolModal .sheet,#catRevModal .sheet{max-width:860px} }
+
+    /* Zonas táctiles cómodas sin cambiar el aspecto: la píldora de estado y el logo miden poco, así que su área de toque se agranda hacia afuera */
+    .estado-pill::after,.topbar .brand::after{content:"";position:absolute;inset:-9px -6px}
+    .topbar .brand{position:relative}
+    .link-btn{min-height:36px;display:inline-flex;align-items:center}
   </style>
 </head>
 <body>
@@ -6267,7 +6276,7 @@
         + fila('Última publicada', info ? safe(info.app)+(info.fecha?' · '+safe(info.fecha):'') : 'sin consultar')
         + fila('Servidor (Apps Script)', srv ? safe(srv) : 'sin consultar')
         + fila('Servidor que pide esta app', safe(min));
-      var e=$('verEstado'), appVieja = info && info.app > APP_VERSION, srvViejo = srv && min && srv < min, srvPorPublicar = info && info.servidor && srv && srv < info.servidor;
+      var e=$('verEstado'), appVieja = info && verCmp(info.app, APP_VERSION) > 0, srvViejo = srv && min && verCmp(srv, min) < 0, srvPorPublicar = info && info.servidor && srv && verCmp(srv, info.servidor) < 0;
       if(appVieja){ e.className='ver-estado aviso'; e.innerHTML='⚠️ Hay una versión nueva de la app ('+safe(info.app)+'). Toca <b>Buscar actualización</b> y luego <b>Actualizar ahora</b>.'; }
       else if(srvViejo || srvPorPublicar){ e.className='ver-estado aviso'; e.innerHTML='⚠️ El servidor está en la '+safe(srv)+' y falta la '+safe(srvViejo?min:info.servidor)+'. En Apps Script: Implementar → Administrar implementaciones → Editar → Nueva versión.'; }
       else if(info && srv){ e.className='ver-estado ok'; e.innerHTML='✅ Todo al día: la app y el servidor van acordes.'; }
@@ -6289,7 +6298,7 @@
         b.disabled=false; b.textContent='Buscar actualización'; pintarVersiones();
         var info=r[0];
         if(!info) toast('No se pudo consultar la versión publicada (¿sin internet?).','error');
-        else if(!(info.app > APP_VERSION)) toast('Ya tienes la última versión ✓','success');
+        else if(!(verCmp(info.app, APP_VERSION) > 0)) toast('Ya tienes la última versión ✓','success');
       });
     });
     function abrirConfig(){
@@ -7243,15 +7252,16 @@
       if(!STATE.products.length){ toast('No hay productos para exportar.','error'); return; }
       var cab=['SKU_INTERNO','EAN_FABRICA','PRODUCTO','TONO','MARCA','COSTO','DISTRIBUIDOR',
                'MAYORISTA','DETAL','STOCK','RESERVADO','DISPONIBLE'];
-      function esc(v){
+      function esc(v, texto){
         var t=String(v==null?'':v);
+        if(texto && /^[=+\-@\t\r]/.test(t)) t="'"+t;   // un nombre que empieza por = + - @ se abriría como fórmula en Excel/Sheets
         return /[",;\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t;
       }
       var filas=[cab.join(';')];
       STATE.products.forEach(function(p){
         filas.push([p.sku,p.ean||'',p.producto,p.tono||'',p.marca,
                     p.costo,p.distribuidor,p.mayorista,p.detal,
-                    p.stock,p.reservado||0,(p.disponibleReal!=null?p.disponibleReal:(p.disponible!=null?p.disponible:p.stock))].map(esc).join(';'));
+                    p.stock,p.reservado||0,(p.disponibleReal!=null?p.disponibleReal:(p.disponible!=null?p.disponible:p.stock))].map(function(v,i){ return esc(v, i<5); }).join(';'));
       });
       var blob=new Blob(['\ufeff'+filas.join('\r\n')],{type:'text/csv;charset=utf-8;'});
       var url=URL.createObjectURL(blob), a=document.createElement('a');
