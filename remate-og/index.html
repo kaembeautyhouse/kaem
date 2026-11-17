@@ -181,11 +181,6 @@ body.fijo{overflow:hidden}
     <p class="nota">KAÉM es intermediario: te ofrece estos productos de Outdoor Girl y coordina tu pedido.</p>
   </header>
 
-  <div class="barra" id="barra">
-    <label class="buscar"><span class="sr">Buscar un producto</span>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
-      <input id="q" type="search" placeholder="Busca un producto…" autocomplete="off" enterkeyhint="search"></label>
-  </div>
   <p class="cuenta" id="cuenta" aria-live="polite"></p>
   <div id="grid" class="grid"></div>
   <p class="estado" id="vacio" hidden>No encontramos productos con esa búsqueda.</p>
@@ -410,7 +405,7 @@ function cargarGuardado(){
 
 /* Búsqueda */
 function filtrar(){
-  var q=norm($('q').value).trim(), n=0;
+  var q='', n=0;
   P.forEach(function(p){ var ok=!q||norm(p.nombre).indexOf(q)>=0; CARD[p.id].hidden=!ok; if(ok) n++; });
   $('vacio').hidden=n>0; $('cuenta').textContent=q?(n+(n===1?' producto encontrado':' productos encontrados')):(P.length+(P.length===1?' producto':' productos'));
 }
@@ -431,9 +426,7 @@ function eventos(){
   $('visor').addEventListener('click',function(e){ if(e.target===this) cerrar(); });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrar(); });
   $('form').addEventListener('submit',enviar); $('copiar').addEventListener('click',copiar);
-  $('q').addEventListener('input',filtrar);
   Array.prototype.forEach.call($('form').querySelectorAll('input'),function(i){ i.addEventListener('input',function(){ i.classList.remove('mal'); }); });
-  var barra=$('barra'); window.addEventListener('scroll',function(){ barra.classList.toggle('sombra',window.scrollY>140); },{passive:true});
 }
 eventos(); init();
 })();
