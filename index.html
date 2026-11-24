@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-24-30';
+    const APP_VERSION = '2026-11-24-31';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4408,6 +4408,7 @@
         <div class="field"><label class="lbl" for="cliCiudad">Ciudad</label>
           <input id="cliCiudad" type="text" autocomplete="off" placeholder="Ciudad"></div>
         </div>
+        <div id="cliExisteStrip" class="cupo-strip cli-existe" style="display:none" role="status" aria-live="polite"></div>
         <div class="field"><label class="lbl" for="orderNotes">Notas / Observaciones del Pedido</label>
           <textarea id="orderNotes" rows="3" autocomplete="off" placeholder="Ej. Entregar después de las 5 p. m. · Empaque de regalo"></textarea></div>
         </div>
@@ -5272,12 +5273,12 @@
   </div>
   <div class="modal" id="cliValModal">
     <div class="sheet">
-      <h3>Cliente ya registrado</h3>
+      <h3>Este cliente ya existe</h3>
       <div id="cliValBody"></div>
-      <button class="btn-solid" id="clivTodo" type="button" style="width:100%;margin-top:14px">Usar todos los datos registrados</button>
+      <button class="btn-solid" id="clivElegido" type="button" style="width:100%;margin-top:14px;min-height:48px">Guardar el pedido con lo elegido</button>
       <div class="modal-actions" style="margin-top:8px">
         <button class="btn-ghost" id="clivVolver" type="button">Volver</button>
-        <button class="btn-ghost" id="clivElegido" type="button">Continuar con lo elegido</button>
+        <button class="btn-ghost" id="clivTodo" type="button">Usar todo lo registrado</button>
       </div>
     </div>
   </div>
@@ -10948,7 +10949,7 @@
     function newOrder(silencio){
       CART.items=[]; lastOrder=null; orderCommitted=false; editingRef=null; editingTs=''; pedState.catalogoId=null; PED_ERA_EDICION=false;
       $('pedEditBadge').style.display='none';
-      $('cliNombre').value=''; $('clientNit').value=''; $('cliTel').value=''; $('cliDir').value=''; $('cliCiudad').value='';
+      $('cliNombre').value=''; $('clientNit').value=''; $('cliTel').value=''; $('cliDir').value=''; $('cliCiudad').value=''; try{ if(window.cliExisteOcultar) window.cliExisteOcultar(); }catch(e){}
       $('orderNotes').value='';
       $('fleteInput').value=''; $('abonoInput').value=''; FLETE_MANUAL=false;
       $('descInput').value='';   // vacío = hereda el "Descuento por defecto" de Ajustes
@@ -12667,16 +12668,34 @@
         return true;
       }
       _cliValPend = { reg:reg, reales:reales };
-      var h='<p class="seg-estado">📱 El teléfono <b>'+safe(p.cliente.telefono)+'</b> ya es de <b>'+safe(reg.nombre||'un cliente registrado')+'</b>. Para no duplicarlo, elige qué dato va en este pedido.</p>';
+      var h='<p class="seg-estado">📱 El teléfono <b>'+safe(p.cliente.telefono)+'</b> ya es de <b>'+safe(reg.nombre||'un cliente registrado')+'</b>. Hay datos distintos entre su ficha y lo que escribiste: elige cuál queda. <b>Aquí mismo puedes actualizar al cliente</b>, sin ir al módulo Clientes.</p>';
       reales.forEach(function(x,i){
         h+='<div class="catr-row"><span class="catr-lbl">'+x.campo[1]+'</span><div class="catr-opts">'
-          +'<label class="catr-opt"><input type="radio" name="cliv_'+i+'" value="reg" checked><span><small>Registrado</small>'+safe(x.reg)+'</span></label>'
-          +'<label class="catr-opt"><input type="radio" name="cliv_'+i+'" value="ped"><span><small>Este pedido</small>'+safe(x.ped)+'</span></label></div></div>';
+          +'<label class="catr-opt"><input type="radio" name="cliv_'+i+'" value="reg"><span><small>Registrado</small>'+safe(x.reg)+'</span></label>'
+          +'<label class="catr-opt"><input type="radio" name="cliv_'+i+'" value="ped" checked><span><small>Lo que escribiste ahora</small>'+safe(x.ped)+'</span></label></div></div>';
       });
-      h+='<label class="catr-check"><input type="checkbox" id="clivActualizar"><span>Actualizar también la ficha del cliente (sus pedidos y cartera) con lo que elija de "Este pedido"</span></label>';
+      h+='<label class="catr-check"><input type="checkbox" id="clivActualizar" checked><span><b>Actualizar al cliente</b> con lo que elegiste de «lo que escribiste ahora» (queda igual en todos sus pedidos y en su ficha de Clientes)</span></label>';
       $('cliValBody').innerHTML=h; $('cliValModal').classList.add('show'); haptic(15);
       return false;
     }
+    /** Aviso en vivo: apenas se escribe un teléfono que ya es de un cliente registrado, se le dice a la persona (antes se enteraba al guardar). */
+    function cliExisteOcultar(){ var e=$('cliExisteStrip'); if(e){ e.style.display='none'; e.innerHTML=''; } }
+    window.cliExisteOcultar = cliExisteOcultar;
+    function cliExistePintar(){
+      var el=$('cliExisteStrip'); if(!el) return;
+      var reg=null, tel=$('cliTel').value;
+      try{ if(typeof editingRef!=='undefined' && editingRef) { cliExisteOcultar(); return; } reg=clientePorTelefono(tel); }catch(e){ reg=null; }
+      if(!reg || telKey(tel).length<10){ cliExisteOcultar(); return; }
+      var c=currentOrderPayload().cliente, dif=[];
+      CLIVAL_CAMPOS.forEach(function(f){ var r=String(reg[f[0]]||'').trim(), a=String(c[f[0]]||'').trim(); if(r && a && cliNormTxt(a)!==cliNormTxt(r)) dif.push(f[1]); else if(!r && a) dif.push(f[1]+' (nuevo)'); });
+      el.className='cupo-strip cli-existe'+(dif.length?'':'');
+      el.innerHTML='<b>✓ Ya es cliente: '+safe(reg.nombre||'registrado')+'</b>'
+        +'<small>'+(dif.length ? ('Tienes datos distintos o nuevos en: '+safe(dif.join(', '))+'. Al guardar el pedido podrás elegir y actualizar al cliente aquí mismo.') : 'Sus datos coinciden con su ficha.')+'</small>';
+      el.style.display='flex';
+    }
+    ['blur','change'].forEach(function(ev){ $('cliTel').addEventListener(ev, function(){ setTimeout(cliExistePintar, 60); }); });
+    $('cliTel').addEventListener('input', function(){ if(telKey(this.value).length>=10) cliExistePintar(); else cliExisteOcultar(); });
+    ['cliNombre','clientNit','cliDir','cliCiudad'].forEach(function(id){ $(id).addEventListener('change', function(){ if(telKey($('cliTel').value).length>=10) cliExistePintar(); }); });
     function cliValContinuar(todoRegistrado){
       var v=_cliValPend; if(!v) return;
       var cambios=false;
@@ -15786,7 +15805,14 @@
       if(!PGD.nivel) return pgFalta('nivelSeg', 'Elige la lista de precios (nivel) del cliente.');
       if(PGD.cli==='nuevo'){
         var ya=pgBuscarPorTel($('cliTel').value);
-        if(ya) return pgFalta('pgCli', 'Ese teléfono ya es de '+(ya.nombre||'un cliente')+'. Usa «Seleccionar cliente existente» para no duplicarlo.');
+        if(ya){
+          // Ya NO se bloquea (antes obligaba a «Seleccionar cliente existente», que borraba lo escrito y traía una ficha incompleta):
+          // se guarda como el MISMO cliente (no se duplica), se conserva lo que la persona escribió y, si hay datos distintos, el diálogo
+          // «Este cliente ya existe» deja actualizarlo aquí mismo.
+          if(telKey(ya.telefono)!==telKey($('cliTel').value) && ya.telefono) $('cliTel').value=String(ya.telefono);   // era otro celular suyo: se usa el principal
+          PGD.cli='existente'; PGD.elegido=true; pgPintar();
+          toast('Ese teléfono ya es de '+(ya.nombre||'un cliente')+': se guarda como su cliente (no se duplica) y puedes actualizar sus datos.','info');
+        }
       }
       if(!PGD.flete) return pgFalta('pgFleteRow', 'Elige el flete: gratis o con valor.');
       if(PGD.flete==='valor' && !getFlete()) return pgFalta('fleteRow', 'Escribe el valor del flete o elige Gratis.');
