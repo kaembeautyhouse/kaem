@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-24-29';
+    const APP_VERSION = '2026-11-24-30';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3848,6 +3848,14 @@
     .ent-mas-row .chip{min-height:44px;flex:0 1 auto;padding:0 12px}
     .ent-resumen{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--blanco);border:1px dashed var(--terracota);font-size:14px;line-height:1.5;color:var(--espresso)}
     .ent-resumen small{color:var(--texto-suave);font-size:12.5px}
+
+    /* ——— Recibos y pagos ——— */
+    .rec-dia{margin:14px 0 2px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--texto-suave)}
+    .rec-row.rc2{flex-wrap:wrap;row-gap:8px;padding:10px 0}
+    .rec-row.rc2 .rec-btns{display:flex;gap:8px;width:100%}
+    .rec-row.rc2 .rec-btns .ab-recibo{flex:1;min-height:42px;margin:0;font-size:13.5px;font-weight:600}
+    .rec-tags i.warn{background:var(--st-soon-bg);color:var(--st-soon-text);border:1px solid var(--st-soon-border);font-weight:700}
+    .rec-total a{color:var(--terracota-txt);font-weight:600}
   </style>
 </head>
 <body>
@@ -4086,7 +4094,7 @@
           </div>
           <button class="car-recibos-btn" type="button" id="carRecibosBtn" aria-label="Recibos recientes">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18l-3-2-3 2-3-2-3 2-4-2V3z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            <span>Recibos</span>
+            <span>Recibos y pagos</span>
           </button>
         </div>
 
@@ -5328,13 +5336,23 @@
   </div>
 
   <div class="modal" id="recibosModal">
-    <div class="sheet">
+    <div class="sheet ent-sheet">
       <h3>Recibos y pagos</h3>
-      <p class="cfg-hint">Todos los pagos registrados, esté o no la remisión cerrada. Con «Recibo» generas el comprobante; con «Corregir» cambias el valor, la fecha o el método, o eliminas un pago registrado por error.</p>
-      <div class="field" style="margin:10px 0 0"><label class="lbl" for="recibosMes">Mes</label><select id="recibosMes"><option value="">Últimos 40</option></select></div>
+      <p class="cfg-hint">Aquí están <b>todos</b> los pagos. Búscalo, toca <b>Recibo</b> para el comprobante, o <b>Corregir</b> si quedó repetido o con un valor, fecha o método equivocado.</p>
+      <div id="recibosCtl">
+        <input type="search" id="recibosBuscar" class="ent-buscar" placeholder="🔎 Buscar cliente, remisión, método o valor" autocomplete="off" enterkeyhint="search">
+        <div class="segmented ent-filtro" id="recibosFiltro" role="group" aria-label="Filtrar pagos">
+          <button type="button" class="seg active" data-f="todos">Todos <em>0</em></button>
+          <button type="button" class="seg" data-f="mes">Este mes <em>0</em></button>
+          <button type="button" class="seg" data-f="rep">⚠ Repetidos <em>0</em></button>
+          <button type="button" class="seg" data-f="corr">Corregidos <em>0</em></button>
+        </div>
+        <div class="field" style="margin:8px 0 0"><label class="lbl" for="recibosMes">Mes</label><select id="recibosMes"><option value="">Todos los meses</option></select></div>
+      </div>
       <p class="rec-total" id="recibosTotal" style="display:none"></p>
-      <div id="recibosList" style="margin-top:12px"></div>
+      <div id="recibosList" style="margin-top:8px"></div>
       <p id="recibosEmpty" class="cart-empty" style="display:none">Aún no hay pagos registrados.</p>
+      <button class="btn-ghost" id="recibosMas" type="button" style="display:none;width:100%;margin-top:6px">Ver más</button>
       <button class="btn-ghost" id="recibosCerrarBtn" type="button" style="width:100%;margin-top:12px">Cerrar</button>
     </div>
   </div>
@@ -11785,7 +11803,7 @@
         +   (c.porEntregar ? '' : '<button class="car-btn wa" type="button" data-act="wa" data-id="'+safe(c.idRemision)+'" aria-label="Recordar por WhatsApp">Recordar</button>')
         +   '<button class="car-btn pay" type="button" data-act="pay" data-id="'+safe(c.idRemision)+'">'
         +     (c.abonado>0?'Abonar':'Registrar pago')+'</button>'
-        +   (c.abonado>0 ? '<button class="car-btn" type="button" data-act="recibo" data-id="'+safe(c.idRemision)+'" aria-label="Recibo del último pago">Recibo</button>' : '')
+        +   (c.abonado>0 ? '<button class="car-btn" type="button" data-act="pagos" data-id="'+safe(c.idRemision)+'" aria-label="Ver, corregir o sacar recibo de los pagos">Pagos</button>' : '')
         + '</div>';
         frag.appendChild(card);
       });
@@ -13006,66 +13024,113 @@
 
     // MESES_ES ya está definido en 17-pdf-remision-motor.js (misma lista)
     function mesLargo(ym){ var p=String(ym).split('-'); return (MESES_ES[(+p[1])-1]||ym)+' '+p[0]; }
-    /* Pagos de UNA remisión (se abre desde el aviso al editar un pedido): para corregir o eliminar un pago repetido */
+    /* ——— Recibos y pagos ———
+       Trae TODOS los pagos (también de remisiones ya pagadas) y filtra en pantalla: buscador por cliente, remisión, método o valor;
+       filtros Todos / Este mes / ⚠ Repetidos / Corregidos; selector de mes; agrupado por día. Marca los pagos que parecen repetidos
+       (misma remisión, mismo día, mismo valor y método). «Pagos de una remisión» (botón de cada tarjeta de Cartera o aviso al editar un pedido)
+       usa esta misma lista, limitada a esa remisión. */
     var RECIBOS_REM = '';
+    var RC = { todos:[], q:'', filtro:'todos', mes:'', pagina:1, cargado:false };
+    var RC_PAG = 30;
+    function recMarcarRepetidos(l){
+      var c={}; l.forEach(function(p){ p._k=[p.idRemision,String(p.fecha).slice(0,10),Math.round(p.monto),p.metodo].join('|'); c[p._k]=(c[p._k]||0)+1; });
+      l.forEach(function(p){ p.repetido = c[p._k]>1; });
+    }
+    function recDiaTitulo(iso){
+      var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso||'')); if(!m) return 'Sin fecha';
+      var d=new Date(+m[1],+m[2]-1,+m[3]), h=new Date(); h=new Date(h.getFullYear(),h.getMonth(),h.getDate());
+      var dif=Math.round((h-d)/864e5);
+      return dif===0?'Hoy':dif===1?'Ayer':d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long', year:(d.getFullYear()===h.getFullYear()?undefined:'numeric') });
+    }
     function abrirRecibosDe(id){
-      RECIBOS_REM = String(id||'').trim(); $('recibosMes').value='';
-      $('recibosModal').classList.add('show'); haptic(10); cargarRecibos('', false);
+      RECIBOS_REM = String(id||'').trim(); RC.q=''; RC.filtro='todos'; RC.mes=''; RC.pagina=1; $('recibosBuscar').value='';
+      $('recibosModal').classList.add('show'); haptic(10); recCargar();
     }
     window.abrirRecibosDe = abrirRecibosDe;
-    function cargarRecibosDeRemision(){
-      var id = RECIBOS_REM;
-      $('recibosList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('recibosEmpty').style.display='none'; $('recibosTotal').style.display='none';
-      google.script.run.withSuccessHandler(function(r){
-        if(!r || !r.ok || !r.abonos || !r.abonos.length){ $('recibosList').innerHTML=''; $('recibosEmpty').textContent=(r&&r.ok)?('La remisión '+id+' no tiene pagos registrados.'):((r&&r.message)||'No se pudo cargar.'); $('recibosEmpty').style.display='block'; return; }
-        $('recibosTotal').innerHTML='Pagos de la remisión <b>'+safe(id)+'</b> · <b>'+r.abonos.length+(r.abonos.length===1?' pago':' pagos')+'</b> · saldo <b>'+cop(r.saldo||0)+'</b> · <a href="#" id="recibosVerTodos">ver todos los recibos</a>';
-        $('recibosTotal').style.display='block';
-        $('recibosList').innerHTML = r.abonos.map(function(a,i){
-          return '<div class="rec-row"><div class="rec-info">'
-            +'<span class="rec-cli">'+safe(r.cliente||id)+'</span>'
-            +'<span class="rec-meta">'+safe(kaemFmtFecha(a.fecha)||a.fecha||'')+' · '+safe(id)+(a.metodo?(' · '+safe(a.metodo)):'')+'</span>'
-            +abEtiquetas({ nota:a.nota, descuento:a.descuento, editado:a.editado, estadoRem:r.estado })
-            +'</div><span class="rec-monto">'+cop(a.monto)+'</span>'
-            +'<button type="button" class="ab-recibo" data-id="'+safe(id)+'" data-idx="'+i+'">Recibo</button>'
-            +'<button type="button" class="ab-recibo ab-edit" data-id="'+safe(id)+'" data-idx="'+i+'" data-monto="'+Math.round(a.monto)+'" data-fecha="'+safe(a.fecha||'')+'" data-metodo="'+safe(a.metodo||'')+'" data-cli="'+safe(r.cliente||'')+'" data-desc="'+Math.round(a.descuento||0)+'" data-saldo="'+Math.round(r.saldo||0)+'" data-total="'+Math.round(r.total||0)+'" data-estado="'+safe(r.estado||'')+'">Corregir</button></div>';
-        }).join('');
-        var vt=$('recibosVerTodos'); if(vt) vt.addEventListener('click', function(e){ e.preventDefault(); RECIBOS_REM=''; cargarRecibos('', false); });
-      }).withFailureHandler(function(){
-        $('recibosList').innerHTML=''; $('recibosEmpty').textContent='Sin conexión · no se pudo consultar.'; $('recibosEmpty').style.display='block';
-      }).obtenerAbonos({ idRemision:id });
-    }
-    function cargarRecibos(mes, primera){
-      if(RECIBOS_REM){ cargarRecibosDeRemision(); return; }
-      $('recibosList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('recibosEmpty').style.display='none'; $('recibosTotal').style.display='none';
-      google.script.run.withSuccessHandler(function(r){
-        if(!r || !r.ok){ $('recibosList').innerHTML=''; $('recibosEmpty').textContent=(r&&r.message)||'No se pudo cargar.'; $('recibosEmpty').style.display='block'; return; }
-        if(primera || !$('recibosMes').options.length || ($('recibosMes').options.length===1 && (r.meses||[]).length)){
-          var sel=$('recibosMes'), ant=sel.value;
-          sel.innerHTML='<option value="">Últimos 40</option>'+(r.meses||[]).map(function(m){ return '<option value="'+m.mes+'">'+mesLargo(m.mes)+' ('+m.n+')</option>'; }).join('');
-          sel.value=ant||'';
-        }
-        if(!r.pagos || !r.pagos.length){ $('recibosList').innerHTML=''; $('recibosEmpty').textContent=mes?'No hubo pagos en '+mesLargo(mes)+'.':'Aún no hay pagos registrados.'; $('recibosEmpty').style.display='block'; return; }
-        if(mes){ $('recibosTotal').innerHTML='<b>'+r.total+(r.total===1?' pago':' pagos')+'</b> en '+mesLargo(mes)+' · total <b>'+cop(r.totalMonto)+'</b>'; $('recibosTotal').style.display='block'; }
-        $('recibosList').innerHTML = r.pagos.map(function(p){
-          return '<div class="rec-row"><div class="rec-info">'
-            +'<span class="rec-cli">'+safe(p.cliente||p.idRemision)+'</span>'
-            +'<span class="rec-meta">'+safe(kaemFmtFecha(p.fecha)||p.fecha||'')+' · '+safe(p.idRemision)+(p.metodo?(' · '+safe(p.metodo)):'')+'</span>'
-            +abEtiquetas(p)
-            +'</div><span class="rec-monto">'+cop(p.monto)+'</span>'
-            +'<button type="button" class="ab-recibo" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'">Recibo</button>'
-            +'<button type="button" class="ab-recibo ab-edit" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'" data-monto="'+Math.round(p.monto)+'" data-fecha="'+safe(p.fecha)+'" data-metodo="'+safe(p.metodo)+'" data-cli="'+safe(p.cliente||'')+'" data-desc="'+Math.round(p.descuento||0)+'" data-saldo="'+Math.round(p.saldoRem||0)+'" data-total="'+Math.round(p.totalRem||0)+'" data-estado="'+safe(p.estadoRem||'')+'">Corregir</button></div>';
-        }).join('');
-      }).withFailureHandler(function(){
-        $('recibosList').innerHTML=''; $('recibosEmpty').textContent='Sin conexión · no se pudo consultar.'; $('recibosEmpty').style.display='block';
-      }).obtenerPagosRecientes(mes ? { mes:mes } : { limite:40 });
-    }
     function abrirRecibosRecientes(){
-      RECIBOS_REM = '';
-      $('recibosModal').classList.add('show'); haptic(10);
-      $('recibosMes').value='';
-      cargarRecibos('', true);
+      RECIBOS_REM = ''; RC.q=''; RC.filtro='todos'; RC.mes=''; RC.pagina=1; $('recibosBuscar').value='';
+      $('recibosModal').classList.add('show'); haptic(10); recCargar();
     }
-    $('recibosMes').addEventListener('change', function(){ haptic(8); RECIBOS_REM=''; cargarRecibos(this.value, false); });
+    /** Pide los pagos al servidor (todos, o los de una remisión) y los pinta. Mantiene el filtro y la búsqueda actuales. */
+    function recCargar(){
+      $('recibosList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('recibosEmpty').style.display='none'; $('recibosMas').style.display='none';
+      if(RECIBOS_REM){
+        var id=RECIBOS_REM;
+        google.script.run.withSuccessHandler(function(r){
+          if(!r || !r.ok){ RC.todos=[]; recPintar((r&&r.message)||'No se pudo cargar.'); return; }
+          RC.todos = (r.abonos||[]).map(function(a,i){ return { idRemision:id, cliente:r.cliente||id, indice:i, fecha:String(a.fecha||''), monto:Number(a.monto)||0, metodo:String(a.metodo||''), operador:String(a.operador||''),
+            descuento:Math.round(Number(a.descuento)||0), nota:String(a.nota||''), editado:a.editado===true, totalRem:Math.round(r.total||0), saldoRem:Math.round(r.saldo||0), estadoRem:String(r.estado||'').toUpperCase() }; });
+          recMarcarRepetidos(RC.todos); RC.cargado=true; recPintar();
+        }).withFailureHandler(function(){ RC.todos=[]; recPintar('Sin conexión · no se pudo consultar.'); }).obtenerAbonos({ idRemision:id });
+        return;
+      }
+      google.script.run.withSuccessHandler(function(r){
+        if(!r || !r.ok){ RC.todos=[]; recPintar((r&&r.message)||'No se pudo cargar.'); return; }
+        RC.todos = r.pagos||[]; recMarcarRepetidos(RC.todos); RC.cargado=true; recPintar();
+      }).withFailureHandler(function(){ RC.todos=[]; recPintar('Sin conexión · no se pudo consultar.'); }).obtenerPagosRecientes({ todos:true });
+    }
+    function cargarRecibos(){ recCargar(); }   // lo llaman «Corregir» y «Eliminar» al terminar
+    function recFiltrar(){
+      var q=fnorm(RC.q||''), qd=String(RC.q||'').replace(/\D/g,''), mesAct=isoOf(new Date()).slice(0,7);
+      return RC.todos.filter(function(p){
+        if(!RECIBOS_REM){
+          if(RC.filtro==='mes' && String(p.fecha).slice(0,7)!==mesAct) return false;
+          if(RC.filtro==='rep' && !p.repetido) return false;
+          if(RC.filtro==='corr' && !p.editado) return false;
+          if(RC.mes && String(p.fecha).slice(0,7)!==RC.mes) return false;
+        }
+        if(!q) return true;
+        if(fnorm([p.cliente,p.idRemision,p.telefono,p.metodo,p.operador,p.nota].join(' ')).indexOf(q)>=0) return true;
+        return qd.length>=3 && String(Math.round(p.monto)).indexOf(qd)>=0;
+      });
+    }
+    function recFila(p){
+      return '<div class="rec-row rc2"><div class="rec-info">'
+        +'<span class="rec-cli">'+safe(p.cliente||p.idRemision)+'</span>'
+        +'<span class="rec-meta">'+safe(p.idRemision)+(p.metodo?(' · '+safe(p.metodo)):'')+(p.operador?(' · '+safe(p.operador)):'')+(RECIBOS_REM?(' · '+safe(kaemFmtFecha(p.fecha)||p.fecha||'')):'')+'</span>'
+        +abEtiquetas(p)
+        +'</div><span class="rec-monto">'+cop(p.monto)+'</span>'
+        +'<div class="rec-btns"><button type="button" class="ab-recibo" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'">🧾 Recibo</button>'
+        +'<button type="button" class="ab-recibo ab-edit" data-id="'+safe(p.idRemision)+'" data-idx="'+p.indice+'" data-monto="'+Math.round(p.monto)+'" data-fecha="'+safe(p.fecha)+'" data-metodo="'+safe(p.metodo)+'" data-cli="'+safe(p.cliente||'')+'" data-desc="'+Math.round(p.descuento||0)+'" data-saldo="'+Math.round(p.saldoRem||0)+'" data-total="'+Math.round(p.totalRem||0)+'" data-estado="'+safe(p.estadoRem||'')+'">✏️ Corregir</button></div></div>';
+    }
+    function recPintar(error){
+      var ctl=$('recibosCtl'); if(ctl) ctl.style.display = RECIBOS_REM ? 'none' : 'block';
+      var T=RC.todos, mesAct=isoOf(new Date()).slice(0,7);
+      var n={ todos:T.length, mes:0, rep:0, corr:0 }; T.forEach(function(p){ if(String(p.fecha).slice(0,7)===mesAct) n.mes++; if(p.repetido) n.rep++; if(p.editado) n.corr++; });
+      Array.prototype.forEach.call($('recibosFiltro').querySelectorAll('.seg'), function(b){
+        var k=b.getAttribute('data-f'); b.classList.toggle('active', k===RC.filtro); var em=b.querySelector('em'); if(em) em.textContent=n[k];
+      });
+      // selector de meses (con la cantidad de pagos de cada uno)
+      var sel=$('recibosMes'), meses={}; T.forEach(function(p){ var m=String(p.fecha).slice(0,7); if(/^\d{4}-\d{2}$/.test(m)) meses[m]=(meses[m]||0)+1; });
+      var ks=Object.keys(meses).sort().reverse(), firma=ks.join(',');
+      if(sel.getAttribute('data-firma')!==firma){ sel.innerHTML='<option value="">Todos los meses</option>'+ks.map(function(m){ return '<option value="'+m+'">'+mesLargo(m)+' ('+meses[m]+')</option>'; }).join(''); sel.setAttribute('data-firma',firma); }
+      sel.value=RC.mes;
+      var l=recFiltrar(), vis=l.slice(0, RC.pagina*RC_PAG), tot=0; l.forEach(function(p){ tot+=p.monto; });
+      var tEl=$('recibosTotal');
+      if(RECIBOS_REM){
+        tEl.innerHTML='Pagos de la remisión <b>'+safe(RECIBOS_REM)+'</b> · <b>'+l.length+(l.length===1?' pago':' pagos')+'</b>'+(T[0]?(' · saldo <b>'+cop(T[0].saldoRem||0)+'</b>'):'')+' · <a href="#" id="recibosVerTodos">ver todos los pagos</a>';
+        tEl.style.display='block';
+      } else if(l.length){ tEl.innerHTML='<b>'+l.length+(l.length===1?' pago':' pagos')+'</b> · total <b>'+cop(tot)+'</b>'+((RC.q||RC.filtro!=='todos'||RC.mes)?' <small>(con el filtro actual)</small>':''); tEl.style.display='block'; }
+      else tEl.style.display='none';
+      var vt=$('recibosVerTodos'); if(vt) vt.addEventListener('click', function(e){ e.preventDefault(); RECIBOS_REM=''; RC.cargado=false; recCargar(); });
+      if(!l.length){
+        $('recibosList').innerHTML='';
+        $('recibosEmpty').textContent = error ? error : (RC.q ? ('Ningún pago coincide con «'+RC.q+'».') : RC.filtro==='rep' ? '👍 No hay pagos que parezcan repetidos.' : RC.filtro==='corr' ? 'Aún no has corregido ningún pago.' : (RC.mes||RC.filtro==='mes') ? 'No hubo pagos en ese periodo.' : 'Aún no hay pagos registrados.');
+        $('recibosEmpty').style.display='block'; $('recibosMas').style.display='none'; return;
+      }
+      $('recibosEmpty').style.display='none';
+      var h='', dia='';
+      vis.forEach(function(p){
+        if(!RECIBOS_REM){ var d=String(p.fecha).slice(0,10); if(d!==dia){ dia=d; h+='<p class="rec-dia">'+safe(recDiaTitulo(d))+'</p>'; } }
+        h+=recFila(p);
+      });
+      $('recibosList').innerHTML=h;
+      $('recibosMas').style.display = l.length>vis.length ? 'block' : 'none'; $('recibosMas').textContent='Ver más ('+(l.length-vis.length)+')';
+    }
+    $('recibosBuscar').addEventListener('input', function(){ RC.q=this.value; RC.pagina=1; recPintar(); });
+    $('recibosFiltro').addEventListener('click', function(e){ var b=e.target.closest('.seg'); if(!b) return; RC.filtro=b.getAttribute('data-f'); RC.pagina=1; haptic(8); recPintar(); });
+    $('recibosMes').addEventListener('change', function(){ RC.mes=this.value; RC.pagina=1; haptic(8); recPintar(); });
+    $('recibosMas').addEventListener('click', function(){ RC.pagina++; recPintar(); });
     $('carRecibosBtn').addEventListener('click', abrirRecibosRecientes);
     $('recibosCerrarBtn').addEventListener('click', function(){ $('recibosModal').classList.remove('show'); });
     $('recibosModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
@@ -13083,9 +13148,10 @@
       var t=[];
       if(/pago total/i.test(p.nota||'')) t.push('Pago total');
       if(p.descuento>0) t.push('con descuento '+cop(p.descuento));
+      if(p.repetido) t.push('⚠ posible repetido');
       if(p.editado) t.push('corregido');
       if(p.estadoRem==='PAGADO') t.push('remisión pagada');
-      return t.length ? '<span class="rec-tags">'+t.map(function(x){ return '<i>'+safe(x)+'</i>'; }).join('')+'</span>' : '';
+      return t.length ? '<span class="rec-tags">'+t.map(function(x){ return '<i'+(/^⚠/.test(x)?' class="warn"':'')+'>'+safe(x)+'</i>'; }).join('')+'</span>' : '';
     }
     var ABED = { id:'', idx:-1, metodo:'', desde:'', monto0:0, saldo:0, total:0, estado:'', desc:0 };
     function abEditAbrir(id, idx, d, desde){
@@ -13253,6 +13319,7 @@
       var act = b.getAttribute('data-act');
       if(act==='wa') enviarRecordatorioWA(id);
       else if(act==='recibo') descargarReciboUltimoPago(id);
+      else if(act==='pagos') abrirRecibosDe(id);
       else abrirPago(id);
     });
     $('carSearch').addEventListener('input', function(e){ CARTERA.busqueda = e.target.value; carteraRender(); });
