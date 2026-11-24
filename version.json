@@ -1,6 +1,6 @@
 {
   "app": "2026-11-24-29",
-  "servidor": "2026.10.67",
+  "servidor": "2026.10.68",
   "fecha": "2026-11-24",
   "novedades": [
     "«Fechas de entrega» rediseñada para que se entienda y no se acumulen pendientes: arriba ves el ciclo en 3 pasos (empacas → pones cuándo llega → confirmas que llegó); la lista tiene filtros con conteo (Por confirmar · En camino · Recibidos · Todos) y un BUSCADOR por cliente, remisión o ciudad que alcanza también los pedidos viejos (antes solo salían los últimos 40); cada tarjeta dice con claridad en qué estado está y trae un botón de un toque («Llegó el 29 oct», «Ya llegó hoy»); si tienes muchos atrasados, un botón los confirma todos de una vez en su fecha estimada; y la ventana «Fecha y plazo» pregunta primero si ya lo recibió, luego el día, y los días de crédito (15, 30, 45, 60, 90 o los que quieras, con +7/+15/+30 para dar más tiempo) mostrando en vivo cuándo vence y cuándo vencía antes. El crédito siempre cuenta desde la fecha de entrega.",
