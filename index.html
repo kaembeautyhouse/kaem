@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-24-28';
+    const APP_VERSION = '2026-11-24-29';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3801,6 +3801,53 @@
     .estado-pill::after,.topbar .brand::after{content:"";position:absolute;inset:-9px -6px}
     .topbar .brand{position:relative}
     .link-btn{min-height:36px;display:inline-flex;align-items:center}
+
+    /* ——— Fechas de entrega: lista con filtros, buscador, tarjetas y ventana «Fecha y plazo» ——— */
+    .ent-sheet{max-width:520px}
+    .ent-pasos{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+    .ent-pasos span{display:inline-flex;align-items:center;gap:6px;background:var(--crema-2);border:1px solid var(--linea);border-radius:99px;padding:5px 10px 5px 5px;font-size:12.5px;font-weight:600;color:var(--espresso)}
+    .ent-pasos i{font-style:normal;display:inline-flex;width:20px;height:20px;border-radius:99px;background:var(--terracota);color:#fff;font-size:11.5px;font-weight:700;align-items:center;justify-content:center}
+    .ent-pasos-nota{margin:2px 0 12px;font-size:12.5px;color:var(--texto-suave)}
+    .ent-buscar{width:100%;min-height:48px;border:1.5px solid var(--piedra);border-radius:14px;padding:0 14px;font-size:15px;background:var(--blanco);color:var(--espresso);margin-bottom:10px;box-sizing:border-box}
+    .ent-filtro{display:flex;width:100%;overflow-x:auto;box-sizing:border-box}
+    .ent-filtro .seg{flex:1 0 auto;min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:12.5px;line-height:1.1;white-space:nowrap;padding:4px 10px}
+    .ent-filtro .seg em{font-style:normal;font-weight:700;font-size:14px}
+    .ent-lote{width:100%;margin:10px 0 0;min-height:44px;font-size:13.5px;background:var(--salvia-txt)!important;border-color:var(--salvia-txt)!important;color:#fff!important}
+    .ent-cuenta{font-size:12px;color:var(--texto-suave);margin:8px 2px 6px;min-height:14px}
+    .ent-card{background:var(--crema-2);border:1px solid var(--linea);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+    .ent-card.ent-por,.ent-card.ent-sin{border-color:var(--st-soon-border);background:var(--st-soon-bg)}
+    .ent-top{display:flex;flex-direction:column;gap:1px}
+    .ent-top b{font-size:15px;color:var(--espresso)}
+    .ent-top small{font-size:12px;color:var(--texto-suave)}
+    .ent-linea{margin-top:6px;font-size:13px;line-height:1.4}
+    .ent-cred{color:var(--texto-suave);font-size:12.5px}
+    .ent-cred b{color:var(--espresso)}
+    .ent-st{display:inline-block;font-size:13px;font-weight:500;padding:4px 10px;border-radius:14px;line-height:1.35}
+    .ent-st small{opacity:.8}
+    .ent-st.ok{background:var(--st-wa-bg);color:var(--st-wa-text);border:1px solid var(--st-wa-border)}
+    .ent-st.pend{background:var(--blanco);color:var(--st-soon-text);border:1px solid var(--st-soon-border)}
+    .ent-st.road{background:var(--crema-3);color:var(--espresso);border:1px solid var(--linea)}
+    .ent-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .ent-btns button{flex:1 1 150px;min-height:46px;border-radius:12px;font-family:'Jost',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+    .ent-ok{background:var(--salvia-txt);color:#fff;border:none}
+    .ent-edit{background:var(--blanco);color:var(--espresso);border:1.5px solid var(--piedra)}
+    .ent-ok:active,.ent-edit:active{transform:scale(.98)}
+    .ent-box .lbl.ent-paso{margin:14px 0 8px;font-size:14px!important;font-weight:700;text-transform:none!important;letter-spacing:0!important;color:var(--espresso)}
+    .ent-box .lbl.ent-paso:first-child{margin-top:0}
+    .ent-paso small{font-weight:400;color:var(--texto-suave)}
+    .ent-estado-seg{display:flex;width:100%;box-sizing:border-box}
+    .ent-estado-seg .seg{flex:1;min-height:48px;font-size:13.5px;white-space:normal;line-height:1.2}
+    .ent-estado-seg .seg:disabled{opacity:.45}
+    .ent-plazo-in{width:84px;min-height:50px;text-align:center;font-size:20px;font-weight:700;border:1.5px solid var(--piedra);border-radius:14px;background:var(--blanco);color:var(--espresso);box-sizing:border-box}
+    .ent-dias-txt{font-size:14px;color:var(--texto-suave)}
+    .ent-presets{flex:1 1 auto;width:auto}
+    .ent-presets .chip{min-height:46px;flex:1}
+    .chip.on{background:var(--terracota);border-color:var(--terracota);color:#fff}
+    .ent-mas-row{align-items:center;margin-top:8px;flex-wrap:wrap}
+    .ent-mas-lbl{font-size:12.5px;color:var(--texto-suave)}
+    .ent-mas-row .chip{min-height:44px;flex:0 1 auto;padding:0 12px}
+    .ent-resumen{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--blanco);border:1px dashed var(--terracota);font-size:14px;line-height:1.5;color:var(--espresso)}
+    .ent-resumen small{color:var(--texto-suave);font-size:12.5px}
   </style>
 </head>
 <body>
@@ -3985,8 +4032,8 @@
           <div id="packList"></div>
 
           <div class="ent-box" id="packEntregaBox">
-            <label class="lbl" for="packEntregaFecha">📅 Fecha aproximada de entrega</label>
-            <p class="ent-nota">Pon el día estimado; cuando pase te recordamos confirmar que le llegó.</p>
+            <label class="lbl" for="packEntregaFecha">📅 ¿Cuándo lo recibe el cliente?</label>
+            <p class="ent-nota">Pon el día estimado de entrega (el crédito empieza a contar ese día). Cuando pase, te recordamos confirmar que le llegó.</p>
             <div class="ent-row">
               <input type="date" id="packEntregaFecha">
               <div class="ent-chips">
@@ -3997,7 +4044,7 @@
                 <button type="button" class="chip" data-ent-dias="-5" data-ent-in="packEntregaFecha">+5</button>
               </div>
             </div>
-            <label class="ent-check"><input type="checkbox" id="packEntregaConf"><span>El cliente <b>ya lo recibió</b> (fecha confirmada)</span></label>
+            <label class="ent-check"><input type="checkbox" id="packEntregaConf"><span>Marcar como <b>ya recibido</b> (el cliente ya lo tiene)</span></label>
             <p class="ent-hint" id="packEntregaHint"></p>
           </div>
 
@@ -4788,48 +4835,68 @@
   <!-- Modal · recibos recientes (toda la cartera, pendiente o ya cerrada) -->
   <!-- Modal · fechas de entrega: cuándo recibió el cliente (de ahí corre el crédito) -->
   <div class="modal" id="packHistModal">
-    <div class="sheet">
+    <div class="sheet ent-sheet">
       <h3>Fechas de entrega</h3>
-      <p class="cfg-hint">Empacar y entregar no siempre son el mismo día. Toca un pedido para elegir en el calendario el día que el cliente lo recibió: <b>desde ahí corren los días de crédito</b> y se corrige el cobro en Cartera.</p>
-      <div id="packHistList" style="margin-top:12px"></div>
+      <div class="ent-pasos" aria-label="Cómo funciona"><span><i>1</i>Empacas</span><span><i>2</i>Pones cuándo llega</span><span><i>3</i>Confirmas que llegó</span></div>
+      <p class="ent-pasos-nota">El crédito cuenta desde el día en que el cliente lo recibe.</p>
+      <input type="search" id="packHistBuscar" class="ent-buscar" placeholder="🔎 Buscar cliente, remisión o ciudad" autocomplete="off" enterkeyhint="search">
+      <div class="segmented ent-filtro" id="packHistFiltro" role="group" aria-label="Filtrar entregas">
+        <button type="button" class="seg active" data-f="por">Por confirmar <em>0</em></button>
+        <button type="button" class="seg" data-f="camino">En camino <em>0</em></button>
+        <button type="button" class="seg" data-f="conf">Recibidos <em>0</em></button>
+        <button type="button" class="seg" data-f="todos">Todos <em>0</em></button>
+      </div>
+      <button type="button" class="btn-solid ent-lote" id="packHistTodos" style="display:none"></button>
+      <p class="ent-cuenta" id="packHistCuenta"></p>
+      <div id="packHistList"></div>
       <p id="packHistEmpty" class="cart-empty" style="display:none">Aún no hay pedidos empacados.</p>
+      <button class="btn-ghost" id="packHistMas" type="button" style="display:none;width:100%;margin-top:6px">Ver más</button>
       <button class="btn-ghost" id="packHistCerrarBtn" type="button" style="width:100%;margin-top:12px">Cerrar</button>
     </div>
   </div>
 
+  <!-- Modal · fecha y plazo de UN pedido -->
   <div class="modal" id="repackModal">
     <div class="sheet op-sheet" style="text-align:left">
-      <h3>Fecha de entrega</h3>
+      <h3>Fecha de entrega y plazo</h3>
       <p class="cfg-hint" id="repackSub"></p>
       <div class="ent-box" style="margin-top:12px">
-        <label class="lbl" for="repackFecha">📅 El cliente recibió el</label>
+        <p class="lbl ent-paso">1 · ¿El cliente ya lo recibió?</p>
+        <div class="segmented ent-estado-seg" id="repackEstado" role="group" aria-label="¿Ya lo recibió?">
+          <button type="button" class="seg active" data-v="si">✓ Sí, ya lo recibió</button>
+          <button type="button" class="seg" data-v="no">Aún no (fecha estimada)</button>
+        </div>
+        <label class="lbl ent-paso" for="repackFecha" id="repackFechaLbl">2 · ¿Qué día lo recibió?</label>
         <div class="ent-row">
           <input id="repackFecha" type="date">
-          <div class="ent-chips">
-            <button type="button" class="chip" data-ent-dias="1" data-ent-in="repackFecha">Ayer</button>
-            <button type="button" class="chip" data-ent-dias="0" data-ent-in="repackFecha">Hoy</button>
-            <button type="button" class="chip" data-ent-dias="-1" data-ent-in="repackFecha">Mañana</button>
-          </div>
+          <div class="ent-chips" id="repackChips"></div>
         </div>
-        <div id="repackPlazoBox" style="display:none;margin-top:12px">
-          <label class="lbl" for="repackPlazo">⏳ Plazo del crédito (días desde que lo recibe)</label>
+        <div id="repackPlazoBox" style="display:none">
+          <label class="lbl ent-paso" for="repackPlazo">3 · ¿Cuántos días de crédito? <small>(no siempre son 30)</small></label>
           <div class="ent-row">
-            <input id="repackPlazo" type="number" inputmode="numeric" min="1" max="365" step="1" style="width:96px">
-            <div class="ent-chips">
-              <button type="button" class="chip" data-plazo-mas="7">+7 días</button>
-              <button type="button" class="chip" data-plazo-mas="15">+15 días</button>
-              <button type="button" class="chip" data-plazo-mas="30">+30 días</button>
+            <input id="repackPlazo" class="ent-plazo-in" type="number" inputmode="numeric" min="1" max="365" step="1" aria-label="Días de crédito">
+            <span class="ent-dias-txt">días</span>
+            <div class="ent-chips ent-presets">
+              <button type="button" class="chip" data-plazo-set="15">15</button>
+              <button type="button" class="chip" data-plazo-set="30">30</button>
+              <button type="button" class="chip" data-plazo-set="45">45</button>
+              <button type="button" class="chip" data-plazo-set="60">60</button>
+              <button type="button" class="chip" data-plazo-set="90">90</button>
             </div>
           </div>
-          <p class="cfg-hint" style="margin-top:6px">Para dar más tiempo sin cambiar el día de entrega, sube los días del plazo.</p>
+          <div class="ent-chips ent-mas-row">
+            <span class="ent-mas-lbl">Dar más tiempo:</span>
+            <button type="button" class="chip" data-plazo-mas="7">+7 días</button>
+            <button type="button" class="chip" data-plazo-mas="15">+15 días</button>
+            <button type="button" class="chip" data-plazo-mas="30">+30 días</button>
+          </div>
         </div>
-        <p class="ent-hint" id="repackHint"></p>
+        <div class="ent-resumen" id="repackHint" aria-live="polite"></div>
       </div>
       <div class="modal-actions" style="margin-top:14px">
         <button class="btn-ghost" id="repackCancelBtn" type="button">Cancelar</button>
-        <button class="btn-ghost" id="repackGuardarBtn" type="button">Guardar estimación</button>
+        <button class="btn-solid" id="repackGuardarBtn" type="button">✓ Guardar: ya lo recibió</button>
       </div>
-      <button class="btn-solid" id="repackConfirmarBtn" type="button" style="width:100%;margin-top:8px">✓ Confirmar: el cliente ya lo recibió</button>
     </div>
   </div>
 
@@ -12640,9 +12707,23 @@
     $('catRevCargar').addEventListener('click', catPedCargarEnPedido);
     ['catInboxModal','catRevModal'].forEach(function(id){ $(id).addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); }); });
 
-    /* ——— Fechas de entrega (antes "re-packing") ———
-       El crédito cuenta desde que el cliente RECIBE. Aquí se elige ese día en el calendario; el servidor
-       recalcula el vencimiento del pedido y de Cartera. Se apoya en obtenerHistorial (ya trae lo empacado). */
+    /* ——— Pantalla «Fechas de entrega» ———
+       Ciclo: ① se empaca → ② se pone cuándo llega (fecha estimada) → ③ se confirma que ya llegó. El crédito cuenta desde la fecha de entrega.
+       La lista trae TODOS los pedidos empacados (también los viejos): filtros (Por confirmar / En camino / Recibidos / Todos) y buscador.
+       Cada tarjeta tiene un botón claro; «Fecha y plazo» abre la ventana para cambiar el día de entrega y los días de crédito (no siempre son 30). */
+    var ENT = { todos:[], filtro:'por', q:'', pagina:1, cargado:false };
+    var ENT_PAG = 20, ENT_MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    var REPACK = { ref:null, o:null, plazo:30, plazo0:30, estado:'si', bloqueada:false, desdeLista:false };
+    function entCorta(iso){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return ''; return parseInt(m[3],10)+' '+ENT_MES[parseInt(m[2],10)-1]+(+m[1]===new Date().getFullYear()?'':' '+m[1]); }
+    function entDias(iso){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return 0; var h=new Date(); h=new Date(h.getFullYear(),h.getMonth(),h.getDate()); return Math.round((new Date(+m[1],+m[2]-1,+m[3])-h)/864e5); }
+    function entRel(n){ return n===0?'hoy':n===1?'mañana':n===-1?'ayer':n>1?('en '+n+' días'):('hace '+(-n)+' días'); }
+    function entDMY(iso){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); return m ? (m[3]+'/'+m[2]+'/'+m[1]) : ''; }
+    /** 'conf' recibido · 'por' ya pasó la fecha estimada y falta confirmar · 'camino' fecha estimada futura · 'sin' no tiene fecha */
+    function entEstado(o){
+      if(o.entregaConfirmada) return 'conf';
+      var f = dmyToISO(o.fechaEntrega); if(!f) return 'sin';
+      return entDias(f)>0 ? 'camino' : 'por';
+    }
     function entInfo(o){
       var cred = /cr[eé]dito/i.test(String((o && o.metodoPago)||'')) && Number(o && o.saldo) > 0;
       return { cred:cred, plazo:plazoDePedido(o) };
@@ -12660,7 +12741,7 @@
         ? ('Crédito de <b>'+pl+' días</b> contados desde esa fecha: vence el <b>'+safe(entVence(iso, pl))+'</b>.')
         : '');
     }
-    /** Convierte cada selector de fecha de entrega en un botón grande con la fecha en letras. */
+    /** Convierte cada selector de fecha en un botón grande con la fecha en letras. */
     function fbTexto(iso){
       if(!iso) return { k:'Fecha de entrega', t:'Toca para elegir' };
       var d=new Date(iso+'T00:00:00'), hoy=new Date(); hoy.setHours(0,0,0,0);
@@ -12694,100 +12775,234 @@
     });
     $('packEntregaConf').addEventListener('change', function(){ if(this.checked && $('packEntregaFecha').value>isoOf(new Date())){ $('packEntregaFecha').value=isoOf(new Date()); fbRefrescar('packEntregaFecha'); entPintarHint('packEntregaHint', PACK.pedido, $('packEntregaFecha').value, 0); } haptic(8); });
 
-    var REPACK = { ref:null, o:null, plazo:30 };
-    function repackHint(){
-      entPintarHint('repackHint', REPACK.o, $('repackFecha').value, REPACK.plazo);
-      // Antes → ahora: así se ve cuánto se movió el vencimiento antes de guardar
-      var h=$('repackHint'), vAntes=REPACK.o && REPACK.o.fechaVencimiento;
-      if(h && vAntes && entInfo(REPACK.o).cred && $('repackFecha').value) h.innerHTML += ' <span style="opacity:.8">Antes vencía el <b>'+safe(vAntes)+'</b>.</span>';
-    }
-    $('repackFecha').addEventListener('input', repackHint);
-    function repackPlazoPoner(n){
-      n = Math.max(1, Math.min(365, Math.round(+n)||REPACK.plazo||30)); REPACK.plazo = n;
-      var i=$('repackPlazo'); if(i && String(i.value)!==String(n)) i.value=n; repackHint();
-    }
-    $('repackPlazo').addEventListener('input', function(){ var v=parseInt(this.value,10); if(v>=1){ REPACK.plazo=Math.min(365,v); repackHint(); } });
-    $('repackPlazo').addEventListener('blur', function(){ repackPlazoPoner(this.value); });
-    Array.prototype.forEach.call(document.querySelectorAll('#repackModal [data-plazo-mas]'), function(b){
-      b.addEventListener('click', function(){ repackPlazoPoner((REPACK.plazo||30)+parseInt(b.getAttribute('data-plazo-mas'),10)); haptic(8); });
-    });
-    var HIST_ENT = [];
-    function abrirHistoricoEmpaque(){
-      $('packHistModal').classList.add('show'); haptic(10);
-      $('packHistList').innerHTML='<p class="cart-empty">Consultando…</p>';
-      $('packHistEmpty').style.display='none';
+    /* ——— Lista ——— */
+    function entCargar(){
+      $('packHistList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('packHistEmpty').style.display='none'; $('packHistMas').style.display='none'; $('packHistTodos').style.display='none';
       google.script.run.withSuccessHandler(function(r){
-        var lista = (r && r.orders) || [];
-        lista = lista.filter(function(o){ return String(o.estado||'').toUpperCase()==='EMPACADO'; });
-        lista.sort(function(a,b){
-          var pa=a.entregaConfirmada?1:0, pb=b.entregaConfirmada?1:0; if(pa!==pb) return pa-pb;            // primero las que faltan por confirmar
-          return (kaemParseFecha(b.packingFecha)||0) - (kaemParseFecha(a.packingFecha)||0);
-        });
-        HIST_ENT = lista.slice(0,40);
-        if(!HIST_ENT.length){ $('packHistList').innerHTML=''; $('packHistEmpty').style.display='block'; return; }
-        $('packHistList').innerHTML = HIST_ENT.map(function(o, i){
-          var cli=o.cliente||{}, inf=entInfo(o);
-          var linea2 = 'Empacado '+safe(kaemFmtFecha(o.packingFecha)||'')+' · '+(o.fechaEntrega?('<b>'+(o.entregaConfirmada?'Recibido ':'Entrega estimada ')+safe(o.fechaEntrega)+'</b>'):'sin fecha de entrega')
-            +(o.entregaConfirmada?' <span class="ent-estado ok">✓ Confirmada</span>':' <span class="ent-estado pend">Por confirmar</span>');
-          var linea3 = inf.cred ? ('Crédito '+plazoDePedido(o)+' días · vence '+safe(o.fechaVencimiento||'—')+' · debe '+cop(o.saldo)) : 'Contado / pagado';
-          return '<button type="button" class="rec-row ent-item" data-i="'+i+'" style="width:100%;text-align:left"><div class="rec-info">'
-            +'<span class="rec-cli">'+safe(cli.nombre||o.remision||o.id)+' <small>'+safe(o.remision||o.id)+'</small></span>'
-            +'<span class="rec-meta">'+linea2+'</span>'
-            +'<span class="rec-meta">'+linea3+'</span>'
-            +'</div><span class="ab-recibo">📅</span></button>';
-        }).join('');
+        ENT.todos = ((r && r.orders) || []).filter(function(o){ return String(o.estado||'').toUpperCase()==='EMPACADO'; });
+        ENT.cargado = true;
+        // Si no hay nada por confirmar, se abre en «Todos» para que no parezca vacío
+        if(ENT.primera){ ENT.primera=false; ENT.filtro = ENT.todos.some(function(o){ var s=entEstado(o); return s==='por'||s==='sin'; }) ? 'por' : 'todos'; }
+        entPintar();
       }).withFailureHandler(function(){
         $('packHistList').innerHTML=''; $('packHistEmpty').textContent='Sin conexión · no se pudo consultar.'; $('packHistEmpty').style.display='block';
       }).obtenerHistorial({});
     }
+    function entLista(){
+      var q = fnorm(ENT.q||'');
+      var l = ENT.todos.filter(function(o){
+        var s = entEstado(o);
+        if(ENT.filtro==='por' && !(s==='por'||s==='sin')) return false;
+        if(ENT.filtro==='camino' && s!=='camino') return false;
+        if(ENT.filtro==='conf' && s!=='conf') return false;
+        if(!q) return true;
+        var c=o.cliente||{};
+        return fnorm([c.nombre, o.remision, o.id, c.ciudad, c.telefono, c.nit].join(' ')).indexOf(q)>=0;
+      });
+      var fe = function(o){ return dmyToISO(o.fechaEntrega)||''; };
+      l.sort(function(a,b){
+        if(ENT.filtro==='por') return (fe(a)||'0000').localeCompare(fe(b)||'0000');                      // primero los que llevan más tiempo esperando
+        if(ENT.filtro==='camino') return fe(a).localeCompare(fe(b));
+        return (kaemParseFecha(b.packingFecha)||0) - (kaemParseFecha(a.packingFecha)||0);               // recibidos / todos: los más recientes primero
+      });
+      return l;
+    }
+    function entTarjeta(o, i){
+      var st=entEstado(o), c=o.cliente||{}, inf=entInfo(o), fIso=dmyToISO(o.fechaEntrega), esCred=/cr[eé]dito/i.test(String(o.metodoPago||''));
+      var estado, btn='';
+      if(st==='conf'){ estado='<span class="ent-st ok">✓ Recibido el <b>'+safe(entCorta(fIso))+'</b></span>'; }
+      else if(st==='por'){
+        estado='<span class="ent-st pend">⏳ Falta confirmar · llegaba el <b>'+safe(entCorta(fIso))+'</b> <small>('+entRel(entDias(fIso))+')</small></span>';
+        btn='<button type="button" class="ent-ok" data-ent-act="ok">✓ Llegó el '+safe(entCorta(fIso))+'</button>';
+      } else if(st==='camino'){
+        estado='<span class="ent-st road">🚚 En camino · llega el <b>'+safe(entCorta(fIso))+'</b> <small>('+entRel(entDias(fIso))+')</small></span>';
+        btn='<button type="button" class="ent-ok" data-ent-act="ok">✓ Ya llegó hoy</button>';
+      } else {
+        estado='<span class="ent-st pend">⚠️ Sin fecha de entrega</span>';
+        btn='<button type="button" class="ent-ok" data-ent-act="ok">✓ Llegó hoy</button>';
+      }
+      var cred = inf.cred ? ('Crédito <b>'+plazoDePedido(o)+' días</b> · vence <b>'+safe(o.fechaVencimiento||'—')+'</b> · debe <b>'+cop(o.saldo)+'</b>')
+               : (esCred ? 'Crédito · ya pagado' : 'Contado');
+      return '<div class="ent-card ent-'+st+'" data-i="'+i+'"><div class="ent-top"><b>'+safe(c.nombre||o.remision||o.id)+'</b><small>'+safe(o.remision||o.id)+(c.ciudad?(' · '+safe(c.ciudad)):'')+'</small></div>'
+        +'<div class="ent-linea">'+estado+'</div><div class="ent-linea ent-cred">'+cred+'</div>'
+        +'<div class="ent-btns">'+btn+'<button type="button" class="ent-edit" data-ent-act="edit">Fecha y plazo</button></div></div>';
+    }
+    function entPintar(){
+      var n = { por:0, camino:0, conf:0, todos:ENT.todos.length };
+      ENT.todos.forEach(function(o){ var s=entEstado(o); if(s==='por'||s==='sin') n.por++; else n[s]++; });
+      Array.prototype.forEach.call($('packHistFiltro').querySelectorAll('.seg'), function(b){
+        var k=b.getAttribute('data-f'); b.classList.toggle('active', k===ENT.filtro);
+        var em=b.querySelector('em'); if(em) em.textContent=n[k];
+      });
+      var l = entLista(), lim = ENT.pagina*ENT_PAG, vis = l.slice(0, lim);
+      var info = $('packHistCuenta');
+      info.textContent = l.length ? ('Mostrando '+vis.length+' de '+l.length+(ENT.q?' que coinciden con la búsqueda':'')) : '';
+      if(!l.length){
+        $('packHistList').innerHTML='';
+        $('packHistEmpty').textContent = ENT.q ? ('Ningún pedido empacado coincide con «'+ENT.q+'».') : (ENT.filtro==='por' ? '🎉 No hay entregas por confirmar.' : ENT.filtro==='camino' ? 'No hay pedidos en camino.' : ENT.filtro==='conf' ? 'Aún no hay entregas confirmadas.' : 'Aún no hay pedidos empacados.');
+        $('packHistEmpty').style.display='block';
+      } else {
+        $('packHistEmpty').style.display='none';
+        $('packHistList').innerHTML = vis.map(function(o){ return entTarjeta(o, ENT.todos.indexOf(o)); }).join('');
+      }
+      $('packHistMas').style.display = l.length>vis.length ? 'block' : 'none';
+      $('packHistMas').textContent = 'Ver más ('+(l.length-vis.length)+')';
+      // Confirmar varios de una vez: solo los que ya pasaron su fecha estimada (los que tienen fecha)
+      var lote = (ENT.filtro==='por') ? l.filter(function(o){ return entEstado(o)==='por'; }) : [];
+      $('packHistTodos').style.display = lote.length>=2 ? 'block' : 'none';
+      $('packHistTodos').textContent = '✓ Confirmar los '+lote.length+' (en su fecha estimada)';
+    }
+    var PACK_ENT_BUSY = false;
+    /** Llama al servidor para guardar fecha/plazo/confirmación y devuelve el resultado a cb(res|null). */
+    function entGuardarServidor(o, fecha, confirmada, plazo, cb){
+      var envio = { clientRef:String(o.clientRef||o.remision||o.id), fecha:fecha, confirmada:!!confirmada, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
+      if(plazo && entInfo(o).cred) envio.plazoDias = plazo;
+      google.script.run.withSuccessHandler(function(r){ cb(r); }).withFailureHandler(function(){ cb(null); }).actualizarFechaEntrega(envio);
+    }
+    function entRefrescarResto(){
+      limpiarCacheLectura(); window.__kaemForzar=true; try{ refreshData(); }catch(e){}
+      try{ carteraCargar(true); }catch(e){}
+      try{ packCargarPendientes(true); }catch(e){}
+      try{ if(window.KAEM && KAEM.hub) KAEM.hub.pintar(); }catch(e){}
+    }
+    function entAplicarLocal(o, fecha, confirmada, r){
+      o.fechaEntrega = entDMY(fecha); if(confirmada){ o.entregaConfirmada=true; o.entregaConfirmadaFecha=isoOf(new Date()); }
+      if(r){ if(r.fechaVencimiento) o.fechaVencimiento=r.fechaVencimiento; if(r.plazoDias) o.plazoDias=r.plazoDias; }
+    }
+    /** Un toque: marca el pedido como recibido (en su fecha estimada si ya pasó; si no, hoy). */
+    function entConfirmarRapido(o){
+      if(PACK_ENT_BUSY) return; PACK_ENT_BUSY=true;
+      var st=entEstado(o), fecha = (st==='por') ? dmyToISO(o.fechaEntrega) : isoOf(new Date());
+      toast('Guardando…','info',1200,{ grupo:'ent' });
+      entGuardarServidor(o, fecha, true, 0, function(r){
+        PACK_ENT_BUSY=false;
+        if(r && r.ok){
+          entAplicarLocal(o, fecha, true, r); toast(r.message||'Entrega confirmada','success',null,{ grupo:'ent' }); haptic(15); beep('success');
+          entPintar(); entRefrescarResto();
+        } else { toast((r&&r.message)||'Sin conexión · no se pudo guardar.','error'); beep('error'); }
+      });
+    }
+    /** Confirma de una vez todos los de la lista (con su fecha estimada). Pide confirmación y avisa el avance. */
+    function entConfirmarLote(){
+      var l = entLista().filter(function(o){ return entEstado(o)==='por'; }); if(l.length<2 || PACK_ENT_BUSY) return;
+      if(!window.confirm('Vas a marcar '+l.length+' pedidos como RECIBIDOS, cada uno en la fecha estimada que ya tenía.\n\nHazlo solo si ya les llegó a todos. Si alguno no, cámbialo después con «Fecha y plazo».\n\n¿Confirmar los '+l.length+'?')) return;
+      PACK_ENT_BUSY=true; var ok=0, mal=0, i=0, btn=$('packHistTodos'); btn.disabled=true;
+      (function sig(){
+        if(i>=l.length){
+          PACK_ENT_BUSY=false; btn.disabled=false; entPintar(); entRefrescarResto();
+          toast(ok+' entregas confirmadas'+(mal?(' · '+mal+' no se pudieron guardar (intenta de nuevo)'):''), mal?'error':'success'); beep(mal?'error':'success'); return;
+        }
+        var o=l[i++]; btn.textContent='Confirmando '+i+' de '+l.length+'…';
+        var fecha=dmyToISO(o.fechaEntrega);
+        entGuardarServidor(o, fecha, true, 0, function(r){ if(r&&r.ok){ ok++; entAplicarLocal(o, fecha, true, r); } else mal++; sig(); });
+      })();
+    }
+    function abrirHistoricoEmpaque(){
+      $('packHistModal').classList.add('show'); haptic(10);
+      ENT.q=''; ENT.pagina=1; ENT.primera=true; $('packHistBuscar').value='';
+      entCargar();
+    }
     $('packHistBtn').addEventListener('click', abrirHistoricoEmpaque);
     $('packHistCerrarBtn').addEventListener('click', function(){ $('packHistModal').classList.remove('show'); });
     $('packHistModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
+    $('packHistBuscar').addEventListener('input', function(){ ENT.q=this.value; ENT.pagina=1; entPintar(); });
+    $('packHistFiltro').addEventListener('click', function(e){ var b=e.target.closest('.seg'); if(!b) return; ENT.filtro=b.getAttribute('data-f'); ENT.pagina=1; haptic(8); entPintar(); });
+    $('packHistMas').addEventListener('click', function(){ ENT.pagina++; entPintar(); });
+    $('packHistTodos').addEventListener('click', entConfirmarLote);
     $('packHistList').addEventListener('click', function(e){
-      var b = e.target.closest ? e.target.closest('.ent-item') : null; if(!b) return;
-      var o = HIST_ENT[parseInt(b.getAttribute('data-i'),10)]; if(!o) return;
-      var cli = o.cliente || {}, inf = entInfo(o);
-      REPACK.o = o; REPACK.ref = String(o.clientRef||o.remision||o.id); REPACK.plazo = inf.plazo;
-      $('repackConfirmarBtn').style.display = o.entregaConfirmada ? 'none' : 'block';
-      $('repackGuardarBtn').textContent = o.entregaConfirmada ? 'Corregir fecha' : 'Guardar estimación';
-      $('repackSub').textContent = (cli.nombre||'')+' · '+(o.remision||o.id)+' · venta del '+(o.fecha||'');
-      var base = dmyToISO(o.fechaEntrega) || dmyToISO(kaemFmtFecha(o.packingFecha)) || isoOf(new Date());
+      var b = e.target.closest ? e.target.closest('[data-ent-act]') : null; if(!b) return;
+      var card = b.closest('.ent-card'), o = ENT.todos[parseInt(card.getAttribute('data-i'),10)]; if(!o) return;
+      if(b.getAttribute('data-ent-act')==='ok') entConfirmarRapido(o); else repackAbrir(o);
+    });
+
+    /* ——— Ventana «Fecha y plazo» ——— */
+    function repackChips(){
+      var si = REPACK.estado==='si', def = si ? [['Hoy',0],['Ayer',1],['Antier',2]] : [['Mañana',-1],['+2',-2],['+3',-3],['+5',-5]];
+      $('repackChips').innerHTML = def.map(function(x){ return '<button type="button" class="chip" data-ent-dias="'+x[1]+'" data-ent-in="repackFecha">'+x[0]+'</button>'; }).join('');
+    }
+    function repackResumen(){
+      var o=REPACK.o, iso=$('repackFecha').value, h=$('repackHint'), inf=entInfo(o); if(!h) return;
+      if(!iso){ h.innerHTML='Elige el día en el calendario.'; return; }
+      var futura = iso > isoOf(new Date()), t='';
+      if(inf.cred){
+        t = '📅 <b>'+safe(carteraFechaLarga(iso))+'</b> <span class="ent-mas">+ '+REPACK.plazo+' días de crédito</span> → vence el <b>'+safe(entVence(iso, REPACK.plazo))+'</b>';
+        if(o.fechaVencimiento) t += '<br><small>Antes vencía el '+safe(o.fechaVencimiento)+'.</small>';
+      } else t = 'Este pedido '+(/cr[eé]dito/i.test(String(o.metodoPago||''))?'ya está pagado':'es de contado')+': no hay crédito que contar.';
+      if(futura) t += '<br><small>🚚 Aún no lo recibe: el crédito empezará a contar desde esa fecha estimada.</small>';
+      h.innerHTML = t;
+      $('repackGuardarBtn').textContent = REPACK.estado==='si' ? '✓ Guardar: ya lo recibió' : 'Guardar fecha estimada';
+    }
+    function repackPintarEstado(){
+      Array.prototype.forEach.call($('repackEstado').querySelectorAll('.seg'), function(b){
+        b.classList.toggle('active', b.getAttribute('data-v')===REPACK.estado);
+        b.disabled = !!(REPACK.bloqueada && b.getAttribute('data-v')==='no');
+      });
+      $('repackFechaLbl').textContent = REPACK.estado==='si' ? '2 · ¿Qué día lo recibió?' : '2 · ¿Qué día cree que le llegará?';
+      repackChips(); repackResumen();
+    }
+    function repackPlazoPintar(){
+      var i=$('repackPlazo'); if(i && String(i.value)!==String(REPACK.plazo)) i.value=REPACK.plazo;
+      Array.prototype.forEach.call(document.querySelectorAll('#repackModal [data-plazo-set]'), function(b){ b.classList.toggle('on', parseInt(b.getAttribute('data-plazo-set'),10)===REPACK.plazo); });
+    }
+    function repackPlazoPoner(n){
+      n = Math.max(1, Math.min(365, Math.round(+n)||REPACK.plazo||30)); REPACK.plazo = n; repackPlazoPintar(); repackResumen();
+    }
+    function repackAbrir(o){
+      var inf = entInfo(o), st = entEstado(o), fIso = dmyToISO(o.fechaEntrega), c = o.cliente||{};
+      REPACK.o=o; REPACK.ref=String(o.clientRef||o.remision||o.id); REPACK.plazo=REPACK.plazo0=inf.plazo; REPACK.bloqueada=(st==='conf');
+      REPACK.estado = (st==='conf' || st==='por' || st==='sin') ? 'si' : 'no';
+      var hoy=isoOf(new Date());
+      var base = (st==='por' && fIso) ? fIso : (st==='conf' && fIso) ? fIso : (st==='camino' && fIso) ? fIso : hoy;
+      $('repackSub').textContent = (c.nombre||'')+' · '+(o.remision||o.id)+' · venta del '+(o.fecha||'');
       $('repackFecha').value = base; $('repackFecha').removeAttribute('max'); $('repackFecha').min = dmyToISO(o.fecha) || ''; fbRefrescar('repackFecha');
-      $('repackPlazoBox').style.display = inf.cred ? 'block' : 'none'; $('repackPlazo').value = inf.cred ? REPACK.plazo : '';
-      repackHint();
-      $('packHistModal').classList.remove('show');
+      $('repackPlazoBox').style.display = inf.cred ? 'block' : 'none';
+      repackPlazoPintar(); repackPintarEstado();
       $('repackModal').classList.add('show'); haptic(10);
+    }
+    $('repackEstado').addEventListener('click', function(e){
+      var b=e.target.closest('.seg'); if(!b || b.disabled) return;
+      REPACK.estado=b.getAttribute('data-v'); var hoy=isoOf(new Date()), f=$('repackFecha');
+      if(REPACK.estado==='si' && f.value>hoy){ f.value=hoy; fbRefrescar('repackFecha'); }                // «ya lo recibió» no puede tener fecha futura
+      if(REPACK.estado==='no' && f.value<=hoy){ var d=new Date(); d.setDate(d.getDate()+1); f.value=isoOf(d); fbRefrescar('repackFecha'); }
+      haptic(8); repackPintarEstado();
+    });
+    $('repackFecha').addEventListener('input', function(){
+      if(this.value>isoOf(new Date()) && REPACK.estado==='si' && !REPACK.bloqueada){ REPACK.estado='no'; repackPintarEstado(); return; }   // fecha futura = todavía no lo recibe
+      if(this.value>isoOf(new Date()) && REPACK.bloqueada){ this.value=isoOf(new Date()); fbRefrescar('repackFecha'); toast('Ya está confirmado como recibido: la fecha no puede ser futura.','info'); }
+      repackResumen();
+    });
+    $('repackPlazo').addEventListener('input', function(){ var v=parseInt(this.value,10); if(v>=1){ REPACK.plazo=Math.min(365,v); repackPlazoPintar(); repackResumen(); } });
+    $('repackPlazo').addEventListener('blur', function(){ repackPlazoPoner(this.value); });
+    Array.prototype.forEach.call(document.querySelectorAll('#repackModal [data-plazo-mas]'), function(b){
+      b.addEventListener('click', function(){ repackPlazoPoner((REPACK.plazo||30)+parseInt(b.getAttribute('data-plazo-mas'),10)); haptic(8); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#repackModal [data-plazo-set]'), function(b){
+      b.addEventListener('click', function(){ repackPlazoPoner(parseInt(b.getAttribute('data-plazo-set'),10)); haptic(8); });
     });
     $('repackCancelBtn').addEventListener('click', function(){ $('repackModal').classList.remove('show'); });
     $('repackModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
-    function repackGuardar(confirmada){
+    function repackGuardar(){
       if(!REPACK.ref) return;
       var fecha = $('repackFecha').value; if(!fecha){ toast('Elige el día en el calendario.','error'); return; }
-      if(confirmada && fecha > isoOf(new Date())){ toast('Para confirmar que ya llegó, la fecha no puede ser futura. Cámbiala o guarda solo la estimación.','error'); return; }
-      var bG=$('repackGuardarBtn'), bC=$('repackConfirmarBtn'), txtG=bG.textContent, txtC=bC.textContent;
-      bG.disabled=true; bC.disabled=true; (confirmada?bC:bG).textContent='Guardando…';
-      var envio = { clientRef:REPACK.ref, fecha:fecha, confirmada:!!confirmada, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() };
-      if(entInfo(REPACK.o).cred) envio.plazoDias = REPACK.plazo;
-      var fin=function(){ bG.disabled=false; bC.disabled=false; bG.textContent=txtG; bC.textContent=txtC; };
-      google.script.run.withSuccessHandler(function(r){
-        fin();
+      var confirmada = REPACK.estado==='si';
+      if(confirmada && fecha > isoOf(new Date())){ toast('Para marcarlo como recibido, el día no puede ser futuro. Elige hoy o antes, o marca «Aún no».','error'); return; }
+      var bG=$('repackGuardarBtn'), txtG=bG.textContent; bG.disabled=true; bG.textContent='Guardando…';
+      var o=REPACK.o;
+      entGuardarServidor(o, fecha, confirmada, REPACK.plazo, function(r){
+        bG.disabled=false; bG.textContent=txtG;
         if(r && r.ok){
           toast(r.message||'Fecha de entrega guardada','success'); haptic(15); beep('success');
+          entAplicarLocal(o, fecha, confirmada, r);
+          if(confirmada){ var rem=String(o.remision||o.id||''); window.POR_CONFIRMAR=(window.POR_CONFIRMAR||[]).filter(function(x){ return String(x.remision)!==rem; }); try{ localStorage.setItem('kaem_por_confirmar', JSON.stringify(window.POR_CONFIRMAR)); }catch(e){} }
           $('repackModal').classList.remove('show');
-          if(confirmada){ var rem=String(REPACK.o.remision||REPACK.o.id||''); window.POR_CONFIRMAR=(window.POR_CONFIRMAR||[]).filter(function(x){ return String(x.remision)!==rem; }); try{ localStorage.setItem('kaem_por_confirmar', JSON.stringify(window.POR_CONFIRMAR)); }catch(e){} }
-          limpiarCacheLectura(); window.__kaemForzar=true; try{ refreshData(); }catch(e){}
-          try{ carteraCargar(true); }catch(e){}
-          try{ packCargarPendientes(true); }catch(e){}
-          try{ if(window.KAEM && KAEM.hub) KAEM.hub.pintar(); }catch(e){}
+          if($('packHistModal').classList.contains('show')) entPintar();
+          entRefrescarResto();
         } else {
-          toast((r&&r.message)||'No se pudo guardar la fecha.','error'); beep('error');
+          toast((r&&r.message)||'Sin conexión · no se pudo guardar.','error'); beep('error');
         }
-      }).withFailureHandler(function(){
-        fin(); toast('Sin conexión · no se pudo guardar.','error'); beep('error');
-      }).actualizarFechaEntrega(envio);
+      });
     }
-    $('repackGuardarBtn').addEventListener('click', function(){ repackGuardar(false); });
-    $('repackConfirmarBtn').addEventListener('click', function(){ repackGuardar(true); });
+    $('repackGuardarBtn').addEventListener('click', repackGuardar);
 
     // MESES_ES ya está definido en 17-pdf-remision-motor.js (misma lista)
     function mesLargo(ym){ var p=String(ym).split('-'); return (MESES_ES[(+p[1])-1]||ym)+' '+p[0]; }
