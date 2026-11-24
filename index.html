@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-14-27';
+    const APP_VERSION = '2026-11-24-28';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -4811,6 +4811,18 @@
             <button type="button" class="chip" data-ent-dias="-1" data-ent-in="repackFecha">Mañana</button>
           </div>
         </div>
+        <div id="repackPlazoBox" style="display:none;margin-top:12px">
+          <label class="lbl" for="repackPlazo">⏳ Plazo del crédito (días desde que lo recibe)</label>
+          <div class="ent-row">
+            <input id="repackPlazo" type="number" inputmode="numeric" min="1" max="365" step="1" style="width:96px">
+            <div class="ent-chips">
+              <button type="button" class="chip" data-plazo-mas="7">+7 días</button>
+              <button type="button" class="chip" data-plazo-mas="15">+15 días</button>
+              <button type="button" class="chip" data-plazo-mas="30">+30 días</button>
+            </div>
+          </div>
+          <p class="cfg-hint" style="margin-top:6px">Para dar más tiempo sin cambiar el día de entrega, sube los días del plazo.</p>
+        </div>
         <p class="ent-hint" id="repackHint"></p>
       </div>
       <div class="modal-actions" style="margin-top:14px">
@@ -9086,6 +9098,12 @@
           if(res.total!=null){ p.total=res.total; if(res.abono!=null) p.abono=res.abono; if(res.saldo!=null) p.saldo=res.saldo; }   // el dinero que vale es el del servidor
           if(res.ts) p.ts = res.ts;                                        // sello de modificación: la próxima edición detecta cambios ajenos
           commitOrder(p, true, res.id); refreshData(); packRefrescarFondo();
+          if(res.avisoPagos){
+            // El abono de la pantalla era MENOR que lo ya cobrado: el servidor NO borra pagos registrados (se conserva lo cobrado). Se explica y se ofrece el camino.
+            var ap=res.avisoPagos;
+            toast('Ojo: esta remisión ya tiene '+cop(ap.registrado)+' en pagos registrados, por eso el abono sigue en '+cop(ap.registrado)+' (pusiste '+cop(ap.enviado)+'). Si algún pago está repetido o mal, corrígelo ahí.','error',16000,{ accion:'Ver pagos', fn:function(){ if(window.abrirRecibosDe) window.abrirRecibosDe(ap.remision||p.remision); } });
+            beep('error');
+          }
           if(res.cartera && res.cartera.ok===false){
             toast('⚠️ El pedido se guardó, pero el crédito NO quedó registrado en cartera ('+(res.cartera.message||'error desconocido')+'). Corre "Previsualizar cartera" para corregirlo.','error');
             beep('error');
@@ -12677,8 +12695,22 @@
     $('packEntregaConf').addEventListener('change', function(){ if(this.checked && $('packEntregaFecha').value>isoOf(new Date())){ $('packEntregaFecha').value=isoOf(new Date()); fbRefrescar('packEntregaFecha'); entPintarHint('packEntregaHint', PACK.pedido, $('packEntregaFecha').value, 0); } haptic(8); });
 
     var REPACK = { ref:null, o:null, plazo:30 };
-    function repackHint(){ entPintarHint('repackHint', REPACK.o, $('repackFecha').value, REPACK.plazo); }
+    function repackHint(){
+      entPintarHint('repackHint', REPACK.o, $('repackFecha').value, REPACK.plazo);
+      // Antes → ahora: así se ve cuánto se movió el vencimiento antes de guardar
+      var h=$('repackHint'), vAntes=REPACK.o && REPACK.o.fechaVencimiento;
+      if(h && vAntes && entInfo(REPACK.o).cred && $('repackFecha').value) h.innerHTML += ' <span style="opacity:.8">Antes vencía el <b>'+safe(vAntes)+'</b>.</span>';
+    }
     $('repackFecha').addEventListener('input', repackHint);
+    function repackPlazoPoner(n){
+      n = Math.max(1, Math.min(365, Math.round(+n)||REPACK.plazo||30)); REPACK.plazo = n;
+      var i=$('repackPlazo'); if(i && String(i.value)!==String(n)) i.value=n; repackHint();
+    }
+    $('repackPlazo').addEventListener('input', function(){ var v=parseInt(this.value,10); if(v>=1){ REPACK.plazo=Math.min(365,v); repackHint(); } });
+    $('repackPlazo').addEventListener('blur', function(){ repackPlazoPoner(this.value); });
+    Array.prototype.forEach.call(document.querySelectorAll('#repackModal [data-plazo-mas]'), function(b){
+      b.addEventListener('click', function(){ repackPlazoPoner((REPACK.plazo||30)+parseInt(b.getAttribute('data-plazo-mas'),10)); haptic(8); });
+    });
     var HIST_ENT = [];
     function abrirHistoricoEmpaque(){
       $('packHistModal').classList.add('show'); haptic(10);
@@ -12721,6 +12753,7 @@
       $('repackSub').textContent = (cli.nombre||'')+' · '+(o.remision||o.id)+' · venta del '+(o.fecha||'');
       var base = dmyToISO(o.fechaEntrega) || dmyToISO(kaemFmtFecha(o.packingFecha)) || isoOf(new Date());
       $('repackFecha').value = base; $('repackFecha').removeAttribute('max'); $('repackFecha').min = dmyToISO(o.fecha) || ''; fbRefrescar('repackFecha');
+      $('repackPlazoBox').style.display = inf.cred ? 'block' : 'none'; $('repackPlazo').value = inf.cred ? REPACK.plazo : '';
       repackHint();
       $('packHistModal').classList.remove('show');
       $('repackModal').classList.add('show'); haptic(10);
@@ -12758,7 +12791,36 @@
 
     // MESES_ES ya está definido en 17-pdf-remision-motor.js (misma lista)
     function mesLargo(ym){ var p=String(ym).split('-'); return (MESES_ES[(+p[1])-1]||ym)+' '+p[0]; }
+    /* Pagos de UNA remisión (se abre desde el aviso al editar un pedido): para corregir o eliminar un pago repetido */
+    var RECIBOS_REM = '';
+    function abrirRecibosDe(id){
+      RECIBOS_REM = String(id||'').trim(); $('recibosMes').value='';
+      $('recibosModal').classList.add('show'); haptic(10); cargarRecibos('', false);
+    }
+    window.abrirRecibosDe = abrirRecibosDe;
+    function cargarRecibosDeRemision(){
+      var id = RECIBOS_REM;
+      $('recibosList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('recibosEmpty').style.display='none'; $('recibosTotal').style.display='none';
+      google.script.run.withSuccessHandler(function(r){
+        if(!r || !r.ok || !r.abonos || !r.abonos.length){ $('recibosList').innerHTML=''; $('recibosEmpty').textContent=(r&&r.ok)?('La remisión '+id+' no tiene pagos registrados.'):((r&&r.message)||'No se pudo cargar.'); $('recibosEmpty').style.display='block'; return; }
+        $('recibosTotal').innerHTML='Pagos de la remisión <b>'+safe(id)+'</b> · <b>'+r.abonos.length+(r.abonos.length===1?' pago':' pagos')+'</b> · saldo <b>'+cop(r.saldo||0)+'</b> · <a href="#" id="recibosVerTodos">ver todos los recibos</a>';
+        $('recibosTotal').style.display='block';
+        $('recibosList').innerHTML = r.abonos.map(function(a,i){
+          return '<div class="rec-row"><div class="rec-info">'
+            +'<span class="rec-cli">'+safe(r.cliente||id)+'</span>'
+            +'<span class="rec-meta">'+safe(kaemFmtFecha(a.fecha)||a.fecha||'')+' · '+safe(id)+(a.metodo?(' · '+safe(a.metodo)):'')+'</span>'
+            +abEtiquetas({ nota:a.nota, descuento:a.descuento, editado:a.editado, estadoRem:r.estado })
+            +'</div><span class="rec-monto">'+cop(a.monto)+'</span>'
+            +'<button type="button" class="ab-recibo" data-id="'+safe(id)+'" data-idx="'+i+'">Recibo</button>'
+            +'<button type="button" class="ab-recibo ab-edit" data-id="'+safe(id)+'" data-idx="'+i+'" data-monto="'+Math.round(a.monto)+'" data-fecha="'+safe(a.fecha||'')+'" data-metodo="'+safe(a.metodo||'')+'" data-cli="'+safe(r.cliente||'')+'" data-desc="'+Math.round(a.descuento||0)+'" data-saldo="'+Math.round(r.saldo||0)+'" data-total="'+Math.round(r.total||0)+'" data-estado="'+safe(r.estado||'')+'">Corregir</button></div>';
+        }).join('');
+        var vt=$('recibosVerTodos'); if(vt) vt.addEventListener('click', function(e){ e.preventDefault(); RECIBOS_REM=''; cargarRecibos('', false); });
+      }).withFailureHandler(function(){
+        $('recibosList').innerHTML=''; $('recibosEmpty').textContent='Sin conexión · no se pudo consultar.'; $('recibosEmpty').style.display='block';
+      }).obtenerAbonos({ idRemision:id });
+    }
     function cargarRecibos(mes, primera){
+      if(RECIBOS_REM){ cargarRecibosDeRemision(); return; }
       $('recibosList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('recibosEmpty').style.display='none'; $('recibosTotal').style.display='none';
       google.script.run.withSuccessHandler(function(r){
         if(!r || !r.ok){ $('recibosList').innerHTML=''; $('recibosEmpty').textContent=(r&&r.message)||'No se pudo cargar.'; $('recibosEmpty').style.display='block'; return; }
@@ -12783,11 +12845,12 @@
       }).obtenerPagosRecientes(mes ? { mes:mes } : { limite:40 });
     }
     function abrirRecibosRecientes(){
+      RECIBOS_REM = '';
       $('recibosModal').classList.add('show'); haptic(10);
       $('recibosMes').value='';
       cargarRecibos('', true);
     }
-    $('recibosMes').addEventListener('change', function(){ haptic(8); cargarRecibos(this.value, false); });
+    $('recibosMes').addEventListener('change', function(){ haptic(8); RECIBOS_REM=''; cargarRecibos(this.value, false); });
     $('carRecibosBtn').addEventListener('click', abrirRecibosRecientes);
     $('recibosCerrarBtn').addEventListener('click', function(){ $('recibosModal').classList.remove('show'); });
     $('recibosModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('show'); });
@@ -12919,6 +12982,12 @@
       toast(esTotal?'Registrando pago…':'Registrando abono…','info');
 
       function alTerminar(res){
+        if(res && res.repetido){
+          // Doble toque: el servidor vio un pago igual hace pocos minutos. La persona decide; por defecto NO se registra.
+          if(window.confirm(res.message+'\n\nAceptar = sí, es otro pago (se registra).\nCancelar = no registrar (era repetido).')) enviarAbono(true);
+          else { toast('No se registró: era un pago repetido.','info'); carteraCargar(true); }
+          return;
+        }
         if(res && (res.ok || res.success)){
           beep('success'); haptic(20);
           toast(res.message || 'Registrado.', 'success');
@@ -12951,9 +13020,13 @@
         google.script.run.withSuccessHandler(alTerminar).withFailureHandler(alFallar)
           .marcarCreditoPagado({ idRemision:id, metodoPago:metodo, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
       } else {
+        enviarAbono(false);
+      }
+      function enviarAbono(confirmarRepetido){
         google.script.run.withSuccessHandler(alTerminar).withFailureHandler(alFallar)
           .registrarAbono({ idRemision:id, monto:monto, metodoPago:metodo,
                             proximoAbono:String($('pagoProximo').value||'').trim(),
+                            evitarRepetido:true, confirmarRepetido:confirmarRepetido===true,
                             operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
       }
     }
