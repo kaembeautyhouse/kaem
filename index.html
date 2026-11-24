@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-24-31';
+    const APP_VERSION = '2026-11-24-32';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3856,6 +3856,32 @@
     .rec-row.rc2 .rec-btns .ab-recibo{flex:1;min-height:42px;margin:0;font-size:13.5px;font-weight:600}
     .rec-tags i.warn{background:var(--st-soon-bg);color:var(--st-soon-text);border:1px solid var(--st-soon-border);font-weight:700}
     .rec-total a{color:var(--terracota-txt);font-weight:600}
+
+    /* ——— Registrar pago: descuento y redondeo a la vista ——— */
+    .pago-opt-desc{display:block;width:100%;min-height:46px;margin:8px 0 2px;border:1.5px dashed var(--terracota);border-radius:14px;background:var(--crema-2);color:var(--terracota-txt);font-family:'Jost',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+    .pago-opt-desc:active{transform:scale(.99)}
+    .pago-descbox{margin:12px 0 4px;padding:12px 14px 14px;border:1.5px solid var(--terracota);border-radius:16px;background:linear-gradient(180deg,var(--crema-3),var(--crema-2))}
+    .pago-descbox .pago-paso{margin:0 0 10px}
+    .pago-descbox .pago-paso small{font-weight:400;color:var(--texto-suave)}
+    .pago-descbox .pago-desc-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+    .pago-descbox .pago-desc-btns button{flex:1 1 auto;min-height:46px;min-width:64px;padding:0 12px;border:1.5px solid var(--piedra);border-radius:12px;background:var(--blanco);color:var(--espresso);font-family:'Jost',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+    .pago-descbox .pago-desc-btns button.on,.pago-red button.on{background:var(--espresso);border-color:var(--espresso);color:#fff}
+    .pago-pct-otro{display:flex;align-items:center;gap:6px;flex:1 1 120px;min-height:46px;padding:0 10px;border:1.5px solid var(--piedra);border-radius:12px;background:var(--blanco)}
+    .pago-pct-otro span{font-size:13px;font-weight:600;color:var(--texto-suave);white-space:nowrap}
+    .pago-pct-otro input{width:100%;min-width:0;border:none;background:transparent;font-size:16px;font-weight:600;color:var(--espresso);text-align:right;outline:none}
+    .pago-red{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+    .pago-red:empty{display:none}
+    .pago-red-lbl{font-size:13px;color:var(--texto-suave)}
+    .pago-red button{min-height:44px;padding:0 14px;border:1.5px solid var(--piedra);border-radius:12px;background:var(--blanco);color:var(--espresso);font-family:'Jost',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+    .pago-descbox #pagoRecOpt{margin-top:10px}
+    .pago-resumen{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--blanco);border:1px dashed var(--terracota);font-size:14px;line-height:1.5;color:var(--espresso)}
+    .pago-resumen:empty{display:none}
+    .pr-fila{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+    .pr-desc{color:var(--st-soon-text)}
+    .pr-total{border-top:1px solid var(--linea);margin-top:4px;padding-top:6px;font-size:15.5px}
+    .pr-nota{margin:6px 0 0;font-size:12.5px;color:var(--texto-suave)}
+    .pago-err{color:var(--rojo,#B3261E);font-weight:600}
+    #pagoOtrasWrap{margin-top:10px}
   </style>
 </head>
 <body>
@@ -5399,15 +5425,26 @@
           <b id="pagoTotalTxt">$0</b>
         </button>
       </div>
+      <button type="button" class="pago-opt-desc" id="pagoOptDesc">🏷️ Pagó el saldo con descuento o redondeo</button>
       <p class="cfg-hint pago-rest" id="pagoRestante"></p>
-      <details class="pago-mas pago-desc" id="pagoDescWrap">
-        <summary>¿Le diste un descuento o pagó varias facturas juntas?</summary>
-        <div class="pago-otras" id="pagoOtras"></div>
+      <div class="pago-descbox" id="pagoDescWrap" style="display:none">
+        <p class="pago-paso">¿Con descuento o redondeo? <small>(pago anticipado, por ejemplo)</small></p>
+        <div class="pago-desc-btns" id="pagoDescBtns">
+          <button type="button" data-pct="0">Sin descuento</button>
+          <button type="button" data-pct="3">3 %</button>
+          <button type="button" data-pct="5">5 %</button>
+          <button type="button" data-pct="10">10 %</button>
+          <label class="pago-pct-otro"><span>Otro %</span><input id="pagoPct" type="text" inputmode="decimal" autocomplete="off" placeholder="2,5" aria-label="Otro porcentaje de descuento"></label>
+        </div>
+        <div class="pago-red" id="pagoRedBtns"></div>
         <label class="pago-monto-opt" id="pagoRecOpt"><span class="pmo-t" id="pagoRecLbl">Valor que recibiste</span>
-          <input id="pagoRecibido" type="text" inputmode="numeric" autocomplete="off" placeholder="$ 0" enterkeyhint="done"></label>
-        <div class="pago-desc-btns" id="pagoDescBtns"><button type="button" data-pct="3">3%</button><button type="button" data-pct="5">5%</button><button type="button" data-pct="10">10%</button><button type="button" data-red="1">Redondear</button><button type="button" data-quitar="1">Sin descuento</button></div>
-        <p class="cfg-hint" id="pagoDescInfo"></p>
-      </details>
+          <input id="pagoRecibido" type="text" inputmode="numeric" autocomplete="off" placeholder="Escríbelo si recibiste otro valor" enterkeyhint="done"></label>
+        <div class="pago-resumen" id="pagoDescInfo" aria-live="polite"></div>
+        <details class="pago-mas" id="pagoOtrasWrap">
+          <summary>¿Pagó varias facturas juntas?</summary>
+          <div class="pago-otras" id="pagoOtras"></div>
+        </details>
+      </div>
 
       <p class="pago-paso">¿Cómo pagó?</p>
       <div class="pago-opts">
@@ -9981,6 +10018,9 @@
       var esTotal = !!d.esTotal || d.saldoRestante<=0;
       var total = toNum(d.montoTotal), saldo = esTotal ? 0 : toNum(d.saldoRestante);
       var abonadoAcum = Math.max(0, total - saldo);
+      // Si en ESTE pago se dio descuento (pronto pago / redondeo), el recibo solo lo indica con una etiqueta: NO muestra montos ni porcentaje
+      // (eso se habla con el cliente; en la imagen no queremos que se vea cuánto se rebajó).
+      var conDesc = Math.max(0, Math.round(toNum(d.descuento))) > 0;
       var hist = (d.historial||[]).slice(0,3);
       var histRestantes = (d.historial||[]).length - hist.length;
 
@@ -10025,6 +10065,7 @@
         .rc-estado.abono{ background:#FBEBDD; color:#9A5A2E; border:1px solid #E0B88E; }
         .rc-monto-lbl{ font-family:'Jost',sans-serif; font-weight:600; font-size:14px; letter-spacing:.28em; text-transform:uppercase; color:#8A7A6C; }
         .rc-monto-val{ font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:54px; color:#2C211E; margin-top:10px; line-height:1; overflow-wrap:break-word; }
+        .rc-desc{ display:inline-flex; align-items:center; gap:8px; margin-top:14px; font-size:13px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; color:#8A5A1E; background:#FDF2E3; border:1px solid #E0B486; border-radius:20px; padding:6px 16px; }
         .rc-hist{ background:#FBF8F4; border:1px solid #E4D8C8; border-radius:14px; padding:8px 20px; margin-bottom:14px; }
         .rc-hist-t{ display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#B86B53; margin-bottom:6px; }
         .rc-hist-row{ display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:#5A4A3E; padding:2px 0; }
@@ -10061,6 +10102,7 @@
       +     '<div class="rc-estado '+(esTotal?'ok':'abono')+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'+(esTotal?'Remisión pagada':'Abono recibido')+'</div>'
       +     '<div class="rc-monto-lbl">Monto recibido</div>'
       +     '<div class="rc-monto-val">'+formatCOP(d.monto)+'</div>'
+      +     (conDesc ? '<div class="rc-desc"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>Con descuento aplicado</div>' : '')
       +   '</div>'
       +   histHtml
       +   '<div class="rc-breakdown no-break">'
@@ -10144,6 +10186,7 @@
           saldoRestante: (actual.saldoDespues!=null) ? actual.saldoDespues : r.saldo,
           esTotal: (actual.saldoDespues!=null ? actual.saldoDespues<=0 : r.saldo<=0),
           operador: actual.operador || '',
+          descuento: Math.round(Number(actual.descuento)||0),
           historial: historial
         });
       }).withFailureHandler(function(){
@@ -11867,13 +11910,13 @@
 
     /* ——— Registro de pago ——— */
     /* ——— Abonos y pagos ——— */
-    var PAGO = { tipo:'', saldo:0, metodo:'', recibido:0, extras:[] };
+    var PAGO = { tipo:'', saldo:0, metodo:'', recibido:0, extras:[], pct:null };
 
     function abrirPago(id){
       var c = carteraBuscar(id); if(!c) return;
       CARTERA.pagando = id;
-      PAGO.saldo = c.saldoPendiente; PAGO.tipo = ''; PAGO.metodo = ''; PAGO.recibido = 0; PAGO.extras = [];
-      $('pagoRecibido').value = ''; $('pagoDescWrap').open = false; pagoOtrasPintar(c);
+      PAGO.saldo = c.saldoPendiente; PAGO.tipo = ''; PAGO.metodo = ''; PAGO.recibido = 0; PAGO.extras = []; PAGO.pct = null;
+      $('pagoRecibido').value = ''; $('pagoPct').value = ''; $('pagoOtrasWrap').open = false; pagoOtrasPintar(c);
       $('pagoDetalle').innerHTML = '<b>' + safe(c.cliente||'') + '</b> · Remisión #' + safe(c.idRemision)
         + '<br>Saldo pendiente: <b>' + cop(c.saldoPendiente) + '</b>'
         + (c.abonado > 0 ? (' · <span class="car-abonado">ya abonó ' + cop(c.abonado) + '</span>') : '');
@@ -11901,6 +11944,7 @@
         var t2 = String(x.telefono||'').replace(/\D/g,'').slice(-10);
         return (tel && t2===tel) || (!tel && nom && String(x.cliente||'').trim().toUpperCase()===nom);
       });
+      $('pagoOtrasWrap').style.display = otras.length ? '' : 'none';
       $('pagoOtras').innerHTML = otras.map(function(x){
         return '<label class="pago-otra"><input type="checkbox" data-otra="'+safe(x.idRemision)+'"><span>Cobrar también <b>#'+safe(x.idRemision)+'</b></span><b>'+cop(x.saldoPendiente)+'</b></label>';
       }).join('');
@@ -11916,12 +11960,29 @@
       var liquida = total || (m>0 && r===0) || PAGO.extras.length>0;
       $('pagoProxWrap').style.display = liquida ? 'none' : '';
       $('pagoDescWrap').style.display = liquida ? '' : 'none';
-      if(!liquida){ PAGO.recibido = 0; PAGO.extras = []; }
+      if(!liquida){ PAGO.recibido = 0; PAGO.extras = []; PAGO.pct = null; }
       var suma = pagoSuma(), hayDesc = liquida && PAGO.recibido>0 && PAGO.recibido<suma, malRec = liquida && PAGO.recibido>suma;
       $('pagoRecLbl').textContent = PAGO.extras.length ? 'Valor total que recibiste (' + (PAGO.extras.length+1) + ' facturas)' : 'Valor que recibiste';
-      $('pagoDescInfo').innerHTML = !liquida ? '' : (malRec ? '<span style="color:var(--rojo)">Lo recibido supera la deuda ('+cop(suma)+').</span>'
-        : (hayDesc ? 'Deuda <b>'+cop(suma)+'</b> · recibes <b>'+cop(PAGO.recibido)+'</b> · descuento <b>'+cop(suma-PAGO.recibido)+'</b> ('+(100*(suma-PAGO.recibido)/suma).toFixed(1).replace('.',',')+'%). Se guarda como menor venta y baja tu ganancia.'
-          : 'Deuda total: <b>'+cop(suma)+'</b>. Escribe lo que recibiste o toca un porcentaje.'));
+      $('pagoOptDesc').style.display = liquida ? 'none' : '';
+      // porcentajes: el botón activo es el elegido; «Sin descuento» cuando no hay rebaja
+      Array.prototype.forEach.call($('pagoDescBtns').querySelectorAll('[data-pct]'), function(b){
+        var v = parseFloat(b.getAttribute('data-pct')); b.classList.toggle('on', v===0 ? !hayDesc : (hayDesc && PAGO.pct===v));
+      });
+      // redondeos: lo que quedaría recibiendo (hacia abajo a mil y a diez mil)
+      var reds = [], r1 = Math.floor(suma/1000)*1000, r10 = Math.floor(suma/10000)*10000;
+      [r1, r10].forEach(function(v){ if(v>0 && v<suma && reds.indexOf(v)<0) reds.push(v); });
+      $('pagoRedBtns').innerHTML = reds.length ? ('<span class="pago-red-lbl">Redondear a:</span>' + reds.map(function(v){ return '<button type="button" data-rec="'+v+'" class="'+(PAGO.recibido===v?'on':'')+'">'+cop(v)+'</button>'; }).join('')) : '';
+      var resumen = '';
+      if(!liquida) resumen = '';
+      else if(malRec) resumen = '<span class="pago-err">Lo recibido supera la deuda (' + cop(suma) + ').</span>';
+      else if(hayDesc){
+        var dsc = suma - PAGO.recibido, pctReal = (100*dsc/suma).toFixed(1).replace('.',',');
+        resumen = '<div class="pr-fila"><span>Deuda' + (PAGO.extras.length ? ' (' + (PAGO.extras.length+1) + ' facturas)' : '') + '</span><b>' + cop(suma) + '</b></div>'
+                + '<div class="pr-fila pr-desc"><span>Descuento (' + pctReal + '%)</span><b>− ' + cop(dsc) + '</b></div>'
+                + '<div class="pr-fila pr-total"><span>Recibes</span><b>' + cop(PAGO.recibido) + '</b></div>'
+                + '<p class="pr-nota">Se guarda en el recibo, en la remisión y en Cartera como una rebaja de la venta (baja tu ganancia en ' + cop(dsc) + ').</p>';
+      } else resumen = '<div class="pr-fila pr-total"><span>Pago completo, sin descuento</span><b>' + cop(suma) + '</b></div><p class="pr-nota">Si recibiste menos, toca un % o un redondeo, o escribe el valor.</p>';
+      $('pagoDescInfo').innerHTML = resumen;
       var rest = $('pagoRestante');
       rest.classList.toggle('err', m > PAGO.saldo);
       rest.textContent = !m ? '' : (m > PAGO.saldo ? 'El valor supera el saldo pendiente.'
@@ -11939,21 +12000,26 @@
     $('pagoMonto').addEventListener('focus', function(){ if(PAGO.tipo!=='abono'){ PAGO.tipo='abono'; pagoPintar(); } });
     $('pagoMonto').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); this.blur(); } });
     $('pagoOptTotal').addEventListener('click', function(){ PAGO.tipo='total'; $('pagoMonto').value=''; haptic(8); pagoPintar(); });
-    $('pagoRecibido').addEventListener('input', function(e){ var n = pagoRecibidoNum(); e.target.value = n ? formatMiles(n) : ''; PAGO.recibido = n; pagoPintar(); });
+    $('pagoRecibido').addEventListener('input', function(e){ var n = pagoRecibidoNum(); e.target.value = n ? formatMiles(n) : ''; PAGO.recibido = n; PAGO.pct = null; $('pagoPct').value = ''; pagoPintar(); });
     $('pagoRecibido').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); this.blur(); } });
-    function pagoPonerRecibido(n){ PAGO.recibido = Math.max(0, Math.round(n)); $('pagoRecibido').value = PAGO.recibido ? formatMiles(PAGO.recibido) : ''; haptic(8); pagoPintar(); }
+    function pagoPonerRecibido(n, pct){ PAGO.recibido = Math.max(0, Math.round(n)); PAGO.pct = (pct==null ? null : pct); $('pagoRecibido').value = PAGO.recibido ? formatMiles(PAGO.recibido) : ''; if(pct==null || [3,5,10].indexOf(pct)>=0) $('pagoPct').value = ''; haptic(8); pagoPintar(); }
     $('pagoDescBtns').addEventListener('click', function(e){
       var b = e.target.closest && e.target.closest('button'); if(!b) return;
-      var suma = pagoSuma();
-      if(b.getAttribute('data-pct')) pagoPonerRecibido(suma*(1-parseFloat(b.getAttribute('data-pct'))/100));
-      else if(b.getAttribute('data-red')){ var base = PAGO.recibido>0 ? PAGO.recibido : suma; pagoPonerRecibido(Math.floor(base/10000)*10000 || base); }   // redondeo hacia abajo a la decena de mil
-      else pagoPonerRecibido(0);
+      var v = parseFloat(b.getAttribute('data-pct')); if(isNaN(v)) return;
+      if(v===0) pagoPonerRecibido(0, null); else pagoPonerRecibido(pagoSuma()*(1-v/100), v);
     });
+    $('pagoPct').addEventListener('input', function(){
+      var v = parseFloat(String(this.value).replace(',','.'));
+      if(v>0 && v<100) pagoPonerRecibido(pagoSuma()*(1-v/100), v); else if(!this.value) pagoPonerRecibido(0, null);
+    });
+    $('pagoRedBtns').addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('button'); if(!b || !b.getAttribute('data-rec')) return; pagoPonerRecibido(parseInt(b.getAttribute('data-rec'),10), null); });
+    // Botón destacado: «Pagó el saldo con descuento o redondeo» → elige saldo completo y deja el bloque de descuento a la vista
+    $('pagoOptDesc').addEventListener('click', function(){ PAGO.tipo='total'; $('pagoMonto').value=''; haptic(8); pagoPintar(); try{ $('pagoDescWrap').scrollIntoView({ block:'center', behavior:'smooth' }); }catch(e){} });
     $('pagoOtras').addEventListener('change', function(e){
       var ch = e.target; if(!ch.getAttribute || !ch.getAttribute('data-otra')) return;
       var id = ch.getAttribute('data-otra'), i = PAGO.extras.indexOf(id);
       if(ch.checked && i<0) PAGO.extras.push(id); else if(!ch.checked && i>=0) PAGO.extras.splice(i,1);
-      if(PAGO.extras.length){ PAGO.tipo = 'total'; $('pagoMonto').value = ''; PAGO.recibido = 0; $('pagoRecibido').value = ''; }
+      if(PAGO.extras.length){ PAGO.tipo = 'total'; $('pagoMonto').value = ''; PAGO.recibido = 0; PAGO.pct = null; $('pagoRecibido').value = ''; $('pagoPct').value = ''; }
       haptic(8); pagoPintar();
     });
 
@@ -14390,6 +14456,7 @@
       h+='<p class="fin-sec">En qué se va lo que sale este mes</p><div class="bi-card">'+finBarras(FIN_EGR.map(function(x){ return [x[1], M.egr[x[0]]]; }))+'</div>';
       h+='<p class="fin-sec">Resultado del mes</p><div class="bi-card"><table class="fin-tabla">'
         +'<tr><td>Margen de los productos vendidos</td><td>'+biSig(M.margen)+'</td></tr>'
+        +(M.descCobro>0?'<tr><td>↳ incluye descuentos por pronto pago o redondeo al cobrar ('+M.nDescCobro+(M.nDescCobro===1?' remisión':' remisiones')+')</td><td class="neg">'+biSig(-M.descCobro)+'</td></tr>':'')
         +'<tr><td>Fletes cobrados menos lo que cuesta enviar</td><td class="'+(M.fleteNeto<0?'neg':'')+'">'+biSig(M.fleteNeto)+'</td></tr>'
         +'<tr><td>Ahorro por descuentos de proveedores</td><td class="pos">'+biSig(M.ahorro)+'</td></tr>'
         +'<tr><td>Operación (útiles, empaques…)</td><td>'+biSig(-M.egr.operacion)+'</td></tr>'
