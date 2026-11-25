@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-24-33';
+    const APP_VERSION = '2026-11-24-34';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -244,6 +244,7 @@
       var __ledFade = null, __ledPrev = 'sync', __ledArranque = true;
       function pendientesOffline() { try { return (JSON.parse(localStorage.getItem('kaem_pending_orders') || '[]') || []).length; } catch (e) { return 0; } }
       window.kaemLed = function (estado, titulo) {
+        try { if (estado === 'sync') document.documentElement.setAttribute('data-sync', '1'); else document.documentElement.removeAttribute('data-sync'); } catch (eSy) {}   // línea fina arriba mientras el servidor trabaja
         var l = document.getElementById('statusLed'), et = document.getElementById('statusTxt');
         var txt = titulo || ({ ok: 'Conectado · todo al día', sync: 'Sincronizando…', off: 'Sin conexión · mostrando lo guardado' }[estado] || '');
         window.__kaemLedInfo = { estado: estado, titulo: txt };
@@ -276,6 +277,39 @@
         }
         __ledPrev = estado;
       };
+      // ——— Pantalla de «un momento» con su mensaje, para cada proceso que guarda ———
+      // Aparece solo si la espera pasa de ~medio segundo (lo rápido no parpadea) y se quita al terminar. Los guardados de pedido y producto la
+      // manejan ellos mismos (inmediata), y el ajuste por faltantes tiene su propia barra de progreso.
+      var K_MSG = {
+        deleteProduct: 'Eliminando el producto', registrarDevolucion: 'Registrando la devolución', saveProductVariants: 'Guardando los tonos', agregarTono: 'Agregando el tono', addBrand: 'Agregando la marca',
+        deleteOrder: 'Anulando el pedido', finalizarPacking: 'Cerrando el empaque', actualizarFechaEntrega: 'Guardando la fecha de entrega', confirmarEntrega: 'Confirmando la entrega',
+        guardarAjustes: 'Guardando los ajustes', registrarAbono: 'Registrando el abono', editarAbono: 'Corrigiendo el pago', marcarCreditoPagado: 'Registrando el pago', pagarVariasConDescuento: 'Registrando el pago',
+        actualizarCliente: 'Actualizando al cliente', unirClientes: 'Uniendo los clientes', asignarNivelFaltante: 'Asignando el nivel', procesarColaSync: 'Sincronizando con Shopify', crearEnShopify: 'Creando en Shopify',
+        sincronizarPreciosShopify: 'Sincronizando los precios', sincronizarDatosShopify: 'Sincronizando con Shopify', shopifyActualizarNombre: 'Actualizando en Shopify', resincronizarCatalogoShopify: 'Sincronizando con Shopify',
+        guardarObligacion: 'Guardando el pago', registrarPagoObligacion: 'Registrando el pago', deshacerUltimoPagoObligacion: 'Deshaciendo el pago', cambiarEstadoObligacion: 'Actualizando el pago',
+        guardarGasto: 'Guardando el gasto', anularGasto: 'Anulando el gasto', subirFactura: 'Subiendo la factura', guardarCupo: 'Guardando el cupo', asignarCuposIniciales: 'Asignando los cupos',
+        resolverPedidoCatalogo: 'Resolviendo el pedido del catálogo', corregirInventario: 'Corrigiendo el inventario', cambiarSku: 'Cambiando el código del producto', respaldarAhora: 'Haciendo el respaldo',
+        configurarCatalogo: 'Guardando el catálogo', actualizarFotosCatalogo: 'Actualizando las fotos', cerrarOtrasSesiones: 'Cerrando las otras sesiones', unificarNombresLineas: 'Ordenando los nombres', organizarBase: 'Ordenando la base'
+      };
+      var __escPend = 0, __escTimer = null, __escSeguro = null, __escAccion = '', __escMostrado = false;
+      function kEscCerrar() {
+        clearTimeout(__escTimer); __escTimer = null; clearTimeout(__escSeguro); __escSeguro = null;
+        if (__escMostrado) { __escMostrado = false; try { if (window.overlayCargando) window.overlayCargando(false); } catch (e) {} }
+      }
+      function kEscInicio(action) {
+        if (!K_MSG[action]) return;
+        __escPend++; __escAccion = action;
+        if (!__escTimer && !__escMostrado) __escTimer = setTimeout(function () {
+          __escTimer = null;
+          if (__escPend > 0 && window.overlayCargando) { __escMostrado = true; window.overlayCargando(true, K_MSG[__escAccion]); }
+        }, 450);
+        clearTimeout(__escSeguro); __escSeguro = setTimeout(function () { __escPend = 0; kEscCerrar(); }, 60000);   // seguro: jamás se queda pegada
+      }
+      function kEscFin(action) {
+        if (!K_MSG[action]) return;
+        __escPend = Math.max(0, __escPend - 1);
+        if (__escPend === 0) kEscCerrar();
+      }
       function ledInicio(etiqueta) {
         __ledPend++;
         if (__ledTimer) { clearTimeout(__ledTimer); __ledTimer = null; }
@@ -623,9 +657,10 @@
           return;
         }
         var deFondo = esLectura && !!window.__kaemTareaFondo;
-        var ledIni = function (t) { if (!deFondo) ledInicio(t); };
+        var ledIni = function (t) { if (!deFondo) ledInicio(t); if (!esLectura) kEscInicio(action); };
         // De fondo: el éxito puede poner verde; la falla solo dispara la comprobación (nunca rojo directo)
         var ledFinal = function (okk) {
+          if (!esLectura) kEscFin(action);
           if (!deFondo) { ledFin(okk); return; }
           if (okk) { if (__ledPend === 0 && navigator.onLine !== false && !__salud.caido) window.kaemLed('ok'); }
           else comprobarSalud();
@@ -669,7 +704,7 @@
                   console.error('Respuesta no válida del servidor (' + action + '):', limpio.slice(0, 500));
                 } catch (e3) {}
                 if (/authoriz|autoriza/i.test(String(txt).slice(0, 4000))) {
-                  clearTimeout(avisoLento); __ledArranque = false; if (!deFondo) __ledPend = Math.max(0, __ledPend - 1);
+                  clearTimeout(avisoLento); __ledArranque = false; if (!deFondo) __ledPend = Math.max(0, __ledPend - 1); if (!esLectura) kEscFin(action);
                   window.kaemLed('off', 'Falta autorizar permisos en Apps Script');
                   if (typeof toast === 'function') toast('El servidor necesita un permiso nuevo: en Apps Script ejecuta ACTIVAR_MANTENIMIENTO una vez y acepta los permisos.', 'error');
                   if (onFailure) onFailure(new Error('Autorización pendiente en Apps Script'));
@@ -3906,6 +3941,49 @@
     .pack-aj-aviso.err{background:var(--st-late-bg);border-color:var(--st-late-border);color:var(--st-late-text)}
     .hd-ajuste{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--st-soon-bg);border:1px solid var(--st-soon-border);color:var(--st-soon-text);font-size:12.5px;line-height:1.45}
     .hd-ajuste b{display:block;margin-bottom:2px}
+
+    /* ——— Carga con personalidad de marca (PRO) ———
+       · Pantalla de «un momento»: tarjeta de cristal CLARO en modo claro y ESPRESSO con oro en modo oscuro. El logo recibe un brillo dorado que lo cruza,
+         con un halo que respira detrás, una línea con resplandor que se desliza y el mensaje de lo que se está haciendo.
+       · Línea terracota de 2 px arriba mientras el servidor trabaja (solo si tarda más de medio segundo: no parpadea).
+       · Esqueletos con brillo suave en las listas. Todo se detiene si el celular pide «reducir movimiento». */
+    .overlay{z-index:120;background:rgba(44,33,30,.22);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+    .k-load{--k-aura:rgba(201,152,95,.34);position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;padding:20px 30px 17px;border-radius:22px;border:1px solid transparent;
+      background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(249,244,237,.9));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 24px 54px rgba(44,33,30,.24),0 2px 8px rgba(44,33,30,.08);animation:kLoadIn .3s ease both}
+    .k-load::before{content:'';position:absolute;inset:-1px;border-radius:23px;padding:1px;background:linear-gradient(140deg,rgba(201,152,95,.95),rgba(184,107,83,.18) 42%,rgba(201,152,95,.75));
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+    .k-aura{position:absolute;top:6px;left:50%;width:190px;height:70px;transform:translateX(-50%);background:radial-gradient(closest-side,var(--k-aura),transparent);animation:kAura 2.8s ease-in-out infinite;pointer-events:none}
+    .k-mark{position:relative;z-index:1;width:116px;height:26px;background:linear-gradient(105deg,#2C211E 36%,#C9985F 50%,#2C211E 64%);background-size:280% 100%;
+      -webkit-mask:var(--k-logo) center/contain no-repeat;mask:var(--k-logo) center/contain no-repeat;animation:kBrillo 2.3s linear infinite}
+    .k-mark.texto{width:auto;height:auto;font-family:'Fraunces',Georgia,serif;font-size:24px;letter-spacing:.06em;background-clip:text;-webkit-background-clip:text;color:transparent;-webkit-mask:none;mask:none}
+    .k-load-bar{position:relative;z-index:1;width:92px;height:2px;border-radius:99px;background:rgba(184,107,83,.16);overflow:hidden}
+    .k-load-bar i{position:absolute;top:0;bottom:0;left:-40%;width:40%;border-radius:99px;background:linear-gradient(90deg,transparent,var(--terracota),transparent);box-shadow:0 0 10px rgba(184,107,83,.55);animation:kDesliza 1.5s ease-in-out infinite}
+    .k-load-txt{position:relative;z-index:1;margin:0;font-family:'Jost',sans-serif;font-size:10.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:#8A7A6C;display:flex;align-items:baseline}
+    .k-dots{display:inline-flex;gap:3px;margin-left:5px}
+    .k-dots i{width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.25;animation:kPunto 1.2s ease-in-out infinite}
+    .k-dots i:nth-child(2){animation-delay:.18s}.k-dots i:nth-child(3){animation-delay:.36s}
+    /* modo oscuro: espresso con oro */
+    :root.theme-dark .k-load{--k-aura:rgba(201,152,95,.32);border-color:rgba(201,152,95,.55);background:linear-gradient(165deg,#3A2B26,#2A1F1B);
+      box-shadow:inset 0 1px 0 rgba(255,236,210,.14),0 26px 56px rgba(20,12,9,.45),0 2px 8px rgba(20,12,9,.25)}
+    :root.theme-dark .k-load::before{display:none}
+    :root.theme-dark .k-mark{background:linear-gradient(105deg,#E9DCCB 36%,#FFF3DC 50%,#E9DCCB 64%);background-size:280% 100%;filter:drop-shadow(0 0 8px rgba(201,152,95,.35))}
+    :root.theme-dark .k-load-txt{color:#CDBBA6}
+    :root.theme-dark .k-load-bar{background:rgba(201,152,95,.2)}
+    :root.theme-dark .k-load-bar i{background:linear-gradient(90deg,transparent,#E0B07A,transparent);box-shadow:0 0 10px rgba(224,176,122,.7)}
+    :root.theme-dark .k-dots i{background:#E0B07A}
+    @keyframes kLoadIn{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+    @keyframes kBrillo{from{background-position:130% 0}to{background-position:-70% 0}}
+    @keyframes kAura{0%,100%{opacity:.55;transform:translateX(-50%) scale(.92)}50%{opacity:1;transform:translateX(-50%) scale(1.06)}}
+    @keyframes kDesliza{to{left:100%}}
+    @keyframes kPunto{0%,100%{opacity:.25}40%{opacity:1}}
+    #kTopLine{position:fixed;top:0;left:0;right:0;height:2px;z-index:99999;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .35s ease}
+    html[data-sync] #kTopLine{opacity:1;transition-delay:.5s}
+    #kTopLine::before{content:'';position:absolute;top:0;bottom:0;left:-35%;width:35%;background:linear-gradient(90deg,transparent,var(--terracota),transparent);animation:kDesliza 1.6s ease-in-out infinite}
+    @media (prefers-reduced-motion:reduce){
+      .k-load,.k-aura,.k-mark,.k-load-bar i,.k-dots i,#kTopLine::before{animation:none}
+      .k-load-bar i{left:30%}.k-dots i{opacity:.7}.k-mark{background-position:50% 0}
+    }
   </style>
 </head>
 <body>
@@ -4615,7 +4693,8 @@
   <input class="hidden" id="fileCapture" type="file" accept="image/*" capture="environment">
   <div class="hidden" id="readerTmp"></div>
   <div class="flash-screen" id="flashScreen"></div>
-  <div class="overlay" id="overlay"><span class="spin" style="display:inline-block;width:34px;height:34px;border-width:3px;border-top-color:var(--crema);border-color:rgba(243,236,227,.35)"></span></div>
+  <div id="kTopLine" aria-hidden="true"></div>
+  <div class="overlay" id="overlay" role="status" aria-live="polite" aria-label="Cargando"><div class="k-load"><div class="k-aura" aria-hidden="true"></div><div class="k-mark" id="kLoadMark" role="img" aria-label="KAÉM"></div><div class="k-load-bar" aria-hidden="true"><i></i></div><p class="k-load-txt"><span id="overlayMsg">Un momento</span><span class="k-dots" aria-hidden="true"><i></i><i></i><i></i></span></p></div></div>
 
   <!-- Modal escáner -->
   <div class="modal" id="scannerModal">
@@ -7041,7 +7120,7 @@
     }
     function cargarAuditoria(){
       $('auditList').innerHTML='';
-      $('auditEmpty').textContent='Consultando…'; $('auditEmpty').style.display='block';
+      $('auditEmpty').innerHTML=skelFilas(3); $('auditEmpty').style.display='block';
       google.script.run.withSuccessHandler(function(r){
         if(r && r.ok){ AUDIT.lista=r.movimientos||[]; pintarAuditoria(); }
         else { $('auditEmpty').textContent=(r&&r.message)||'No se pudo leer la bitácora.'; }
@@ -9213,7 +9292,24 @@
       }
       return null;
     }
-    function setOrderLoading(on){ var b=$('orderSaveBtn'); b.classList.toggle('loading',on); b.disabled=on; $('orderSaveLabel').textContent=on?'Guardando…':saveLabelText(); $('overlay').classList.toggle('show',on); }
+    /** Pantalla de «un momento»: tarjeta de marca (el logo con un brillo dorado que lo cruza). msg = qué se está haciendo. */
+    function overlayCargando(on, msg){
+      var o = $('overlay'); if(!o) return;
+      if(on){
+        var rs = document.documentElement.style;
+        if(!rs.getPropertyValue('--k-logo')){
+          var fuente = document.querySelector('.brand-logo'), src = fuente && fuente.getAttribute('src');
+          if(src) rs.setProperty('--k-logo', 'url("' + src + '")');
+          else { var mk = $('kLoadMark'); if(mk){ mk.classList.add('texto'); mk.textContent = 'KAÉM'; } }   // sin logo: la palabra, para que nunca quede vacío
+        }
+        var m = $('overlayMsg'); if(m) m.textContent = msg || 'Un momento';
+      }
+      o.classList.toggle('show', !!on);
+    }
+    window.overlayCargando = overlayCargando;   // la usa el puente con el servidor (cabecera) para mostrar el mensaje de cada proceso
+    /** Esqueleto de carga (en vez de un texto «Consultando…»): se ve la forma de lo que viene. */
+    function skelFilas(n){ var h = '<div class="skel-list" aria-busy="true" aria-label="Cargando">'; for(var i = 0; i < (n || 3); i++) h += '<div class="skel-card fila"></div>'; return h + '</div>'; }
+    function setOrderLoading(on){ var b=$('orderSaveBtn'); b.classList.toggle('loading',on); b.disabled=on; $('orderSaveLabel').textContent=on?'Guardando…':saveLabelText(); overlayCargando(on, 'Guardando tu pedido'); }
 
     function submitOrder(){
       var p=currentOrderPayload(); var err=validateOrder(p);
@@ -11780,7 +11876,7 @@
     function carteraCargar(silencioso){
       if(CARTERA.cargando) return;
       CARTERA.cargando = true;
-      if(!silencioso){ $('carEmpty').textContent = 'Consultando cartera…'; $('carEmpty').style.display='block'; }
+      if(!silencioso){ $('carEmpty').innerHTML = skelFilas(3); $('carEmpty').style.display='block'; }
       google.script.run.withSuccessHandler(function(res){
         CARTERA.cargando = false;
         if(res && (res.ok || res.success)){
@@ -11889,7 +11985,7 @@
     function cargarSinEmpacar(force){
       var cont=$('carSinEmpacar');
       if(!force && SINEMPACAR.datos && (Date.now()-SINEMPACAR.ts)<60000){ pintarSinEmpacar(); return; }
-      cont.innerHTML='<p class="cart-empty">Consultando pedidos sin empacar…</p>';
+      cont.innerHTML=skelFilas(3);
       google.script.run.withSuccessHandler(function(r){
         if(r && r.ok){ SINEMPACAR.datos=r.orders||[]; SINEMPACAR.ts=Date.now(); pintarSinEmpacar(); }
         else cont.innerHTML='<p class="cart-empty">'+safe((r&&r.message)||'No se pudo cargar.')+'</p>';
@@ -12217,7 +12313,7 @@
     function pgCargar(silencioso){
       if(PG.cargando) return;
       PG.cargando=true;
-      if(!silencioso && !PG.lista.length){ $('pgEmpty').textContent='Consultando pagos…'; $('pgEmpty').style.display='block'; }
+      if(!silencioso && !PG.lista.length){ $('pgEmpty').innerHTML=skelFilas(3); $('pgEmpty').style.display='block'; }
       google.script.run.withSuccessHandler(function(r){
         PG.cargando=false;
         if(r && r.ok){
@@ -13008,7 +13104,7 @@
 
     /* ——— Lista ——— */
     function entCargar(){
-      $('packHistList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('packHistEmpty').style.display='none'; $('packHistMas').style.display='none'; $('packHistTodos').style.display='none';
+      $('packHistList').innerHTML=skelFilas(3); $('packHistEmpty').style.display='none'; $('packHistMas').style.display='none'; $('packHistTodos').style.display='none';
       google.script.run.withSuccessHandler(function(r){
         ENT.todos = ((r && r.orders) || []).filter(function(o){ return String(o.estado||'').toUpperCase()==='EMPACADO'; });
         ENT.cargado = true;
@@ -13266,7 +13362,7 @@
     }
     /** Pide los pagos al servidor (todos, o los de una remisión) y los pinta. Mantiene el filtro y la búsqueda actuales. */
     function recCargar(){
-      $('recibosList').innerHTML='<p class="cart-empty">Consultando…</p>'; $('recibosEmpty').style.display='none'; $('recibosMas').style.display='none';
+      $('recibosList').innerHTML=skelFilas(3); $('recibosEmpty').style.display='none'; $('recibosMas').style.display='none';
       if(RECIBOS_REM){
         var id=RECIBOS_REM;
         google.script.run.withSuccessHandler(function(r){
@@ -13585,7 +13681,7 @@
     $('packResetBtn').addEventListener('click', packReiniciar);
 
     /* ——————— UI helpers ——————— */
-    function setLoading(on){ var b=$('saveBtn'); b.classList.toggle('loading',on); b.disabled=on; $('saveLabel').textContent=on?'Guardando…':'Guardar producto'; $('overlay').classList.toggle('show',on); }
+    function setLoading(on){ var b=$('saveBtn'); b.classList.toggle('loading',on); b.disabled=on; $('saveLabel').textContent=on?'Guardando…':'Guardar producto'; overlayCargando(on, 'Guardando el producto'); }
     function markErr(field){ var el=$('f-'+field); if(!el) return; el.classList.add('field-error'); var dt=el.closest('details'); if(dt) dt.open=true; var i=el.querySelector('input,select'); if(i) i.focus(); }
     function clearErr(field){ var el=$('f-'+field); if(el) el.classList.remove('field-error'); }
     /* ——— Avisos (toast) ———
