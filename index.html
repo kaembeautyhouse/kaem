@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-24-32';
+    const APP_VERSION = '2026-11-24-33';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -3882,6 +3882,30 @@
     .pr-nota{margin:6px 0 0;font-size:12.5px;color:var(--texto-suave)}
     .pago-err{color:var(--rojo,#B3261E);font-weight:600}
     #pagoOtrasWrap{margin-top:10px}
+
+    /* ——— Ajuste automático del pedido por faltantes (al empacar) ——— */
+    .pack-aj-total{margin:0 0 12px;padding:9px 12px;border-radius:12px;background:var(--crema-2);border:1px solid var(--linea);font-size:13.5px;color:var(--espresso)}
+    .pack-aj-total:empty{display:none}
+    .pack-aj-opt{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;width:100%;min-height:56px;margin:0 0 10px;padding:12px 16px;border:1.5px solid var(--piedra);border-radius:16px;background:var(--blanco);color:var(--espresso);text-align:left;cursor:pointer;font-family:'Jost',sans-serif}
+    .pack-aj-opt b{font-size:16px}
+    .pack-aj-opt small{font-size:13px;color:var(--texto-suave)}
+    .pack-aj-opt:active{transform:scale(.99);background:var(--crema-2)}
+    .pack-aj-opt:disabled{opacity:.5}
+    .pack-aj-prog{padding:4px 2px 2px}
+    .pack-aj-prog-t{margin:0 0 10px;font-size:15px;font-weight:700;color:var(--espresso)}
+    .pack-aj-bar{height:12px;border-radius:99px;background:var(--crema-2);border:1px solid var(--linea);overflow:hidden}
+    .pack-aj-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--terracota),var(--salvia-txt));transition:width .25s ease}
+    .pack-aj-pasos{list-style:none;margin:12px 0 0;padding:0;font-size:13.5px;color:var(--texto-suave)}
+    .pack-aj-pasos li{display:flex;align-items:center;gap:8px;padding:3px 0}
+    .pack-aj-pasos li::before{content:'○';font-size:15px;width:18px;text-align:center}
+    .pack-aj-pasos li.on{color:var(--espresso);font-weight:600}
+    .pack-aj-pasos li.on::before{content:'◔';color:var(--terracota)}
+    .pack-aj-pasos li.ok{color:var(--salvia-txt)}
+    .pack-aj-pasos li.ok::before{content:'✓';color:var(--salvia-txt);font-weight:700}
+    .pack-aj-aviso{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:var(--st-soon-bg);border:1px solid var(--st-soon-border);color:var(--st-soon-text);font-size:13.5px;line-height:1.4}
+    .pack-aj-aviso.err{background:var(--st-late-bg);border-color:var(--st-late-border);color:var(--st-late-text)}
+    .hd-ajuste{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--st-soon-bg);border:1px solid var(--st-soon-border);color:var(--st-soon-text);font-size:12.5px;line-height:1.45}
+    .hd-ajuste b{display:block;margin-bottom:2px}
   </style>
 </head>
 <body>
@@ -5870,6 +5894,31 @@
       <div class="modal-actions single">
         <button class="btn-ghost" id="packFaltCerrarBtn" type="button">Seguir alistando</button>
       </div>
+    </div>
+  </div>
+
+<div class="modal" id="packAjusteModal">
+    <div class="sheet">
+      <h3>¿Por qué se ajusta el pedido?</h3>
+      <p class="cfg-hint" style="margin:0 0 12px">Se ajusta solo, sin editar nada a mano: cantidades, total, cartera e inventario. Queda anotado el motivo.</p>
+      <div id="packAjusteLista" class="kv" style="margin-bottom:10px"></div>
+      <p class="pack-aj-total" id="packAjusteTotal"></p>
+      <div id="packAjusteOpts">
+        <button type="button" class="pack-aj-opt" data-motivo="SIN_STOCK"><b>📦 No hay unidades disponibles</b></button>
+        <button type="button" class="pack-aj-opt" data-motivo="REDUCCION"><b>✂️ Reducción de unidades</b></button>
+      </div>
+      <div id="packAjusteProg" class="pack-aj-prog" style="display:none" role="status" aria-live="polite">
+        <p class="pack-aj-prog-t" id="packAjusteProgT">Ajustando el pedido…</p>
+        <div class="pack-aj-bar"><i id="packAjusteBar"></i></div>
+        <ol class="pack-aj-pasos" id="packAjustePasos">
+          <li>Ajustando cantidades</li>
+          <li>Recalculando total y descuento</li>
+          <li>Actualizando cartera e inventario</li>
+          <li>Anotando el motivo</li>
+        </ol>
+      </div>
+      <p class="pack-aj-aviso" id="packAjusteAviso" style="display:none"></p>
+      <button class="btn-ghost" id="packAjusteVolver" type="button" style="width:100%;margin-top:10px">Volver</button>
     </div>
   </div>
 
@@ -9566,6 +9615,16 @@
         + (dif!==0 ? '<p class="hd-gan-nota">⚠ Algunos costos de este pedido son distintos a los de hoy en el catálogo: la diferencia suma '+cop(Math.abs(dif))+(dif>0?' de más':' de menos')+' en el costo. El pedido conserva el costo con que se vendió.</p>' : '')
         + '</details>';
     }
+    /** Ajustes por faltantes hechos al empacar (motivo, producto y de cuánto a cuánto), para verlos en el detalle del pedido. */
+    function ajusteEmpaqueHTML(o){
+      var raw=o && o.ajusteEmpaque; if(!raw) return '';
+      var arr; try{ arr = typeof raw==='string' ? JSON.parse(raw) : raw; }catch(e){ return ''; }
+      if(!arr || !arr.length) return '';
+      return '<div class="hd-ajuste"><b>Ajuste al empacar</b>'+arr.map(function(a){
+        var m = a.motivo==='SIN_STOCK' ? 'No había unidades disponibles' : 'Reducción de unidades';
+        return '<div>'+safe(m)+(a.ts?' · '+safe(String(a.ts).slice(0,10).split('-').reverse().join('/')):'')+(a.operador?' · '+safe(a.operador):'')+': '+(a.lineas||[]).map(function(l){ return safe(l.nombre)+' '+l.de+' → '+l.a; }).join(', ')+'</div>';
+      }).join('')+'</div>';
+    }
     function histRowHTML(o){
       var items=o.items||[];
       var det=items.map(function(it){ return '<div class="hd-item"><span>'+it.cantidad+'× '+safe(it.nombre||it.sku)+'</span><span>'+cop(it.subtotal!=null?it.subtotal:it.precio*it.cantidad)+'</span></div>'; }).join('');
@@ -9584,7 +9643,7 @@
         +  '<button data-hact="devol" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>Devolución</button>'
         +  '<button class="hact-danger" data-hact="del" data-ref="'+ref+'"><svg class="hist-ico" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Eliminar</button>'
         +'</div>'
-        +'<div class="hist-detail" style="display:none">'+det+(function(){ try{ return gananciaDetalleHTML(gananciaPedido(o)); }catch(e){ return ''; } })()+'</div>'
+        +'<div class="hist-detail" style="display:none">'+det+ajusteEmpaqueHTML(o)+(function(){ try{ return gananciaDetalleHTML(gananciaPedido(o)); }catch(e){ return ''; } })()+'</div>'
         +'</div>';
     }
     // Historial unificado: KAEM_BASE_APP es la fuente de verdad.
@@ -11605,18 +11664,87 @@
       $('packFaltantesModal').classList.remove('show');
       openEdit(btn.getAttribute('data-sku'), 'sumar');
     });
-    $('packFaltEditarBtn').addEventListener('click', function(){
-      $('packFaltantesModal').classList.remove('show');
-      if(!PACK.pedido) return;
-      cargarPedidoEnFormulario(PACK.pedido);
-      // Se limpia el estado de Packing y se fuerza un refresco la próxima vez que
-      // se entre a esa pestaña — si no, onEnterPacking() ve PACK.pendientes ya
-      // lleno y no vuelve a consultar el servidor, mostrando cantidades viejas.
-      packLimpiar(); PACK.pendientes = [];
-      switchTab('pedidos');
-      try{ window.scrollTo({ top:0, behavior:'smooth' }); }catch(e){ window.scrollTo(0,0); }
-      haptic(12); toast('Ajusta las cantidades disponibles y guarda para actualizar el pedido','info');
-    });
+    /* ——— Ajuste AUTOMÁTICO por faltantes ———
+       «Editar pedido (ajustar cantidades)» ya no abre el formulario para tocar números a mano: pregunta el MOTIVO (no hay unidades disponibles /
+       reducción de unidades) y el servidor ajusta solo cantidades, total, descuento, cartera e inventario, y anota el motivo. */
+    var AJ = { busy:false, timer:null };
+    function packAjusteLineas(){
+      return PACK.items.filter(function(it){ return it.cantidad_escaneada < it.cantidad_solicitada; }).map(function(it){
+        var p = packPartirNombre_(it); return { sku:it.sku, nombre:p.nombre + (p.tono ? ' · ' + p.tono : ''), de:it.cantidad_solicitada, a:it.cantidad_escaneada };
+      });
+    }
+    /** Cuánto quedaría el pedido (aproximado: el servidor hace el cálculo definitivo con el mismo descuento y flete). */
+    function packAjusteTotalAprox(){
+      var o = PACK.pedido || {}, cola = {}, sub = 0;
+      PACK.items.forEach(function(it){ var k = cleanSku(it.sku); (cola[k] = cola[k] || []).push(Math.min(it.cantidad_escaneada, it.cantidad_solicitada)); });
+      (o.items || []).forEach(function(it){ var l = cola[cleanSku(it.sku)], q = (l && l.length) ? l.shift() : Math.floor(Number(it.cantidad) || 0); sub += q * (Number(it.precio) || 0); });
+      var desc = Math.round(sub * (Number(o.descuentoPct) || 0) / 100);
+      return Math.max(0, sub - desc) + (Number(o.flete) || 0);
+    }
+    function packAjusteAbrir(){
+      if(!PACK.pedido || AJ.busy) return;
+      var lineas = packAjusteLineas(), quedan = PACK.items.reduce(function(t, it){ return t + Math.min(it.cantidad_escaneada, it.cantidad_solicitada); }, 0);
+      $('packAjusteLista').innerHTML = lineas.map(function(l){
+        return '<div><span>' + safe(l.nombre) + '</span><span>' + l.de + ' → <b>' + (l.a > 0 ? l.a : 'se quita') + '</b></span></div>';
+      }).join('');
+      var o = PACK.pedido, antes = Number(o.total) || 0, ahora = packAjusteTotalAprox();
+      $('packAjusteTotal').innerHTML = quedan > 0 ? ('Total del pedido: <b>' + cop(antes) + '</b> → aprox. <b>' + cop(ahora) + '</b>') : '';
+      $('packAjusteOpts').style.display = quedan > 0 ? '' : 'none';
+      Array.prototype.forEach.call($('packAjusteOpts').querySelectorAll('button'), function(b){ b.disabled = false; });
+      $('packAjusteProg').style.display = 'none'; $('packAjusteVolver').style.display = '';
+      var av = $('packAjusteAviso'); av.className = 'pack-aj-aviso'; av.style.display = quedan > 0 ? 'none' : 'block';
+      if(quedan <= 0) av.textContent = 'No queda ninguna unidad para entregar. En ese caso lo correcto es «Anular este pedido».';
+      $('packFaltantesModal').classList.remove('show'); $('packAjusteModal').classList.add('show'); haptic(10);
+    }
+    function packAjusteBarra(pct, paso, todos){
+      $('packAjusteBar').style.width = Math.max(0, Math.min(100, pct)) + '%';
+      Array.prototype.forEach.call($('packAjustePasos').children, function(li, i){ li.className = todos ? 'ok' : (i < paso ? 'ok' : (i === paso ? 'on' : '')); });
+    }
+    function packAjusteError(msg){
+      if(AJ.timer){ clearInterval(AJ.timer); AJ.timer = null; }
+      AJ.busy = false; $('packAjusteProg').style.display = 'none'; $('packAjusteOpts').style.display = ''; $('packAjusteVolver').style.display = '';
+      var av = $('packAjusteAviso'); av.className = 'pack-aj-aviso err'; av.textContent = msg; av.style.display = 'block'; beep('error');
+    }
+    function packAjusteEjecutar(motivo){
+      if(AJ.busy || !PACK.pedido) return;
+      var lineas = packAjusteLineas(); if(!lineas.length) return;
+      var o = PACK.pedido, payload = {
+        clientRef:String(o.clientRef || '').trim(), remision:String(o.remision || o.id || '').trim(), id:String(o.backendId || o.id || '').trim(),
+        motivo:motivo, operador:String((AJUSTES && AJUSTES.operador) || '').trim(), tsEsperado:String(o.ts || '').trim(),
+        items: lineas.map(function(l){ return { sku:l.sku, cantidad:l.a }; })
+      };
+      AJ.busy = true; $('packAjusteOpts').style.display = 'none'; $('packAjusteVolver').style.display = 'none'; $('packAjusteAviso').style.display = 'none';
+      $('packAjusteProg').style.display = 'block'; $('packAjusteProgT').textContent = 'Ajustando el pedido…'; packAjusteBarra(4, 0, false);
+      var pct = 4; AJ.timer = setInterval(function(){ pct = Math.min(90, pct + (90 - pct) * 0.1 + 0.7); packAjusteBarra(pct, Math.min(3, Math.floor(pct / 25)), false); }, 150);
+      google.script.run.withSuccessHandler(function(res){
+        if(!(res && (res.ok || res.success))){
+          if(res && res.conflicto) packAjusteError('Este pedido cambió en otro equipo. Cierra, vuelve a elegirlo en Empaque y repite el ajuste.');
+          else packAjusteError((res && res.message) || 'No se pudo ajustar el pedido.');
+          return;
+        }
+        if(AJ.timer){ clearInterval(AJ.timer); AJ.timer = null; }
+        packAjusteBarra(100, 4, true); $('packAjusteProgT').textContent = '¡Pedido ajustado!'; beep('success'); haptic(20);
+        setTimeout(function(){
+          // El empaque en pantalla queda con lo ajustado: lo que se había contado ES lo que se entrega
+          PACK.items = PACK.items.filter(function(it){ return it.cantidad_escaneada > 0; }).map(function(it){ it.cantidad_solicitada = it.cantidad_escaneada; return it; });
+          var ped = PACK.pedido; ped.items = res.items || ped.items; ped.total = res.totalDespues; ped.subtotal = res.subtotal; ped.saldo = res.saldo; ped.abono = res.abono; if(res.ts) ped.ts = res.ts;
+          packGuardarProgreso(); packRender();
+          AJ.busy = false; $('packAjusteModal').classList.remove('show');
+          toast((res.message || 'Pedido ajustado.') + ' Ya puedes finalizar el empaque.', 'success', 7000);
+          if(res.saldoAFavor > 0) setTimeout(function(){ toast('El cliente había pagado ' + cop(res.saldoAFavor) + ' más de lo que ahora vale el pedido: queda saldo a favor para devolver o descontar.', 'info', 9000); }, 1200);
+          if(res.revisarStock && res.revisarStock.length) setTimeout(function(){ toast('Revisa el inventario de: ' + res.revisarStock.join(', ') + ' (el sistema creía que había).', 'info', 9000); }, res.saldoAFavor > 0 ? 2600 : 1200);
+          try{ limpiarCacheLectura(); window.__kaemForzar = true; refreshData(); }catch(e){}
+          try{ carteraCargar(true); }catch(e){}
+          try{ packCargarPendientes(true); }catch(e){}
+        }, 800);
+      }).withFailureHandler(function(){
+        packAjusteError('Sin conexión · para ajustar el pedido se necesita internet. No se cambió nada.');
+      }).ajustarPedidoPorFaltantes(payload);
+    }
+    $('packFaltEditarBtn').addEventListener('click', packAjusteAbrir);
+    $('packAjusteOpts').addEventListener('click', function(e){ var b = e.target.closest ? e.target.closest('[data-motivo]') : null; if(b) packAjusteEjecutar(b.getAttribute('data-motivo')); });
+    $('packAjusteVolver').addEventListener('click', function(){ if(AJ.busy) return; $('packAjusteModal').classList.remove('show'); packMostrarFaltantes(PACK.items.filter(function(it){ return it.cantidad_escaneada < it.cantidad_solicitada; })); });
+    $('packAjusteModal').addEventListener('click', function(e){ if(e.target === this && !AJ.busy){ this.classList.remove('show'); packEnfocar(); } });
     $('packFaltAnularBtn').addEventListener('click', function(){
       $('packFaltantesModal').classList.remove('show');
       if(PACK.pedido) abrirAnulacionPedido(PACK.pedido);
