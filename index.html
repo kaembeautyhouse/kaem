@@ -44,7 +44,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-24-34';
+    const APP_VERSION = '2026-11-26-35';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -421,7 +421,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.39', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.72', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -3984,6 +3984,15 @@
       .k-load,.k-aura,.k-mark,.k-load-bar i,.k-dots i,#kTopLine::before{animation:none}
       .k-load-bar i{left:30%}.k-dots i{opacity:.7}.k-mark{background-position:50% 0}
     }
+
+    /* ——— Descuento por marca ——— */
+    .dm-edit{padding:7px 14px;font-size:13px;min-height:0}
+    .dm-lista{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+    .dm-fila{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--linea);border-radius:14px;background:var(--blanco)}
+    .dm-nom{display:flex;flex-direction:column;min-width:0}
+    .dm-nom b{font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .dm-nom small{font-size:12px;color:var(--texto-suave)}
+    .dm-pct{width:56px;text-align:right}
   </style>
 </head>
 <body>
@@ -4571,6 +4580,8 @@
         </div>
 
 <div class="field row-field pg-row" id="pgDescRow"><label class="lbl inline">Descuento</label><div class="segmented" id="pgDesc" role="group" aria-label="Descuento"><button type="button" class="seg" data-v="sin">No</button><button type="button" class="seg" data-v="con">Sí</button></div></div>
+        <div class="field row-field pg-row" id="pgDescModoRow" style="display:none"><label class="lbl inline">¿En qué?</label><div class="segmented" id="pgDescModo" role="group" aria-label="El descuento aplica a"><button type="button" class="seg" data-m="todo">Todo el pedido</button><button type="button" class="seg" data-m="marca">Una marca</button></div></div>
+        <div class="field row-field" id="pgDescMarcaWrap" style="display:none"><span class="lbl inline" id="pgDescMarcaTxt">Sin marca elegida</span><button type="button" class="btn-ghost dm-edit" id="pgDescMarcaBtn">Elegir marca</button></div>
         <div class="field row-field" id="pgDescWrap" style="display:none">
           <label class="lbl inline" for="descInput">¿Cuánto descuento?</label>
           <div class="cost-wrap cost-compact"><input id="descInput" type="text" inputmode="numeric" autocomplete="off" class="desc-inline" maxlength="3" placeholder="0"><span class="sign">%</span></div>
@@ -5998,6 +6009,20 @@
       </div>
       <p class="pack-aj-aviso" id="packAjusteAviso" style="display:none"></p>
       <button class="btn-ghost" id="packAjusteVolver" type="button" style="width:100%;margin-top:10px">Volver</button>
+    </div>
+  </div>
+
+  <!-- Modal descuento por marca -->
+  <div class="modal" id="descMarcaModal">
+    <div class="sheet">
+      <h3>Descuento por marca</h3>
+      <p class="cfg-hint" style="margin:0 0 10px">Escribe el % solo en la marca que lleva descuento. Las demás se quedan al precio normal.</p>
+      <div id="descMarcaLista" class="dm-lista"></div>
+      <p class="pack-aj-total" id="descMarcaResumen"></p>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="descMarcaCancelar" type="button">Cancelar</button>
+        <button class="btn-solid" id="descMarcaAplicar" type="button">Aplicar</button>
+      </div>
     </div>
   </div>
 
@@ -8778,7 +8803,8 @@
        carrito. Ahora se guarda con nombre y se retoma después. Viven solo en
        este dispositivo (no se sincronizan): son borradores, no ventas. */
     // Pasos del pedido guiado (cliente, nivel, flete, pago, abono, descuento): cada uno debe tocarse antes de guardar
-    var PGD={cli:'',elegido:false,nivel:false,flete:'',pago:false,abono:'',desc:''};
+    var PGD={cli:'',elegido:false,nivel:false,flete:'',pago:false,abono:'',desc:'',descModo:'todo'};
+    var DESCM={};   // descuento por marca: { 'MARCA': % }. Solo cuenta cuando PGD.desc==='con' y PGD.descModo==='marca'
     function loadDrafts(){ try{ return JSON.parse(localStorage.getItem('kaem_drafts')||'[]'); }catch(e){ return []; } }
     function saveDrafts(a){ try{ localStorage.setItem('kaem_drafts', JSON.stringify(a.slice(0,8))); }catch(e){} }
 
@@ -8791,7 +8817,7 @@
         cliente:{ nombre:nombre, nit:$('clientNit').value.trim(), telefono:$('cliTel').value.trim(),
                   direccion:$('cliDir').value.trim(), ciudad:$('cliCiudad').value.trim() },
         items:CART.items.slice(), nivel:CART.nivel, nivelTocado:!!CART.nivelTocado, nivelAuto:!!CART.nivelAuto, metodo:CART.metodo,
-        flete:$('fleteInput').value, fleteManual:FLETE_MANUAL, abono:$('abonoInput').value, desc:$('descInput').value,
+        flete:$('fleteInput').value, fleteManual:FLETE_MANUAL, abono:$('abonoInput').value, desc:$('descInput').value, descM:JSON.parse(JSON.stringify(DESCM)),
         venc:$('vencInput').value, notas:$('orderNotes').value,
         total:computeTotals().total, fecha:fmtDateNow(), pg:pgSnap()
       };
@@ -8815,7 +8841,7 @@
       $('cliNombre').value=c.nombre||''; $('clientNit').value=c.nit||''; $('cliTel').value=c.telefono||'';
       $('cliDir').value=c.direccion||''; $('cliCiudad').value=c.ciudad||'';
       $('orderNotes').value=d.notas||''; $('fleteInput').value=d.flete||''; FLETE_MANUAL=!!d.fleteManual; $('abonoInput').value=d.abono||'';
-      $('descInput').value=d.desc||''; $('vencInput').value=d.venc||defaultVencISO();
+      $('descInput').value=d.desc||''; DESCM=d.descM||{}; $('vencInput').value=d.venc||defaultVencISO();
       CART.items=(d.items||[]).slice();
       applyNivelUI(d.nivel||'Detal'); setPago(d.metodo==='Crédito'?'Crédito':'Contado');
       // Un pedido en pausa conserva su lista tal como quedó (los guardados antes de esta función se tratan como elegidos a mano)
@@ -9092,10 +9118,26 @@
       if(isNaN(v)) v = parseInt(AJUSTES && AJUSTES.descuentoDefecto, 10) || 0;
       return Math.max(0, Math.min(100, v));
     }
+    /** Marca de una línea del carrito (clave del descuento por marca). */
+    function marcaClave(it){ return String(it.marca||'').trim() || 'Sin marca'; }
+    function descPorMarcaActivo(){ return PGD.desc==='con' && PGD.descModo==='marca'; }
+    /** % de descuento que le toca a esa línea (solo en modo «una marca»). */
+    function descMarcaDe(it){ return descPorMarcaActivo() ? Math.max(0, Math.min(100, Number(DESCM[marcaClave(it)])||0)) : 0; }
+    /** Marcas que hay en el carrito, con lo que suman, para la ventana de descuento por marca. */
+    function marcasDelCarrito(){
+      var m={}, orden=[];
+      CART.items.forEach(function(it){ var k=marcaClave(it); if(!m[k]){ m[k]={ marca:k, sub:0 }; orden.push(k); } m[k].sub+=subCarrito(it); });
+      return orden.map(function(k){ return m[k]; });
+    }
     function computeTotals(){
       var subtotal=0; CART.items.forEach(function(it){ subtotal+=subCarrito(it); });
-      var pct=getDescPct();
-      var descuento=Math.round(subtotal*pct/100);
+      var pct, descuento;
+      if(descPorMarcaActivo()){
+        // Cada línea con el % de su marca; se redondea por línea igual que el servidor, y el % guardado es el equivalente sobre todo el pedido.
+        descuento=0;
+        CART.items.forEach(function(it){ var d=descMarcaDe(it); if(d>0){ descuento+=Math.round(it.precio*it.cantidad*d/100); if(it.probHalf) descuento+=Math.round(Math.round(it.precio/2)*d/100); } });
+        pct = subtotal>0 ? Math.round(descuento*100/subtotal) : 0;
+      } else { pct=getDescPct(); descuento=Math.round(subtotal*pct/100); }
       var flete=getFlete();
       var total=Math.max(0, subtotal-descuento)+flete;
       var abono, saldo;
@@ -9177,7 +9219,8 @@
       // hasta que ya hubiera un valor, y era fácil no saber que existía.
       var hayDesc=t.descuentoPct>0;
       $('tDesc').textContent = hayDesc ? ('- '+cop(t.descuento)) : ''; $('tDescRow').style.display = hayDesc ? '' : 'none';
-      if(document.activeElement!==$('descInput')) $('descInput').value = hayDesc ? String(t.descuentoPct) : '';
+      if(!descPorMarcaActivo() && document.activeElement!==$('descInput')) $('descInput').value = hayDesc ? String(t.descuentoPct) : '';
+      try{ descMarcaPintarResumen(); }catch(eDm){}
       var cred=CART.metodo==='Crédito';
       $('tAbonoRow').style.display=cred?'flex':'none';
       $('tSaldoRow').style.display=cred?'flex':'none';
@@ -9262,9 +9305,10 @@
       var items=[];
       CART.items.forEach(function(it){
         var cu=costoItem_(it);   // costo del momento (si el pedido ya existía, el que tenía al venderse): la rentabilidad histórica no cambia si después sube
-        items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:it.cantidad, precio:it.precio, subtotal:it.precio*it.cantidad, costo:cu });
+        var dm=descMarcaDe(it), dmo=dm>0?dm:undefined;   // descuento por marca: el % viaja en la línea
+        items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:it.cantidad, precio:it.precio, subtotal:it.precio*it.cantidad, costo:cu, descPct:dmo });
         if(it.probFull){ items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:1, precio:0, subtotal:0, esProbador:'full', costo:cu }); }
-        if(it.probHalf){ var mp=Math.round(it.precio/2); items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:1, precio:mp, subtotal:mp, esProbador:'half', costo:cu }); }
+        if(it.probHalf){ var mp=Math.round(it.precio/2); items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:1, precio:mp, subtotal:mp, esProbador:'half', costo:cu, descPct:dmo }); }
       });
       return {
         clientRef:'ord_'+Date.now()+'_'+Math.floor(Math.random()*1000000),
@@ -9549,6 +9593,10 @@
                  distribuidor:pr?pr.distribuidor:0, mayorista:pr?pr.mayorista:0, detal:pr?pr.detal:0,
                  stock:pr?pr.stock:0, precio:precio, cantidad:cant, probFull:0, probHalf:0, manual:true, costoFijo:Math.round(Number(it.costo)||0) });
       });
+      // Descuento por marca: el % viene en cada línea; se reconstruye por la marca de la línea.
+      DESCM={}; PGD.descModo='todo';
+      (o.items||[]).forEach(function(it){ var d=Number(it.descPct)||0; if(d<=0) return; for(var k=0;k<CART.items.length;k++){ if(CART.items[k].sku===it.sku){ DESCM[marcaClave(CART.items[k])]=d; PGD.descModo='marca'; break; } } });
+      if(PGD.descModo==='marca') $('descInput').value='';
       setPago(o.metodoPago==='Crédito'?'Crédito':'Contado');
       editingRef=o.clientRef||o.remision||o.id;
       editingTs=o.ts||'';
@@ -11150,7 +11198,7 @@
       $('cliNombre').value=''; $('clientNit').value=''; $('cliTel').value=''; $('cliDir').value=''; $('cliCiudad').value=''; try{ if(window.cliExisteOcultar) window.cliExisteOcultar(); }catch(e){}
       $('orderNotes').value='';
       $('fleteInput').value=''; $('abonoInput').value=''; FLETE_MANUAL=false;
-      $('descInput').value='';   // vacío = hereda el "Descuento por defecto" de Ajustes
+      DESCM={}; PGD.descModo='todo'; $('descInput').value='';   // vacío = hereda el "Descuento por defecto" de Ajustes
       _vencTocado=false;
       $('vencInput').value=defaultVencISO();
       setNivel('Detal', true); setPago('Crédito');
@@ -11773,8 +11821,9 @@
     function packAjusteTotalAprox(){
       var o = PACK.pedido || {}, cola = {}, sub = 0;
       PACK.items.forEach(function(it){ var k = cleanSku(it.sku); (cola[k] = cola[k] || []).push(Math.min(it.cantidad_escaneada, it.cantidad_solicitada)); });
-      (o.items || []).forEach(function(it){ var l = cola[cleanSku(it.sku)], q = (l && l.length) ? l.shift() : Math.floor(Number(it.cantidad) || 0); sub += q * (Number(it.precio) || 0); });
-      var desc = Math.round(sub * (Number(o.descuentoPct) || 0) / 100);
+      var descL = 0, porLinea = false;
+      (o.items || []).forEach(function(it){ var l = cola[cleanSku(it.sku)], q = (l && l.length) ? l.shift() : Math.floor(Number(it.cantidad) || 0), s = q * (Number(it.precio) || 0), dp = Number(it.descPct) || 0; sub += s; if(dp > 0){ porLinea = true; descL += Math.round(s * dp / 100); } });
+      var desc = porLinea ? descL : Math.round(sub * (Number(o.descuentoPct) || 0) / 100);
       return Math.max(0, sub - desc) + (Number(o.flete) || 0);
     }
     function packAjusteAbrir(){
@@ -16044,8 +16093,8 @@
        Cliente existente → entra con su nivel. Cliente nuevo → el nivel es obligatorio y queda en su ficha (clienteNuevo).
        Estado en PGD (definido en pedidos en pausa). Los pedidos ya guardados, los de catálogo y los pausados se infieren de sus campos. */
     function pgNivelNombre(n){ n=String(n||'').toUpperCase(); return n==='DETAL'?'Detal':n==='MAYORISTA'?'Mayorista':n==='DISTRIBUIDOR'?'Distribuidor':''; }
-    function pgSnap(){ return { cli:PGD.cli, elegido:PGD.elegido, nivel:PGD.nivel, flete:PGD.flete, pago:PGD.pago, abono:PGD.abono, desc:PGD.desc }; }
-    function pgCopiar(o){ ['cli','elegido','nivel','flete','pago','abono','desc'].forEach(function(k){ PGD[k]=o[k]; }); pgPintar(); }
+    function pgSnap(){ return { cli:PGD.cli, elegido:PGD.elegido, nivel:PGD.nivel, flete:PGD.flete, pago:PGD.pago, abono:PGD.abono, desc:PGD.desc, descModo:PGD.descModo, descM:JSON.parse(JSON.stringify(DESCM)) }; }
+    function pgCopiar(o){ ['cli','elegido','nivel','flete','pago','abono','desc'].forEach(function(k){ PGD[k]=o[k]; }); PGD.descModo=o.descModo||'todo'; if(o.descM) DESCM=JSON.parse(JSON.stringify(o.descM)); pgPintar(); }
     function pgBuscarPorTel(tel){
       var k=telKey(tel); if(!k) return null; var arr=loadClients();
       for(var i=0;i<arr.length;i++){
@@ -16055,13 +16104,13 @@
       }
       return null;
     }
-    function pgReiniciar(){ PGD.cli=''; PGD.elegido=false; PGD.nivel=false; PGD.flete=''; PGD.pago=false; PGD.abono=''; PGD.desc=''; if($('pgBuscar')) $('pgBuscar').value=''; if($('pgRes')) $('pgRes').innerHTML=''; pgPintar(); }
+    function pgReiniciar(){ PGD.cli=''; PGD.elegido=false; PGD.nivel=false; PGD.flete=''; PGD.pago=false; PGD.abono=''; PGD.desc=''; PGD.descModo='todo'; DESCM={}; if($('pgBuscar')) $('pgBuscar').value=''; if($('pgRes')) $('pgRes').innerHTML=''; pgPintar(); }
     function pgInferir(){
       var hay=!!pgBuscarPorTel($('cliTel').value);
       PGD.cli = hay ? 'existente' : 'nuevo'; PGD.elegido=true; PGD.nivel=true; PGD.pago=true;
       PGD.flete = (parseInt(String($('fleteInput').value).replace(/\D/g,''),10)||0) > 0 ? 'valor' : 'gratis'; FLETE_MANUAL=true;
       PGD.abono = (CART.metodo==='Crédito' && (parseInt(String($('abonoInput').value).replace(/\D/g,''),10)||0) > 0) ? 'si' : 'no';
-      PGD.desc  = (parseInt(String($('descInput').value).replace(/\D/g,''),10)||0) > 0 ? 'con' : 'sin';
+      PGD.desc  = ((parseInt(String($('descInput').value).replace(/\D/g,''),10)||0) > 0 || PGD.descModo==='marca') ? 'con' : 'sin';
       pgPintar();
     }
     function pgSeg(id, val){ Array.prototype.forEach.call($(id).querySelectorAll('.seg'), function(s){ s.classList.toggle('active', !!val && s.getAttribute('data-v')===val); }); }
@@ -16079,7 +16128,13 @@
       $('pagoSeg').classList.toggle('pg-pend', !PGD.pago);
       $('creditoBox').style.display = (PGD.pago && CART.metodo==='Crédito') ? 'block' : 'none';
       pgSeg('pgAbono', PGD.abono); $('abonoRow').style.display = PGD.abono==='si' ? '' : 'none';
-      pgSeg('pgDesc', PGD.desc); $('pgDescWrap').style.display = PGD.desc==='con' ? '' : 'none';
+      pgSeg('pgDesc', PGD.desc);
+      var dmM = PGD.desc==='con' && PGD.descModo==='marca';
+      $('pgDescModoRow').style.display = PGD.desc==='con' ? '' : 'none';
+      Array.prototype.forEach.call($('pgDescModo').querySelectorAll('.seg'), function(s){ s.classList.toggle('active', s.getAttribute('data-m')===(dmM?'marca':'todo')); });
+      $('pgDescWrap').style.display = (PGD.desc==='con' && !dmM) ? '' : 'none';
+      $('pgDescMarcaWrap').style.display = dmM ? '' : 'none';
+      try{ descMarcaPintarResumen(); }catch(eDm){}
       // punto terracota junto a lo que aún falta elegir (solo señal visual; la validación no cambia)
       var pm=function(el,on){ if(el) el.classList.toggle('pg-pendiente', !!on && !editingRef); };
       pm($('pgCli').previousElementSibling, !PGD.cli); pm($('nivelSeg').parentNode, !PGD.nivel); pm($('pgFleteRow'), !PGD.flete);
@@ -16113,7 +16168,8 @@
         if(PGD.abono==='si' && !getAbono()) return pgFalta('abonoRow', 'Escribe cuánto abona o elige No.');
       }
       if(!PGD.desc) return pgFalta('pgDescRow', 'Indica si el pedido lleva descuento.');
-      if(PGD.desc==='con' && !(parseInt(String($('descInput').value).replace(/\D/g,''),10)>0)) return pgFalta('pgDescWrap', 'Escribe el porcentaje de descuento o elige No.');
+      if(PGD.desc==='con' && PGD.descModo==='marca' && !CART.items.some(function(it){ return descMarcaDe(it)>0; })) return pgFalta('pgDescMarcaWrap', 'Elige la marca y escribe su porcentaje, o cambia a «Todo el pedido».');
+      if(PGD.desc==='con' && PGD.descModo!=='marca' && !(parseInt(String($('descInput').value).replace(/\D/g,''),10)>0)) return pgFalta('pgDescWrap', 'Escribe el porcentaje de descuento o elige No.');
       return null;
     }
     function pgLimpiarCliente(){ ['cliNombre','clientNit','cliTel','cliDir','cliCiudad'].forEach(function(id){ $(id).value=''; }); }
@@ -16157,6 +16213,54 @@
       }
       updateTotals(); markDirty();
     });
+    // ——— Descuento por marca: «Todo el pedido» o «Una marca» (ventana para elegir marca y %) ———
+    function descMarcaPintarResumen(){
+      var el=$('pgDescMarcaTxt'); if(!el) return;
+      var lista=marcasDelCarrito().filter(function(m){ return (Number(DESCM[m.marca])||0)>0; });
+      el.textContent = lista.length ? lista.map(function(m){ return m.marca+' −'+DESCM[m.marca]+' %'; }).join(' · ') : 'Sin marca elegida';
+      $('pgDescMarcaBtn').textContent = lista.length ? 'Cambiar' : 'Elegir marca';
+    }
+    function descMarcaAbrir(){
+      var marcas=marcasDelCarrito();
+      if(!marcas.length){ toast('Agrega primero los productos para elegir la marca.','error'); return false; }
+      $('descMarcaLista').innerHTML = marcas.map(function(m,i){
+        var v=Number(DESCM[m.marca])||0;
+        return '<div class="dm-fila"><div class="dm-nom"><b>'+safe(m.marca)+'</b><small>'+cop(m.sub)+'</small></div>'
+          + '<div class="cost-wrap cost-compact"><input class="dm-pct" data-i="'+i+'" type="text" inputmode="numeric" autocomplete="off" maxlength="3" placeholder="0" aria-label="Descuento de '+safe(m.marca)+'" value="'+(v>0?v:'')+'"><span class="sign">%</span></div></div>';
+      }).join('');
+      descMarcaResumen(); $('descMarcaModal').classList.add('show');
+      setTimeout(function(){ var f=$('descMarcaLista').querySelector('.dm-pct'); if(f) f.focus(); }, 80);
+      return true;
+    }
+    function descMarcaLeer(){
+      var marcas=marcasDelCarrito(), out={};
+      Array.prototype.forEach.call($('descMarcaLista').querySelectorAll('.dm-pct'), function(inp){
+        var m=marcas[+inp.getAttribute('data-i')], v=parseInt(String(inp.value).replace(/\D/g,''),10)||0;
+        if(m && v>0) out[m.marca]=Math.min(100,v);
+      });
+      return out;
+    }
+    function descMarcaResumen(){
+      var sel=descMarcaLeer(), ahorro=0;
+      CART.items.forEach(function(it){ var d=Number(sel[marcaClave(it)])||0; if(d>0){ ahorro+=Math.round(it.precio*it.cantidad*d/100); if(it.probHalf) ahorro+=Math.round(Math.round(it.precio/2)*d/100); } });
+      $('descMarcaResumen').textContent = ahorro>0 ? 'Descuento total: − '+cop(ahorro) : 'Aún no hay descuento';
+    }
+    function descMarcaCerrar(){ $('descMarcaModal').classList.remove('show'); }
+    $('pgDescModo').addEventListener('click', function(e){
+      var s=e.target.closest('.seg'); if(!s) return; haptic(10);
+      var m=s.getAttribute('data-m');
+      if(m==='marca'){ PGD.descModo='marca'; $('descInput').value=''; pgPintar(); updateTotals(); markDirty(); if(!descMarcaAbrir()){ PGD.descModo='todo'; pgPintar(); updateTotals(); } }
+      else { PGD.descModo='todo'; DESCM={}; var d=parseInt(AJUSTES && AJUSTES.descuentoDefecto,10)||0; if(d>0 && !(parseInt($('descInput').value,10)>0)) $('descInput').value=String(d); pgPintar(); updateTotals(); markDirty(); setTimeout(function(){ $('descInput').focus(); }, 60); }
+    });
+    $('pgDescMarcaBtn').addEventListener('click', function(){ descMarcaAbrir(); });
+    $('descMarcaLista').addEventListener('input', function(e){ if(!e.target.classList.contains('dm-pct')) return; var v=String(e.target.value).replace(/[^0-9]/g,''); if(v!=='' && parseInt(v,10)>100) v='100'; e.target.value=v; descMarcaResumen(); });
+    $('descMarcaCancelar').addEventListener('click', function(){ descMarcaCerrar(); if(!CART.items.some(function(it){ return descMarcaDe(it)>0; })){ PGD.descModo='todo'; DESCM={}; pgPintar(); updateTotals(); } });
+    $('descMarcaAplicar').addEventListener('click', function(){
+      var sel=descMarcaLeer();
+      if(!Object.keys(sel).length){ toast('Escribe el porcentaje de la marca, o toca Cancelar.','error'); var f=$('descMarcaLista').querySelector('.dm-pct'); if(f) f.focus(); return; }
+      DESCM=sel; descMarcaCerrar(); haptic(12); pgPintar(); updateTotals(); markDirty();
+    });
+    $('descMarcaModal').addEventListener('click', function(e){ if(e.target===this) $('descMarcaCancelar').click(); });
     $('fleteHint').addEventListener('click', function(e){ if(e.target && e.target.id==='fletePolBtn'){ PGD.flete = getFlete()>0 ? 'valor' : 'gratis'; if(PGD.flete==='gratis') $('fleteInput').value=''; FLETE_MANUAL=true; updateTotals(); } });
     $('pgAbono').addEventListener('click', function(e){
       var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PGD.abono=v;
@@ -16182,7 +16286,7 @@
     }
     $('pgDesc').addEventListener('click', function(e){
       var s=e.target.closest('.seg'); if(!s) return; var v=s.getAttribute('data-v'); haptic(10); PGD.desc=v;
-      if(v==='sin') $('descInput').value='';
+      if(v==='sin'){ $('descInput').value=''; DESCM={}; PGD.descModo='todo'; }
       else { var d=parseInt(AJUSTES && AJUSTES.descuentoDefecto,10)||0; if(!(parseInt($('descInput').value,10)>0) && d>0) $('descInput').value=String(d); setTimeout(function(){ $('descInput').focus(); }, 60); }
       updateTotals(); markDirty();
     });
