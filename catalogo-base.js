@@ -76,9 +76,8 @@
       + '<div class="bf-izq"><span class="bf-tag">✦ '+esc(OF.nombre||'Oferta')+' ✦</span><div class="bf-big">'+(OF.pct ? '' : '<em>Hasta</em>')+'<b>'+mayor+'</b><sup>%</sup><span>OFF</span></div></div>'
       + '<div class="bf-der"><p class="bf-t">'+(OF.pct ? 'Descuento ' : 'Descuentos ')+cond+'</p>'
       + (chips ? '<p class="bf-chips">'+(OF.pct ? 'Y además:' : 'Marcas:')+' '+chips+'</p>' : '')
-      + '<p class="bf-s bf-contado">💵 Descuento para pagos de contado</p>'
       + (OF.hasta ? '<p class="bf-cd" id="bfCd" aria-live="off"><span>Termina en</span> <span id="bfCdN"></span></p>' : '<p class="bf-s">Por tiempo limitado · el descuento se ve en tu bolsa</p>')
-      + '</div></div>';
+      + '</div><p class="bf-letra">* Descuento válido únicamente para pagos de contado.</p></div>';
     if(OF.hasta){
       var fin = KC.ofFin(), pintarCd = function(){
         var q = fin - Date.now(), n = $('bfCdN');
