@@ -379,6 +379,8 @@
     </div>
   </header>
 
+  <div class="bf-box" id="ofBox" hidden></div>
+
   <div class="barra-top" id="barraTop">
     <div class="fila-b">
       <label class="buscar"><span class="sr">Buscar</span><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
@@ -501,6 +503,11 @@
   }
   function aplicar(r, refresco){
     CAT = r; VAR = {};
+    // Oferta vigente (Black Friday u otra): el servidor manda r.oferta; los catálogos antiguos solo traían r.descuento
+    KC.ofFijar(r.oferta || (r.descuento && r.descuento.pct ? { nombre:'Descuento', pct:r.descuento.pct, minimo:r.descuento.minimo||0, hasta:'', marcas:{} } : null));
+    var ofA = KC.ofActiva(); CAT.descuento = (ofA && ofA.pct) ? { pct:ofA.pct, minimo:ofA.minimo||0 } : null;
+    KC.ofVencio = function(){ CAT.descuento = null; pintar(false); pintarBarra(true); if(PASO==='datos' && HOJAS.some(function(h){ return h.id==='hBolsa'; })) pintarBolsa(); };
+    var ofSig = JSON.stringify(ofA); if(ofSig !== window.__ofSig){ window.__ofSig = ofSig; KC.ofBanner('ofBox'); }
     r.productos.forEach(function(g, i){ g.i = i; g.nombre = KC.titulo(g.nombre); g.variantes.forEach(function(v){ VAR[v.sku] = { g:g, v:v }; }); });
     var c = leer(K_CAR) || {}; CARRITO = {};
     Object.keys(c).forEach(function(s){ if(VAR[s] && c[s]>0) CARRITO[s]=Math.min(c[s], topeDe(s)); });
@@ -557,9 +564,9 @@
         +'<div class="ph" data-mk="'+esc(g.marca)+'"><button class="ver" type="button" data-ver="'+g.i+'" aria-label="Ver '+esc(g.nombre)+'">'
         +(foto?imgTag(foto, g.nombre, 480, '(min-width:1020px) 25vw, (min-width:720px) 33vw, 50vw', n>3?' loading="lazy"':''):'<div class="vacio">'+esc(g.marca)+'</div>')+'</button>'
         +'<button class="fav" type="button" data-fav="'+g.i+'" aria-pressed="'+(FAV[g.id]?'true':'false')+'" aria-label="'+(FAV[g.id]?'Quitar de favoritos':'Guardar en favoritos')+'"><svg viewBox="0 0 24 24"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.6l8.8-8.6a5.2 5.2 0 0 0 0-7.4z"/></svg></button>'
-        +(pocas?'<span class="etq">Últimas unidades</span>':'')+(nf>1?'<span class="fotos-n">'+nf+' fotos</span>':'')+'</div>'
+        +(pocas?'<span class="etq">Últimas unidades</span>':'')+(nf>1?'<span class="fotos-n">'+nf+' fotos</span>':'')+KC.ofEtq(g.marca)+'</div>'
         +'<div class="cap"><span class="mk">'+esc(g.marca)+'</span><h3 class="nom">'+esc(g.nombre)+'</h3>'
-        +'<div class="pr"><span class="precio">'+(pmin!==pmax?'Desde ':'')+(precioVis(pmin)!==pmin?'<s>'+cop(pmin)+'</s>':'')+cop(precioVis(pmin))+'</span><span class="tn">'+(g.variantes.length>1?g.variantes.length+' tonos':(v.tono||''))+'</span></div>'
+        +'<div class="pr"><span class="precio">'+(pmin!==pmax?'Desde ':'')+(precioVis(pmin,g.marca)!==pmin?'<s>'+cop(pmin)+'</s>':'')+cop(precioVis(pmin,g.marca))+'</span><span class="tn">'+(g.variantes.length>1?g.variantes.length+' tonos':(v.tono||''))+'</span></div>'
         +'<button class="add'+(cantDe(g)?' solido':'')+'" type="button" data-add="'+g.i+'">'+(g.variantes.length>1?'Elegir tono':(cantDe(g)?'En tu bolsa · '+cantDe(g):'Agregar'))+'</button></div></article>';
       n++;
     });
@@ -621,7 +628,7 @@
       +'<div class="p-fila"><span class="p-mk">'+esc(g.marca)+(g.tipo?' · '+esc(g.tipo):'')+'</span>'
       +'<button class="fav" id="hpFav" style="position:static;background:var(--arena)" type="button" data-fav="'+g.i+'" aria-pressed="'+(FAV[g.id]?'true':'false')+'" aria-label="Guardar en favoritos"><svg viewBox="0 0 24 24"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.6l8.8-8.6a5.2 5.2 0 0 0 0-7.4z"/></svg></button></div>'
       +'<h2 class="p-nom">'+esc(g.nombre)+'</h2>'
-      +'<div class="p-fila"><span class="p-precio" id="hpPrecio">'+(precioVis(v.precio)!==v.precio?'<s style="font-size:.55em;color:var(--suave);font-weight:400;margin-right:8px">'+cop(v.precio)+'</s>':'')+cop(precioVis(v.precio))+'</span><span class="p-etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'" id="hpEtq">'+esc(v.etiqueta)+'</span></div>'
+      +'<div class="p-fila"><span class="p-precio" id="hpPrecio">'+(precioVis(v.precio,g.marca)!==v.precio?'<s style="font-size:.55em;color:var(--suave);font-weight:400;margin-right:8px">'+cop(v.precio)+'</s>':'')+cop(precioVis(v.precio,g.marca))+'</span><span class="p-etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'" id="hpEtq">'+esc(v.etiqueta)+'</span></div>'
       +(tonos?'<div class="lbl"><span>Tono</span><b id="hpTonoNom">'+esc(v.tono||'Único')+'</b></div><div class="tonos" role="radiogroup" aria-label="Tonos">'+g.variantes.map(function(x){
           var f=(x.fotos&&x.fotos[0])||x.foto||'', propia = f && hay[f]===1;
           return '<button type="button" class="tono'+(x.sku===PROD.sku?' on':'')+(propia?'':' solo-texto')+'" role="radio" aria-checked="'+(x.sku===PROD.sku)+'" data-tono="'+esc(x.sku)+'">'+(propia?imgTag(f,'',90,'30px'):'')+esc(x.tono||'Único')+'</button>';
@@ -630,7 +637,7 @@
       +(enBolsa?'<span class="tn" id="hpEnBolsa" style="margin-left:10px;font-size:13px;color:var(--salvia-txt)">✓ '+enBolsa+(enBolsa===1?' unidad':' unidades')+' en tu bolsa</span>':'<span id="hpEnBolsa"></span>')+'</div>'
       +'<div class="ficha" id="ficha">'+(g.ficha?'<div class="cargando-ficha"><div style="width:70%"></div><div></div><div style="width:85%"></div></div>':'')+'</div>'
       +'<div class="garantias"><p class="g-t">Envíos, pago y pedido</p><div><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><span>Envío <b>gratis en Bucaramanga y área metropolitana'+(CAT.envio.amGratis?'':' desde '+cop(CAT.envio.localGratisDesde||0))+'</b> y al resto del país desde '+cop(CAT.envio.gratisDesde)+'. Si no llegas, flete fijo de '+cop(CAT.envio.tarifa)+'.</span></div>'
-      +(CAT.descuento&&CAT.descuento.pct?'<div><svg viewBox="0 0 24 24"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg><span><b>'+CAT.descuento.pct+'% de descuento</b>'+(CAT.descuento.minimo>0?' en compras desde '+cop(CAT.descuento.minimo):' en toda la tienda')+'.</span></div>':'')
+      +(KC.ofActiva()?'<div><svg viewBox="0 0 24 24"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg><span><b>'+esc(KC.ofActiva().nombre||'Descuento')+': '+(KC.ofActiva().pct?KC.ofActiva().pct+'% de descuento':'descuentos por marca')+'</b>'+(KC.ofActiva().minimo>0?' en compras desde '+cop(KC.ofActiva().minimo):(KC.ofActiva().pct?' en toda la tienda':''))+(KC.ofPct(g.marca)!==(KC.ofActiva().pct||0)?' · en '+esc(g.marca)+' llevas <b>'+KC.ofPct(g.marca)+'%</b>':'')+'.</span></div>':'')
       +'<div><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg><span><b>Sin pedido mínimo</b>: desde 1 unidad.</span></div>'
       +'<div><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg><span>Pagas por <b>transferencia</b> (llaves y QR al finalizar) o en <b>efectivo al recibir</b> si estás en Bucaramanga y AM.</span></div>'
       +'<div><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Tu pedido llega a nuestro WhatsApp y te confirmamos pago y envío.</span></div></div>'
@@ -775,14 +782,13 @@
   }
 
   /* ——— Cuentas: descuento, envío (Bucaramanga y AM siempre gratis · resto del país desde $200.000) y total ——— */
-  function descDe(st){ var d=CAT.descuento; return (d && d.pct && st>=d.minimo) ? Math.round(st*d.pct/100) : 0; }
-  function precioVis(p){ var d=CAT.descuento; return (d && d.pct && d.minimo===0) ? Math.round(p*(100-d.pct)/100) : p; }   // con descuento "siempre": el precio ya se muestra rebajado
+  function precioVis(p,marca){ return KC.ofPrecio(p,marca); }   // con descuento "siempre" (sin compra mínima): el precio ya se muestra rebajado, con el % de su marca
   function totales(ciudad){
-    var st=0,u=0; Object.keys(CARRITO).forEach(function(s){ if(!VAR[s]) return; st+=VAR[s].v.precio*CARRITO[s]; u+=CARRITO[s]; });
+    var st=0,u=0,ls=[]; Object.keys(CARRITO).forEach(function(s){ if(!VAR[s]) return; var sb=VAR[s].v.precio*CARRITO[s]; st+=sb; u+=CARRITO[s]; ls.push({ marca:VAR[s].g.marca, subtotal:sb }); });
     var e=CAT.envio, ciu=String(ciudad||'').trim(), local=ciu?esAreaMetro(ciu):null;
     var umbral = !ciu ? null : (local ? (e.amGratis ? 0 : (e.localGratisDesde!=null ? e.localGratisDesde : e.gratisDesde)) : e.gratisDesde);   // el envío se mide sobre el valor de los productos, antes del descuento
-    var flete = ciu ? (st>=umbral ? 0 : e.tarifa) : 0, desc = descDe(st);
-    return { subtotal:st, descuento:desc, unidades:u, ciudad:ciu, local:local, umbral:umbral, falta: umbral!=null?Math.max(0, umbral-st):null, flete:flete, total:st-desc+flete };
+    var flete = ciu ? (st>=umbral ? 0 : e.tarifa) : 0, dd = KC.ofDescuento(ls), desc = dd.monto;
+    return { subtotal:st, descuento:desc, descPct:dd.pct, descMixto:dd.mixto, unidades:u, ciudad:ciu, local:local, umbral:umbral, falta: umbral!=null?Math.max(0, umbral-st):null, flete:flete, total:st-desc+flete };
   }
   /* Metas de la barra de la bolsa: descuento por compra mínima (si hay) y envío gratis nacional (si aún no sabemos que es de Bucaramanga/AM) */
   function metas(){
@@ -841,7 +847,7 @@
   }
   function lineasCuentas(t, envio){
     return '<div><span>Subtotal · '+t.unidades+(t.unidades===1?' unidad':' unidades')+'</span><span>'+cop(t.subtotal)+'</span></div>'
-      +(t.descuento?'<div class="desc"><span>Descuento '+CAT.descuento.pct+'%</span><span>− '+cop(t.descuento)+'</span></div>':'')
+      +(t.descuento?'<div class="desc"><span>'+esc((KC.ofActiva()&&KC.ofActiva().nombre)||'Descuento')+' '+(t.descMixto?'(por marcas)':t.descPct+'%')+'</span><span>− '+cop(t.descuento)+'</span></div>':'')
       +'<div><span>Envío</span>'+envio+'</div><div class="tot"><span>Total</span><b>'+cop(t.total)+'</b></div>';
   }
   function pintarCuentas(){

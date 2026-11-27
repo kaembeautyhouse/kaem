@@ -66,7 +66,7 @@
   .tono{font-size:12px;padding:6px 11px;min-height:32px;border-radius:16px;background:var(--gris);transition:all .15s}
   .tono.on{background:#fff;box-shadow:0 0 0 2px var(--espresso);font-weight:600}
   .tono .n{display:inline-block;min-width:15px;margin-left:4px;padding:0 4px;border-radius:8px;background:var(--terracota);color:#fff;font-size:11px;text-align:center}
-  .pie{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .pie{margin-top:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 6px}
   .precio{font-size:18px;font-weight:600}
   .etq{font-size:11px;line-height:1.2;padding:3px 8px;border-radius:10px;background:rgba(143,160,142,.2);color:var(--salvia-txt)}
   .etq.pocas{background:rgba(184,107,83,.14);color:#9E5842}
@@ -164,6 +164,7 @@
     <h1 style="margin:0"><img class="logo" src="logo.png" alt="KAÉM Beauty House" width="2298" height="1134" decoding="async" fetchpriority="high" onerror="KC.logoRespaldo(this)"></h1>
     <span class="nivel" id="nivel">Catálogo</span>
   </header>
+  <div class="bf-box" id="ofBox" hidden></div>
   <div class="buscar">
     <input id="q" type="search" placeholder="Busca un producto, marca o tono…" autocomplete="off" enterkeyhint="search" aria-label="Buscar">
     <div class="chips-w"><button class="ch-f i" type="button" aria-label="Marcas anteriores"><svg viewBox="0 0 24 24"><polyline points="15 5 8 12 15 19"/></svg></button><div class="chips" id="chips"></div><button class="ch-f d" type="button" aria-label="Más marcas"><svg viewBox="0 0 24 24"><polyline points="9 5 16 12 9 19"/></svg></button></div>
@@ -225,6 +226,9 @@
     var c = leer(K_CAR) || {}; CARRITO = {};
     Object.keys(c).forEach(function(s){ if(VAR[s] && c[s]>0){ var t=topeDe(s); if(t>=CAT.minPorRef) CARRITO[s]=Math.min(c[s], t); } });
     $('nivel').textContent = '✨ Catálogo ' + r.nivel;
+    KC.ofFijar(r.oferta || null);
+    KC.ofVencio = function(){ pintar(false); pintarBarra(true); if($('cuentas')) pintarCuentas(); };
+    var ofSig = JSON.stringify(KC.ofActiva()); if(ofSig !== window.__ofSig){ window.__ofSig = ofSig; KC.ofBanner('ofBox'); }
     KC.pintarCinta(CAT); pintarChips(); pintar(true); pintarBarra(true);
   }
 
@@ -263,9 +267,9 @@
       }).join('')+'</div>' : '';
       h+='<div class="card'+(animar?' anim':'')+'" data-gi="'+gi+'" style="--d:'+Math.min(n*35,420)+'ms"><div class="foto" data-mk="'+esc(g.marca)+'" data-info="'+gi+'" role="button" aria-label="Ver '+esc(g.nombre)+' en grande">'
         +(foto?imgTag(foto, g.nombre, 420, '(min-width:1280px) 20vw, (min-width:1000px) 25vw, (min-width:700px) 33vw, 50vw', ' loading="lazy"'):'<span class="ph">'+esc(g.marca)+'</span>')
-        +'<button class="ibtn" type="button" data-info="'+gi+'" aria-label="Qué es y para qué sirve">i</button></div>'
+        +'<button class="ibtn" type="button" data-info="'+gi+'" aria-label="Qué es y para qué sirve">i</button>'+KC.ofEtq(g.marca)+'</div>'
         +'<div class="info"><span class="mk">'+esc(g.marca)+'</span><p class="nom">'+esc(g.nombre)+'</p>'+tonos
-        +'<div class="pie"><span class="precio">'+cop(v.precio)+'</span><span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span></div>'
+        +'<div class="pie"><span class="precio">'+precioHTML(v.precio,g.marca)+'</span><span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span></div>'
         +accionHTML(sel, g)+'</div></div>';
       n++;
     });
@@ -298,7 +302,7 @@
     var abierta = $('infoIn').querySelector('.qv-foto.full') ? ' full' : '';
     var h='<h2><span></span><button class="cerrar" id="cerrarInfo" aria-label="Cerrar">✕</button></h2>'
       +'<div class="qv-foto'+abierta+'" id="qvFoto" role="button" aria-label="Ampliar o reducir foto" data-mk="'+esc(g.marca)+'">'+(foto?imgTag(foto, g.nombre, 800, '(min-width:560px) 520px, 94vw'):'<span class="ph">'+esc(g.marca)+'</span>')+'</div>'
-      +'<p class="qv-mk">'+esc(g.marca)+(g.tipo?' · '+esc(g.tipo):'')+'</p><h3 class="qv-nom">'+esc(g.nombre)+'</h3><span class="qv-precio">'+cop(v.precio)+'</span> <span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span>';
+      +'<p class="qv-mk">'+esc(g.marca)+(g.tipo?' · '+esc(g.tipo):'')+'</p><h3 class="qv-nom">'+esc(g.nombre)+'</h3><span class="qv-precio">'+precioHTML(v.precio,g.marca)+'</span> <span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span>';
     if(i.q) h+='<p class="qv-que">'+esc(i.q)+'</p>';
     if(i.b && i.b.length) h+='<ul class="qv-lista">'+i.b.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>';
     if(i.g) h+='<div class="qv-gancho"><b>💡 Para tu negocio</b>'+esc(i.g)+'</div>';
@@ -320,13 +324,16 @@
   window.addEventListener('popstate', function(){ if($('hInfo').classList.contains('on')) cerrarInfo(true); else if($('hoja').classList.contains('on')) $('hoja').classList.remove('on'); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ if($('hInfo').classList.contains('on')) cerrarInfo(); else $('hoja').classList.remove('on'); } });
 
-  /* ——— Cuentas: subtotal, envío y total (el servidor vuelve a calcular todo al recibir) ——— */
+  /* Precio con la oferta: si el descuento es para todo (sin compra mínima) se muestra el viejo tachado y el nuevo */
+  function precioHTML(p, marca){ var n=KC.ofPrecio(p, marca); return n!==p ? '<s>'+cop(p)+'</s>'+cop(n) : cop(p); }
+  /* ——— Cuentas: subtotal, descuento, envío y total (el servidor vuelve a calcular todo al recibir) ——— */
   function totales(ciudad){
-    var st=0,u=0,r=0; Object.keys(CARRITO).forEach(function(s){ if(!VAR[s]) return; st+=VAR[s].v.precio*CARRITO[s]; u+=CARRITO[s]; r++; });
+    var st=0,u=0,r=0,ls=[]; Object.keys(CARRITO).forEach(function(s){ if(!VAR[s]) return; var sb=VAR[s].v.precio*CARRITO[s]; st+=sb; u+=CARRITO[s]; r++; ls.push({ marca:VAR[s].g.marca, subtotal:sb }); });
+    var dd=KC.ofDescuento(ls);
     var e=CAT.envio, am = e.amGratis && esAreaMetro(ciudad);
     var siempre = e.siempreGratis || e.gratisDesde <= CAT.minimo;   // Distribuidor: todo pedido válido va con envío gratis
     var flete = (siempre || am || st>=e.gratisDesde) ? 0 : e.tarifa;
-    return { subtotal:st, unidades:u, refs:r, falta:Math.max(0, CAT.minimo-st), faltaEnvio:Math.max(0, e.gratisDesde-st), flete:flete, am:am, total:st+flete };
+    return { subtotal:st, unidades:u, refs:r, falta:Math.max(0, CAT.minimo-st), faltaEnvio:Math.max(0, e.gratisDesde-st), flete:flete, am:am, descuento:dd.monto, descPct:dd.pct, descMixto:dd.mixto, total:st-dd.monto+flete };
   }
   function pintarBarra(inicial){
     var t=totales(), e=CAT.envio, techo=Math.max(e.gratisDesde, CAT.minimo);
@@ -348,7 +355,7 @@
     if(estado===0) linea='Te faltan '+cop(t.falta)+' para el pedido mínimo';
     else if(estado===1) linea='✓ Mínimo listo · te faltan '+cop(t.faltaEnvio)+' para envío gratis 🚚';
     else linea = siempre ? '✓ Mínimo listo · envío gratis incluido 🚚' : '🚚 ¡Tu pedido tiene envío gratis!';
-    $('barraTxt').innerHTML='<b>'+cop(t.subtotal)+'</b>'+t.unidades+(t.unidades===1?' unidad':' unidades')+' · '+linea;
+    $('barraTxt').innerHTML='<b>'+cop(t.subtotal-t.descuento)+'</b>'+t.unidades+(t.unidades===1?' unidad':' unidades')+' · '+linea;
     if(!inicial && ESTADO_BARRA>=0 && estado>ESTADO_BARRA){
       SON.hito(); vibrar([10,40,10]);
       var p=$('prog'); p.classList.remove('celebra'); void p.offsetWidth; p.classList.add('celebra');
@@ -364,6 +371,7 @@
     if(t.flete===0) envio = t.am ? '<span class="g">¡Gratis! · mensajería KAÉM 🏙️</span>' : '<span class="g">¡Gratis! 🚚</span>';
     else envio = cop(t.flete);
     box.innerHTML='<div><span>Subtotal · '+t.unidades+(t.unidades===1?' unidad':' unidades')+'</span><span>'+cop(t.subtotal)+'</span></div>'
+      +(t.descuento?'<div class="desc"><span>'+esc((KC.ofActiva()&&KC.ofActiva().nombre)||'Descuento')+' '+(t.descMixto?'(por marcas)':t.descPct+'%')+'</span><span>− '+cop(t.descuento)+'</span></div>':'')
       +'<div><span>Envío</span>'+envio+'</div>'
       +'<div class="tot"><span>Total</span><b>'+cop(t.total)+'</b></div>';
     var pista=$('pistaEnvio');
@@ -418,7 +426,7 @@
         + '🧾 *Pedido '+r.id+'* · Catálogo '+r.nivel+'\n\n'
         + '*Productos*\n'
         + r.items.map(function(i){ return '• '+i.cantidad+' × '+nombreItem(i)+' — '+cop(i.subtotal); }).join('\n')
-        + '\n\n💰 Subtotal: '+cop(r.subtotal)+'\n🚚 Envío: '+envioTxt+'\n💳 *Total: '+cop(r.total)+'* · '+r.unidades+' unidades\n\n'
+        + '\n\n💰 Subtotal: '+cop(r.subtotal)+(r.descuento?'\n🏷 Descuento'+(r.descuentoPct?' '+r.descuentoPct+'%':'')+': − '+cop(r.descuento):'')+'\n🚚 Envío: '+envioTxt+'\n💳 *Total: '+cop(r.total)+'* · '+r.unidades+' unidades\n\n'
         + '📦 *Datos de entrega*\n👤 '+cli.nombre+'\n🪪 C.C./NIT: '+cli.nit+'\n📱 '+cli.telefono+'\n📍 '+cli.ciudad+'\n🏠 '+cli.direccion
         + (val('cNotas') ? '\n📝 '+val('cNotas') : '')
         + '\n\nQuedo atento(a) a la confirmación y los datos de pago. ¡Gracias! 🤎';

@@ -25,6 +25,69 @@
       return s;
     }).join('');
   };
+  /* ——— Ofertas (Black Friday y otras): las configura KAÉM en la App; el servidor manda { nombre, pct, minimo, hasta, marcas:{MARCA:pct} } y vuelve a calcular todo al recibir el pedido ——— */
+  var OF = null, OF_T = 0;
+  var sinTil = function(t){ return String(t||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); };
+  var hoyISO = function(){ var d = new Date(), p = function(n){ return (n<10?'0':'') + n; }; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); };
+  KC.ofFijar = function(o){
+    var hay = o && ((o.pct > 0) || (o.marcas && Object.keys(o.marcas).length));
+    OF = (hay && !(o.hasta && hoyISO() > o.hasta)) ? o : null;
+    return OF;
+  };
+  KC.ofActiva = function(){ return OF; };
+  KC.ofPct = function(marca){
+    if(!OF) return 0;
+    var k = sinTil(marca), m = OF.marcas || {};
+    for(var n in m) if(sinTil(n) === k) return m[n];
+    return OF.pct || 0;
+  };
+  /* ¿El descuento se aplica a todo sin pedir compra mínima? Solo entonces el precio se muestra ya rebajado. */
+  KC.ofSiempre = function(){ return !!OF && !(OF.minimo > 0); };
+  KC.ofPrecio = function(precio, marca){ var p = KC.ofPct(marca); return (KC.ofSiempre() && p > 0) ? Math.round(precio*(100-p)/100) : precio; };
+  /* Misma cuenta que el servidor: lineas = [{ marca, subtotal }] → { monto, pct, mixto }. Si todas llevan el mismo % se redondea sobre el total; si no, línea por línea. */
+  KC.ofDescuento = function(lineas){
+    var sub = 0; lineas.forEach(function(l){ sub += l.subtotal; });
+    if(!OF || sub <= 0 || sub < (OF.minimo||0)) return { monto:0, pct:0, mixto:false };
+    var ps = lineas.map(function(l){ return KC.ofPct(l.marca); }), mixto = ps.some(function(p){ return p !== ps[0]; });
+    if(!mixto) return { monto: Math.round(sub*ps[0]/100), pct: ps[0], mixto:false };
+    var monto = 0; lineas.forEach(function(l,i){ monto += Math.round(l.subtotal*ps[i]/100); });
+    return { monto: monto, pct: Math.round(monto*100/sub), mixto:true };
+  };
+  KC.ofEtq = function(marca){ var p = KC.ofPct(marca); return (KC.ofSiempre() && p > 0) ? '<span class="bf-etq" aria-label="'+p+'% de descuento">−'+p+'%</span>' : ''; };
+  /* Marcas con un % distinto al general (para el aviso) */
+  KC.ofMarcasEspeciales = function(){ var r = []; if(!OF) return r; var m = OF.marcas || {}; Object.keys(m).forEach(function(n){ if(m[n] !== (OF.pct||0)) r.push({ marca:n, pct:m[n] }); }); return r; };
+  KC.ofFin = function(){ return (OF && OF.hasta) ? new Date(OF.hasta + 'T23:59:59').getTime() : 0; };
+  var cuenta = function(ms){
+    var s = Math.max(0, Math.floor(ms/1000)), d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60), x = s%60, p = function(n){ return (n<10?'0':'') + n; };
+    return (d ? '<b>'+d+'</b><i>d</i> ' : '') + '<b>'+p(h)+'</b><i>h</i> <b>'+p(m)+'</b><i>m</i> <b>'+p(x)+'</b><i>s</i>';
+  };
+  /* Aviso grande con animaciones. donde = id del contenedor. Sin oferta vigente se oculta. */
+  KC.ofBanner = function(donde){
+    var box = $(donde); if(!box) return;
+    clearInterval(OF_T);
+    if(!OF){ box.innerHTML = ''; box.hidden = true; return; }
+    var esp = KC.ofMarcasEspeciales(), mayor = OF.pct || 0;
+    if(!mayor) esp.forEach(function(e){ if(e.pct > mayor) mayor = e.pct; });
+    var chips = esp.map(function(e){ return '<span class="bf-chip"><b>'+esc(KC.titulo(e.marca))+'</b> −'+e.pct+'%</span>'; }).join('');
+    var cond = OF.minimo > 0 ? 'en compras desde '+KC.cop(OF.minimo) : (OF.pct ? 'en todos los productos' : 'en marcas seleccionadas');
+    var fx = ''; for(var i = 0; i < 14; i++) fx += '<i style="--x:'+(4+i*7)+'%;--t:'+(i%5)*.7+'s;--s:'+(6+(i*5)%9)+'px"></i>';
+    box.hidden = false;
+    box.innerHTML = '<div class="bf" role="note"><div class="bf-fx" aria-hidden="true">'+fx+'</div>'
+      + '<div class="bf-izq"><span class="bf-tag">✦ '+esc(OF.nombre||'Oferta')+' ✦</span><div class="bf-big">'+(OF.pct ? '' : '<em>Hasta</em>')+'<b>'+mayor+'</b><sup>%</sup><span>OFF</span></div></div>'
+      + '<div class="bf-der"><p class="bf-t">'+(OF.pct ? 'Descuento ' : 'Descuentos ')+cond+'</p>'
+      + (chips ? '<p class="bf-chips">'+(OF.pct ? 'Y además:' : 'Marcas:')+' '+chips+'</p>' : '')
+      + '<p class="bf-s bf-contado">💵 Descuento para pagos de contado</p>'
+      + (OF.hasta ? '<p class="bf-cd" id="bfCd" aria-live="off"><span>Termina en</span> <span id="bfCdN"></span></p>' : '<p class="bf-s">Por tiempo limitado · el descuento se ve en tu bolsa</p>')
+      + '</div></div>';
+    if(OF.hasta){
+      var fin = KC.ofFin(), pintarCd = function(){
+        var q = fin - Date.now(), n = $('bfCdN');
+        if(q <= 0){ clearInterval(OF_T); KC.ofFijar(null); box.innerHTML = ''; box.hidden = true; if(KC.ofVencio) KC.ofVencio(); return; }
+        if(n) n.innerHTML = cuenta(q);
+      };
+      pintarCd(); OF_T = setInterval(pintarCd, 1000);
+    }
+  };
   KC.guardar = function(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
   KC.leer = function(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } };
   KC.vibrar = function(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} };

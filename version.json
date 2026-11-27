@@ -1,8 +1,16 @@
 {
-  "app": "2026-11-27-43",
-  "servidor": "2026.10.77",
+  "app": "2026-11-27-44",
+  "servidor": "2026.10.78",
   "fecha": "2026-11-27",
   "novedades": [
+    {
+      "titulo": "Ofertas en los catálogos: Black Friday",
+      "icono": "precio",
+      "para": [
+        "equipo"
+      ],
+      "texto": "Los catálogos Detal, Distribuidor y Mayorista pueden llevar una oferta con aviso animado (con cuenta regresiva si pones fecha final), precio viejo tachado, etiqueta con el porcentaje en cada foto y el descuento ya aplicado en la bolsa. Se configura en Ajustes → Catálogo virtual → «Ofertas de los catálogos»: nombre, % general, compra mínima, último día y un % propio por marca (por ejemplo Distribuidor 5 % y Enchanté 10 %). El pedido llega a Pedidos con cada marca en su porcentaje."
+    },
     {
       "titulo": "Pedidos urgentes, empacados de hoy y lista de revisión",
       "icono": "bodega",
