@@ -48,7 +48,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-26-37';
+    const APP_VERSION = '2026-11-26-38';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -425,7 +425,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.73', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.74', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -437,7 +437,7 @@
       }
 
       var SOLO_LECTURA = {
-        getInitialData:1, listProducts:1, obtenerHistorial:1, listarPedidosPendientes:1, obtenerAjustes:1, obtenerCarteraPendiente:1,
+        getInitialData:1, listProducts:1, estadoFaltantes:1, listarFaltantes:1, obtenerHistorial:1, listarPedidosPendientes:1, obtenerAjustes:1, obtenerCarteraPendiente:1,
         estadoColaSync:1, getNextRemision:1, ping:1, exportarGanchos:1, estadoPin:1, estadoRespaldo:1, estadoCatalogo:1,
         obtenerAlertas:1, obtenerEstadisticas:1, obtenerBI:1, sugerenciaReposicion:1, obtenerClientes:1,
         listarClientes:1, obtenerAbonos:1, obtenerPagosRecientes:1, obtenerAuditoria:1, obtenerPedido:1,
@@ -498,7 +498,7 @@
       // Cada petición responde UNA sola vez. Un error al MOSTRAR los datos (no de red) ya no
       // se confunde con una falla de conexión ni provoca reintentos al servidor.
       // Lo que el perfil Bodega puede pedir (igual que en el servidor): lo demás ni sale del celular y se responde "sin acceso".
-      var BODEGA_OK = { ping:1, estadoPin:1, verificarPin:1, lote:1, getInitialData:1, obtenerAjustes:1, listarPedidosPendientes:1, finalizarPacking:1, actualizarFechaEntrega:1 };
+      var BODEGA_OK = { ping:1, estadoPin:1, verificarPin:1, lote:1, getInitialData:1, obtenerAjustes:1, listarPedidosPendientes:1, finalizarPacking:1, actualizarFechaEntrega:1, reportarFaltante:1, estadoFaltantes:1 };
       function callBackend(action, data, onSuccess, onFailure) {
         if (window.KAEM_ROL === 'bodega' && !BODEGA_OK[action]) {
           setTimeout(function () { if (onSuccess) { try { onSuccess({ ok: false, success: false, rolRestringido: true, message: 'Este perfil no tiene acceso a esa función.' }); } catch (e) {} } }, 0);
@@ -4025,6 +4025,25 @@
     .pkb-notas span{display:block;color:var(--texto-suave);font-size:11.5px;margin-bottom:2px}
     .pkb-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
     html[data-rol="bodega"] .ent-check{display:none !important}   /* Bodega no confirma entregas */
+
+    /* ——— Faltantes de Bodega ——— */
+    .pk-falt{margin:0 0 10px;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.35}
+    .pk-falt small{display:block;margin-top:2px;font-size:12px;opacity:.8}
+    .pk-falt.alerta{background:var(--st-soon-bg,#fff1e0);border:1px solid var(--st-soon-border,#f0c89a);cursor:pointer}
+    .pk-falt.espera{background:var(--st-espera-bg);border:1px solid var(--linea)}
+    .pkb-falt{grid-column:1 / -1}
+    .ftr-sheet{max-height:88vh;overflow:auto}
+    .ftr-card{padding:12px 0 6px;border-top:1px solid var(--linea)}
+    .ftr-t{margin:0;font-size:15px}.ftr-sub{margin:2px 0 8px;font-size:13px;color:var(--texto-suave)}
+    .ftr-lbl{margin:10px 0 6px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-suave)}
+    .ftr-chips{display:flex;flex-wrap:wrap;gap:6px}
+    .ftr-fila{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--linea)}
+    .ftr-nom{display:flex;flex-direction:column;min-width:0;font-size:14px}
+    .ftr-nom small{font-size:12px;color:var(--texto-suave)}
+    .ftr-in{width:58px;text-align:right}
+    .ftr-sum{margin:8px 0;font-size:13.5px;font-weight:600}.ftr-sum.mal{color:var(--rojo-txt)}
+    .ftr-ok{margin:10px 0 6px;font-size:14px}
+    .ftr-msg{white-space:pre-wrap;font-family:inherit;font-size:13px;background:var(--st-espera-bg);padding:10px 12px;border-radius:12px;margin:6px 0}
   </style>
 </head>
 <body>
@@ -4169,6 +4188,7 @@
 
       <!-- ————— PACKING · CHECKLIST DE ALISTAMIENTO ————— -->
       <section class="screen" id="screen-packing">
+        <div class="pk-falt" id="packFaltBanner" style="display:none" role="status"></div>
         <div class="pack-head">
           <div class="field" style="flex:1;margin:0">
             <label class="lbl" for="packOrderSel">Pedido a empacar</label>
@@ -6072,6 +6092,31 @@
     </div>
   </div>
 
+  <!-- Modal: Bodega reporta un faltante -->
+  <div class="modal" id="faltRepModal">
+    <div class="sheet">
+      <h3>Reportar faltante</h3>
+      <p class="cfg-hint" style="margin:0 0 10px">Si no alcanzan las unidades para los pedidos, dinos cuántas hay y les mando la información exacta a Kevin y a Camilo.</p>
+      <div class="field"><label class="lbl" for="faltRepSku">Producto</label><select id="faltRepSku"></select></div>
+      <div class="field"><label class="lbl" for="faltRepHay">¿Cuántas unidades hay en total?</label><input id="faltRepHay" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0"></div>
+      <div id="faltRepRes" style="display:none"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="faltRepCerrar" type="button">Cerrar</button>
+        <button class="btn-solid" id="faltRepEnviar" type="button">Reportar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: el equipo reparte las unidades -->
+  <div class="modal" id="faltResModal">
+    <div class="sheet ftr-sheet">
+      <h3>Faltantes por resolver</h3>
+      <p class="cfg-hint" style="margin:0 0 10px">Decide cuántas unidades le tocan a cada pedido. Con que uno de los dos autorice basta: los pedidos se ajustan solos (total, cartera e inventario) y Bodega los puede cerrar.</p>
+      <div id="faltResLista"></div>
+      <button class="btn-ghost" id="faltResCerrar" type="button" style="width:100%;margin-top:6px">Cerrar</button>
+    </div>
+  </div>
+
   <!-- Modal anular remisión -->
   <div class="modal" id="orderDeleteModal">
     <div class="sheet">
@@ -6422,6 +6467,7 @@
     });
     function switchTab(tab){
       if(window.KAEM_ROL==='bodega' && tab!=='packing') tab='packing';   // el perfil Bodega solo trabaja en Empaque
+      if(tab==='packing'){ try{ if(window.ftRefrescar) setTimeout(function(){ window.ftRefrescar(true); }, 300); }catch(e){} }   // faltantes pendientes
       // Ajustes y Estadísticas son pantallas completas que viven encima de los módulos: al pasar a otro módulo se cierran
       try{ hubCerrarPantallas(); }catch(e){}
       // Lo que este módulo necesita pasa al frente de la fila
@@ -11606,7 +11652,7 @@
       el.innerHTML = '<p class="pkb-t">Datos para el rótulo</p>'
         + fila('Nombre', c.nombre) + fila('Teléfono', c.telefono) + fila('Dirección', c.direccion) + fila('Ciudad', c.ciudad) + fila('NIT / CC', nit)
         + (o.notas ? '<div class="pkb-notas"><span>Notas del pedido</span><b>'+safe(o.notas)+'</b></div>' : '')
-        + '<div class="pkb-btns"><button type="button" class="btn-ghost" data-bod="pdf">Remisión PDF</button><button type="button" class="btn-ghost" data-bod="wa">Escribir por WhatsApp</button></div>';
+        + '<div class="pkb-btns"><button type="button" class="btn-ghost" data-bod="pdf">Remisión PDF</button><button type="button" class="btn-ghost" data-bod="wa">Escribir por WhatsApp</button><button type="button" class="btn-ghost pkb-falt" data-bod="falt">Reportar faltante</button></div>';
       el.style.display = 'block';
     }
     document.addEventListener('click', function(e){
@@ -16686,6 +16732,182 @@
         } });
       }catch(e){}
     }
+    /* ═══════ Faltantes de Bodega ═══════
+       Bodega: «Reportar faltante» → el servidor guarda la solicitud y arma el mensaje exacto → ella lo manda por WhatsApp a Kevin Y a Camilo.
+       Equipo: ventana de reparto con sugerencias (proporcional, parejo, más antiguos, más pequeños) o cantidades a mano (por prioridad de cliente).
+               Con que uno autorice basta: los pedidos se ajustan solos y Bodega puede cerrarlos. */
+    var FT = { abiertas:[], lista:[], ultimoN:0, ocupado:false, rep:{} };
+    function ftEsBodega(){ return window.KAEM_ROL === 'bodega'; }
+
+    /* ——— Repartos sugeridos ———
+       pedidos: [{ remision, pedido, otrasLineas }] del más antiguo al más reciente · D: unidades que hay.
+       Reglas: nadie recibe más de lo que pidió; un pedido que solo tiene este producto recibe al menos 1 (el servidor no deja 0). */
+    function ftSugerir(modo, pedidos, D){
+      var n = pedidos.length, out = {}, i, resto = Math.max(0, Math.floor(D));
+      pedidos.forEach(function(p){ out[p.remision] = 0; });
+      // mínimo 1 para los pedidos que solo llevan este producto
+      pedidos.forEach(function(p){ if(p.otrasLineas === 0 && resto > 0){ out[p.remision] = 1; resto--; } });
+      var cabe = function(p){ return p.pedido - out[p.remision]; };
+      if(modo === 'antiguos' || modo === 'pequenos'){
+        var orden = pedidos.slice(); if(modo === 'pequenos') orden.sort(function(a, b){ return (a.pedido - b.pedido) || (pedidos.indexOf(a) - pedidos.indexOf(b)); });
+        orden.forEach(function(p){ var d = Math.min(resto, cabe(p)); out[p.remision] += d; resto -= d; });
+      } else if(modo === 'parejo'){
+        var avanzo = true;
+        while(resto > 0 && avanzo){ avanzo = false; for(i = 0; i < n && resto > 0; i++){ if(cabe(pedidos[i]) > 0){ out[pedidos[i].remision]++; resto--; avanzo = true; } } }
+      } else {   // proporcional a lo que pidió cada uno (restos a los de mayor fracción)
+        var tot = 0; pedidos.forEach(function(p){ tot += p.pedido; });
+        var base = pedidos.map(function(p, k){ var ideal = (Math.max(0, D) * p.pedido) / (tot || 1), f = Math.floor(ideal); return { k:k, f:f, frac: ideal - f, p:p }; });
+        base.forEach(function(b){ var ya = out[b.p.remision], quiere = Math.min(b.p.pedido, Math.max(b.f, ya)), d = Math.min(resto, quiere - ya); if(d > 0){ out[b.p.remision] += d; resto -= d; } });
+        base.sort(function(a, b){ return (b.frac - a.frac) || (a.k - b.k); });
+        var vuelta = true;
+        while(resto > 0 && vuelta){ vuelta = false; for(i = 0; i < base.length && resto > 0; i++){ if(cabe(base[i].p) > 0){ out[base[i].p.remision]++; resto--; vuelta = true; } } }
+      }
+      return out;
+    }
+    window.ftSugerir = ftSugerir;
+
+    /* ——— Lo que ve el equipo y Bodega en la parte de arriba de Empaque ——— */
+    function ftBanner(){
+      var el = $('packFaltBanner'); if(!el) return;
+      if(ftEsBodega()){
+        if(!FT.abiertas.length){ el.style.display = 'none'; el.innerHTML = ''; return; }
+        el.innerHTML = '⏳ <b>Faltante pendiente</b> · ' + safe(FT.abiertas.map(function(f){ return f.producto; }).join(', ')) + '<small>Esperando que Kevin o Camilo decidan el reparto. Esos pedidos no se pueden cerrar todavía.</small>';
+        el.className = 'pk-falt espera'; el.style.display = 'block'; el.onclick = null;
+      } else {
+        if(!FT.lista.length){ el.style.display = 'none'; el.innerHTML = ''; return; }
+        el.innerHTML = '⚠️ <b>' + FT.lista.length + (FT.lista.length === 1 ? ' faltante por resolver' : ' faltantes por resolver') + '</b><small>Bodega reportó que no alcanzan unidades. Toca para repartir.</small>';
+        el.className = 'pk-falt alerta'; el.style.display = 'block'; el.onclick = ftAbrirResolver;
+      }
+    }
+    function ftRefrescar(silencioso){
+      if(FT.ocupado) return; FT.ocupado = true;
+      if(ftEsBodega()){
+        google.script.run.withSuccessHandler(function(r){ FT.ocupado = false; if(r && r.ok){ var antes = FT.abiertas.length; FT.abiertas = r.faltantes || []; ftBanner();
+            if(antes && !FT.abiertas.length){ toast('Kevin o Camilo ya decidieron el reparto. Actualiza la lista: los pedidos quedaron ajustados.','success',6000); try{ packCargarPendientes(true); }catch(e){} } } })
+          .withFailureHandler(function(){ FT.ocupado = false; }).estadoFaltantes();
+      } else {
+        google.script.run.withSuccessHandler(function(r){ FT.ocupado = false; if(r && r.ok){ FT.lista = r.faltantes || [];
+            if(FT.lista.length > FT.ultimoN && !silencioso){ toast('Bodega reportó un faltante: hay que repartir las unidades.','info',6000,{ accion:'Ver', fn:ftAbrirResolver }); }
+            FT.ultimoN = FT.lista.length; ftBanner(); } })
+          .withFailureHandler(function(){ FT.ocupado = false; }).listarFaltantes({});
+      }
+    }
+    window.ftRefrescar = ftRefrescar;
+    setInterval(function(){ try{ if(!document.hidden && $('screen-packing') && ($('screen-packing').classList.contains('active') || getComputedStyle($('screen-packing')).display !== 'none')) ftRefrescar(true); }catch(e){} }, 45000);
+
+    /* ——— BODEGA: reportar ——— */
+    function ftAbrirReporte(){
+      if(!PACK.pedido || !PACK.items.length){ toast('Elige primero un pedido.','info'); return; }
+      var sel = $('faltRepSku');
+      sel.innerHTML = PACK.items.map(function(it){ return '<option value="'+safe(it.sku)+'">'+safe(it.nombre)+' · pide '+it.cantidad_solicitada+'</option>'; }).join('');
+      $('faltRepHay').value = ''; $('faltRepRes').style.display = 'none'; $('faltRepRes').innerHTML = ''; $('faltRepEnviar').style.display = ''; $('faltRepEnviar').disabled = false;
+      $('faltRepModal').classList.add('show'); setTimeout(function(){ try{ $('faltRepHay').focus(); }catch(e){} }, 120);
+    }
+    function ftReportar(){
+      var sku = $('faltRepSku').value, hay = String($('faltRepHay').value).replace(/[^0-9]/g,'');
+      if(hay === ''){ toast('Escribe cuántas unidades hay (0 si no queda ninguna).','error'); $('faltRepHay').focus(); return; }
+      $('faltRepEnviar').disabled = true;
+      google.script.run.withSuccessHandler(function(r){
+        $('faltRepEnviar').disabled = false;
+        if(!r || !r.ok){ toast((r && r.message) || 'No se pudo reportar.','error'); return; }
+        $('faltRepEnviar').style.display = 'none';
+        var c = bodegaCfg(), res = $('faltRepRes');
+        res.innerHTML = '<p class="ftr-ok">✓ Reportado: <b>'+safe(r.producto)+'</b> · hay '+r.disponible+' de '+r.totalPedido+' pedidas.</p>'
+          + '<pre class="ftr-msg">'+safe(r.mensaje)+'</pre>'
+          + '<p class="cfg-hint">Avísales a los dos por WhatsApp. Con que uno responda basta. Mientras tanto estos pedidos no se pueden cerrar.</p>'
+          + '<div class="pkb-btns"><button type="button" class="btn-solid wa" data-ftwa="'+safe(c.waKevin)+'">Enviar a Kevin</button><button type="button" class="btn-solid wa" data-ftwa="'+safe(c.waCamilo)+'">Enviar a Camilo</button></div>';
+        res.style.display = 'block'; FT.mensaje = r.mensaje; haptic(15); ftRefrescar(true);
+      }).withFailureHandler(function(){ $('faltRepEnviar').disabled = false; toast('Sin conexión: no se pudo reportar.','error'); })
+        .reportarFaltante({ sku:sku, disponible:parseInt(hay,10), operador:'Bodega' });
+    }
+
+    /* ——— EQUIPO: repartir ——— */
+    function ftAbrirResolver(){
+      if(!FT.lista.length){ toast('No hay faltantes por resolver.','info'); return; }
+      ftPintarResolver(); $('faltResModal').classList.add('show');
+    }
+    function ftPintarResolver(){
+      FT.rep = FT.rep || {};
+      $('faltResLista').innerHTML = FT.lista.map(function(s, si){
+        var filas = s.pedidos.map(function(p){
+          var v = FT.rep[s.id] && FT.rep[s.id][p.remision] !== undefined ? FT.rep[s.id][p.remision] : '';
+          return '<div class="ftr-fila"><div class="ftr-nom"><b>'+safe(p.remision)+'</b> · '+safe(p.cliente||'sin nombre')+'<small>'+safe(p.nivel||'')+' · pide '+p.pedido+(p.otrasLineas===0?' · solo lleva este':'')+'</small></div>'
+               + '<div class="cost-wrap cost-compact"><input class="ftr-in" data-s="'+si+'" data-r="'+safe(p.remision)+'" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0" value="'+v+'" aria-label="Unidades para '+safe(p.remision)+'"></div></div>';
+        }).join('');
+        return '<div class="ftr-card" data-s="'+si+'"><p class="ftr-t"><b>'+safe(s.producto)+'</b></p>'
+          + '<p class="ftr-sub">Hay <b>'+s.disponible+'</b> · piden <b>'+s.totalPedido+'</b> · faltan <b>'+s.faltan+'</b></p>'
+          + '<p class="ftr-lbl">Sugerencias</p><div class="ftr-chips">'
+          + '<button type="button" class="chip" data-sug="proporcional" data-s="'+si+'">Proporcional</button><button type="button" class="chip" data-sug="parejo" data-s="'+si+'">Parejo</button>'
+          + '<button type="button" class="chip" data-sug="antiguos" data-s="'+si+'">Primero los más antiguos</button><button type="button" class="chip" data-sug="pequenos" data-s="'+si+'">Primero los más pequeños</button></div>'
+          + '<p class="ftr-lbl">O escribe cuántas le das a cada pedido</p>' + filas
+          + '<p class="ftr-sum" id="ftrSum'+si+'"></p>'
+          + '<div class="modal-actions"><button type="button" class="btn-ghost" data-ftcancel="'+si+'">Ya apareció la mercancía</button><button type="button" class="btn-solid" data-ftok="'+si+'">Autorizar reparto</button></div></div>';
+      }).join('');
+      FT.lista.forEach(function(s, si){ ftSuma(si); });
+    }
+    function ftLeer(si){
+      var s = FT.lista[si], out = {}; if(!s) return out;
+      Array.prototype.forEach.call($('faltResLista').querySelectorAll('.ftr-in[data-s="'+si+'"]'), function(i){ var v = String(i.value).replace(/[^0-9]/g,''); out[i.getAttribute('data-r')] = v === '' ? undefined : parseInt(v,10); });
+      return out;
+    }
+    function ftSuma(si){
+      var s = FT.lista[si], el = $('ftrSum'+si); if(!s || !el) return;
+      var r = ftLeer(si), tot = 0, falta = 0; s.pedidos.forEach(function(p){ if(r[p.remision] === undefined) falta++; else tot += r[p.remision]; });
+      var mal = tot > s.disponible;
+      el.className = 'ftr-sum' + (mal ? ' mal' : ''); el.textContent = 'Repartidas ' + tot + ' de ' + s.disponible + (mal ? ' · te pasaste' : (falta ? ' · faltan ' + falta + ' pedido(s) por llenar' : ''));
+    }
+    function ftAutorizar(si){
+      var s = FT.lista[si]; if(!s) return;
+      var r = ftLeer(si), rep = {}, faltan = false;
+      s.pedidos.forEach(function(p){ if(r[p.remision] === undefined) faltan = true; else rep[p.remision] = r[p.remision]; });
+      if(faltan){ toast('Llena cuántas unidades van a cada pedido (o usa una sugerencia).','error'); return; }
+      var tot = 0; Object.keys(rep).forEach(function(k){ tot += rep[k]; });
+      if(tot > s.disponible){ toast('Repartiste ' + tot + ' y solo hay ' + s.disponible + '.','error'); return; }
+      overlayCargando(true, 'Ajustando los pedidos');
+      google.script.run.withSuccessHandler(function(res){
+        overlayCargando(false);
+        if(res && res.ok){ toast(res.message,'success',5000); haptic(20); $('faltResModal').classList.remove('show'); delete FT.rep[s.id]; ftRefrescar(true); try{ packCargarPendientes(true); }catch(e){} }
+        else toast((res && res.message) || 'No se pudo aplicar el reparto.','error',7000);
+      }).withFailureHandler(function(){ overlayCargando(false); toast('Sin conexión: no se aplicó el reparto.','error'); })
+        .resolverFaltante({ id:s.id, reparto:rep, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+    }
+    function ftCancelar(si){
+      var s = FT.lista[si]; if(!s) return;
+      if(!window.confirm('¿Ya apareció la mercancía? Se cierra la solicitud sin cambiar ningún pedido.')) return;
+      google.script.run.withSuccessHandler(function(res){
+        if(res && res.ok){ toast(res.message,'success'); $('faltResModal').classList.remove('show'); ftRefrescar(true); }
+        else toast((res && res.message) || 'No se pudo cerrar.','error');
+      }).withFailureHandler(function(){ toast('Sin conexión.','error'); })
+        .cancelarFaltante({ id:s.id, operador:String((AJUSTES&&AJUSTES.operador)||'').trim() });
+    }
+
+    /* ——— Eventos ——— */
+    document.addEventListener('click', function(e){
+      var t = e.target.closest ? e.target : null; if(!t) return;
+      var b;
+      if((b = t.closest('#packBodega [data-bod="falt"]'))){ haptic(10); ftAbrirReporte(); return; }
+      if((b = t.closest('[data-ftwa]'))){ haptic(10); waAbrir(b.getAttribute('data-ftwa'), FT.mensaje || ''); return; }
+      if((b = t.closest('[data-sug]'))){
+        var si = +b.getAttribute('data-s'), s = FT.lista[si]; if(!s) return;
+        var sug = ftSugerir(b.getAttribute('data-sug'), s.pedidos, s.disponible); FT.rep[s.id] = sug; haptic(8);
+        Array.prototype.forEach.call($('faltResLista').querySelectorAll('.ftr-in[data-s="'+si+'"]'), function(i){ i.value = String(sug[i.getAttribute('data-r')] || 0); });
+        ftSuma(si); return;
+      }
+      if((b = t.closest('[data-ftok]'))){ ftAutorizar(+b.getAttribute('data-ftok')); return; }
+      if((b = t.closest('[data-ftcancel]'))){ ftCancelar(+b.getAttribute('data-ftcancel')); return; }
+    });
+    document.addEventListener('input', function(e){
+      var i = e.target; if(!i || !i.classList || !i.classList.contains('ftr-in')) return;
+      i.value = String(i.value).replace(/[^0-9]/g,''); var si = +i.getAttribute('data-s'), s = FT.lista[si];
+      if(s){ FT.rep[s.id] = FT.rep[s.id] || {}; FT.rep[s.id][i.getAttribute('data-r')] = i.value === '' ? undefined : parseInt(i.value,10); ftSuma(si); }
+    });
+    $('faltRepEnviar').addEventListener('click', ftReportar);
+    $('faltRepCerrar').addEventListener('click', function(){ $('faltRepModal').classList.remove('show'); });
+    $('faltRepModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
+    $('faltResCerrar').addEventListener('click', function(){ $('faltResModal').classList.remove('show'); });
+    $('faltResModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
+    // al abrir la app (ya desbloqueada) se revisa una vez
+    setTimeout(function(){ try{ ftRefrescar(true); }catch(e){} }, 4000);
     /* ═══════ SALUD DEL SISTEMA · se abre al tocar el estado (🟢 Al día · hora) ═══════ */
     var SAL = { t:null, prueba:'' };
     function saludFila(nivel, k, v){ return '<div class="sl-row '+nivel+(String(v).length>24?' ancho':'')+'"><i></i><div><small>'+safe(k)+'</small><b>'+safe(v)+'</b></div></div>'; }

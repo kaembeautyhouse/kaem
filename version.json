@@ -1,8 +1,9 @@
 {
-  "app": "2026-11-26-37",
-  "servidor": "2026.10.73",
+  "app": "2026-11-26-38",
+  "servidor": "2026.10.74",
   "fecha": "2026-11-26",
   "novedades": [
+    "Faltantes de Bodega: si no alcanzan las unidades para los pedidos, Bodega toca «Reportar faltante», dice cuántas hay y la app arma el mensaje exacto para mandárselo por WhatsApp a Kevin y a Camilo. Mientras no decidan, esos pedidos no se pueden cerrar. Kevin o Camilo ven el aviso en Empaque y reparten las unidades con sugerencias (proporcional, parejo, más antiguos o más pequeños primero) o escribiendo cuántas le tocan a cada pedido, por ejemplo para darle prioridad a un cliente. Con que uno autorice basta: los pedidos se ajustan solos (total, cartera e inventario) y Bodega los puede cerrar.",
     "Perfil Bodega: quien empaca entra con su propio PIN (Ajustes → Seguridad) y solo ve Empaque. Ve los pedidos por empacar con los datos del cliente para el rótulo, genera la misma remisión en PDF, marca la fecha de entrega y escribe por WhatsApp a Kevin o a Camilo según el tipo de pedido. No ve costos, ganancia, cartera ni finanzas: el servidor lo rechaza aunque alguien lo intente a mano. En un pedido guardado hay un botón «Avisar a Bodega» que abre su WhatsApp con el mensaje listo. Los números de WhatsApp se editan en Ajustes.",
     "Pagos en computador: las tarjetas «Por pagar este mes», «Vencidos» y «Próximos 7 días» ya no se ven aplastadas cuando «Pagado este mes» tiene datos.",
     "Descuento por marca al montar un pedido: al marcar «Sí» en Descuento aparece «¿En qué?» con dos opciones, «Todo el pedido» (como antes) o «Una marca». Con «Una marca» se abre una ventana con las marcas del pedido para escribir el % de cada una; las demás quedan a precio normal. El total, el recibo, la edición del pedido, las devoluciones y el ajuste por faltantes al empacar respetan ese descuento.",
