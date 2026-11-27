@@ -1,8 +1,16 @@
 {
-  "app": "2026-11-27-44",
-  "servidor": "2026.10.78",
+  "app": "2026-11-27-45",
+  "servidor": "2026.10.79",
   "fecha": "2026-11-27",
   "novedades": [
+    {
+      "titulo": "Ofertas más completas: fechas, letra pequeña y descuentos por producto",
+      "icono": "precio",
+      "para": [
+        "equipo"
+      ],
+      "texto": "En Ajustes → Catálogo virtual → Ofertas ahora también eliges el primer y el último día (la oferta queda programada y se apaga sola), escribes tu propia letra pequeña, pones 0 % a una marca dentro de una oferta general y das un porcentaje distinto por categoría, producto o tono. Siempre gana lo más específico: tono, producto, categoría, marca y por último el general. Al aprobar un pedido del catálogo, cada línea llega con su porcentaje exacto."
+    },
     {
       "titulo": "Ofertas en los catálogos: Black Friday",
       "icono": "precio",

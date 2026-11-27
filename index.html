@@ -48,7 +48,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-27-44';
+    const APP_VERSION = '2026-11-27-45';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -513,7 +513,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.78', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.79', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -526,7 +526,7 @@
 
       var SOLO_LECTURA = {
         getInitialData:1, listProducts:1, estadoFaltantes:1, listarFaltantes:1, estadoPush:1, listarEmpacadosHoy:1, obtenerHistorial:1, listarPedidosPendientes:1, obtenerAjustes:1, obtenerCarteraPendiente:1,
-        estadoColaSync:1, getNextRemision:1, ping:1, exportarGanchos:1, estadoPin:1, estadoRespaldo:1, estadoCatalogo:1,
+        estadoColaSync:1, getNextRemision:1, ping:1, exportarGanchos:1, estadoPin:1, estadoRespaldo:1, estadoCatalogo:1, opcionesOferta:1,
         obtenerAlertas:1, obtenerEstadisticas:1, obtenerBI:1, sugerenciaReposicion:1, obtenerClientes:1,
         listarClientes:1, obtenerAbonos:1, obtenerPagosRecientes:1, obtenerAuditoria:1, obtenerPedido:1,
         listarUbicacionesShopify:1, listarObligaciones:1, listarPedidosCatalogo:1, obtenerDevoluciones:1, estadoSesiones:1,
@@ -4401,6 +4401,11 @@
 .of-add{display:grid;grid-template-columns:1fr 64px auto;gap:8px;align-items:center}
 .of-add select,.of-add input{min-height:44px;border-radius:12px;border:1px solid var(--linea,#d9d0c3);padding:0 10px;font:inherit;background:var(--blanco,#fff);color:inherit}
 @media (max-width:420px){.of-add{grid-template-columns:1fr 64px}.of-add .btn-ghost{grid-column:1 / -1}}
+.of-add-3{grid-template-columns:110px 1fr 64px auto}
+.of-chip small{opacity:.7;text-transform:uppercase;font-size:10px;letter-spacing:.06em}
+@media (max-width:480px){.of-add-3{grid-template-columns:1fr 64px}.of-add-3 select:first-child{grid-column:1 / -1}.of-add-3 .btn-ghost{grid-column:1 / -1}}
+#cfgOfLetra{width:100%;border-radius:12px;border:1px solid var(--linea,#d9d0c3);padding:10px;font:inherit;background:var(--blanco,#fff);color:inherit;resize:vertical}
+#cfgOfDesde,#cfgOfHasta{min-width:0;width:100%}
   </style>
 </head>
 <body>
@@ -6291,10 +6296,18 @@
         <div class="field"><label class="lbl" for="cfgOfNombre">Nombre de la oferta</label><input id="cfgOfNombre" type="text" maxlength="30" placeholder="Black Friday" autocomplete="off"></div>
         <div class="field"><label class="lbl" for="cfgOfPct">Descuento para todos los productos (%) · 0 si solo habrá por marca</label><input id="cfgOfPct" type="text" inputmode="numeric" maxlength="2" placeholder="Ej. 30" autocomplete="off"></div>
         <div class="field"><label class="lbl" for="cfgOfMin">Compra mínima para recibirlo (0 = siempre)</label><input id="cfgOfMin" type="text" inputmode="numeric" placeholder="0" autocomplete="off"></div>
-        <div class="field"><label class="lbl" for="cfgOfHasta">Último día de la oferta (opcional)</label><input id="cfgOfHasta" type="date"></div>
-        <p class="cfg-sub" style="margin-top:12px">Marcas con descuento propio</p>
+        <div class="cfg-2col">
+          <div class="field"><label class="lbl" for="cfgOfDesde">Primer día (opcional)</label><input id="cfgOfDesde" type="date"></div>
+          <div class="field"><label class="lbl" for="cfgOfHasta">Último día (opcional)</label><input id="cfgOfHasta" type="date"></div>
+        </div>
+        <div class="field"><label class="lbl" for="cfgOfLetra">Letra pequeña del aviso (déjala vacía para no mostrarla)</label><textarea id="cfgOfLetra" rows="2" maxlength="240" placeholder="* Descuento válido únicamente para pagos de contado."></textarea></div>
+        <p class="cfg-sub" style="margin-top:12px">Marcas con descuento propio <small style="text-transform:none;letter-spacing:0">(0 = esa marca queda sin descuento)</small></p>
         <div id="cfgOfMarcas" class="of-marcas"></div>
         <div class="of-add"><select id="cfgOfMarcaSel" aria-label="Marca"></select><input id="cfgOfMarcaPct" type="text" inputmode="numeric" maxlength="2" placeholder="%" aria-label="Porcentaje de la marca" autocomplete="off"><button class="btn-ghost" id="cfgOfMarcaAdd" type="button">Agregar marca</button></div>
+        <p class="cfg-sub" style="margin-top:14px">Por categoría, producto o tono <small style="text-transform:none;letter-spacing:0">(manda sobre la marca)</small></p>
+        <div id="cfgOfReglas" class="of-marcas"></div>
+        <div class="of-add of-add-3"><select id="cfgOfReglaTipo" aria-label="Tipo"><option value="cat">Categoría</option><option value="prod">Producto</option><option value="tono">Tono</option></select><select id="cfgOfReglaVal" aria-label="Elemento"></select><input id="cfgOfReglaPct" type="text" inputmode="numeric" maxlength="2" placeholder="%" aria-label="Porcentaje" autocomplete="off"><button class="btn-ghost" id="cfgOfReglaAdd" type="button">Agregar</button></div>
+        <p class="cfg-hint" id="cfgOfReglaAyuda" style="margin:4px 0 0"></p>
         <button class="btn-solid" id="cfgOfGuardar" type="button" style="margin-top:10px;width:100%">Guardar oferta</button>
       </div>
       <p class="cfg-hint" id="cfgOfHint">Sin oferta en este catálogo.</p>
@@ -9836,7 +9849,7 @@
     function marcaClave(it){ return String(it.marca||'').trim() || 'Sin marca'; }
     function descPorMarcaActivo(){ return PGD.desc==='con' && PGD.descModo==='marca'; }
     /** % de descuento que le toca a esa línea (solo en modo «una marca»). */
-    function descMarcaDe(it){ return descPorMarcaActivo() ? Math.max(0, Math.min(100, Number(DESCM[marcaClave(it)])||0)) : 0; }
+    function descMarcaDe(it){ return descPorMarcaActivo() ? Math.max(0, Math.min(100, Number(it.descLin!=null ? it.descLin : DESCM[marcaClave(it)])||0)) : 0; }   // descLin: % propio de la línea (ofertas del catálogo por categoría, producto o tono); si no, el de su marca
     /** Marcas que hay en el carrito, con lo que suman, para la ventana de descuento por marca. */
     function marcasDelCarrito(){
       var m={}, orden=[];
@@ -10312,6 +10325,7 @@
       // Descuento por marca: el % viene en cada línea; se reconstruye por la marca de la línea.
       DESCM={}; PGD.descModo='todo';
       (o.items||[]).forEach(function(it){ var d=Number(it.descPct)||0; if(d<=0) return; for(var k=0;k<CART.items.length;k++){ if(CART.items[k].sku===it.sku){ DESCM[marcaClave(CART.items[k])]=d; PGD.descModo='marca'; break; } } });
+      if(PGD.descModo==='marca') (o.items||[]).forEach(function(it){ for(var k=0;k<CART.items.length;k++){ if(CART.items[k].sku===it.sku){ CART.items[k].descLin=Number(it.descPct)||0; break; } } });   // cada línea conserva su % exacto
       if(PGD.descModo==='marca') $('descInput').value='';
       CART.marcaOrden = marcasEnOrden(o.items||[]);
       setPago(o.metodoPago==='Crédito'?'Crédito':'Contado');
@@ -13733,7 +13747,7 @@
       // Oferta con % distinto por marca (Black Friday: general + una marca especial): cada línea trae su % y se reconstruye el descuento por marca
       if(items.some(function(it){ return Number(it.descPct)>0; })){
         DESCM={}; PGD.descModo='marca'; PGD.desc='con'; $('descInput').value='';
-        CART.items.forEach(function(ci,i){ var d=Number(items[i].descPct)||0; if(d>0) DESCM[marcaClave(ci)]=d; });
+        CART.items.forEach(function(ci,i){ var d=Number(items[i].descPct)||0; if(d>0) DESCM[marcaClave(ci)]=d; ci.descLin=d; });   // y cada línea con su % exacto (puede variar dentro de una misma marca)
       }
       $('fleteInput').value = p.flete ? String(p.flete) : ''; FLETE_MANUAL=true;   // calculado por el servidor con la misma política
       var pagoCat = { Transferencia:'Transferencia', Efectivo:'Efectivo', Contraentrega:'Efectivo' }[p.pago];
@@ -14888,19 +14902,42 @@
     var CATCFG = null;
     function catEnlace(nivel){ return CATCFG && CATCFG.claves && CATCFG.claves[nivel] ? new URL((nivel==='DETAL'?'catalogo-detal.html':'catalogo.html')+'?k='+CATCFG.claves[nivel], location.href).href : ''; }
     /* Ofertas por catálogo (Detal, Distribuidor, Mayorista): se editan en un borrador y se guardan con el botón */
-    var OFSEL='DETAL', OFD=null;
+    var OFSEL='DETAL', OFD=null, OFCARGANDO=false;
     var OF_NOMBRES={ DETAL:'Detal', DISTRIB:'Distribuidor', MAYOR:'Mayorista' };
-    function ofVacia(){ return { activo:false, nombre:'Black Friday', pct:0, minimo:0, hasta:'', marcas:{} }; }
-    function ofCargar(){ var o=(CATCFG && CATCFG.ofertas && CATCFG.ofertas[OFSEL]) || ofVacia(); OFD=JSON.parse(JSON.stringify(o)); OFD.marcas=OFD.marcas||{}; }
+    var OF_LETRA_DEF='* Descuento válido únicamente para pagos de contado.', OFOPC=null;
+    function ofVacia(){ return { activo:false, nombre:'Black Friday', pct:0, minimo:0, desde:'', hasta:'', letra:OF_LETRA_DEF, marcas:{}, reglas:[] }; }
+    function ofCargar(){ var o=(CATCFG && CATCFG.ofertas && CATCFG.ofertas[OFSEL]) || ofVacia(); OFD=JSON.parse(JSON.stringify(o)); OFD.marcas=OFD.marcas||{}; OFD.reglas=OFD.reglas||[]; if(OFD.letra==null) OFD.letra=OF_LETRA_DEF; OFOPC=null; }
     function ofFechaTxt(h){ var p=String(h||'').split('-'); return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0] : ''; }
     function pintarOfMarcas(){
       var box=$('cfgOfMarcas'), ks=Object.keys(OFD.marcas);
-      box.innerHTML = ks.length ? ks.map(function(k){ return '<span class="of-chip"><b>'+safe(k)+'</b> '+OFD.marcas[k]+' % <button type="button" data-ofq="'+safe(k)+'" aria-label="Quitar '+safe(k)+'">✕</button></span>'; }).join('') : '<small class="cfg-hint" style="margin:0">Ninguna: todas las marcas llevan el descuento general.</small>';
+      box.innerHTML = ks.length ? ks.map(function(k){ return '<span class="of-chip"><b>'+safe(k)+'</b> '+(OFD.marcas[k]>0?OFD.marcas[k]+' %':'sin descuento')+' <button type="button" data-ofq="'+safe(k)+'" aria-label="Quitar '+safe(k)+'">✕</button></span>'; }).join('') : '<small class="cfg-hint" style="margin:0">Ninguna: todas las marcas llevan el descuento general.</small>';
       var marcas=[]; ((STATE&&STATE.products)||[]).forEach(function(p){ var m=String(p.marca||'').trim(); if(m && marcas.indexOf(m)<0 && !ks.some(function(k){ return k.toUpperCase()===m.toUpperCase(); })) marcas.push(m); });
       marcas.sort(function(a,b){ return a.localeCompare(b,'es'); });
       var sel=$('cfgOfMarcaSel'), prev=sel.value;
       sel.innerHTML='<option value="">Elige una marca…</option>'+marcas.map(function(m){ return '<option value="'+safe(m)+'">'+safe(m)+'</option>'; }).join('');
       if(prev && marcas.indexOf(prev)>=0) sel.value=prev;
+    }
+    var OF_TIPO={ cat:'Categoría', prod:'Producto', tono:'Tono' };
+    function pintarOfReglas(){
+      var box=$('cfgOfReglas');
+      box.innerHTML = OFD.reglas.length ? OFD.reglas.map(function(r,i){ return '<span class="of-chip"><small>'+OF_TIPO[r.t]+'</small> <b>'+safe(r.e||r.v)+'</b> '+(r.p>0?r.p+' %':'sin descuento')+' <button type="button" data-ofr="'+i+'" aria-label="Quitar">✕</button></span>'; }).join('') : '<small class="cfg-hint" style="margin:0">Ninguno.</small>';
+      ofValores();
+    }
+    function ofValores(){
+      var t=$('cfgOfReglaTipo').value, sel=$('cfgOfReglaVal'), ay=$('cfgOfReglaAyuda'), o=OFOPC, h='<option value="">Elige…</option>';
+      if(!o){ sel.innerHTML=h; ay.textContent='Cargando la lista del catálogo…'; return; }
+      var usados={}; OFD.reglas.forEach(function(r){ if(r.t===t) usados[r.v]=1; });
+      if(t==='cat') o.categorias.forEach(function(c){ if(!usados[c]) h+='<option value="'+safe(c)+'" data-e="'+safe(c)+'">'+safe(c)+'</option>'; });
+      else if(t==='prod') o.productos.forEach(function(p){ if(!usados[p.id]) h+='<option value="'+safe(p.id)+'" data-e="'+safe(p.nombre+' · '+p.marca)+'">'+safe(p.marca+' · '+p.nombre)+'</option>'; });
+      else o.productos.forEach(function(p){ p.tonos.forEach(function(x){ if(!usados[x.sku]) h+='<option value="'+safe(x.sku)+'" data-e="'+safe(p.nombre+(x.tono?' · '+x.tono:''))+'">'+safe(p.marca+' · '+p.nombre+(x.tono?' · '+x.tono:'')+' ('+x.sku+')')+'</option>'; }); });
+      sel.innerHTML=h; ay.textContent='';
+    }
+    function ofCargarOpciones(){
+      var nivel=OFSEL;
+      google.script.run.withSuccessHandler(function(r){
+        if(nivel!==OFSEL) return;
+        if(r && r.ok){ OFOPC=r; ofValores(); } else { $('cfgOfReglaAyuda').textContent=(r&&r.message)||'No se pudo cargar la lista.'; }
+      }).withFailureHandler(function(){ $('cfgOfReglaAyuda').textContent='Sin conexión: no se pudo cargar la lista.'; }).opcionesOferta({ nivel:nivel });
     }
     function pintarOfCfg(){
       if(!OFD) ofCargar();
@@ -14913,12 +14950,15 @@
         if(a!==$('cfgOfPct')) $('cfgOfPct').value=OFD.pct?String(OFD.pct):'';
         if(a!==$('cfgOfMin')) $('cfgOfMin').value=OFD.minimo?formatMiles(OFD.minimo):'0';
         if(a!==$('cfgOfHasta')) $('cfgOfHasta').value=OFD.hasta||'';
-        pintarOfMarcas();
+        if(a!==$('cfgOfDesde')) $('cfgOfDesde').value=OFD.desde||'';
+        if(a!==$('cfgOfLetra')) $('cfgOfLetra').value=OFD.letra||'';
+        pintarOfMarcas(); pintarOfReglas();
+        if(!OFOPC && !OFCARGANDO){ OFCARGANDO=true; ofCargarOpciones(); setTimeout(function(){ OFCARGANDO=false; }, 4000); }
       }
       var g=(CATCFG && CATCFG.ofertas && CATCFG.ofertas[OFSEL]) || null, ks=g?Object.keys(g.marcas||{}):[];
       $('cfgOfHint').textContent = g && g.activo
-        ? ('🏷️ '+(g.nombre||'Oferta')+' activa en '+OF_NOMBRES[OFSEL]+': '+(g.pct?g.pct+' % en todo':'solo por marca')+(ks.length?' · '+ks.map(function(k){ return k+' '+g.marcas[k]+' %'; }).join(' · '):'')+(g.minimo>0?' · desde '+cop(g.minimo):'')+(g.hasta?' · hasta el '+ofFechaTxt(g.hasta):'')+'. El envío gratis se mide sobre el valor de los productos antes del descuento.')
-        : (g && g.vencida ? '⌛ La oferta venció el '+ofFechaTxt(g.hasta)+' y se apagó sola. Cambia la fecha o crea una nueva.' : 'Sin oferta en el catálogo '+OF_NOMBRES[OFSEL]+'.');
+        ? ('🏷️ '+(g.nombre||'Oferta')+' activa en '+OF_NOMBRES[OFSEL]+': '+(g.pct?g.pct+' % en todo':'solo por marca')+(ks.length?' · '+ks.map(function(k){ return k+' '+g.marcas[k]+' %'; }).join(' · '):'')+(g.minimo>0?' · desde '+cop(g.minimo):'')+((g.reglas&&g.reglas.length)?' · '+g.reglas.length+' regla(s) por categoría/producto/tono':'')+(g.desde?' · desde el '+ofFechaTxt(g.desde):'')+(g.hasta?' · hasta el '+ofFechaTxt(g.hasta):'')+'. El envío gratis se mide sobre el valor de los productos antes del descuento.')
+        : (g && g.programada ? '🗓️ Oferta «'+(g.nombre||'')+'» programada: empieza el '+ofFechaTxt(g.desde)+'.' : (g && g.vencida ? '⌛ La oferta venció el '+ofFechaTxt(g.hasta)+' y se apagó sola. Cambia la fecha o crea una nueva.' : 'Sin oferta en el catálogo '+OF_NOMBRES[OFSEL]+'.'));
     }
     function pintarCatalogoCfg(r){
       if(r) CATCFG=r;
@@ -14982,16 +15022,27 @@
     $('cfgOfMin').addEventListener('input', function(e){ var n=parseInt(String(e.target.value).replace(/\D/g,''),10)||0; e.target.value = n ? formatMiles(n) : ''; });
     $('cfgOfMarcas').addEventListener('click', function(e){ var q=e.target.closest('[data-ofq]'); if(!q) return; delete OFD.marcas[q.getAttribute('data-ofq')]; pintarOfMarcas(); });
     $('cfgOfMarcaAdd').addEventListener('click', function(){
-      var m=$('cfgOfMarcaSel').value, p=parseInt($('cfgOfMarcaPct').value,10)||0;
+      var m=$('cfgOfMarcaSel').value, txt=String($('cfgOfMarcaPct').value).trim(), p=parseInt(txt,10);
       if(!m){ toast('Elige una marca.','error'); return; }
-      if(p<1 || p>50){ toast('Escribe un porcentaje entre 1 y 50 para la marca.','error'); return; }
+      if(txt==='' || isNaN(p) || p<0 || p>50){ toast('Escribe un porcentaje de 0 a 50 para la marca (0 = sin descuento).','error'); return; }
       OFD.marcas[m]=p; $('cfgOfMarcaPct').value=''; pintarOfMarcas();
     });
+    $('cfgOfReglaTipo').addEventListener('change', ofValores);
+    $('cfgOfReglas').addEventListener('click', function(e){ var q=e.target.closest('[data-ofr]'); if(!q) return; OFD.reglas.splice(parseInt(q.getAttribute('data-ofr'),10),1); pintarOfReglas(); });
+    $('cfgOfReglaAdd').addEventListener('click', function(){
+      var sel=$('cfgOfReglaVal'), v=sel.value, txt=String($('cfgOfReglaPct').value).trim(), p=parseInt(txt,10);
+      if(!v){ toast('Elige qué categoría, producto o tono.','error'); return; }
+      if(txt==='' || isNaN(p) || p<0 || p>50){ toast('Escribe un porcentaje de 0 a 50 (0 = sin descuento).','error'); return; }
+      var op=sel.options[sel.selectedIndex];
+      OFD.reglas.push({ t:$('cfgOfReglaTipo').value, v:v, e:op.getAttribute('data-e')||op.textContent, p:p }); $('cfgOfReglaPct').value=''; pintarOfReglas();
+    });
     $('cfgOfGuardar').addEventListener('click', function(){
-      var pct=parseInt($('cfgOfPct').value,10)||0, mn=parseInt(String($('cfgOfMin').value).replace(/\D/g,''),10)||0, hasta=$('cfgOfHasta').value||'';
+      var pct=parseInt($('cfgOfPct').value,10)||0, mn=parseInt(String($('cfgOfMin').value).replace(/\D/g,''),10)||0, hasta=$('cfgOfHasta').value||'', desde=$('cfgOfDesde').value||'';
       if(pct<0 || pct>50){ toast('El porcentaje general va de 0 a 50.','error'); return; }
-      if(!pct && !Object.keys(OFD.marcas).length){ toast('Escribe el porcentaje general o agrega al menos una marca.','error'); return; }
-      var d={ ofertas:{} }; d.ofertas[OFSEL]={ activo:true, nombre:($('cfgOfNombre').value||'').trim()||'Black Friday', pct:pct, minimo:mn, hasta:hasta, marcas:OFD.marcas };
+      if(desde && hasta && desde>hasta){ toast('El primer día no puede ser después del último.','error'); return; }
+      var hayEsp=Object.keys(OFD.marcas).some(function(k){ return OFD.marcas[k]>0; }) || OFD.reglas.some(function(r){ return r.p>0; });
+      if(!pct && !hayEsp){ toast('Escribe el porcentaje general o agrega al menos una marca, categoría, producto o tono con descuento.','error'); return; }
+      var d={ ofertas:{} }; d.ofertas[OFSEL]={ activo:true, nombre:($('cfgOfNombre').value||'').trim()||'Black Friday', pct:pct, minimo:mn, desde:desde, hasta:hasta, letra:String($('cfgOfLetra').value||'').trim(), marcas:OFD.marcas, reglas:OFD.reglas };
       catConfigurar(d, 'Oferta guardada ✓ ya se ve en el catálogo '+OF_NOMBRES[OFSEL]);
     });
     /** CSV (comillas, comas y saltos de línea dentro de un campo) → filas de texto. */
@@ -17133,7 +17184,7 @@
     $('descMarcaAplicar').addEventListener('click', function(){
       var sel=descMarcaLeer();
       if(!Object.keys(sel).length){ toast('Escribe el porcentaje de la marca, o toca Cancelar.','error'); var f=$('descMarcaLista').querySelector('.dm-pct'); if(f) f.focus(); return; }
-      DESCM=sel; descMarcaCerrar(); haptic(12); pgPintar(); updateTotals(); markDirty();
+      DESCM=sel; CART.items.forEach(function(it){ delete it.descLin; }); descMarcaCerrar(); haptic(12); pgPintar(); updateTotals(); markDirty();
     });
     $('descMarcaModal').addEventListener('click', function(e){ if(e.target===this) $('descMarcaCancelar').click(); });
     $('fleteHint').addEventListener('click', function(e){ if(e.target && e.target.id==='fletePolBtn'){ PGD.flete = getFlete()>0 ? 'valor' : 'gratis'; if(PGD.flete==='gratis') $('fleteInput').value=''; FLETE_MANUAL=true; updateTotals(); } });

@@ -267,9 +267,9 @@
       }).join('')+'</div>' : '';
       h+='<div class="card'+(animar?' anim':'')+'" data-gi="'+gi+'" style="--d:'+Math.min(n*35,420)+'ms"><div class="foto" data-mk="'+esc(g.marca)+'" data-info="'+gi+'" role="button" aria-label="Ver '+esc(g.nombre)+' en grande">'
         +(foto?imgTag(foto, g.nombre, 420, '(min-width:1280px) 20vw, (min-width:1000px) 25vw, (min-width:700px) 33vw, 50vw', ' loading="lazy"'):'<span class="ph">'+esc(g.marca)+'</span>')
-        +'<button class="ibtn" type="button" data-info="'+gi+'" aria-label="Qué es y para qué sirve">i</button>'+KC.ofEtq(g.marca)+'</div>'
+        +'<button class="ibtn" type="button" data-info="'+gi+'" aria-label="Qué es y para qué sirve">i</button>'+KC.ofEtq(KC.ofRef(g,v))+'</div>'
         +'<div class="info"><span class="mk">'+esc(g.marca)+'</span><p class="nom">'+esc(g.nombre)+'</p>'+tonos
-        +'<div class="pie"><span class="precio">'+precioHTML(v.precio,g.marca)+'</span><span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span></div>'
+        +'<div class="pie"><span class="precio">'+precioHTML(v.precio,KC.ofRef(g,v))+'</span><span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span></div>'
         +accionHTML(sel, g)+'</div></div>';
       n++;
     });
@@ -302,7 +302,7 @@
     var abierta = $('infoIn').querySelector('.qv-foto.full') ? ' full' : '';
     var h='<h2><span></span><button class="cerrar" id="cerrarInfo" aria-label="Cerrar">✕</button></h2>'
       +'<div class="qv-foto'+abierta+'" id="qvFoto" role="button" aria-label="Ampliar o reducir foto" data-mk="'+esc(g.marca)+'">'+(foto?imgTag(foto, g.nombre, 800, '(min-width:560px) 520px, 94vw'):'<span class="ph">'+esc(g.marca)+'</span>')+'</div>'
-      +'<p class="qv-mk">'+esc(g.marca)+(g.tipo?' · '+esc(g.tipo):'')+'</p><h3 class="qv-nom">'+esc(g.nombre)+'</h3><span class="qv-precio">'+precioHTML(v.precio,g.marca)+'</span> <span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span>';
+      +'<p class="qv-mk">'+esc(g.marca)+(g.tipo?' · '+esc(g.tipo):'')+'</p><h3 class="qv-nom">'+esc(g.nombre)+'</h3><span class="qv-precio">'+precioHTML(v.precio,KC.ofRef(g,v))+'</span> <span class="etq'+(v.etiqueta!=='Disponible'?' pocas':'')+'">'+esc(v.etiqueta)+'</span>';
     if(i.q) h+='<p class="qv-que">'+esc(i.q)+'</p>';
     if(i.b && i.b.length) h+='<ul class="qv-lista">'+i.b.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>';
     if(i.g) h+='<div class="qv-gancho"><b>💡 Para tu negocio</b>'+esc(i.g)+'</div>';
@@ -325,10 +325,10 @@
   document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ if($('hInfo').classList.contains('on')) cerrarInfo(); else $('hoja').classList.remove('on'); } });
 
   /* Precio con la oferta: si el descuento es para todo (sin compra mínima) se muestra el viejo tachado y el nuevo */
-  function precioHTML(p, marca){ var n=KC.ofPrecio(p, marca); return n!==p ? '<s>'+cop(p)+'</s>'+cop(n) : cop(p); }
+  function precioHTML(p, ref){ var n=KC.ofPrecio(p, ref); return n!==p ? '<s>'+cop(p)+'</s>'+cop(n) : cop(p); }
   /* ——— Cuentas: subtotal, descuento, envío y total (el servidor vuelve a calcular todo al recibir) ——— */
   function totales(ciudad){
-    var st=0,u=0,r=0,ls=[]; Object.keys(CARRITO).forEach(function(s){ if(!VAR[s]) return; var sb=VAR[s].v.precio*CARRITO[s]; st+=sb; u+=CARRITO[s]; r++; ls.push({ marca:VAR[s].g.marca, subtotal:sb }); });
+    var st=0,u=0,r=0,ls=[]; Object.keys(CARRITO).forEach(function(s){ if(!VAR[s]) return; var sb=VAR[s].v.precio*CARRITO[s]; st+=sb; u+=CARRITO[s]; r++; ls.push({ ref:KC.ofRef(VAR[s].g, VAR[s].v), subtotal:sb }); });
     var dd=KC.ofDescuento(ls);
     var e=CAT.envio, am = e.amGratis && esAreaMetro(ciudad);
     var siempre = e.siempreGratis || e.gratisDesde <= CAT.minimo;   // Distribuidor: todo pedido válido va con envío gratis
