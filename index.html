@@ -48,7 +48,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-26-38';
+    const APP_VERSION = '2026-11-26-39';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -425,7 +425,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.74', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.75', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -437,7 +437,7 @@
       }
 
       var SOLO_LECTURA = {
-        getInitialData:1, listProducts:1, estadoFaltantes:1, listarFaltantes:1, obtenerHistorial:1, listarPedidosPendientes:1, obtenerAjustes:1, obtenerCarteraPendiente:1,
+        getInitialData:1, listProducts:1, estadoFaltantes:1, listarFaltantes:1, estadoPush:1, obtenerHistorial:1, listarPedidosPendientes:1, obtenerAjustes:1, obtenerCarteraPendiente:1,
         estadoColaSync:1, getNextRemision:1, ping:1, exportarGanchos:1, estadoPin:1, estadoRespaldo:1, estadoCatalogo:1,
         obtenerAlertas:1, obtenerEstadisticas:1, obtenerBI:1, sugerenciaReposicion:1, obtenerClientes:1,
         listarClientes:1, obtenerAbonos:1, obtenerPagosRecientes:1, obtenerAuditoria:1, obtenerPedido:1,
@@ -498,7 +498,7 @@
       // Cada petición responde UNA sola vez. Un error al MOSTRAR los datos (no de red) ya no
       // se confunde con una falla de conexión ni provoca reintentos al servidor.
       // Lo que el perfil Bodega puede pedir (igual que en el servidor): lo demás ni sale del celular y se responde "sin acceso".
-      var BODEGA_OK = { ping:1, estadoPin:1, verificarPin:1, lote:1, getInitialData:1, obtenerAjustes:1, listarPedidosPendientes:1, finalizarPacking:1, actualizarFechaEntrega:1, reportarFaltante:1, estadoFaltantes:1 };
+      var BODEGA_OK = { ping:1, estadoPin:1, verificarPin:1, lote:1, getInitialData:1, obtenerAjustes:1, listarPedidosPendientes:1, finalizarPacking:1, actualizarFechaEntrega:1, reportarFaltante:1, estadoFaltantes:1, registrarPush:1, quitarPush:1, estadoPush:1 };
       function callBackend(action, data, onSuccess, onFailure) {
         if (window.KAEM_ROL === 'bodega' && !BODEGA_OK[action]) {
           setTimeout(function () { if (onSuccess) { try { onSuccess({ ok: false, success: false, rolRestringido: true, message: 'Este perfil no tiene acceso a esa función.' }); } catch (e) {} } }, 0);
@@ -4044,6 +4044,11 @@
     .ftr-sum{margin:8px 0;font-size:13.5px;font-weight:600}.ftr-sum.mal{color:var(--rojo-txt)}
     .ftr-ok{margin:10px 0 6px;font-size:14px}
     .ftr-msg{white-space:pre-wrap;font-family:inherit;font-size:13px;background:var(--st-espera-bg);padding:10px 12px;border-radius:12px;margin:6px 0}
+
+    /* ——— Aviso para activar notificaciones (Bodega) ——— */
+    .pk-push{margin:0 0 10px;padding:12px 14px;border-radius:14px;background:var(--st-wa-bg);border:1px solid var(--linea);font-size:14px;line-height:1.35}
+    .pk-push small{display:block;margin:2px 0 8px;font-size:12px;opacity:.8}
+    .pk-push .btn-solid{width:100%}
   </style>
 </head>
 <body>
@@ -4188,6 +4193,7 @@
 
       <!-- ————— PACKING · CHECKLIST DE ALISTAMIENTO ————— -->
       <section class="screen" id="screen-packing">
+        <div class="pk-push" id="pushBanner" style="display:none" role="status"></div>
         <div class="pk-falt" id="packFaltBanner" style="display:none" role="status"></div>
         <div class="pack-head">
           <div class="field" style="flex:1;margin:0">
@@ -5947,6 +5953,18 @@
         </div>
       </details>
       <details class="cfg-sec">
+        <summary><span><b>Avisos al celular</b><small>Pedidos nuevos, faltantes y repartos, sin abrir la app</small></span></summary>
+        <div class="cfg-sec-body">
+      <p class="seg-estado" id="cfgPushEstado">—</p>
+      <div class="seg-btns">
+        <button class="btn-solid" id="cfgPushOn" type="button" style="grid-column:1/-1">Activar avisos en este celular</button>
+        <button class="btn-ghost" id="cfgPushOff" type="button">Desactivar en este celular</button>
+        <button class="btn-ghost" id="cfgPushTest" type="button">Enviar aviso de prueba</button>
+      </div>
+      <p class="cfg-hint">Cada celular lo activa una vez (Kevin, Camilo y Bodega). <b>Pedido nuevo</b> avisa a Bodega; <b>faltante</b> avisa a Kevin y a Camilo; cuando se decide el reparto, avisa a Bodega. Los avisos no llevan datos del cliente. En iPhone funciona con la app instalada en la pantalla de inicio. Si un aviso no llega, el WhatsApp sigue como respaldo.</p>
+        </div>
+      </details>
+      <details class="cfg-sec">
         <summary><span><b>Seguridad y respaldo</b><small>PIN de acceso y copias automáticas en Drive</small></span></summary>
         <div class="cfg-sec-body">
       <p class="lbl" style="margin:0 0 6px">PIN de acceso</p>
@@ -6467,6 +6485,7 @@
     });
     function switchTab(tab){
       if(window.KAEM_ROL==='bodega' && tab!=='packing') tab='packing';   // el perfil Bodega solo trabaja en Empaque
+      if(tab==='packing'){ try{ if(window.pushPintar) window.pushPintar(); }catch(e){} }
       if(tab==='packing'){ try{ if(window.ftRefrescar) setTimeout(function(){ window.ftRefrescar(true); }, 300); }catch(e){} }   // faltantes pendientes
       // Ajustes y Estadísticas son pantallas completas que viven encima de los módulos: al pasar a otro módulo se cierran
       try{ hubCerrarPantallas(); }catch(e){}
@@ -16906,8 +16925,119 @@
     $('faltRepModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
     $('faltResCerrar').addEventListener('click', function(){ $('faltResModal').classList.remove('show'); });
     $('faltResModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('show'); });
-    // al abrir la app (ya desbloqueada) se revisa una vez
-    setTimeout(function(){ try{ ftRefrescar(true); }catch(e){} }, 4000);
+    // (sin revisión al abrir la app: se revisa al entrar a Empaque y cada 45 s mientras está abierto, para no gastar una consulta más al arrancar)
+    /* ═══════ AVISOS PUSH · notificaciones al celular ═══════
+       Cada celular (Kevin, Camilo, Bodega) activa los avisos UNA vez: pide permiso, obtiene su «token» de Firebase y lo registra en el
+       servidor, que decide a quién avisar según el rol. Pedido nuevo → Bodega · Faltante → Kevin y Camilo · Reparto decidido → Bodega.
+       iPhone: solo funciona con la app instalada en la pantalla de inicio (Compartir → Agregar a pantalla de inicio). */
+    var PUSH = { ocupado:false, web:null };
+    var PUSH_SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+    function pushSoportado(){ return ('Notification' in window) && ('serviceWorker' in navigator) && ('PushManager' in window); }
+    function pushEsIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+    function pushEsInstalada(){ try{ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }catch(e){ return false; } }
+    function pushTokenLocal(){ try{ return localStorage.getItem('kaem_push_token') || ''; }catch(e){ return ''; } }
+    function pushGuardar(tok){ try{ if(tok){ localStorage.setItem('kaem_push_token', tok); localStorage.setItem('kaem_push_hora', String(Date.now())); } else { localStorage.removeItem('kaem_push_token'); localStorage.removeItem('kaem_push_hora'); } }catch(e){} }
+    function pushActivo(){ return pushSoportado() && Notification.permission === 'granted' && !!pushTokenLocal(); }
+
+    function pushCargarScript(src){
+      return new Promise(function(ok, mal){
+        var ya = document.querySelector('script[data-push="'+src+'"]'); if(ya){ ok(); return; }
+        var s = document.createElement('script'); s.src = src; s.async = true; s.setAttribute('data-push', src);
+        s.onload = function(){ ok(); }; s.onerror = function(){ mal(new Error('No se pudo cargar el servicio de avisos (revisa internet).')); };
+        document.head.appendChild(s);
+      });
+    }
+    function pushSDK(){
+      if(window.firebase && window.firebase.messaging) return Promise.resolve();
+      return pushCargarScript(PUSH_SDK + 'firebase-app-compat.js').then(function(){ return pushCargarScript(PUSH_SDK + 'firebase-messaging-compat.js'); });
+    }
+    function pushRegistro(){
+      // la app ya registra sw.js (es el que muestra los avisos); si aún no está listo se espera un momento
+      var espera = new Promise(function(ok){ setTimeout(function(){ ok(null); }, 4000); });
+      return Promise.race([navigator.serviceWorker.ready.catch(function(){ return null; }), espera]);
+    }
+    function pushServidor(accion, datos){
+      return new Promise(function(ok, mal){ google.script.run.withSuccessHandler(ok).withFailureHandler(function(e){ mal(e || new Error('Sin conexión')); })[accion](datos || {}); });
+    }
+    /** Obtiene (o renueva) el token de este celular y lo registra en el servidor. */
+    function pushObtenerToken(){
+      return pushServidor('estadoPush').then(function(est){
+        if(!est || !est.ok || !est.web) throw new Error('El servidor aún no tiene los avisos (actualiza la app y el servidor).');
+        PUSH.web = est.web; PUSH.configurado = !!est.configurado;
+        return pushSDK().then(function(){
+          var fb = window.firebase; if(!fb.apps || !fb.apps.length) fb.initializeApp(est.web.firebaseConfig);
+          return pushRegistro().then(function(reg){
+            var o = { vapidKey: est.web.vapidKey }; if(reg) o.serviceWorkerRegistration = reg;
+            return fb.messaging().getToken(o);
+          });
+        });
+      }).then(function(tok){
+        if(!tok) throw new Error('No se obtuvo el permiso de avisos de este celular.');
+        return pushServidor('registrarPush', { token: tok, perfil: String((AJUSTES && AJUSTES.operador) || '') }).then(function(r){
+          if(!r || !r.ok) throw new Error((r && r.message) || 'El servidor no registró este celular.');
+          pushGuardar(tok); return r;
+        });
+      });
+    }
+    function pushActivar(){
+      if(PUSH.ocupado) return;
+      if(!pushSoportado()){ toast('Este navegador no permite avisos. Usa Chrome en Android o instala la app en iPhone.','error',7000); return; }
+      if(pushEsIOS() && !pushEsInstalada()){ toast('En iPhone primero instala la app: toca Compartir y «Agregar a pantalla de inicio». Luego ábrela desde ahí y activa los avisos.','info',10000); return; }
+      PUSH.ocupado = true; pushPintar();
+      Promise.resolve(Notification.requestPermission()).then(function(perm){
+        if(perm !== 'granted') throw new Error('No diste el permiso. Para activarlo, ve a los ajustes del navegador de este sitio y permite las notificaciones.');
+        return pushObtenerToken();
+      }).then(function(r){
+        PUSH.ocupado = false; pushPintar(); haptic(15);
+        toast(r.configurado ? 'Avisos activados en este celular.' : 'Avisos activados en este celular. Falta la llave de Firebase en el servidor para que lleguen.', r.configurado ? 'success' : 'info', 6000);
+      }).catch(function(e){ PUSH.ocupado = false; pushPintar(); toast(String((e && e.message) || e), 'error', 8000); });
+    }
+    function pushDesactivar(){
+      var tok = pushTokenLocal();
+      pushServidor('quitarPush', { token: tok }).catch(function(){}).then(function(){
+        try{ if(window.firebase && window.firebase.apps && window.firebase.apps.length) window.firebase.messaging().deleteToken(); }catch(e){}
+        pushGuardar(''); pushPintar(); toast('Avisos desactivados en este celular.','info');
+      });
+    }
+    function pushProbar(){
+      pushServidor('probarPush').then(function(r){ toast((r && r.message) || 'No se pudo enviar la prueba.', r && r.ok ? 'success' : 'error', 7000); })
+        .catch(function(){ toast('Sin conexión.','error'); });
+    }
+    /** Cada día se renueva el token en silencio (Firebase a veces lo cambia) y se mantiene registrado. */
+    function pushRefrescar(){
+      if(!pushActivo()) return;
+      var h = 0; try{ h = parseInt(localStorage.getItem('kaem_push_hora') || '0', 10) || 0; }catch(e){}
+      if(Date.now() - h < 20 * 3600 * 1000) return;
+      pushObtenerToken().catch(function(){});
+    }
+
+    /* ——— Pantalla: Ajustes (equipo) y aviso en Empaque (Bodega) ——— */
+    function pushPintar(){
+      var on = pushActivo(), sop = pushSoportado(), ios = pushEsIOS() && !pushEsInstalada();
+      var est = $('cfgPushEstado');
+      if(est){
+        est.textContent = !sop ? 'Este navegador no permite avisos.' : (ios ? 'En iPhone hay que instalar la app primero (Compartir → Agregar a pantalla de inicio).' : (on ? '🔔 Avisos activos en este celular.' : (Notification.permission === 'denied' ? 'Bloqueados: permite las notificaciones de este sitio en el navegador.' : 'Avisos apagados en este celular.')));
+        $('cfgPushOn').style.display = on ? 'none' : ''; $('cfgPushOn').disabled = PUSH.ocupado; $('cfgPushOn').textContent = PUSH.ocupado ? 'Activando…' : 'Activar avisos en este celular';
+        $('cfgPushOff').style.display = on ? '' : 'none';
+        $('cfgPushTest').style.display = (window.KAEM_ROL === 'bodega') ? 'none' : '';
+      }
+      var b = $('pushBanner');
+      if(b){
+        var ver = window.KAEM_ROL === 'bodega' && sop && !on;
+        b.style.display = ver ? 'block' : 'none';
+        if(ver) b.innerHTML = '🔔 <b>Activa los avisos</b><small>Para enterarte al instante cuando llegue un pedido para preparar.</small><button type="button" class="btn-solid" id="pushBannerBtn">' + (PUSH.ocupado ? 'Activando…' : 'Activar avisos') + '</button>';
+      }
+    }
+    window.pushPintar = pushPintar;
+    document.addEventListener('click', function(e){
+      var t = e.target; if(!t || !t.closest) return;
+      if(t.closest('#cfgPushOn') || t.closest('#pushBannerBtn')){ haptic(10); pushActivar(); }
+      else if(t.closest('#cfgPushOff')){ pushDesactivar(); }
+      else if(t.closest('#cfgPushTest')){ pushProbar(); }
+    });
+    setTimeout(function(){ try{ pushPintar(); pushRefrescar(); }catch(e){} }, 6000);
+    // cuando el aviso se toca estando la app abierta, el service worker pide mirar Empaque
+    try{ navigator.serviceWorker.addEventListener('message', function(ev){ if(ev && ev.data && ev.data.kaem === 'abrir-empaque'){ try{ switchTab('packing'); }catch(e){} } }); }catch(e){}
     /* ═══════ SALUD DEL SISTEMA · se abre al tocar el estado (🟢 Al día · hora) ═══════ */
     var SAL = { t:null, prueba:'' };
     function saludFila(nivel, k, v){ return '<div class="sl-row '+nivel+(String(v).length>24?' ancho':'')+'"><i></i><div><small>'+safe(k)+'</small><b>'+safe(v)+'</b></div></div>'; }
