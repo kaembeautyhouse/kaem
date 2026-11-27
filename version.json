@@ -1,11 +1,98 @@
 {
-  "app": "2026-11-26-39",
-  "servidor": "2026.10.75",
-  "fecha": "2026-11-26",
+  "app": "2026-11-27-43",
+  "servidor": "2026.10.77",
+  "fecha": "2026-11-27",
   "novedades": [
-    "Avisos al celular (notificaciones push): cada celular activa los avisos una vez en Ajustes → Avisos al celular (Bodega lo ve como un aviso en Empaque). Cuando se guarda un pedido nuevo le llega un aviso a Bodega; cuando Bodega reporta un faltante les llega a Kevin y a Camilo; y cuando se decide el reparto le llega a Bodega. Los avisos solo llevan el número de remisión y las unidades, nunca datos del cliente. Si el aviso falla, nada se bloquea y el WhatsApp sigue como respaldo. Requiere pegar la llave de Firebase en Apps Script (Propiedades del script).",
-    "Faltantes de Bodega: si no alcanzan las unidades para los pedidos, Bodega toca «Reportar faltante», dice cuántas hay y la app arma el mensaje exacto para mandárselo por WhatsApp a Kevin y a Camilo. Mientras no decidan, esos pedidos no se pueden cerrar. Kevin o Camilo ven el aviso en Empaque y reparten las unidades con sugerencias (proporcional, parejo, más antiguos o más pequeños primero) o escribiendo cuántas le tocan a cada pedido, por ejemplo para darle prioridad a un cliente. Con que uno autorice basta: los pedidos se ajustan solos (total, cartera e inventario) y Bodega los puede cerrar.",
-    "Perfil Bodega: quien empaca entra con su propio PIN (Ajustes → Seguridad) y solo ve Empaque. Ve los pedidos por empacar con los datos del cliente para el rótulo, genera la misma remisión en PDF, marca la fecha de entrega y escribe por WhatsApp a Kevin o a Camilo según el tipo de pedido. No ve costos, ganancia, cartera ni finanzas: el servidor lo rechaza aunque alguien lo intente a mano. En un pedido guardado hay un botón «Avisar a Bodega» que abre su WhatsApp con el mensaje listo. Los números de WhatsApp se editan en Ajustes.",
+    {
+      "titulo": "Pedidos urgentes, empacados de hoy y lista de revisión",
+      "icono": "bodega",
+      "para": [
+        "equipo",
+        "bodega"
+      ],
+      "texto": "Al montar un pedido puedes marcarlo «Urgente» y dejarle una instrucción a Bodega (no sale en la remisión del cliente): le llega de primero, destacado, y el aviso al celular dice URGENTE. En Empaque, Bodega ve cuántos pedidos y unidades empacó hoy y puede volver a descargar la remisión. Y antes de cerrar un pedido marca una lista de revisión (remisión adentro, caja sellada, rótulo pegado) que se enciende y edita en Ajustes.",
+      "textoBodega": "Los pedidos urgentes te salen de primero, con su etiqueta roja y la instrucción. En el paso 1 ves cuántos empacaste hoy y puedes volver a descargar sus remisiones. Y antes de tocar «Pedido listo» marcas una lista de revisión rápida."
+    },
+    {
+      "titulo": "Orden de los productos por marca",
+      "icono": "marca",
+      "para": [
+        "equipo"
+      ],
+      "texto": "En el detalle del pedido (Historial), en el PDF de la remisión y en el mensaje de WhatsApp, los productos salen agrupados por marca: primero la marca que tocaste primero al montar el pedido, y dentro de cada marca de la A a la Z. Mientras montas, la lista sigue igual: lo último que agregas queda arriba."
+    },
+    {
+      "titulo": "Tonos sugeridos y vitrina automática",
+      "icono": "diseno",
+      "para": [
+        "equipo"
+      ],
+      "texto": "Al agregar un producto con tonos salen hasta 2 sugerencias de otros tonos que aún no están en el pedido (y «Ver los N tonos que faltan»), para agregar varios tonos sin escribir. En la vitrina los productos siguen apareciendo solos al llegar al final, sin tocar «Ver más»."
+    },
+    {
+      "titulo": "Pedidos: no pierdes el avance y resumen al guardar",
+      "icono": "pedido",
+      "para": [
+        "equipo"
+      ],
+      "texto": "El pedido que estás montando se guarda solo en el celular: si la app se cierra o se reinicia (por ejemplo al cambiar a modo oscuro), lo recupera al abrir. Al guardar, el pedido queda como un resumen con los botones Editar / Actualizar, PDF, WhatsApp, Avisar a Bodega y Nuevo pedido. Y si pasas más de 10 minutos fuera de la app sin nada a medias, vuelve sola al inicio."
+    },
+    {
+      "titulo": "Escáner de códigos con interruptor",
+      "icono": "escaner",
+      "para": [
+        "equipo"
+      ],
+      "texto": "El escáner (cámara y lector de códigos) ahora se enciende o apaga con una sola opción en Ajustes, «Escáner de códigos». Viene apagado: en Empaque, Inventario, Nuevo producto y Pedido desaparecen sus botones y los textos dejan de hablar de escanear. Cuando quieras usarlo, lo enciendes y vuelve todo como estaba."
+    },
+    {
+      "titulo": "Interfaz de Bodega en 3 pasos",
+      "icono": "bodega",
+      "para": [
+        "equipo",
+        "bodega"
+      ],
+      "texto": "Bodega ahora trabaja en 3 pasos separados y explicados: 1 Pedidos (lista en tarjetas, los más antiguos primero), 2 Empacar (marcar o escanear cada producto, con «Reportar faltante») y 3 Envío (datos para el rótulo, remisión en PDF y fecha de entrega, y «Pedido listo»). Barra fija abajo con las acciones y sin menú de más.",
+      "textoBodega": "Ahora trabajas en 3 pasos: 1 Pedidos (eliges el pedido), 2 Empacar (marcas los productos) y 3 Envío (datos para el rótulo, remisión en PDF y fecha de entrega). Cada paso te explica qué hacer y abajo siempre tienes los botones que necesitas."
+    },
+    {
+      "titulo": "Ventana de novedades renovada",
+      "texto": "Ahora tiene iconos por área en cada novedad, el botón «Actualizar» y la X para cerrar arriba, y se lee mejor. Bodega solo ve las novedades que le corresponden.",
+      "icono": "diseno",
+      "para": [
+        "equipo"
+      ]
+    },
+    {
+      "texto": "Avisos al celular (notificaciones push): cada celular activa los avisos una vez en Ajustes → Avisos al celular (Bodega lo ve como un aviso en Empaque). Cuando se guarda un pedido nuevo le llega un aviso a Bodega; cuando Bodega reporta un faltante les llega a Kevin y a Camilo; y cuando se decide el reparto le llega a Bodega. Los avisos solo llevan el número de remisión y las unidades, nunca datos del cliente. Si el aviso falla, nada se bloquea y el WhatsApp sigue como respaldo.",
+      "para": [
+        "equipo",
+        "bodega"
+      ],
+      "titulo": "Avisos al celular",
+      "icono": "aviso",
+      "textoBodega": "Ahora te llega un aviso al celular cada vez que hay un pedido nuevo para preparar, y cuando Kevin o Camilo deciden cómo repartir un faltante. Actívalos desde el aviso «Activa los avisos» que sale en Empaque."
+    },
+    {
+      "texto": "Faltantes de Bodega: si no alcanzan las unidades para los pedidos, Bodega toca «Reportar faltante», dice cuántas hay y la app arma el mensaje exacto para mandárselo por WhatsApp a Kevin y a Camilo. Mientras no decidan, esos pedidos no se pueden cerrar. Kevin o Camilo ven el aviso en Empaque y reparten las unidades con sugerencias (proporcional, parejo, más antiguos o más pequeños primero) o escribiendo cuántas le tocan a cada pedido, por ejemplo para darle prioridad a un cliente. Con que uno autorice basta: los pedidos se ajustan solos (total, cartera e inventario) y Bodega los puede cerrar.",
+      "para": [
+        "equipo",
+        "bodega"
+      ],
+      "titulo": "Faltantes de Bodega",
+      "icono": "bodega",
+      "textoBodega": "Si de un producto no alcanzan las unidades, toca «Reportar faltante», escribe cuántas hay y envía el mensaje por WhatsApp a Kevin y a Camilo. El pedido no se cierra hasta que ellos decidan el reparto."
+    },
+    {
+      "texto": "Perfil Bodega: quien empaca entra con su propio PIN (Ajustes → Seguridad) y solo ve Empaque. Ve los pedidos por empacar con los datos del cliente para el rótulo, genera la misma remisión en PDF, marca la fecha de entrega y escribe por WhatsApp a Kevin o a Camilo según el tipo de pedido. No ve costos, ganancia, cartera ni finanzas: el servidor lo rechaza aunque alguien lo intente a mano. En un pedido guardado hay un botón «Avisar a Bodega» que abre su WhatsApp con el mensaje listo. Los números de WhatsApp se editan en Ajustes.",
+      "para": [
+        "equipo",
+        "bodega"
+      ],
+      "titulo": "Perfil Bodega",
+      "icono": "bodega",
+      "textoBodega": "Entras con tu propio PIN y trabajas solo en Empaque: ves los datos del cliente para el rótulo, descargas la remisión en PDF, eliges la fecha de entrega y escribes por WhatsApp a Kevin o a Camilo."
+    },
     "Pagos en computador: las tarjetas «Por pagar este mes», «Vencidos» y «Próximos 7 días» ya no se ven aplastadas cuando «Pagado este mes» tiene datos.",
     "Descuento por marca al montar un pedido: al marcar «Sí» en Descuento aparece «¿En qué?» con dos opciones, «Todo el pedido» (como antes) o «Una marca». Con «Una marca» se abre una ventana con las marcas del pedido para escribir el % de cada una; las demás quedan a precio normal. El total, el recibo, la edición del pedido, las devoluciones y el ajuste por faltantes al empacar respetan ese descuento.",
     "Carga con personalidad KAÉM: cuando la app guarda algo y tarda un poco, sale una tarjeta elegante con el logo y un brillo dorado que lo cruza, un halo que respira y una línea que se desliza, con el mensaje de lo que está haciendo (Registrando el pago, Cerrando el empaque, Guardando el gasto, Anulando el pedido, Sincronizando con Shopify…). En modo claro es una tarjeta de cristal crema con borde dorado y en modo oscuro es espresso con oro. Lo rápido no la muestra (no parpadea), arriba hay una línea fina terracota mientras el servidor trabaja, y las listas que cargan muestran tarjetas con brillo suave en vez de un texto. Se detiene si el celular pide reducir movimiento.",

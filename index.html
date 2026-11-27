@@ -48,7 +48,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-26-39';
+    const APP_VERSION = '2026-11-27-43';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -137,47 +137,135 @@
         Promise.all(tareas).then(ir, ir); setTimeout(ir, 2500);
       }
 
-      function avisarVersion(info) {
+      // ——— VENTANA DE NOVEDADES (una sola para «hay versión nueva», «tu app se actualizó» y «ver novedades») ———
+      // Arriba: el título, el botón de actualizar y la X. Cada novedad lleva su icono. Las novedades pueden ser texto simple
+      // (se muestran solo al equipo) u objetos { titulo, texto, textoBodega, icono, para:['equipo','bodega'] }: Bodega solo ve las suyas.
+      var NV_ICONOS = {
+        bodega:   '<path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3.3 7.5L12 12.5l8.7-5M12 22V12.5"/>',
+        faltante: '<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18.2v.1"/>',
+        aviso:    '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+        whatsapp: '<path d="M21 12a8.5 8.5 0 0 1-12.4 7.5L3 21l1.6-5.3A8.5 8.5 0 1 1 21 12z"/><path d="M9 9.5c.5 2.5 2.5 4.5 5 5l1.2-1.3-2-1-.8.8c-.8-.4-1.5-1.1-1.9-1.9l.8-.8-1-2L9 9.5z"/>',
+        pdf:      '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 14h6M9 17.5h4"/>',
+        precio:   '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/>',
+        marca:    '<path d="M6 3h12v18l-6-4-6 4V3z"/>',
+        cliente:  '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+        pedido:   '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/>',
+        entrega:  '<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M8 14h3"/>',
+        pagos:    '<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h3"/>',
+        seguro:   '<rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+        celular:  '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+        diseno:   '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/>',
+        rapido:   '<path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>',
+        inventario:'<path d="M3 9l9-5 9 5v10l-9 3-9-3V9z"/><path d="M3 9l9 4 9-4M12 13v9"/>',
+        grafica:  '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+        escaner:  '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/>',
+        arreglo:  '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3 17.7 6.3 21l6.3-6.3a4 4 0 0 0 5.1-5.4l-2.6 2.6-2.2-.5-.5-2.2 2.3-2.9z"/>',
+        servidor: '<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.1M7 16.5h.1"/>',
+        actualizar:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
+        cerrar:   '<path d="M6 6l12 12M18 6L6 18"/>'
+      };
+      // Áreas que reconoce la ventana: (clave de icono, etiqueta, palabras que la activan). Cada novedad muestra hasta 3 etiquetas con su icono.
+      var NV_AREAS = [
+        ['faltante', 'Faltantes', /faltante|reparto|no alcanz/],
+        ['bodega', 'Bodega', /bodega|empaque|empac/],
+        ['aviso', 'Avisos', /aviso|notific|push/],
+        ['whatsapp', 'WhatsApp', /whatsapp/],
+        ['pdf', 'Remisión', /pdf|remisi[oó]n|recibo/],
+        ['precio', 'Descuentos', /descuento|rebaja|redondeo/],
+        ['marca', 'Marcas', /marca/],
+        ['cliente', 'Clientes', /cliente|r[oó]tulo/],
+        ['entrega', 'Entregas', /entrega|fecha|plazo/],
+        ['pedido', 'Pedidos', /pedido/],
+        ['pagos', 'Pagos', /pago|abono|cobro|cartera|cr[eé]dito/],
+        ['seguro', 'Seguridad', /\bpin\b|seguridad|acceso|llave|clave|permiso/],
+        ['celular', 'Celular', /celular|iphone|android|instal/],
+        ['escaner', 'Escáner', /esc[aá]ner|c[aá]mara|c[oó]digo de barras/],
+        ['inventario', 'Inventario', /inventario|stock|unidades/],
+        ['grafica', 'Estadísticas', /estad[ií]stic|ganancia|ventas|meta\b|gr[aá]fic/],
+        ['rapido', 'Velocidad', /r[aá]pid|lent|velocidad|carga/],
+        ['servidor', 'Servidor', /servidor|apps script|firebase/],
+        ['arreglo', 'Arreglo', /arregl|correg|error|aplast|fallo/],
+        ['diseno', 'Diseño', /dise[nñ]o|ventana|pantalla|bot[oó]n|icono|oscuro|colores?|novedades/]
+      ];
+      function nvSvg(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (NV_ICONOS[k] || NV_ICONOS.diseno) + '</svg>'; }
+      /** Hasta 3 áreas que toca la novedad (en el orden del catálogo: lo más específico primero). */
+      function nvAreas(t) { t = String(t || '').toLowerCase(); return NV_AREAS.filter(function (a) { return a[2].test(t); }).slice(0, 3); }
+      function nvIcono(t) { var a = nvAreas(t); return a.length ? a[0][0] : 'diseno'; }
+      /** Normaliza una novedad (texto o objeto) para el rol actual. Devuelve null si no le corresponde. */
+      function nvNormalizar(x, rol) {
+        var o = (typeof x === 'string') ? { texto: x } : (x || {});
+        var para = o.para || ['equipo'];
+        if (para.indexOf(rol) < 0) return null;
+        var texto = String((rol === 'bodega' && o.textoBodega) ? o.textoBodega : (o.texto || '')).trim(), titulo = String(o.titulo || '').trim();
+        if (!titulo) {   // título = lo que va antes de los dos puntos, o la primera frase
+          var m = texto.match(/^([^:.]{3,64})[:.]\s+([\s\S]*)$/);
+          if (m) { titulo = m[1].trim(); texto = m[2].trim(); texto = texto.charAt(0).toUpperCase() + texto.slice(1); }
+        }
+        var areas = nvAreas(titulo + ' ' + texto);
+        return { titulo: titulo, texto: texto, icono: o.icono || (areas.length ? areas[0][0] : 'diseno'), areas: areas };
+      }
+      function nvFecha(f) {
+        var m = String(f || '').match(/^(\d{4})-(\d{2})-(\d{2})/); if (!m) return '';
+        try { return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return f; }
+      }
+      /** modo: 'nueva' (hay una versión más nueva por instalar) · 'actualizada' (se abrió una versión nueva) · 'manual' (desde Salud). */
+      function ventanaVersion(info, modo) {
         if (document.getElementById('kaemAvisoVer')) return;
         var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-        var nov = (info.novedades || []).slice(0, 8);
+        var rol = (window.KAEM_ROL === 'bodega') ? 'bodega' : 'equipo';
+        var items = (info.novedades || []).map(function (x) { return nvNormalizar(x, rol); }).filter(Boolean).slice(0, 8);
+        var ver = modo === 'nueva' ? info.app : APP_VERSION, fecha = nvFecha(info.fecha);
+        var titulo = modo === 'nueva' ? 'Hay una versión nueva' : (modo === 'manual' ? 'Novedades de esta versión' : 'Tu app se actualizó');
         var d = document.createElement('div');
-        d.id = 'kaemAvisoVer';
-        d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
-        d.style.cssText = 'position:fixed;inset:0;z-index:99990;background:rgba(30,22,19,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:18px;font:15px/1.45 system-ui,-apple-system,sans-serif';
-        d.innerHTML = '<div style="background:#F7F4EE;color:#2C211E;border-radius:26px;padding:22px 20px 18px;width:100%;max-width:420px;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)">'
-          + '<div style="font-size:34px;line-height:1">✨</div>'
-          + '<h2 style="margin:8px 0 2px;font:500 24px Fraunces,Georgia,serif">Hay una versión nueva</h2>'
-          + '<p style="margin:0 0 12px;color:#6B5B52;font-size:13px">Tienes la ' + esc(APP_VERSION) + ' · nueva: <b>' + esc(info.app) + '</b>' + (info.fecha ? ' · ' + esc(info.fecha) : '') + '</p>'
-          + (nov.length ? '<p style="margin:0 0 6px;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Novedades</p><ul style="margin:0 0 14px;padding:0 0 0 18px;display:grid;gap:6px;font-size:14px">' + nov.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p style="margin:0 0 14px;font-size:14px">Mejoras y correcciones.</p>')
-          + '<button type="button" data-a="ya" style="width:100%;background:#2C211E;color:#fff;border:0;border-radius:16px;min-height:52px;font:600 16px system-ui;cursor:pointer">Actualizar ahora</button>'
-          + '<button type="button" data-a="tarde" style="width:100%;margin-top:8px;background:transparent;color:#6B5B52;border:0;min-height:44px;font:500 14px system-ui;cursor:pointer">Más tarde</button>'
-          + '<p style="margin:6px 0 0;text-align:center;color:#8a7a6c;font-size:11.5px">Los pedidos sin enviar se conservan.</p></div>';
-        d.querySelector('[data-a="ya"]').addEventListener('click', function () { this.disabled = true; this.textContent = 'Actualizando…'; irANuevaVersion(info.app); });
-        d.querySelector('[data-a="tarde"]').addEventListener('click', function () { pospuesto = Date.now() + 20 * 60000; d.remove(); });
+        d.id = 'kaemAvisoVer'; d.className = 'nv-fondo'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', titulo);
+        var item = function (i) {
+          return '<li class="nv-item"><span class="nv-ico">' + nvSvg(i.icono) + '</span><div class="nv-tx">' + (i.titulo ? '<b>' + esc(i.titulo) + '</b>' : '')
+            + '<p class="nv-p">' + esc(i.texto) + '</p>' + (i.texto.length > 150 ? '<button type="button" class="nv-mas" data-nv="mas">Ver más</button>' : '')
+            + (i.areas && i.areas.length ? '<div class="nv-chips">' + i.areas.map(function (a) { return '<span class="nv-chip">' + nvSvg(a[0]) + esc(a[1]) + '</span>'; }).join('') + '</div>' : '') + '</div></li>';
+        };
+        var visibles = items.slice(0, 3), ocultas = items.slice(3);
+        d.innerHTML = '<div class="nv-hoja">'
+          + '<div class="nv-top"><span class="nv-badge">' + nvSvg(modo === 'nueva' ? 'actualizar' : 'diseno') + '</span>'
+          +   '<div class="nv-tit"><h2>' + esc(titulo) + '</h2><p>' + (modo === 'nueva' ? 'Instalada: ' + esc(APP_VERSION) + ' · nueva: <b>' + esc(info.app) + '</b>' : 'Versión <b>' + esc(APP_VERSION) + '</b>') + (fecha ? ' · ' + esc(fecha) : '') + '</p></div>'
+          +   '<button type="button" class="nv-x" data-a="' + (modo === 'nueva' ? 'tarde' : 'ok') + '" aria-label="Cerrar">' + nvSvg('cerrar') + '</button></div>'
+          + '<button type="button" class="nv-act' + (modo === 'nueva' ? ' fuerte' : '') + '" data-a="ya">' + nvSvg('actualizar') + '<span>' + (modo === 'nueva' ? 'Actualizar ahora' : 'Actualizar la app') + '</span></button>'
+          + (items.length ? '<p class="nv-sec">' + (modo === 'nueva' ? 'Qué trae' : 'Qué hay de nuevo') + '</p><ul class="nv-lista">' + visibles.map(item).join('') + '</ul>'
+              + (ocultas.length ? '<ul class="nv-lista nv-ant" hidden>' + ocultas.map(item).join('') + '</ul><button type="button" class="nv-ver" data-nv="ant">Ver anteriores (' + ocultas.length + ')</button>' : '')
+            : '<p class="nv-vacio">' + (modo === 'nueva' ? 'Hay mejoras disponibles para que la app funcione mejor.' : 'Todo está al día.') + '</p>')
+          + '<p class="nv-pie">' + (modo === 'nueva' ? 'Los pedidos sin enviar se conservan.' : 'Si algo se ve raro, toca «Actualizar la app» para cargar la última versión.') + '</p>'
+          + (modo === 'nueva' ? '' : '<button type="button" class="nv-ok" data-a="ok">Entendido</button>') + '</div>';
+        var cerrar = function (a) {
+          if (a === 'ok') { try { localStorage.setItem('kaem_ver_vista', APP_VERSION); } catch (e) {} }
+          else if (a === 'tarde') pospuesto = Date.now() + 20 * 60000;
+          document.removeEventListener('keydown', tecla); d.remove();
+        };
+        var tecla = function (e) { if (e.key === 'Escape') cerrar(modo === 'nueva' ? 'tarde' : 'ok'); };
+        d.addEventListener('click', function (e) {
+          var b = e.target.closest ? e.target.closest('[data-a],[data-nv]') : null;
+          if (!b) { if (e.target === d) cerrar(modo === 'nueva' ? 'tarde' : 'ok'); return; }
+          var a = b.getAttribute('data-a'), nv = b.getAttribute('data-nv');
+          if (a === 'ya') { b.disabled = true; var sp = b.querySelector('span'); if (sp) sp.textContent = 'Actualizando…'; irANuevaVersion(modo === 'nueva' ? info.app : (info.app || APP_VERSION)); }
+          else if (a) cerrar(a);
+          else if (nv === 'mas') { var p = b.parentNode.querySelector('.nv-p'); var abre = !p.classList.contains('abierto'); p.classList.toggle('abierto', abre); b.textContent = abre ? 'Ver menos' : 'Ver más'; }
+          else if (nv === 'ant') { var l = d.querySelector('.nv-ant'); if (l) { l.hidden = !l.hidden; b.textContent = l.hidden ? 'Ver anteriores (' + l.children.length + ')' : 'Ocultar anteriores'; } }
+        });
+        document.addEventListener('keydown', tecla);
         document.body.appendChild(d);
       }
+      function avisarVersion(info) { ventanaVersion(info, 'nueva'); }
 
       // ——— NOVEDADES TRAS ACTUALIZAR ———
       // La app siempre abre con la versión más reciente (el service worker revisa la red primero), así que
       // casi nunca hay una "versión nueva por instalar". Por eso, la primera vez que se abre una versión
-      // nueva se muestran sus novedades UNA vez ("Entendido" la guarda). También se puede abrir desde Salud.
+      // nueva se muestran sus novedades UNA vez ("Entendido" o la X la guardan). También se puede abrir desde Salud.
+      // Bodega solo ve las novedades que le corresponden; si no hay ninguna, no se le muestra nada.
       function mostrarNovedades(info, manual) {
         if (document.getElementById('kaemAvisoVer')) return;
-        var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-        var nov = (info.novedades || []).slice(0, 8);
-        var d = document.createElement('div');
-        d.id = 'kaemAvisoVer';
-        d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
-        d.style.cssText = 'position:fixed;inset:0;z-index:99990;background:rgba(30,22,19,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:18px;font:15px/1.45 system-ui,-apple-system,sans-serif';
-        d.innerHTML = '<div style="background:#F7F4EE;color:#2C211E;border-radius:26px;padding:22px 20px 18px;width:100%;max-width:420px;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)">'
-          + '<div style="font-size:34px;line-height:1">🎉</div>'
-          + '<h2 style="margin:8px 0 2px;font:500 24px Fraunces,Georgia,serif">' + (manual ? 'Novedades de esta versión' : 'Tu app se actualizó') + '</h2>'
-          + '<p style="margin:0 0 12px;color:#6B5B52;font-size:13px">Versión <b>' + esc(APP_VERSION) + '</b>' + (info.fecha ? ' · ' + esc(info.fecha) : '') + '</p>'
-          + (nov.length ? '<p style="margin:0 0 6px;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Qué hay de nuevo</p><ul style="margin:0 0 14px;padding:0 0 0 18px;display:grid;gap:6px;font-size:14px">' + nov.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p style="margin:0 0 14px;font-size:14px">Mejoras y correcciones.</p>')
-          + '<button type="button" data-a="ok" style="width:100%;background:#2C211E;color:#fff;border:0;border-radius:16px;min-height:52px;font:600 16px system-ui;cursor:pointer">Entendido</button></div>';
-        d.querySelector('[data-a="ok"]').addEventListener('click', function () { try { localStorage.setItem('kaem_ver_vista', APP_VERSION); } catch (e) {} d.remove(); });
-        document.body.appendChild(d);
+        if (!manual && window.KAEM_ROL === 'bodega') {
+          var propias = (info.novedades || []).some(function (x) { return !!nvNormalizar(x, 'bodega'); });
+          if (!propias) { try { localStorage.setItem('kaem_ver_vista', APP_VERSION); } catch (e) {} return; }
+        }
+        ventanaVersion(info, manual ? 'manual' : 'actualizada');
       }
       /** Compara versiones por números («2026.10.100» > «2026.10.67», «…-24» > «…-9»): con texto plano se invertía al pasar de 99 a 100. */
       window.verCmp = function (a, b) {
@@ -425,7 +513,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.75', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.77', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -437,7 +525,7 @@
       }
 
       var SOLO_LECTURA = {
-        getInitialData:1, listProducts:1, estadoFaltantes:1, listarFaltantes:1, estadoPush:1, obtenerHistorial:1, listarPedidosPendientes:1, obtenerAjustes:1, obtenerCarteraPendiente:1,
+        getInitialData:1, listProducts:1, estadoFaltantes:1, listarFaltantes:1, estadoPush:1, listarEmpacadosHoy:1, obtenerHistorial:1, listarPedidosPendientes:1, obtenerAjustes:1, obtenerCarteraPendiente:1,
         estadoColaSync:1, getNextRemision:1, ping:1, exportarGanchos:1, estadoPin:1, estadoRespaldo:1, estadoCatalogo:1,
         obtenerAlertas:1, obtenerEstadisticas:1, obtenerBI:1, sugerenciaReposicion:1, obtenerClientes:1,
         listarClientes:1, obtenerAbonos:1, obtenerPagosRecientes:1, obtenerAuditoria:1, obtenerPedido:1,
@@ -498,7 +586,7 @@
       // Cada petición responde UNA sola vez. Un error al MOSTRAR los datos (no de red) ya no
       // se confunde con una falla de conexión ni provoca reintentos al servidor.
       // Lo que el perfil Bodega puede pedir (igual que en el servidor): lo demás ni sale del celular y se responde "sin acceso".
-      var BODEGA_OK = { ping:1, estadoPin:1, verificarPin:1, lote:1, getInitialData:1, obtenerAjustes:1, listarPedidosPendientes:1, finalizarPacking:1, actualizarFechaEntrega:1, reportarFaltante:1, estadoFaltantes:1, registrarPush:1, quitarPush:1, estadoPush:1 };
+      var BODEGA_OK = { ping:1, estadoPin:1, verificarPin:1, lote:1, getInitialData:1, obtenerAjustes:1, listarPedidosPendientes:1, listarEmpacadosHoy:1, finalizarPacking:1, actualizarFechaEntrega:1, reportarFaltante:1, estadoFaltantes:1, registrarPush:1, quitarPush:1, estadoPush:1 };
       function callBackend(action, data, onSuccess, onFailure) {
         if (window.KAEM_ROL === 'bodega' && !BODEGA_OK[action]) {
           setTimeout(function () { if (onSuccess) { try { onSuccess({ ok: false, success: false, rolRestringido: true, message: 'Este perfil no tiene acceso a esa función.' }); } catch (e) {} } }, 0);
@@ -4049,6 +4137,262 @@
     .pk-push{margin:0 0 10px;padding:12px 14px;border-radius:14px;background:var(--st-wa-bg);border:1px solid var(--linea);font-size:14px;line-height:1.35}
     .pk-push small{display:block;margin:2px 0 8px;font-size:12px;opacity:.8}
     .pk-push .btn-solid{width:100%}
+
+    /* ═══ Ventana de novedades / versión nueva ═══ */
+    .nv-fondo{position:fixed;inset:0;z-index:99990;background:rgba(30,22,19,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'Jost',system-ui,sans-serif;animation:nvFondo .2s ease both}
+    .nv-hoja{background:var(--crema);color:var(--espresso);border-radius:26px;padding:18px 18px 16px;width:100%;max-width:430px;max-height:90vh;max-height:90dvh;overflow:auto;box-shadow:0 22px 60px rgba(0,0,0,.35);animation:nvHoja .28s cubic-bezier(.2,.8,.2,1) both}
+    .nv-top{display:flex;align-items:flex-start;gap:12px}
+    .nv-badge{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--rosa);color:var(--terracota-txt)}
+    .nv-badge svg{width:23px;height:23px}
+    .nv-tit{flex:1;min-width:0}
+    .nv-tit h2{margin:1px 0 2px;font:500 21px/1.2 'Fraunces',Georgia,serif}
+    .nv-tit p{margin:0;font-size:12.5px;color:var(--texto-suave)}
+    .nv-x{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:1px solid var(--linea);background:var(--blanco);color:var(--espresso);cursor:pointer;padding:0}
+    .nv-x svg{width:17px;height:17px}.nv-x:active{transform:scale(.94)}
+    .nv-act{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:14px 0 4px;min-height:46px;border-radius:15px;border:1.5px solid var(--linea);background:var(--blanco);color:var(--espresso);font:600 15px 'Jost',system-ui,sans-serif;cursor:pointer}
+    .nv-act svg{width:18px;height:18px}
+    .nv-act.fuerte{background:var(--espresso);color:#fff;border-color:var(--espresso);min-height:50px;font-size:16px}
+    .nv-act:disabled{opacity:.7}
+    .nv-act:active{transform:scale(.985)}
+    .nv-sec{margin:14px 0 8px;font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--texto-suave)}
+    .nv-lista{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:8px}
+    .nv-lista[hidden]{display:none}
+    .nv-item{display:flex;gap:11px;padding:11px 12px;border-radius:16px;background:var(--blanco);border:1px solid var(--linea)}
+    .nv-ico{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--crema-2);color:var(--terracota-txt)}
+    .nv-ico svg{width:19px;height:19px}
+    .nv-tx{min-width:0;flex:1}
+    .nv-tx b{display:block;font-size:14.5px;font-weight:600;line-height:1.3}
+    .nv-p{margin:2px 0 0;font-size:13.5px;line-height:1.45;color:var(--texto-suave);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+    .nv-p.abierto{display:block;-webkit-line-clamp:unset;overflow:visible}
+    .nv-mas,.nv-ver{background:none;border:0;padding:4px 0;margin:0;font:600 12.5px 'Jost',system-ui,sans-serif;color:var(--terracota-txt);cursor:pointer}
+    .nv-ver{display:block;width:100%;text-align:center;padding:8px 0}
+    .nv-vacio{margin:14px 0 6px;font-size:14px;color:var(--texto-suave)}
+    .nv-pie{margin:8px 0 0;text-align:center;font-size:12px;color:var(--texto-suave)}
+    .nv-ok{display:block;width:100%;margin-top:12px;min-height:50px;border-radius:15px;border:0;background:var(--espresso);color:#fff;font:600 16px 'Jost',system-ui,sans-serif;cursor:pointer}
+    :root.theme-dark .nv-hoja{background:#2a211e}
+    :root.theme-dark .nv-item,:root.theme-dark .nv-x,:root.theme-dark .nv-act:not(.fuerte){background:#352a26;border-color:#4a3d37;color:#f3ece4}
+    :root.theme-dark .nv-ico{background:#3f322d;color:#e0b486}
+    :root.theme-dark .nv-badge{background:#3f322d;color:#e0b486}
+    :root.theme-dark .nv-act.fuerte,:root.theme-dark .nv-ok{background:#c9985f;color:#2a211e;border-color:#c9985f}
+    @keyframes nvFondo{from{opacity:0}to{opacity:1}}
+    @keyframes nvHoja{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+    @media (prefers-reduced-motion:reduce){.nv-fondo,.nv-hoja{animation:none}}
+
+    /* ═══ INTERFAZ DE BODEGA: lista de pedidos → pedido con barras fijas ═══ */
+    .bod-top,.bod-cola,.bod-back,.bod-falt{display:none}
+    html[data-rol="bodega"]{--nav-h:0px}
+    html[data-rol="bodega"] .bottom-nav,html[data-rol="bodega"] .pack-head,html[data-rol="bodega"] #packHistBtn,html[data-rol="bodega"] #packAntig,html[data-rol="bodega"] #packEmpty{display:none !important}
+    html[data-rol="bodega"] .bod-top{display:flex}
+    html[data-rol="bodega"] .bod-cola{display:grid;gap:10px}
+    html[data-rol="bodega"] .bod-back{display:inline-flex}
+    html[data-rol="bodega"] .bod-falt{display:inline-flex}
+    .bod-top{align-items:center;gap:12px;margin:2px 0 14px}
+    .bod-ti-ico{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--rosa);color:var(--terracota-txt)}
+    .bod-ti-ico svg{width:23px;height:23px}
+    .bod-ti{flex:1;min-width:0}
+    .bod-ti h2{margin:0;font:500 21px/1.2 'Fraunces',Georgia,serif}
+    .bod-ti p{margin:2px 0 0;font-size:12.5px;color:var(--texto-suave)}
+    .bod-count{flex:none;min-width:34px;height:34px;padding:0 10px;border-radius:17px;background:var(--espresso);color:#fff;display:grid;place-items:center;font:600 15px 'Jost',sans-serif}
+    .bod-ref{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--linea);background:var(--blanco);color:var(--espresso);cursor:pointer;padding:0}
+    .bod-ref svg{width:18px;height:18px}.bod-ref:active{transform:rotate(90deg)}
+    .bod-card{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border:1px solid var(--linea);border-radius:18px;background:var(--blanco);text-align:left;cursor:pointer;font-family:inherit;color:inherit;box-shadow:var(--sombra)}
+    .bod-card:active{transform:scale(.985)}
+    .bod-card.on{border-color:var(--espresso);box-shadow:0 0 0 1px var(--espresso)}
+    .bod-card.tarde{border-color:var(--st-late-border,#E3B7AB)}
+    .bod-card-ico{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:var(--crema-2);color:var(--terracota-txt)}
+    .bod-card.tarde .bod-card-ico{background:var(--st-late-bg);color:var(--st-late-text,#9E5842)}
+    .bod-card-ico svg{width:22px;height:22px}
+    .bod-card-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+    .bod-card-main b{font-size:15.5px;font-weight:600;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bod-card-main small{font-size:12.5px;color:var(--texto-suave)}
+    .bod-card-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:5px;font-size:12px;color:var(--texto-suave)}
+    .bod-card-meta i{display:inline-flex;align-items:center;gap:4px;font-style:normal}
+    .bod-card-meta i svg{width:14px;height:14px}
+    .bod-card-meta i.tarde{color:var(--st-late-text,#9E5842);font-weight:600}
+    .bod-card-meta em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--crema-2);color:var(--espresso)}
+    .bod-card-go{flex:none;color:var(--texto-suave)}.bod-card-go svg{width:20px;height:20px}
+    .bod-vacio{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:34px 20px;border:1.5px dashed var(--linea);border-radius:20px;color:var(--texto-suave)}
+    .bod-vacio span{display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:var(--st-wa-bg);color:var(--st-wa-text)}
+    .bod-vacio span svg{width:28px;height:28px}.bod-vacio b{font-size:17px;color:var(--espresso);margin-top:6px}
+    /* el pedido: barra de arriba fija */
+    html[data-rol="bodega"] .chk-head{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(44,33,30,.06)}
+    html[data-rol="bodega"] .chk-head-top{align-items:center}
+    html[data-rol="bodega"] .chk-cliente{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bod-back{align-items:center;gap:4px;flex:none;padding:6px 12px 6px 6px;border:1px solid var(--linea);border-radius:999px;background:var(--crema);color:var(--espresso);font:600 13.5px 'Jost',sans-serif;cursor:pointer}
+    .bod-back svg{width:17px;height:17px}.bod-back:active{transform:scale(.96)}
+    /* tarjeta de datos del envío */
+    html[data-rol="bodega"] .pk-bod{padding:14px 16px 12px}
+    .pkb-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+    .pkb-ti{display:flex;align-items:center;gap:8px;font-size:15px}.pkb-ti svg{width:20px;height:20px;color:var(--terracota-txt)}
+    .pkb-pdf{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:12px;border:0;background:var(--espresso);color:#fff;font:600 13px 'Jost',sans-serif;cursor:pointer}
+    .pkb-pdf svg{width:16px;height:16px}
+    html[data-rol="bodega"] .pkb-f{display:grid;grid-template-columns:22px auto 1fr;align-items:start;gap:8px;padding:8px 0;border-bottom:1px dashed var(--linea);font-size:14.5px}
+    .pkb-fi{color:var(--texto-suave);padding-top:1px}.pkb-fi svg{width:17px;height:17px}
+    html[data-rol="bodega"] .pkb-fe{color:var(--texto-suave);font-size:12.5px;padding-top:2px}
+    .pkb-notas{display:flex;gap:10px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--st-espera-bg);font-size:13.5px}
+    .pkb-notas>svg{flex:none;width:18px;height:18px;color:var(--texto-suave);margin-top:1px}.pkb-notas span{display:block;font-size:11.5px;color:var(--texto-suave)}
+    .pkb-wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:12px;padding:10px;border-radius:12px;border:1px solid var(--st-wa-border);background:var(--st-wa-bg);color:var(--st-wa-text);font:600 13.5px 'Jost',sans-serif;cursor:pointer}
+    .pkb-wa svg{width:18px;height:18px}
+    /* barra de abajo fija: reportar faltante + pedido listo */
+    .bod-acciones{display:contents}
+    html[data-rol="bodega"] .bod-acciones{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;position:sticky;bottom:0;z-index:6;margin:14px -4px 0;padding:12px 4px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--crema) 72%,rgba(247,244,238,0))}
+    html[data-rol="bodega"] .bod-acciones .btn-primary,html[data-rol="bodega"] .bod-acciones .btn-ghost{margin:0;width:100%;min-height:52px}
+    .bod-falt{align-items:center;justify-content:center;gap:7px;font-weight:600}
+    .bod-ico-btn svg{width:18px;height:18px;vertical-align:-3px}
+    html[data-rol="bodega"] #packResetBtn{width:auto !important;margin:6px auto 4px !important;display:block;border:0;background:none;color:var(--texto-suave);text-decoration:underline;min-height:0}
+    html[data-rol="bodega"] .ent-nota{display:none}
+    /* celular: lista O pedido (nunca los dos) · computador: lista a la izquierda y pedido a la derecha */
+    @media (max-width:899px){
+      html[data-rol="bodega"] #screen-packing:not(.con-pedido) .pk-col-b{display:none}
+      html[data-rol="bodega"] #screen-packing.con-pedido .pk-col-a{display:none}
+      html[data-rol="bodega"] #screen-packing:not([data-paso="1"]) .bod-solo1{display:none}
+    }
+    @media (min-width:900px){ html[data-rol="bodega"] .bod-back{display:none} html[data-rol="bodega"] #screen-packing > .bod-top{max-width:420px} }
+    :root.theme-dark .bod-card,:root.theme-dark .bod-ref{background:#352a26;border-color:#4a3d37}
+    :root.theme-dark .bod-card-ico,:root.theme-dark .bod-ti-ico{background:#3f322d;color:#e0b486}
+    :root.theme-dark .bod-count,:root.theme-dark .pkb-pdf{background:#c9985f;color:#2a211e}
+    html.theme-dark[data-rol="bodega"] .bod-acciones{background:linear-gradient(to top,#231b18 72%,rgba(35,27,24,0))}
+
+    /* ═══ Bodega: pasos 1 Pedidos → 2 Empacar → 3 Envío ═══ */
+    .bod-pasos,.bod-prev,.bod-next,.bod-resumen{display:none}
+    html[data-rol="bodega"] .bod-pasos{display:flex}
+    html[data-rol="bodega"] .bod-prev,html[data-rol="bodega"] .bod-next{display:inline-flex}
+    .bod-pasos{list-style:none;margin:0 0 14px;padding:0;gap:0;align-items:flex-start}
+    .bod-pasos li{flex:1;position:relative;text-align:center}
+    .bod-pasos li::before{content:"";position:absolute;top:17px;left:-50%;width:100%;height:2px;background:var(--linea);z-index:0}
+    .bod-pasos li:first-child::before{display:none}
+    .bod-pasos li.hecho::before,.bod-pasos li.on::before{background:var(--espresso)}
+    .bod-pasos button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;background:none;border:0;padding:0;cursor:pointer;font-family:inherit;color:var(--texto-suave)}
+    .bod-pasos i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:2px solid var(--linea);background:var(--blanco);font:600 14px 'Jost',sans-serif;font-style:normal;color:var(--texto-suave)}
+    .bod-pasos i svg{width:17px;height:17px}
+    .bod-pasos span{font-size:12.5px;font-weight:600;letter-spacing:.02em}
+    .bod-pasos li.on i{background:var(--espresso);border-color:var(--espresso);color:#fff}
+    .bod-pasos li.on span{color:var(--espresso)}
+    .bod-pasos li.hecho i{background:var(--st-wa-bg);border-color:var(--st-wa-border);color:var(--st-wa-text)}
+    .bod-pasos li.hecho span{color:var(--st-wa-text)}
+    .bod-pasos li.bloq{opacity:.55}
+    .bod-ti p{line-height:1.4}
+    /* qué se ve en cada paso */
+    html[data-rol="bodega"] #screen-packing:not([data-paso="3"]) #packBodega,
+    html[data-rol="bodega"] #screen-packing:not([data-paso="3"]) #packEntregaBox,
+    html[data-rol="bodega"] #screen-packing:not([data-paso="3"]) #bodResumen,
+    html[data-rol="bodega"] #screen-packing:not([data-paso="3"]) #packFinishBtn,
+    html[data-rol="bodega"] #screen-packing:not([data-paso="3"]) #bodPrev{display:none !important}
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] .pack-capture,
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] #packList,
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] #bodFaltBtn,
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] #bodNext,
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] #packResetBtn,
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] .chk-head,
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] .bod-back{display:none !important}
+    html[data-rol="bodega"] .bod-acciones .bod-next{gap:8px;align-items:center;justify-content:center}
+    html[data-rol="bodega"] .bod-acciones .bod-prev{align-items:center;justify-content:center;gap:6px}
+    /* resumen del paso 3 y bloques del envío */
+    .bod-resumen{align-items:center;gap:12px;margin-bottom:12px;padding:12px 14px;border-radius:16px;background:var(--st-wa-bg);border:1px solid var(--st-wa-border);color:var(--st-wa-text)}
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] .bod-resumen{display:flex}
+    .bod-resumen>span{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--blanco)}
+    .bod-resumen svg{width:21px;height:21px}.bod-resumen b{display:block;font-size:15px}.bod-resumen small{font-size:12.5px;opacity:.85}
+    html[data-rol="bodega"] .pk-bod{padding:0;background:none;border:0}
+    .pkb-bloque{margin-bottom:12px;padding:14px 16px 12px;background:var(--blanco);border:1px solid var(--linea);border-radius:16px}
+    .pkb-hint{margin:2px 0 8px;font-size:12.5px;line-height:1.4;color:var(--texto-suave)}
+    .pkb-bloque .pkb-pdf{width:100%;justify-content:center;padding:12px;font-size:14px;border-radius:13px}
+    :root.theme-dark .pkb-bloque{background:#352a26;border-color:#4a3d37}
+    :root.theme-dark .bod-pasos i{background:#352a26;border-color:#4a3d37}
+    :root.theme-dark .bod-pasos li.on i{background:#c9985f;border-color:#c9985f;color:#2a211e}
+
+    /* Bodega: las tarjetas nunca se salen del ancho, y el aviso de activar notificaciones solo estorba en el paso 1 */
+    html[data-rol="bodega"] .bod-cola{grid-template-columns:minmax(0,1fr)}
+    .bod-card{min-width:0}
+    html[data-rol="bodega"] #screen-packing:not([data-paso="1"]) .pk-push{display:none !important}
+
+    /* Bodega en computador: la lista vieja de «Pedidos por empacar» no se usa (ya está la de tarjetas) */
+    html[data-rol="bodega"] #screen-packing #packEmpty,html[data-rol="bodega"] #screen-packing.con-pedido #packEmpty{display:none !important}
+
+    .nv-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+    .nv-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 6px;border-radius:999px;background:var(--crema-2);color:var(--terracota-txt);font:600 11px 'Jost',system-ui,sans-serif;letter-spacing:.02em}
+    .nv-chip svg{width:13px;height:13px}
+    :root.theme-dark .nv-chip{background:#3f322d;color:#e0b486}
+
+    /* ——— Escáner de códigos apagado (Ajustes): no se ve en ninguna pantalla ——— */
+    html:not([data-escaner="1"]) .search-scan,
+    html:not([data-escaner="1"]) .form-scan,
+    html:not([data-escaner="1"]) #packCamBtn,
+    html:not([data-escaner="1"]) .pack-capture,
+    html:not([data-escaner="1"]) #scannerModal{display:none !important}
+
+    /* ═══ Bodega: urgente / instrucción, empacados hoy y lista de revisión ═══ */
+    .bodform{margin-top:2px}
+    .bodform textarea{margin-top:8px}
+    .bod-aviso,.bod-check,.bod-hoy{display:none}
+    html[data-rol="bodega"] .bod-hoy{display:block;margin-top:14px}
+    .bod-aviso{align-items:flex-start;gap:12px;margin:0 0 12px;padding:12px 14px;border-radius:16px;background:var(--st-soon-bg);border:1px solid var(--st-soon-border);color:var(--st-soon-text)}
+    .bod-aviso>span{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--blanco)}
+    .bod-aviso svg{width:19px;height:19px}
+    .bod-aviso b{display:block;font-size:14.5px}.bod-aviso p{margin:2px 0 0;font-size:14px;line-height:1.4;color:var(--espresso)}
+    .bod-aviso.urgente{background:var(--st-late-bg);border-color:var(--st-late-border);color:var(--st-late-text)}
+    .bod-card.urgente{border-color:var(--st-late-border);box-shadow:0 0 0 1px var(--st-late-border),var(--sombra)}
+    .bod-card.urgente .bod-card-ico{background:var(--st-late-bg);color:var(--st-late-text)}
+    .bod-urg{display:inline-block;align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:2px 8px;border-radius:999px;background:var(--st-late-text,#9A4535);color:#fff;margin-bottom:3px}
+    .bod-card-nota{display:flex;align-items:flex-start;gap:6px;margin-top:6px;padding:6px 9px;border-radius:10px;background:var(--st-espera-bg);font-size:12.5px;color:var(--espresso);line-height:1.35}
+    .bod-card-nota svg{flex:none;width:14px;height:14px;margin-top:2px;color:var(--texto-suave)}
+    /* lista de revisión */
+    html[data-rol="bodega"] #screen-packing[data-paso="3"] .bod-check{margin:0 0 12px;padding:14px 16px;background:var(--blanco);border:1px solid var(--linea);border-radius:16px}
+    .bod-check-t{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:14.5px}.bod-check-t svg{width:19px;height:19px;color:var(--terracota-txt)}
+    .bod-check-it{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px dashed var(--linea);font-size:14.5px;cursor:pointer}
+    .bod-check-it input{flex:none;width:22px;height:22px;accent-color:var(--espresso)}
+    .bod-check.sacude{animation:bodSacude .45s ease}
+    @keyframes bodSacude{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    html[data-rol="bodega"] #packFinishBtn.bod-espera{opacity:.55}
+    /* empacados hoy */
+    .bod-hoy-res{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--st-wa-bg);border:1px solid var(--st-wa-border);color:var(--st-wa-text)}
+    .bod-hoy-res>span{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--blanco)}
+    .bod-hoy-res svg{width:19px;height:19px}.bod-hoy-res b{display:block;font-size:14.5px}.bod-hoy-res small{font-size:12.5px;opacity:.85}
+    .bod-hoy-det{margin-top:8px;border:1px solid var(--linea);border-radius:16px;background:var(--blanco);padding:2px 14px}
+    .bod-hoy-det summary{cursor:pointer;padding:12px 0;font-size:13.5px;font-weight:600;color:var(--terracota-txt);list-style:none}
+    .bod-hoy-det summary::-webkit-details-marker{display:none}
+    .bod-hoy-it{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px dashed var(--linea)}
+    .bod-hoy-it b{display:block;font-size:14px}.bod-hoy-it small{font-size:12px;color:var(--texto-suave)}
+    .bod-hoy-it button{display:inline-flex;align-items:center;gap:5px;flex:none;padding:7px 11px;border-radius:11px;border:1px solid var(--linea);background:var(--crema);color:var(--espresso);font:600 12.5px 'Jost',sans-serif;cursor:pointer}
+    .bod-hoy-it button svg{width:15px;height:15px}
+    @media (min-width:900px){ html[data-rol="bodega"] .bod-hoy{max-width:420px} }
+    :root.theme-dark .bod-hoy-det,:root.theme-dark .bod-check,:root.theme-dark .bod-hoy-it button{background:#352a26;border-color:#4a3d37}
+
+    /* ═══ Pedido guardado: resumen con sus botones ═══ */
+    .ped-resumen-card{display:none}
+    #screen-pedidos.ped-resumen .ped-resumen-card{display:block}
+    #screen-pedidos.ped-resumen .ped-cols,#screen-pedidos.ped-resumen .ped-barra{display:none !important}
+    .pr-cab{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:var(--st-wa-bg);border:1px solid var(--st-wa-border);color:var(--st-wa-text);margin-bottom:12px}
+    .pr-ok{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--blanco)}.pr-ok svg{width:23px;height:23px}
+    .pr-cab b{display:block;font-size:16px}.pr-cab small{font-size:12.5px;opacity:.85}
+    .pr-urg{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--st-late-bg);color:var(--st-late-text);font-size:13.5px;font-weight:600}
+    .pr-nota{margin:0 0 10px;padding:9px 12px;border-radius:12px;background:var(--st-espera-bg);font-size:13.5px}
+    .pr-box{margin-bottom:12px;padding:12px 16px;background:var(--blanco);border:1px solid var(--linea);border-radius:16px}
+    .pr-t{margin:0 0 6px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
+    .pr-it{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px dashed var(--linea);font-size:14px}.pr-it:first-of-type{border-top:0}
+    .pr-it em{font-style:normal;color:var(--texto-suave)}.pr-it b{flex:none}
+    .pr-mas{margin:6px 0 0;font-size:12.5px;color:var(--texto-suave)}
+    .pr-tot>div{display:flex;justify-content:space-between;padding:5px 0;font-size:14px}
+    .pr-tot .pr-grande{border-top:1px solid var(--linea);margin-top:4px;padding-top:9px;font-size:17px}.pr-tot .pr-grande b{font-family:'Fraunces',serif}
+    .pr-btns{display:grid;gap:8px;margin-bottom:18px}
+    .pr-btns button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;margin:0}
+    .pr-btns button svg{width:18px;height:18px}
+    .pr-editar{min-height:52px !important}
+    /* sugerencias de tonos */
+    .cart-sug{margin:8px 0 4px;padding:10px 12px;border:1px solid var(--linea);border-radius:14px;background:var(--blanco)}
+    .sug-t{margin:0 0 8px;font-size:12.5px;color:var(--texto-suave)}.sug-t b{color:var(--espresso)}
+    .sug-fila{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .sug-chip{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 9px;border:1px solid var(--linea);border-radius:12px;background:var(--crema);cursor:pointer;font-family:inherit;color:inherit;text-align:left}
+    .sug-chip:active{transform:scale(.97)}
+    .sug-chip .rs-foto{flex:none;width:34px;height:34px;border-radius:9px;overflow:hidden;display:block}
+    .sug-chip span{flex:1;min-width:0;display:flex;flex-direction:column}
+    .sug-chip b{font-size:13.5px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sug-chip small{font-size:11px;color:var(--texto-suave)}
+    .sug-chip em{flex:none;font-style:normal;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--espresso);color:#fff;font-weight:700}
+    .sug-todos{display:block;width:100%;margin-top:8px;padding:6px;background:none;border:0;color:var(--terracota-txt);font:600 12.5px 'Jost',sans-serif;cursor:pointer}
+    .sug-fin{margin:0;font-size:13px;color:var(--st-wa-text)}
+    #galMas.auto{background:none;border:0;color:var(--texto-suave);font-size:12.5px;pointer-events:none}
+    :root.theme-dark .cart-sug,:root.theme-dark .pr-box{background:#352a26;border-color:#4a3d37}
+    :root.theme-dark .sug-chip{background:#2a211e;border-color:#4a3d37}
   </style>
 </head>
 <body>
@@ -4195,6 +4539,17 @@
       <section class="screen" id="screen-packing">
         <div class="pk-push" id="pushBanner" style="display:none" role="status"></div>
         <div class="pk-falt" id="packFaltBanner" style="display:none" role="status"></div>
+        <ol class="bod-pasos" id="bodPasos" aria-label="Pasos para preparar un pedido">
+          <li data-p="1"><button type="button"><i>1</i><span>Pedidos</span></button></li>
+          <li data-p="2"><button type="button"><i>2</i><span>Empacar</span></button></li>
+          <li data-p="3"><button type="button"><i>3</i><span>Envío</span></button></li>
+        </ol>
+        <div class="bod-top" id="bodTop">
+          <span class="bod-ti-ico" id="bodTiIco" aria-hidden="true"></span>
+          <div class="bod-ti"><h2 id="bodTit">Pedidos por preparar</h2><p id="bodSub">Cargando…</p></div>
+          <span class="bod-count bod-solo1" id="bodCount">0</span>
+          <button type="button" class="bod-ref bod-solo1" id="bodRefresh" aria-label="Actualizar la lista"></button>
+        </div>
         <div class="pack-head">
           <div class="field" style="flex:1;margin:0">
             <label class="lbl" for="packOrderSel">Pedido a empacar</label>
@@ -4209,6 +4564,8 @@
         <p id="packAntig" class="pack-antig"></p>
 
         <div class="pk-cols"><div class="pk-col-a">
+        <div class="bod-cola" id="bodQueue" aria-label="Pedidos por preparar"></div>
+        <div class="bod-hoy" id="bodHoy"></div>
         <div id="packEmpty" class="empty">
           <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>
           <div id="packEmptyTxt">Selecciona un pedido para empezar a empacarlo.</div>
@@ -4219,15 +4576,18 @@
         <div id="packHud" style="display:none">
           <div class="chk-head">
             <div class="chk-head-top">
+              <button type="button" class="bod-back" id="bodBack" aria-label="Volver a la lista de pedidos"></button>
               <span id="packCliente" class="chk-cliente"></span>
               <span id="packProgText" class="chk-count">0 de 0</span>
             </div>
             <div class="pack-bar"><div class="pack-bar-fill" id="packBarFill"></div></div>
           </div>
+          <div class="bod-aviso" id="bodAviso"></div>
+          <div class="bod-resumen" id="bodResumen"></div>
           <div class="pk-bod" id="packBodega" style="display:none"></div>
 
           <div class="pack-capture">
-            <input id="packInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Escanea o toca la fila…">
+            <input id="packInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Toca la fila…">
             <button class="btn-solid" id="packCamBtn" type="button" aria-label="Escanear con la cámara">
               <svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;stroke:currentColor;fill:none"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
             </button>
@@ -4252,7 +4612,13 @@
             <p class="ent-hint" id="packEntregaHint"></p>
           </div>
 
-          <button class="btn-primary" id="packFinishBtn" type="button"><span class="spin"></span><span id="packFinishLabel">Pedido listo</span></button>
+          <div class="bod-check" id="bodCheck"></div>
+          <div class="bod-acciones">
+            <button class="btn-ghost bod-prev" id="bodPrev" type="button"><span class="bod-ico-btn" aria-hidden="true"></span>Atrás</button>
+            <button class="btn-ghost bod-falt" id="bodFaltBtn" type="button" data-bod="falt"><span class="bod-ico-btn" aria-hidden="true"></span>Reportar faltante</button>
+            <button class="btn-primary bod-next" id="bodNext" type="button"><span>Continuar</span><span class="bod-ico-btn" aria-hidden="true"></span></button>
+            <button class="btn-primary" id="packFinishBtn" type="button"><span class="spin"></span><span id="packFinishLabel">Pedido listo</span></button>
+          </div>
           <button class="btn-ghost" id="packResetBtn" type="button" style="width:100%;margin-top:10px">Desmarcar todo</button>
         </div>
         </div></div>
@@ -4548,6 +4914,7 @@
         </div>
 
         <div id="draftBar" class="draft-bar" style="display:none"></div>
+        <div id="pedResumen" class="ped-resumen-card" aria-live="polite"></div>
 
         <div class="ped-cols"><div class="ped-col ped-col-a">
         <div class="field row-field">
@@ -4565,7 +4932,7 @@
                ahorra una fila completa en pantallas pequeñas. -->
           <div class="search-bar" style="box-shadow:none;border:1px solid var(--linea)">
             <svg class="lupa" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input id="cartSearch" type="text" autocomplete="off" placeholder="Buscar o escanear producto…">
+            <input id="cartSearch" type="text" autocomplete="off" placeholder="Buscar producto…">
             <button class="search-voz" id="vozCartBtn" type="button" aria-label="Buscar por voz" title="Buscar por voz">
               <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
             </button>
@@ -4574,6 +4941,7 @@
             </button>
           </div>
           <div id="cartSearchResults" class="cart-results"></div>
+          <div id="cartSug" class="cart-sug" style="display:none" aria-live="polite"></div>
         </div>
 
         <button type="button" class="gal-btn" id="galBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>Mostrar productos al cliente</button>
@@ -4607,6 +4975,15 @@
         <div id="cliExisteStrip" class="cupo-strip cli-existe" style="display:none" role="status" aria-live="polite"></div>
         <div class="field"><label class="lbl" for="orderNotes">Notas / Observaciones del Pedido</label>
           <textarea id="orderNotes" rows="3" autocomplete="off" placeholder="Ej. Entregar después de las 5 p. m. · Empaque de regalo"></textarea></div>
+        <div class="field bodform" id="bodFormBox">
+          <label class="lbl">Para Bodega</label>
+          <div class="segmented" id="bodUrgSeg" role="group" aria-label="Prioridad del pedido">
+            <button type="button" class="seg active" data-urg="no">Normal</button>
+            <button type="button" class="seg" data-urg="si">🔴 Urgente</button>
+          </div>
+          <textarea id="bodNotaInput" rows="2" maxlength="300" autocomplete="off" placeholder="Instrucción para Bodega (opcional). Ej. Poner tarjeta de regalo · Entregar antes del viernes"></textarea>
+          <p class="cfg-hint">Solo lo ve Bodega: no sale en la remisión del cliente. Si es urgente, a Bodega le llega de primero y le avisamos al celular.</p>
+        </div>
         </div>
         </div><div class="ped-col ped-col-b">
         <div class="ped-card ped-cond">
@@ -5665,6 +6042,14 @@
           <button type="button" class="seg active" data-sonidos="on">Activo</button>
         </div>
       </div>
+      <div class="field row-field">
+        <label class="lbl inline">Escáner de códigos</label>
+        <div class="segmented" id="cfgEscanerSeg" role="group">
+          <button type="button" class="seg active" data-escaner="off">Apagado</button>
+          <button type="button" class="seg" data-escaner="on">Activo</button>
+        </div>
+      </div>
+      <p class="cfg-hint" style="margin:-4px 0 12px">Apagado, la app no muestra el escáner por cámara ni el lector de códigos en ninguna pantalla: todo se hace con toques y escribiendo. Enciéndelo cuando vayas a usar el escáner.</p>
       <div class="field row-field"><label class="lbl inline">Aviso de pagos al abrir</label>
         <div class="segmented" id="cfgAvisoPagosSeg" role="group">
           <button type="button" class="seg" data-avisopg="off">Apagado</button>
@@ -5989,6 +6374,11 @@
       <div class="field"><label class="lbl" for="cfgWaKevin">WhatsApp de Kevin (Distribuidor)</label><input id="cfgWaKevin" type="tel" inputmode="numeric" autocomplete="off" placeholder="573112079880"></div>
       <div class="field"><label class="lbl" for="cfgWaCamilo">WhatsApp de Camilo (Detal)</label><input id="cfgWaCamilo" type="tel" inputmode="numeric" autocomplete="off" placeholder="573181305060"></div>
       <div class="field"><label class="lbl" for="cfgWaBodega">WhatsApp de Bodega</label><input id="cfgWaBodega" type="tel" inputmode="numeric" autocomplete="off" placeholder="573156506780"></div>
+      <div class="field row-field"><label class="lbl inline">Lista de revisión al cerrar un pedido</label>
+        <div class="segmented" id="cfgBodCheckSeg" role="group"><button type="button" class="seg" data-bodcheck="off">Apagada</button><button type="button" class="seg active" data-bodcheck="on">Activa</button></div></div>
+      <div class="field"><label class="lbl" for="cfgBodCheckItems">Puntos de la lista (uno por línea, máximo 6)</label>
+        <textarea id="cfgBodCheckItems" rows="4" maxlength="520" placeholder="La remisión va dentro de la caja"></textarea></div>
+      <p class="cfg-hint">Antes de tocar «Pedido listo», Bodega marca cada punto. Sirve para no olvidar la remisión, el sellado o el rótulo.</p>
       <p class="cfg-hint">Con indicativo y sin signos (Colombia: 57 + celular). Se usan en los botones de WhatsApp de Bodega y en «Avisar a Bodega». Se guardan con el botón Guardar de Ajustes.</p>
       <p class="cfg-hint">Bodega entra con su propio PIN y solo ve Empaque: los pedidos por preparar, con los datos del cliente y la remisión. No ve costos, ganancia, cartera ni finanzas. Para crearlo o cambiarlo se pide el PIN del equipo.</p>
       <p class="lbl" style="margin:18px 0 6px">Respaldo de la base de datos</p>
@@ -6582,13 +6972,13 @@
       b.classList.toggle('active', b.dataset.tema===temaGuardado());
     });
     if(TEMA_MQ){
-      var alCambiarSistema=function(){ if(temaGuardado()==='auto') aplicarTema('auto'); };
+      var alCambiarSistema=function(){ try{ pedBorradorGuardar(); }catch(e){} if(temaGuardado()==='auto') aplicarTema('auto'); };   // antes de cambiar, se guarda el pedido en curso
       if(TEMA_MQ.addEventListener) TEMA_MQ.addEventListener('change', alCambiarSistema);
       else if(TEMA_MQ.addListener) TEMA_MQ.addListener(alCambiarSistema);   // Safari viejo
     }
 
     var AJUSTES_DEF = { shopifyDominio:'', shopifyWebhook:'', shopifyActivo:false, descuentoDefecto:0,
-                        inventarioEstricto:false, operador:'', notaPDF:'', sonidos:true,
+                        inventarioEstricto:false, operador:'', notaPDF:'', sonidos:true, escaner:false,
                         plazoCredito:30, alertaDias:5, coberturaDias:14, waCobro:'', waPedido:'', waCampos:'', waTextos:'',
                         metaVentas:0, costoEnvioNac:21200, costoEnvioAm:0, llavesPago:'', avisoPagos:true, finanzasCfg:'' };
     /* Parámetros de finanzas (cupos, presupuesto de viáticos, caja): un solo ajuste JSON, con valores por defecto */
@@ -6620,7 +7010,20 @@
       if (haySesion) AJUSTES.operador = operadorSesion;   // el operador es por dispositivo, nunca por servidor
       guardarAjustesLocal();
     }
-    function guardarAjustesLocal(){ try{ localStorage.setItem('kaem_ajustes', JSON.stringify(AJUSTES)); }catch(e){} }
+    function guardarAjustesLocal(){ try{ localStorage.setItem('kaem_ajustes', JSON.stringify(AJUSTES)); }catch(e){} try{ escanerAplicar(); }catch(e){} }
+    /** Escáner de códigos: una sola opción en Ajustes lo enciende o apaga en TODA la app (cámara y lector). Apagado por defecto.
+        Apagado se esconden sus botones y campos y los textos dejan de hablar de «escanear». */
+    function escanerActivo(){ return !!(AJUSTES && AJUSTES.escaner === true); }
+    function escanerAplicar(){
+      var on = escanerActivo();
+      if(on) document.documentElement.setAttribute('data-escaner', '1'); else document.documentElement.removeAttribute('data-escaner');
+      var cs = $('cartSearch'); if(cs) cs.placeholder = on ? 'Buscar o escanear producto…' : 'Buscar producto…';
+      var pi = $('packInput'); if(pi) pi.placeholder = on ? 'Escanea o toca la fila…' : 'Toca la fila…';
+      try{ if(window.bodIrPaso && window.KAEM_ROL === 'bodega') window.bodIrPaso(window.__bodPaso || 1); }catch(e){}   // vuelve a escribir el texto del paso
+    }
+    window.escanerActivo = escanerActivo;
+    window.escanerAplicar = escanerAplicar;
+    escanerAplicar();
     function segEstado(cont, attr, activo){
       Array.prototype.forEach.call($(cont).querySelectorAll('.seg'), function(s){
         s.classList.toggle('active', (s.dataset[attr]==='on')===!!activo);
@@ -6653,6 +7056,7 @@
       $('cfgVerCosto').checked   = VER_COSTO;
       $('cfgNotaPDF').value     = AJUSTES.notaPDF||'';
       var bc = bodegaCfg(); $('cfgWaKevin').value = bc.waKevin; $('cfgWaCamilo').value = bc.waCamilo; $('cfgWaBodega').value = bc.waBodega;
+      segEstado('cfgBodCheckSeg','bodcheck', bc.checklist.activo); $('cfgBodCheckItems').value = bc.checklist.items.join('\n');
       $('cfgShopDominio').value = AJUSTES.shopifyDominio||'';
       $('cfgShopWebhook').value = AJUSTES.shopifyWebhook||'';
       $('cfgDescuento').value   = AJUSTES.descuentoDefecto ? String(AJUSTES.descuentoDefecto) : '';
@@ -6666,6 +7070,7 @@
       $('cfgLlaves').value = AJUSTES.llavesPago || '';
       segEstado('cfgEstrictoSeg','estricto', AJUSTES.inventarioEstricto);
       segEstado('cfgSonidosSeg','sonidos', AJUSTES.sonidos !== false);
+      segEstado('cfgEscanerSeg','escaner', escanerActivo());
       pintarFinanzasCfg();
       pintarSelectorMarcas();
     }
@@ -6756,8 +7161,9 @@
         waCampos:           waCanonico(WA_EDIT),
         waTextos:           waTextosCanonico(),
         notaPDF:            textoDe('cfgNotaPDF'),
-        bodegaCfg:          { waKevin:textoDe('cfgWaKevin'), waCamilo:textoDe('cfgWaCamilo'), waBodega:textoDe('cfgWaBodega') },
+        bodegaCfg:          { waKevin:textoDe('cfgWaKevin'), waCamilo:textoDe('cfgWaCamilo'), waBodega:textoDe('cfgWaBodega'), checklist:{ activo:segValor('cfgBodCheckSeg','bodcheck'), items:String($('cfgBodCheckItems').value||'').split(/\r?\n/) } },
         sonidos:            segValor('cfgSonidosSeg','sonidos'),
+        escaner:            segValor('cfgEscanerSeg','escaner'),
         shopifyDominio:     textoDe('cfgShopDominio'),
         shopifyWebhook:     textoDe('cfgShopWebhook'),
         shopifyClientId:    textoDe('cfgShopClientId'),
@@ -7872,6 +8278,12 @@
     Array.prototype.forEach.call($('cfgEstrictoSeg').querySelectorAll('.seg'), function(s){
       s.addEventListener('click', function(){ segEstado('cfgEstrictoSeg','estricto', s.dataset.estricto==='on'); haptic(8); });
     });
+    Array.prototype.forEach.call($('cfgBodCheckSeg').querySelectorAll('.seg'), function(s){
+      s.addEventListener('click', function(){ segEstado('cfgBodCheckSeg','bodcheck', s.dataset.bodcheck==='on'); });
+    });
+    Array.prototype.forEach.call($('cfgEscanerSeg').querySelectorAll('.seg'), function(s){
+      s.addEventListener('click', function(){ segEstado('cfgEscanerSeg','escaner', s.dataset.escaner==='on'); });
+    });
     Array.prototype.forEach.call($('cfgSonidosSeg').querySelectorAll('.seg'), function(s){
       s.addEventListener('click', function(){ segEstado('cfgSonidosSeg','sonidos', s.dataset.sonidos==='on'); });
     });
@@ -8903,7 +9315,41 @@
     }
 
     /* ═══════════════════ MÓDULO 4 · PEDIDOS ═══════════════════ */
-    var CART = { items:[], nivel:'Detal', metodo:'Crédito' };
+    var CART = { items:[], nivel:'Detal', metodo:'Crédito', marcaOrden:[] };   // marcaOrden: las marcas en el orden en que se tocaron por primera vez al montar el pedido
+    /* ——— Orden de PRESENTACIÓN de un pedido (detalle, PDF, WhatsApp): las marcas en el orden en que se tocaron al montarlo y,
+       dentro de cada marca, de la A a la Z. La lista mientras se monta NO cambia (lo último agregado arriba). ——— */
+    function marcaLineaClave(it){
+      var m = it && it.marca ? it.marca : '';
+      if(!m){ try{ var p = findProduct(it.sku); m = p ? p.marca : ''; }catch(e){} }
+      m = String(m || '').trim().toUpperCase();
+      return m || 'ZZZ SIN MARCA';
+    }
+    /** Marcas en orden de primer toque. Con el orden guardado (campo om de cada línea) se usa ese; si el pedido es viejo y no lo trae,
+        se deduce del orden guardado (lo primero que se agregó queda al final de la lista). */
+    function marcasEnOrden(items){
+      var arr = items || [], rango = {}, tiene = arr.some(function(it){ return it && it.om !== undefined && it.om !== null && isFinite(Number(it.om)); });
+      if(tiene){ arr.forEach(function(it){ var m = marcaLineaClave(it), o = (it.om !== undefined && it.om !== null && isFinite(Number(it.om))) ? Number(it.om) : 1e6; if(rango[m] === undefined || o < rango[m]) rango[m] = o; }); }
+      else { var n = 0; for(var k = arr.length - 1; k >= 0; k--){ var m2 = marcaLineaClave(arr[k]); if(rango[m2] === undefined) rango[m2] = n++; } }
+      if(rango['ZZZ SIN MARCA'] !== undefined) rango['ZZZ SIN MARCA'] = 1e9;
+      return Object.keys(rango).sort(function(x, y){ return rango[x] - rango[y]; });
+    }
+    function lineasPorMarca(items){
+      var arr = (items || []).map(function(it, i){ return { it:it, i:i }; });
+      var orden = marcasEnOrden(items), pos = {}; orden.forEach(function(m, i){ pos[m] = i; });
+      var nom = function(it){ return String((it && (it.nombre || it.producto || it.sku)) || ''); };
+      arr.sort(function(a, b){
+        return ((pos[marcaLineaClave(a.it)] || 0) - (pos[marcaLineaClave(b.it)] || 0))
+          || nom(a.it).localeCompare(nom(b.it), 'es', { sensitivity:'base', numeric:true })
+          || ((a.it && a.it.esProbador ? 1 : 0) - (b.it && b.it.esProbador ? 1 : 0)) || (a.i - b.i);
+      });
+      return arr.map(function(x){ return x.it; });
+    }
+    /** Posición de la marca de esta línea entre las marcas del pedido en curso (si es nueva, queda de última). */
+    function marcaRango(it){
+      var m = marcaLineaClave(it); if(!CART.marcaOrden) CART.marcaOrden = [];
+      var i = CART.marcaOrden.indexOf(m); if(i < 0){ CART.marcaOrden.push(m); i = CART.marcaOrden.length - 1; }
+      return i;
+    }
     var pedState = { draftId:null, remisionId:null };
     var lastOrder = null;
     var orderCommitted = false;
@@ -8926,15 +9372,7 @@
       if(!CART.items.length){ toast('No hay nada que pausar.','error'); return; }
       if(editingRef){ toast('Este pedido ya está guardado: usa "Actualizar pedido".','info'); return; }
       var nombre=String($('cliNombre').value||'').trim();
-      var d={
-        id:'dft_'+Date.now(),
-        cliente:{ nombre:nombre, nit:$('clientNit').value.trim(), telefono:$('cliTel').value.trim(),
-                  direccion:$('cliDir').value.trim(), ciudad:$('cliCiudad').value.trim() },
-        items:CART.items.slice(), nivel:CART.nivel, nivelTocado:!!CART.nivelTocado, nivelAuto:!!CART.nivelAuto, metodo:CART.metodo,
-        flete:$('fleteInput').value, fleteManual:FLETE_MANUAL, abono:$('abonoInput').value, desc:$('descInput').value, descM:JSON.parse(JSON.stringify(DESCM)),
-        venc:$('vencInput').value, notas:$('orderNotes').value,
-        total:computeTotals().total, fecha:fmtDateNow(), pg:pgSnap()
-      };
+      var d=pedSnapshot(); d.id='dft_'+Date.now();
       var arr=loadDrafts();
       if(arr.length>=8 && !window.confirm('Ya tienes 8 pedidos sin terminar. Si dejas este aparte, se borra el más antiguo. ¿Continuar?')) return;
       arr.unshift(d); saveDrafts(arr);
@@ -8948,19 +9386,8 @@
       for(var i=0;i<arr.length;i++) if(arr[i].id===id){ d=arr[i]; break; }
       if(!d){ toast('Ese pedido ya no está disponible.','error'); return; }
       if(CART.items.length && !orderCommitted && !window.confirm('Lo que llevas en pantalla sin guardar se perderá. ¿Retomar este pedido?')) return;
-      // Se retoma como pedido nuevo: nada de lo guardado antes queda abierto
-      editingRef=null; editingTs=''; orderCommitted=false; lastOrder=null; PED_ERA_EDICION=false; pedState.remisionId=null; setDraftId(); setActionsEnabled(false);
-      $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
+      pedAplicarSnapshot(d, false);
       var c=d.cliente||{};
-      $('cliNombre').value=c.nombre||''; $('clientNit').value=c.nit||''; $('cliTel').value=c.telefono||'';
-      $('cliDir').value=c.direccion||''; $('cliCiudad').value=c.ciudad||'';
-      $('orderNotes').value=d.notas||''; $('fleteInput').value=d.flete||''; FLETE_MANUAL=!!d.fleteManual; $('abonoInput').value=d.abono||'';
-      $('descInput').value=d.desc||''; DESCM=d.descM||{}; $('vencInput').value=d.venc||defaultVencISO();
-      CART.items=(d.items||[]).slice();
-      applyNivelUI(d.nivel||'Detal'); setPago(d.metodo==='Crédito'?'Crédito':'Contado');
-      // Un pedido en pausa conserva su lista tal como quedó (los guardados antes de esta función se tratan como elegidos a mano)
-      CART.nivelTocado = (d.nivelTocado===undefined) ? true : !!d.nivelTocado; CART.nivelAuto = !!d.nivelAuto;
-      if(d.pg) pgCopiar(d.pg); else pgInferir();
       descartarDraft(id, true);
       renderCart(); haptic(15);
       toast('Pedido retomado'+(c.nombre?(' · '+c.nombre):''),'success');
@@ -9038,6 +9465,155 @@
     function bumpRem(){ var n=peekRem()+1; try{ localStorage.setItem('kaem_next_rem', String(n)); }catch(e){} }
     // El consecutivo lo manda el SERVIDOR (fuente única). El contador local solo
     // se usa como respaldo cuando no hay conexión, y se corrige al sincronizar.
+    /* ═══ Pedido en curso: se guarda SOLO en este celular mientras lo montas y se recupera si la app se cierra o se reinicia ═══
+       (cambio de modo claro/oscuro del sistema, memoria llena, batería…). Nunca viaja al servidor: es una copia local. */
+    var BORR_KEY = 'kaem_ped_borrador', BORR_MAX_DIAS = 7, _borrT = null;
+    var _borrArranque = true; setTimeout(function(){ _borrArranque = false; }, 8000);   // mientras la app arranca NO se borra la copia: primero se intenta recuperar
+    /** «Retrato» del pedido tal como está en pantalla. */
+    function pedSnapshot(){
+      var nombre = String($('cliNombre').value||'').trim();
+      return {
+        cliente:{ nombre:nombre, nit:$('clientNit').value.trim(), telefono:$('cliTel').value.trim(), direccion:$('cliDir').value.trim(), ciudad:$('cliCiudad').value.trim() },
+        items:CART.items.slice(), nivel:CART.nivel, nivelTocado:!!CART.nivelTocado, nivelAuto:!!CART.nivelAuto, metodo:CART.metodo,
+        flete:$('fleteInput').value, fleteManual:FLETE_MANUAL, abono:$('abonoInput').value, desc:$('descInput').value, descM:JSON.parse(JSON.stringify(DESCM)),
+        venc:$('vencInput').value, notas:$('orderNotes').value, urg:bodUrgenteForm(), nbod:$('bodNotaInput').value, mo:(CART.marcaOrden||[]).slice(),
+        total:computeTotals().total, fecha:fmtDateNow(), pg:pgSnap()
+      };
+    }
+    /** Pone un «retrato» en pantalla. edicion=true conserva que se estaba EDITANDO un pedido ya guardado. */
+    function pedAplicarSnapshot(d, edicion){
+      editingRef=null; editingTs=''; orderCommitted=false; lastOrder=null; PED_ERA_EDICION=false; pedState.remisionId=null;
+      if(!(edicion && d.editingRef)) setDraftId();
+      setActionsEnabled(false);
+      $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText();
+      var c=d.cliente||{};
+      $('cliNombre').value=c.nombre||''; $('clientNit').value=c.nit||''; $('cliTel').value=c.telefono||'';
+      $('cliDir').value=c.direccion||''; $('cliCiudad').value=c.ciudad||'';
+      $('orderNotes').value=d.notas||''; bodFormPoner(!!d.urg, d.nbod||''); $('fleteInput').value=d.flete||''; FLETE_MANUAL=!!d.fleteManual; $('abonoInput').value=d.abono||'';
+      $('descInput').value=d.desc||''; DESCM=d.descM||{}; $('vencInput').value=d.venc||defaultVencISO();
+      CART.items=(d.items||[]).slice(); CART.marcaOrden=(d.mo||[]).slice();
+      applyNivelUI(d.nivel||'Detal'); setPago(d.metodo==='Crédito'?'Crédito':'Contado');
+      CART.nivelTocado = (d.nivelTocado===undefined) ? true : !!d.nivelTocado; CART.nivelAuto = !!d.nivelAuto;
+      if(d.pg) pgCopiar(d.pg); else pgInferir();
+      if(edicion && d.editingRef){
+        editingRef=d.editingRef; editingTs=d.editingTs||''; pedState.remisionId=d.remisionId||null; PED_ERA_EDICION=true;
+        if(d.remisionId) $('pedId').textContent=d.remisionId;
+      }
+      renderCart();
+      try{ pedEstadoPintar(); }catch(e){}
+    }
+    /** ¿Hay un pedido a medias (sin guardar) en pantalla? */
+    function pedTieneTrabajo(){
+      if(orderCommitted) return false;
+      return !!(CART.items.length || String($('cliNombre').value||'').trim() || String($('cliTel').value||'').trim() || String($('orderNotes').value||'').trim() || String($('bodNotaInput').value||'').trim());
+    }
+    function pedBorradorBorrar(){ clearTimeout(_borrT); try{ localStorage.removeItem(BORR_KEY); }catch(e){} }
+    function pedBorradorGuardar(){
+      clearTimeout(_borrT);
+      try{
+        if(!pedTieneTrabajo()){ if(!_borrArranque) localStorage.removeItem(BORR_KEY); return; }
+        var d = pedSnapshot(); d.ts = Date.now();
+        if(editingRef){ d.editingRef = editingRef; d.editingTs = editingTs; d.remisionId = pedState.remisionId || null; }
+        localStorage.setItem(BORR_KEY, JSON.stringify(d));
+      }catch(e){}
+    }
+    function pedBorradorProgramar(){ clearTimeout(_borrT); _borrT = setTimeout(pedBorradorGuardar, 500); }
+    /** Al abrir la app: si quedó un pedido a medias, vuelve a ponerse y te lleva a él. */
+    function pedBorradorRecuperar(){
+      if(window.KAEM_ROL === 'bodega'){ _borrArranque = false; return; }
+      var d = null; try{ d = JSON.parse(localStorage.getItem(BORR_KEY) || 'null'); }catch(e){ d = null; }
+      if(!d){ _borrArranque = false; return; }
+      var c = d.cliente || {}, hay = (d.items && d.items.length) || c.nombre || c.telefono;
+      if(!hay || (Date.now() - (d.ts || 0)) > BORR_MAX_DIAS * 86400000){ pedBorradorBorrar(); return; }
+      if(CART.items.length || orderCommitted || pedTieneTrabajo()){ _borrArranque = false; return; }   // ya hay algo en pantalla: no se pisa
+      pedAplicarSnapshot(d, true); _borrArranque = false;
+      try{ switchTab('pedidos'); }catch(e){}
+      var n = (d.items || []).length;
+      toast('Recuperé tu pedido sin guardar' + (c.nombre ? ' · ' + c.nombre : '') + (n ? ' (' + n + (n === 1 ? ' producto' : ' productos') + ')' : ''), 'success', 9000, { accion:'Descartar', fn:function(){ if(window.confirm('¿Descartar este pedido sin guardar?')){ newOrder(true); toast('Pedido descartado','info'); } } });
+    }
+    window.pedBorradorGuardar = pedBorradorGuardar; window.pedBorradorRecuperar = pedBorradorRecuperar;
+    // Se guarda al cambiar cualquier cosa del pedido y SIEMPRE al salir de la app o cambiar el modo claro/oscuro del sistema
+    ['input','change','click'].forEach(function(ev){ document.addEventListener(ev, function(e){ var s=$('screen-pedidos'); if(s && s.classList.contains('active') && e.target && s.contains(e.target)) pedBorradorProgramar(); }, true); });
+    document.addEventListener('visibilitychange', function(){ if(document.hidden) pedBorradorGuardar(); });
+    window.addEventListener('pagehide', pedBorradorGuardar);
+
+    /* ═══ Volver al inicio tras un rato fuera de la app (si no hay nada a medias) ═══ */
+    var AUSENCIA_INICIO_MIN = 10, _ocultaDesde = 0;
+    function kaemVolverAlInicio(){
+      if(pedTieneTrabajo()) return;                                         // pedido a medias: se queda donde estaba
+      if(window.KAEM_ROL === 'bodega'){ if(PACK && PACK.pedido) return; return; }   // Bodega siempre trabaja en Empaque
+      if(document.querySelector('.modal.show, #lockScreen.show, #kaemAvisoVer')) return;   // ventana abierta: puede haber algo en curso
+      if(STATE.tab === 'hub') return;
+      // las búsquedas viejas no se quedan «pegadas»
+      Array.prototype.forEach.call(document.querySelectorAll('.search-bar input, input[type="search"]'), function(i){ if(i.value){ i.value=''; try{ i.dispatchEvent(new Event('input', { bubbles:true })); }catch(e){} } });
+      try{ switchTab('hub'); }catch(e){}
+    }
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden){ _ocultaDesde = Date.now(); return; }
+      var min = _ocultaDesde ? (Date.now() - _ocultaDesde) / 60000 : 0; _ocultaDesde = 0;
+      if(min >= AUSENCIA_INICIO_MIN) kaemVolverAlInicio();
+    });
+
+    /* ═══ Pedido guardado → RESUMEN con sus botones (Editar / Actualizar, PDF, WhatsApp…) ═══ */
+    function pedResumenPintar(g){
+      var sc = $('screen-pedidos'), el = $('pedResumen'); if(!sc || !el) return;
+      if(!g){ sc.classList.remove('ped-resumen'); return; }
+      var o = orderForOutput() || {}, c = o.cliente || {}, items = o.items || [];
+      var I = window.bodIco || function(){ return ''; };
+      var lineas = items.filter(function(it){ return !it.esProbador; }), probs = items.length - lineas.length;
+      var fila = function(it){ return '<div class="pr-it"><span>' + safe(it.nombre || it.sku) + ' <em>× ' + (Number(it.cantidad) || 0) + '</em></span><b>' + cop((Number(it.precio) || 0) * (Number(it.cantidad) || 0)) + '</b></div>'; };
+      var cred = /cr[eé]dito/i.test(String(o.metodoPago || ''));
+      el.innerHTML =
+          '<div class="pr-cab"><span class="pr-ok">' + I('check') + '</span><div><b>' + (PED_ERA_EDICION ? 'Pedido actualizado' : 'Pedido guardado') + (pedState.remisionId ? ' · ' + safe(pedState.remisionId) : '') + '</b><small>' + safe(c.nombre || 'Sin cliente') + (c.ciudad ? ' · ' + safe(c.ciudad) : '') + (c.telefono ? ' · ' + safe(c.telefono) : '') + '</small></div></div>'
+        + (o.urgente ? '<p class="pr-urg">🔴 Urgente para Bodega' + (o.notaBodega ? ' · ' + safe(o.notaBodega) : '') + '</p>' : (o.notaBodega ? '<p class="pr-nota">Para Bodega: ' + safe(o.notaBodega) + '</p>' : ''))
+        + '<div class="pr-box"><p class="pr-t">Productos (' + lineas.length + (probs ? ' · ' + probs + (probs === 1 ? ' probador' : ' probadores') : '') + ')</p>' + lineas.slice(0, 12).map(fila).join('') + (lineas.length > 12 ? '<p class="pr-mas">y ' + (lineas.length - 12) + ' más…</p>' : '') + '</div>'
+        + '<div class="pr-box pr-tot"><div><span>Subtotal</span><b>' + cop(o.subtotal || 0) + '</b></div>' + (o.descuento ? '<div><span>Descuento</span><b>− ' + cop(o.descuento) + '</b></div>' : '') + '<div><span>Flete</span><b>' + (o.flete ? cop(o.flete) : 'Gratis') + '</b></div><div class="pr-grande"><span>Total</span><b>' + cop(o.total || 0) + '</b></div>'
+        +   '<div><span>Pago</span><b>' + (cred ? 'Crédito' : 'Contado') + '</b></div>' + (cred ? '<div><span>Abono</span><b>' + cop(o.abono || 0) + '</b></div><div><span>Saldo</span><b>' + cop(o.saldo || 0) + '</b></div>' + (o.fechaVencimiento ? '<div><span>Vence</span><b>' + safe(o.fechaVencimiento) + '</b></div>' : '') : '') + '</div>'
+        + (o.notas ? '<p class="pr-nota">Notas: ' + safe(o.notas) + '</p>' : '')
+        + '<div class="pr-btns"><button type="button" class="btn-primary pr-editar" data-pr="editar">' + I('nota') + '<span>Editar / Actualizar este pedido</span></button>'
+        +   '<button type="button" class="btn-ghost" data-pr="pdf">' + I('pdf') + '<span>Descargar PDF</span></button>'
+        +   '<button type="button" class="btn-solid wa" data-pr="wa">' + I('chat') + '<span>WhatsApp al cliente</span></button>'
+        +   '<button type="button" class="btn-ghost" data-pr="bodega">' + I('caja') + '<span>Avisar a Bodega</span></button>'
+        +   '<button type="button" class="btn-ghost" data-pr="nuevo">+ <span>Nuevo pedido</span></button>'
+        +   '<button type="button" class="btn-ghost" data-pr="hist"><span>Ver pedidos guardados (Historial)</span></button></div>';
+      sc.classList.add('ped-resumen');
+      try{ window.scrollTo(0, 0); sc.scrollTop = 0; }catch(e){}
+    }
+    document.addEventListener('click', function(e){
+      var b = e.target && e.target.closest ? e.target.closest('#pedResumen [data-pr]') : null; if(!b) return;
+      var a = b.getAttribute('data-pr'); haptic(10);
+      if(a === 'editar'){ markDirty(); toast('Cambia lo que necesites y toca «Actualizar pedido»: se corrige este mismo, no se crea otro.', 'info', 5000); try{ window.scrollTo(0, 0); }catch(eS){} }
+      else if(a === 'pdf') downloadOrderPDF();
+      else if(a === 'wa') sendPDFClient();
+      else if(a === 'bodega') avisarBodega(orderForOutput());
+      else if(a === 'nuevo') $('orderNewBtn').click();
+      else if(a === 'hist') $('historyBtn').click();
+    });
+
+    /* ═══ Sugerencias de tonos al agregar un producto con tonos (máximo 2, las que aún no están en el pedido) ═══ */
+    function cartDisp(p){ return (p.disponibleReal!=null ? p.disponibleReal : (p.disponible!=null ? p.disponible : (Number(p.stock)||0))); }
+    function cartSugOcultar(){ var b = $('cartSug'); if(b){ b.style.display = 'none'; b.innerHTML = ''; } }
+    function cartSugPintar(p){
+      var box = $('cartSug'); if(!box) return;
+      if(!p || !p.tono){ cartSugOcultar(); return; }
+      var fam = fnorm(p.producto || ''), enCarrito = {}; CART.items.forEach(function(it){ enCarrito[it.sku] = 1; });
+      var otros = STATE.products.filter(function(q){ return q.sku !== p.sku && q.marca === p.marca && fnorm(q.producto || '') === fam && q.tono && !enCarrito[q.sku] && cartDisp(q) > 0; });
+      otros.sort(function(a, b){ return String(a.tono).localeCompare(String(b.tono), 'es', { numeric:true }); });
+      var k = 0; while(k < otros.length && String(otros[k].tono).localeCompare(String(p.tono), 'es', { numeric:true }) < 0) k++;
+      otros = otros.slice(k).concat(otros.slice(0, k));   // sigue con los que vienen después del tono recién agregado
+      if(!otros.length){ box.innerHTML = '<p class="sug-fin">✓ Ya están todos los tonos disponibles de <b>' + safe(p.producto) + '</b></p>'; box.style.display = 'block'; clearTimeout(box._t); box._t = setTimeout(cartSugOcultar, 4500); return; }
+      box.innerHTML = '<p class="sug-t">Otros tonos de <b>' + safe(p.producto) + '</b></p><div class="sug-fila">'
+        + otros.slice(0, 2).map(function(q){ return '<button type="button" class="sug-chip" data-sug-sku="' + safe(q.sku) + '"><i class="rs-foto">' + fotoMini(q, 72) + '</i><span><b>' + safe(q.tono) + '</b><small>' + cartDisp(q) + ' disp.</small></span><em>+</em></button>'; }).join('')
+        + '</div>' + (otros.length > 2 ? '<button type="button" class="sug-todos" data-sug-todos="' + safe(p.producto) + '">Ver los ' + otros.length + ' tonos que faltan</button>' : '');
+      box.style.display = 'block'; clearTimeout(box._t);
+    }
+    document.addEventListener('click', function(e){
+      var t = e.target && e.target.closest ? e.target : null; if(!t) return;
+      var chip = t.closest('[data-sug-sku]'); if(chip){ addToCart(chip.getAttribute('data-sug-sku')); return; }   // addToCart vuelve a pintar las que siguen
+      var todos = t.closest('[data-sug-todos]'); if(todos){ var cs = $('cartSearch'); cs.value = todos.getAttribute('data-sug-todos'); cs.dispatchEvent(new Event('input', { bubbles:true })); cartSugOcultar(); }
+    });
+    document.addEventListener('input', function(e){ if(e.target && e.target.id === 'cartSearch' && e.target.value) cartSugOcultar(); });
+
     function setDraftId(){
       pedState.remisionId=null;
       pedState.draftId='';
@@ -9060,7 +9636,7 @@
 
     // ——— Estado de acciones (PDF/WhatsApp bloqueados hasta guardar) ———
     function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; if($('orderBodegaBtn')) $('orderBodegaBtn').disabled=!on; }
-    function markDirty(){ if(orderCommitted){ orderCommitted=false; $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText(); setActionsEnabled(false); } pedEstadoPintar(); }
+    function markDirty(){ try{ pedBorradorProgramar(); }catch(eB){} if(orderCommitted){ orderCommitted=false; $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText(); setActionsEnabled(false); } pedEstadoPintar(); }
     /* Qué se ve abajo del pedido según su estado: sin guardar → Guardar · guardado → aviso, PDF y WhatsApp · con cambios → Actualizar */
     var PED_ERA_EDICION=false;
     function pedEstadoPintar(){
@@ -9072,6 +9648,7 @@
       $('orderActionsRow').style.display=g?'':'none';
       $('orderNewBtn').style.display=(g||ed||CART.items.length)?'':'none';
       try{ pedBarraPintar(); }catch(e){}
+      try{ if(g) pedBorradorBorrar(); pedResumenPintar(g); }catch(e){}   // guardado: ya no hay copia local pendiente y se ve el resumen
       if($('orderEditHint')){ $('orderEditHint').style.display=(!g&&ed)?'':'none'; $('orderEditHint').textContent='Estás cambiando '+(id||'este pedido')+'. Toca «Actualizar pedido» para que quede; no se crea uno nuevo.'; }
     }
 
@@ -9081,8 +9658,10 @@
       var ex=null; for(var i=0;i<CART.items.length;i++){ if(CART.items[i].sku===p.sku){ ex=CART.items[i]; break; } }
       if(ex){ ex.cantidad++; CART.items.splice(CART.items.indexOf(ex),1); CART.items.unshift(ex); }
       else { CART.items.unshift({ sku:p.sku, nombre:(p.producto||'')+(p.tono?(' · '+p.tono):''), marca:p.marca, distribuidor:p.distribuidor, mayorista:p.mayorista, detal:p.detal, stock:p.stock, precio:priceForLevel(p,CART.nivel), cantidad:1, probFull:0, probHalf:0, manual:false }); }
+      try{ marcaRango(CART.items[0]); }catch(eM){}   // primer toque de esta marca: define el orden en que saldrá en el detalle y el PDF
       beep('success'); haptic(20); flash();
       renderCart(); toast('Agregado · '+p.producto,'success',1600,{ grupo:'pedido' });
+      try{ cartSugPintar(p); }catch(eS){}   // otros tonos del mismo producto, a un toque
       // Queda de primero y visible: se ajustan las unidades sin buscarlo en toda la lista
       var fila=$('cartList').firstElementChild;
       if(fila){ fila.classList.remove('recien'); void fila.offsetWidth; fila.classList.add('recien'); try{ fila.scrollIntoView({ block:'nearest', behavior:'smooth' }); }catch(e){} }
@@ -9139,6 +9718,7 @@
       return true;
     }
     function renderCart(){
+      try{ pedBorradorProgramar(); }catch(eB){}
       if(!__nivelBusy && aplicarNivelAutomatico()) return;     // cambió la lista de precios: ya se pintó de nuevo
       var c=$('cartList'), empty=$('cartEmpty');
       if(!CART.items.length){ c.innerHTML=''; if(empty) empty.style.display='block'; updateTotals(); markDirty(); return; }
@@ -9420,9 +10000,10 @@
       CART.items.forEach(function(it){
         var cu=costoItem_(it);   // costo del momento (si el pedido ya existía, el que tenía al venderse): la rentabilidad histórica no cambia si después sube
         var dm=descMarcaDe(it), dmo=dm>0?dm:undefined;   // descuento por marca: el % viaja en la línea
-        items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:it.cantidad, precio:it.precio, subtotal:it.precio*it.cantidad, costo:cu, descPct:dmo });
-        if(it.probFull){ items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:1, precio:0, subtotal:0, esProbador:'full', costo:cu }); }
-        if(it.probHalf){ var mp=Math.round(it.precio/2); items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, cantidad:1, precio:mp, subtotal:mp, esProbador:'half', costo:cu, descPct:dmo }); }
+        var omx = marcaRango(it);   // orden en que se tocó la marca de esta línea al montar el pedido
+        items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, om:omx, cantidad:it.cantidad, precio:it.precio, subtotal:it.precio*it.cantidad, costo:cu, descPct:dmo });
+        if(it.probFull){ items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, om:omx, cantidad:1, precio:0, subtotal:0, esProbador:'full', costo:cu }); }
+        if(it.probHalf){ var mp=Math.round(it.precio/2); items.push({ sku:it.sku, nombre:it.nombre, marca:it.marca, om:omx, cantidad:1, precio:mp, subtotal:mp, esProbador:'half', costo:cu, descPct:dmo }); }
       });
       return {
         clientRef:'ord_'+Date.now()+'_'+Math.floor(Math.random()*1000000),
@@ -9431,6 +10012,7 @@
         flete:t.flete, total:t.total, metodoPago:CART.metodo,
         abono:t.abono, saldo:t.saldo, fechaVencimiento:(CART.metodo==='Crédito'?vencDateStr():''),
         notas:$('orderNotes').value.trim(),
+        urgente: bodUrgenteForm(), notaBodega: String($('bodNotaInput').value||'').trim(),   // para Bodega: no sale en la remisión
         operador:String(AJUSTES.operador||'').trim(),
         estado:(t.saldo<=0?'Pagado':'Pendiente'),
         clienteNuevo:(PGD.cli==='nuevo' && !editingRef)
@@ -9680,7 +10262,7 @@
     function cargarPedidoEnFormulario(o){
       var cli=o.cliente||{};
       $('cliNombre').value=cli.nombre||''; $('clientNit').value=cli.nit||''; $('cliTel').value=cli.telefono||'';
-      $('cliDir').value=cli.direccion||''; $('cliCiudad').value=cli.ciudad||''; $('orderNotes').value=o.notas||'';
+      $('cliDir').value=cli.direccion||''; $('cliCiudad').value=cli.ciudad||''; $('orderNotes').value=o.notas||''; bodFormPoner(!!o.urgente, o.notaBodega||'');
       $('fleteInput').value=(Number(o.flete)||0)?String(Number(o.flete)||0):''; FLETE_MANUAL=true;
       $('abonoInput').value=(Number(o.abono)||0)?String(Number(o.abono)||0):'';
       // El % guardado del pedido manda sobre el default de Ajustes; si el pedido
@@ -9711,6 +10293,7 @@
       DESCM={}; PGD.descModo='todo';
       (o.items||[]).forEach(function(it){ var d=Number(it.descPct)||0; if(d<=0) return; for(var k=0;k<CART.items.length;k++){ if(CART.items[k].sku===it.sku){ DESCM[marcaClave(CART.items[k])]=d; PGD.descModo='marca'; break; } } });
       if(PGD.descModo==='marca') $('descInput').value='';
+      CART.marcaOrden = marcasEnOrden(o.items||[]);
       setPago(o.metodoPago==='Crédito'?'Crédito':'Contado');
       editingRef=o.clientRef||o.remision||o.id;
       editingTs=o.ts||'';
@@ -9885,7 +10468,7 @@
     }
     function histRowHTML(o){
       var items=o.items||[];
-      var det=items.map(function(it){ return '<div class="hd-item"><span>'+it.cantidad+'× '+safe(it.nombre||it.sku)+'</span><span>'+cop(it.subtotal!=null?it.subtotal:it.precio*it.cantidad)+'</span></div>'; }).join('');
+      var det=lineasPorMarca(items).map(function(it){ return '<div class="hd-item"><span>'+it.cantidad+'× '+safe(it.nombre||it.sku)+'</span><span>'+cop(it.subtotal!=null?it.subtotal:it.precio*it.cantidad)+'</span></div>'; }).join('');
       var ref=safe(o.clientRef||o.remision||'');
       return '<div class="hist-row" data-ref="'+ref+'">'
         +'<div class="hist-top"><div class="hist-id"><b>'+safe(o.remision||o.id||'—')+'</b><span>'+safe(o.fecha||'')+(o.synced===false?' <em class="hist-pend">(sin sincronizar)</em>':'')+'</span></div>'+pagoBadge(o.metodoPago,o.saldo)+'</div>'
@@ -10633,7 +11216,7 @@
         cliente:{ nombre:kaemFirst(cli.nombre, cli.razonSocial, d.clienteNombre, '—'), nit:kaemFirst(cli.nit, cli.cedula, cli.documento, d.clienteNit, '—'),
                   tel:kaemFirst(cli.telefono, cli.celular, cli.whatsapp, d.clienteTel, '—'), ciudad:kaemFirst(cli.ciudad, d.clienteCiudad, '—'),
                   dir:kaemFirst(cli.direccion, cli.direccionEntrega, d.clienteDireccion, '—') }, filas:[] };
-      var items = d.items || d.productos || [], calcSub = 0, nUni = 0, nProd = 0;
+      var items = lineasPorMarca(d.items || d.productos || []), calcSub = 0, nUni = 0, nProd = 0;   // por marca (en el orden en que se tocaron al montar el pedido) y de la A a la Z
       items.forEach(function(it){
         it = it || {};
         var prob = it.esProbador, cant = toNum(kaemFirst(it.cantidad, it.cant, 0)), pu = toNum(kaemFirst(it.precio, it.valorUnitario, it.valorUnit, it.unitario, 0));
@@ -11068,7 +11651,7 @@
       return out.join('\n').replace(/\n{3,}/g,'\n\n').trim();
     }
     function waItemsPedido(o){
-      return (o.items||[]).map(function(it){
+      return lineasPorMarca(o.items||[]).map(function(it){
         var pr = toNum(it.precio), esFull = it.esProbador==='full' || (!it.esProbador && pr===0 && toNum(it.cantidad)===1 && (o.items||[]).some(function(x){ return x!==it && x.sku===it.sku && toNum(x.precio)>0; }));
         var rot = esFull ? ' (probador de cortesía 🎁)' : (it.esProbador==='half' ? ' (probador a mitad de precio)' : '');
         return '• ' + (Number(it.cantidad)||0) + 'x ' + (it.nombre || it.sku || '') + rot;
@@ -11199,7 +11782,13 @@
 
     /* ——— Bodega: números de WhatsApp y avisos ——— */
     var BODEGA_CFG_DEF = { waKevin:'573112079880', waCamilo:'573181305060', waBodega:'573156506780' };
-    function bodegaCfg(){ var c = (AJUSTES && AJUSTES.bodegaCfg) || {}; return { waKevin:String(c.waKevin||BODEGA_CFG_DEF.waKevin), waCamilo:String(c.waCamilo||BODEGA_CFG_DEF.waCamilo), waBodega:String(c.waBodega||BODEGA_CFG_DEF.waBodega) }; }
+    var BODEGA_CHECK_DEF = ['La remisión va dentro de la caja', 'La caja está bien sellada', 'El rótulo está pegado'];
+    function bodegaCfg(){
+      var c = (AJUSTES && AJUSTES.bodegaCfg) || {}, ck = c.checklist || {};
+      var items = (Array.isArray(ck.items) ? ck.items : []).map(function(x){ return String(x||'').trim(); }).filter(Boolean).slice(0, 6);
+      return { waKevin:String(c.waKevin||BODEGA_CFG_DEF.waKevin), waCamilo:String(c.waCamilo||BODEGA_CFG_DEF.waCamilo), waBodega:String(c.waBodega||BODEGA_CFG_DEF.waBodega),
+               checklist:{ activo: ck.activo === undefined ? true : !!ck.activo, items: items.length ? items : BODEGA_CHECK_DEF.slice() } };
+    }
     function bodegaUnidades(o){ var n=0; ((o&&o.items)||[]).forEach(function(it){ if(!it.esProbador) n += Math.floor(Number(it.cantidad)||0); }); return n; }
     /** Kevin / Camilo avisan a Bodega que hay un pedido para preparar (abre su chat con el mensaje listo). */
     function avisarBodega(o){
@@ -11325,10 +11914,11 @@
 
     // ——— Nuevo pedido ———
     function newOrder(silencio){
-      CART.items=[]; lastOrder=null; orderCommitted=false; editingRef=null; editingTs=''; pedState.catalogoId=null; PED_ERA_EDICION=false;
+      CART.items=[]; CART.marcaOrden=[]; lastOrder=null; orderCommitted=false; editingRef=null; editingTs=''; pedState.catalogoId=null; PED_ERA_EDICION=false;
+      try{ pedBorradorBorrar(); cartSugOcultar(); }catch(eB){}
       $('pedEditBadge').style.display='none';
       $('cliNombre').value=''; $('clientNit').value=''; $('cliTel').value=''; $('cliDir').value=''; $('cliCiudad').value=''; try{ if(window.cliExisteOcultar) window.cliExisteOcultar(); }catch(e){}
-      $('orderNotes').value='';
+      $('orderNotes').value=''; bodFormPoner(false, '');
       $('fleteInput').value=''; $('abonoInput').value=''; FLETE_MANUAL=false;
       DESCM={}; PGD.descModo='todo'; $('descInput').value='';   // vacío = hereda el "Descuento por defecto" de Ajustes
       _vencTocado=false;
@@ -11346,6 +11936,7 @@
       actualizarTextoPlazoCredito();
       $('vencInput').value=defaultVencISO(); setPago(CART.metodo);
       renderCart(); renderPending(); pintarDrafts();
+      setTimeout(function(){ try{ pedBorradorRecuperar(); }catch(e){ console.error('No se pudo recuperar el pedido sin guardar:', e); } }, 1200);   // si la app se cerró con un pedido a medias, vuelve
       if(loadPending().length && navigator.onLine!==false) syncPending();
       sincronizarAjustes();
     }
@@ -11590,7 +12181,7 @@
       var conDias = PACK.pendientes.map(function(o, i){
         var f = kaemParseFecha(o.fecha); if(f) f = new Date(f.getFullYear(), f.getMonth(), f.getDate());
         return { o:o, i:i, dias: f ? Math.max(0, Math.round((hoy0 - f) / 86400000)) : null };
-      }).sort(function(a, b){ return ((b.dias==null?-1:b.dias) - (a.dias==null?-1:a.dias)) || (a.i - b.i); });
+      }).sort(function(a, b){ return ((b.o.urgente?1:0) - (a.o.urgente?1:0)) || ((b.dias==null?-1:b.dias) - (a.dias==null?-1:a.dias)) || (a.i - b.i); });   // urgentes primero, luego del más antiguo al más reciente
       var atrasados = 0;
       conDias.forEach(function(x){
         var o = x.o;
@@ -11601,7 +12192,7 @@
         var edad = x.dias == null ? '' : (x.dias === 0 ? ' · hoy' : (x.dias === 1 ? ' · ayer' : ' · hace ' + x.dias + ' d'));
         if(x.dias != null && x.dias >= 2) atrasados++;
         html += '<option value="' + safe(ref) + '"' + (ref === actual ? ' selected' : '') + '>' +
-                (x.dias != null && x.dias >= 2 ? '⚠️ ' : '') + safe(id) + ' · ' + safe(nom) + ' (' + unds + ' un.)' + edad + '</option>';
+                (o.urgente ? '🔴 URGENTE · ' : '') + (x.dias != null && x.dias >= 2 ? '⚠️ ' : '') + safe(id) + ' · ' + safe(nom) + ' (' + unds + ' un.)' + edad + '</option>';
       });
       sel.innerHTML = html;
       // Los más antiguos, a un toque (el menú de arriba sigue para buscar cualquiera)
@@ -11614,6 +12205,7 @@
           return '<button type="button" class="pack-sug-it'+(x.dias!=null&&x.dias>=2?' tarde':'')+'" data-ref="'+safe(ref)+'"><b>'+safe(nom)+'</b><small>'+safe(o.remision||o.id||'')+' · '+unds+' un.'+(edad?' · '+edad:'')+'</small></button>';
         }).join('');
       }
+      try{ if(window.bodPintarCola) window.bodPintarCola(conDias, atrasados); }catch(eB){}
       if(et) et.textContent = conDias.length ? 'Toca un pedido para empezar a empacarlo (primero los más antiguos).' : 'No hay pedidos por empacar. ¡Todo al día!';
       var an = $('packAntig');
       if(an){
@@ -11658,20 +12250,28 @@
       if($('packEntregaConf')) $('packEntregaConf').checked=false; $('packEntregaFecha').value = isoOf(new Date()); $('packEntregaFecha').min = dmyToISO(o.fecha) || ''; $('packEntregaFecha').removeAttribute('max'); fbRefrescar('packEntregaFecha');
       entPintarHint('packEntregaHint', o, $('packEntregaFecha').value, 0);
       packBodegaTarjeta(o);
+      try{ window.bodAlSeleccionar(ref); }catch(eB){}
       packRender();
       packEnfocar();
       haptic(12);
     }
-    /** Solo para el perfil Bodega: datos del cliente (para el rótulo a mano), la remisión en PDF y avisos por WhatsApp. */
+    /** Solo para el perfil Bodega (paso 3): datos para el rótulo, remisión en PDF y contacto con Kevin o Camilo. */
     function packBodegaTarjeta(o){
       var el = $('packBodega'); if(!el) return;
       if(window.KAEM_ROL !== 'bodega' || !o){ el.style.display = 'none'; el.innerHTML = ''; return; }
-      var c = o.cliente || {}, fila = function(et, v){ return v ? '<div class="pkb-f"><span>'+et+'</span><b>'+safe(v)+'</b></div>' : ''; };
+      var I = window.bodIco || function(){ return ''; };
+      var c = o.cliente || {}, fila = function(ic, et, v){ return v ? '<div class="pkb-f"><span class="pkb-fi">'+I(ic)+'</span><span class="pkb-fe">'+et+'</span><b>'+safe(v)+'</b></div>' : ''; };
       var nit = String(c.nit||'').trim(); if(/^2+$/.test(nit)) nit = '';   // el NIT genérico no identifica a nadie
-      el.innerHTML = '<p class="pkb-t">Datos para el rótulo</p>'
-        + fila('Nombre', c.nombre) + fila('Teléfono', c.telefono) + fila('Dirección', c.direccion) + fila('Ciudad', c.ciudad) + fila('NIT / CC', nit)
-        + (o.notas ? '<div class="pkb-notas"><span>Notas del pedido</span><b>'+safe(o.notas)+'</b></div>' : '')
-        + '<div class="pkb-btns"><button type="button" class="btn-ghost" data-bod="pdf">Remisión PDF</button><button type="button" class="btn-ghost" data-bod="wa">Escribir por WhatsApp</button><button type="button" class="btn-ghost pkb-falt" data-bod="falt">Reportar faltante</button></div>';
+      var dest = (typeof bodegaDestinos === 'function') ? bodegaDestinos(o)[0].quien : 'Kevin';
+      el.innerHTML =
+          '<div class="pkb-bloque"><div class="pkb-head"><span class="pkb-ti">'+I('pin')+'<b>Datos para el rótulo</b></span></div>'
+        +   '<p class="pkb-hint">Escríbelos a mano en el rótulo que va pegado a la caja.</p>'
+        +   fila('user', 'Nombre', c.nombre) + fila('tel', 'Teléfono', c.telefono) + fila('pin', 'Dirección', c.direccion) + fila('ciudad', 'Ciudad', c.ciudad) + fila('id', 'NIT / CC', nit)
+        +   (o.notas ? '<div class="pkb-notas">'+I('nota')+'<div><span>Notas del pedido</span><b>'+safe(o.notas)+'</b></div></div>' : '') + '</div>'
+        + '<div class="pkb-bloque"><div class="pkb-head"><span class="pkb-ti">'+I('pdf')+'<b>Remisión</b></span></div>'
+        +   '<p class="pkb-hint">Es la misma que recibe el cliente: descárgala o imprímela y métela dentro de la caja.</p>'
+        +   '<button type="button" class="pkb-pdf" data-bod="pdf">'+I('pdf')+'<span>Descargar remisión en PDF</span></button></div>'
+        + '<button type="button" class="pkb-wa" data-bod="wa">'+I('chat')+'<span>¿Dudas? Escribir a '+dest+' por WhatsApp</span></button>';
       el.style.display = 'block';
     }
     document.addEventListener('click', function(e){
@@ -11681,11 +12281,12 @@
       else if(a === 'wa'){ haptic(10); var d = bodegaDestinos(PACK.pedido), c = PACK.pedido.cliente || {}; waAbrir(d[0].tel, 'Hola 👋 Soy Bodega. Sobre el pedido ' + (PACK.pedido.remision||'') + ' de ' + (c.nombre||'') + ': '); }
     });
     // resalta en la cola (escritorio) el pedido que se está empacando
-    function packMarcarCola(ref){ Array.prototype.forEach.call(document.querySelectorAll('#packSugeridos .pack-sug-it'), function(b){ b.classList.toggle('on', !!ref && b.getAttribute('data-ref')===ref); }); }
+    function packMarcarCola(ref){ Array.prototype.forEach.call(document.querySelectorAll('#packSugeridos .pack-sug-it, #bodQueue .bod-card'), function(b){ b.classList.toggle('on', !!ref && b.getAttribute('data-ref')===ref); }); }
     function packLimpiar(){
       PACK.pedido = null; PACK.items = []; packMarcarCola('');
       $('packHud').style.display = 'none'; $('screen-packing').classList.remove('con-pedido');
       $('packEmpty').style.display = 'block';
+      try{ window.bodAlLimpiar(); }catch(eB){}
       packGuardarProgreso();
     }
 
@@ -11758,7 +12359,7 @@
       var b = $('packFinishBtn');
       b.disabled = PACK.cerrando || !PACK.items.length;
       $('packFinishLabel').textContent = PACK.cerrando ? 'Cerrando…'
-        : (r.completo ? 'Pedido listo' : 'Pedido listo (con faltantes)');
+        : (r.completo ? 'Pedido listo' : (window.KAEM_ROL === 'bodega' ? 'Pedido listo' : 'Pedido listo (con faltantes)'));
       packGuardarProgreso();
     }
 
@@ -11893,11 +12494,15 @@
       // Se guía a resolverlo en vez de dejar pasar el faltante en silencio.
       if(!r.completo){
         var faltan = PACK.items.filter(function(it){ return it.cantidad_escaneada < it.cantidad_solicitada; });
+        // Bodega no ajusta, agrega stock ni anula pedidos: lo que corresponde es REPORTAR el faltante a Kevin y a Camilo
+        if(window.KAEM_ROL === 'bodega'){ packSonido('error'); packVibrar([160, 80, 160]); try{ window.ftAbrirReporte(faltan[0] && faltan[0].sku); }catch(eF){} return; }
         packMostrarFaltantes(faltan);
         packSonido('error'); packVibrar([160, 80, 160]);
         return;
       }
 
+      // Lista de revisión de Bodega (si está encendida en Ajustes): todos los puntos marcados antes de cerrar
+      if(window.KAEM_ROL === 'bodega' && window.bodRevisionLista && !window.bodRevisionLista()){ packSonido('error'); packVibrar([160, 80, 160]); return; }
       var payload = packPayload();
       PACK.cerrando = true;
       var b = $('packFinishBtn');
@@ -14026,6 +14631,7 @@
       try{ if(rol==='bodega') localStorage.setItem('kaem_rol','bodega'); else localStorage.removeItem('kaem_rol'); }catch(e){}
       window.KAEM_ROL = rol;
       if(rol==='bodega') document.documentElement.setAttribute('data-rol','bodega'); else document.documentElement.removeAttribute('data-rol');
+      try{ if(window.bodIrPaso) window.bodIrPaso(1); }catch(e){}   // Bodega empieza en el paso 1
       if(rol==='bodega'){ try{ switchTab('packing'); }catch(e){} }
     }
     window.aplicarRol = aplicarRol;
@@ -16582,9 +17188,24 @@
       GAL.lista = galFiltrar();
       var hasta = GAL.pagina*GAL_POR_PAGINA, vis = GAL.lista.slice(0, hasta);
       $('galGrid').innerHTML = vis.length ? vis.map(galTarjeta).join('') : '<p class="cart-empty" style="grid-column:1/-1">Ningún producto coincide.</p>';
-      $('galMas').style.display = GAL.lista.length>hasta ? '' : 'none';
-      $('galMas').textContent = 'Ver más ('+(GAL.lista.length-hasta)+')';
+      var quedan = GAL.lista.length - hasta;
+      $('galMas').style.display = quedan > 0 ? '' : 'none';
+      // Con IntersectionObserver los productos siguen apareciendo solos al llegar al final (sin tocar nada); sin él queda el botón
+      var auto = ('IntersectionObserver' in window);
+      $('galMas').textContent = auto ? ('Cargando más productos… (' + quedan + ')') : ('Ver más (' + quedan + ')');
+      $('galMas').classList.toggle('auto', auto);
+      if(auto && quedan > 0) galVigilar();
       galBarra();
+    }
+    var _galObs = null;
+    function galVigilar(){
+      var m = $('galMas'); if(!m) return;
+      if(!_galObs){
+        _galObs = new IntersectionObserver(function(es){
+          if(es[0] && es[0].isIntersecting && $('galMas').style.display !== 'none'){ GAL.pagina++; galPintar(); }
+        }, { root: document.querySelector('#galModal .fvg-scroll') || null, rootMargin: '0px 0px 300px 0px' });
+      }
+      _galObs.unobserve(m); _galObs.observe(m);   // vuelve a avisar aunque siga a la vista (listas cortas)
     }
     function galBarra(){
       var n=0, sub=0; CART.items.forEach(function(it){ n+=it.cantidad; sub+=subCarrito(it); });
@@ -16815,10 +17436,11 @@
     setInterval(function(){ try{ if(!document.hidden && $('screen-packing') && ($('screen-packing').classList.contains('active') || getComputedStyle($('screen-packing')).display !== 'none')) ftRefrescar(true); }catch(e){} }, 45000);
 
     /* ——— BODEGA: reportar ——— */
-    function ftAbrirReporte(){
+    function ftAbrirReporte(skuPref){
       if(!PACK.pedido || !PACK.items.length){ toast('Elige primero un pedido.','info'); return; }
       var sel = $('faltRepSku');
       sel.innerHTML = PACK.items.map(function(it){ return '<option value="'+safe(it.sku)+'">'+safe(it.nombre)+' · pide '+it.cantidad_solicitada+'</option>'; }).join('');
+      if(skuPref && typeof skuPref === 'string') sel.value = skuPref;
       $('faltRepHay').value = ''; $('faltRepRes').style.display = 'none'; $('faltRepRes').innerHTML = ''; $('faltRepEnviar').style.display = ''; $('faltRepEnviar').disabled = false;
       $('faltRepModal').classList.add('show'); setTimeout(function(){ try{ $('faltRepHay').focus(); }catch(e){} }, 120);
     }
@@ -16901,10 +17523,11 @@
     }
 
     /* ——— Eventos ——— */
+    window.ftAbrirReporte = ftAbrirReporte;
     document.addEventListener('click', function(e){
       var t = e.target.closest ? e.target : null; if(!t) return;
       var b;
-      if((b = t.closest('#packBodega [data-bod="falt"]'))){ haptic(10); ftAbrirReporte(); return; }
+      if((b = t.closest('[data-bod="falt"]'))){ haptic(10); var m = PACK.items.filter(function(it){ return it.cantidad_escaneada < it.cantidad_solicitada; })[0]; ftAbrirReporte(m && m.sku); return; }
       if((b = t.closest('[data-ftwa]'))){ haptic(10); waAbrir(b.getAttribute('data-ftwa'), FT.mensaje || ''); return; }
       if((b = t.closest('[data-sug]'))){
         var si = +b.getAttribute('data-s'), s = FT.lista[si]; if(!s) return;
@@ -17038,6 +17661,217 @@
     setTimeout(function(){ try{ pushPintar(); pushRefrescar(); }catch(e){} }, 6000);
     // cuando el aviso se toca estando la app abierta, el service worker pide mirar Empaque
     try{ navigator.serviceWorker.addEventListener('message', function(ev){ if(ev && ev.data && ev.data.kaem === 'abrir-empaque'){ try{ switchTab('packing'); }catch(e){} } }); }catch(e){}
+    /* ═══════ INTERFAZ DE BODEGA ═══════
+       Pantalla propia para quien empaca: 1) lista de pedidos por preparar (tarjetas, los más antiguos primero) → 2) el pedido: barra fija con
+       «‹ Pedidos» y el avance, productos, datos del envío con la remisión en PDF, fecha de entrega, y abajo SIEMPRE a mano «Reportar faltante» y
+       «Pedido listo». En computador (pantalla ancha) la lista queda a la izquierda y el pedido a la derecha. Solo se ve con el perfil Bodega. */
+    var BOD_ICONOS = {
+      caja:   '<path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3.3 7.5L12 12.5l8.7-5M12 22V12.5"/>',
+      user:   '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+      tel:    '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+      pin:    '<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+      ciudad: '<path d="M4 21V9l6-4v16M10 21V3l10 5v13M2 21h20"/><path d="M14 11h2M14 15h2"/>',
+      id:     '<rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="11" r="2"/><path d="M6.5 16a3 3 0 0 1 5 0M14 10h4M14 14h3"/>',
+      nota:   '<path d="M5 3h10l4 4v14H5z"/><path d="M14 3v5h5M8 12h8M8 16h6"/>',
+      pdf:    '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 14h6M9 17.5h4"/>',
+      chat:   '<path d="M21 12a8.5 8.5 0 0 1-12.4 7.5L3 21l1.6-5.3A8.5 8.5 0 1 1 21 12z"/>',
+      alerta: '<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18.2v.1"/>',
+      reloj:  '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      check:  '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/>',
+      atras:  '<path d="M15 5l-7 7 7 7"/>',
+      sigue:  '<path d="M9 5l7 7-7 7"/>',
+      refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
+      cubo:   '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5L12 12l8-4.5M12 12v9"/>',
+      fuego:  '<path d="M12 3s5 4.2 5 9a5 5 0 0 1-10 0c0-2 1-3.2 2-4.2.2 1.5 1 2.2 2 2.2C11.5 8.2 11 5.6 12 3z"/>',
+      lista:  '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>',
+      envio:  '<path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>'
+    };
+    function bodIco(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (BOD_ICONOS[k] || '') + '</svg>'; }
+    window.bodIco = bodIco;
+    function bodEsBodega(){ return window.KAEM_ROL === 'bodega'; }
+
+    /* ——— Pedido (equipo): urgente + instrucción para Bodega ——— */
+    function bodUrgenteForm(){ var b = document.querySelector('#bodUrgSeg .seg.active'); return !!b && b.getAttribute('data-urg') === 'si'; }
+    function bodFormPoner(urg, nota){
+      Array.prototype.forEach.call(document.querySelectorAll('#bodUrgSeg .seg'), function(s){ s.classList.toggle('active', (s.getAttribute('data-urg') === 'si') === !!urg); });
+      if($('bodNotaInput')) $('bodNotaInput').value = nota || '';
+    }
+    window.bodUrgenteForm = bodUrgenteForm; window.bodFormPoner = bodFormPoner;
+    document.addEventListener('click', function(e){
+      var s = e.target && e.target.closest ? e.target.closest('#bodUrgSeg .seg') : null; if(!s) return;
+      haptic(10); bodFormPoner(s.getAttribute('data-urg') === 'si', $('bodNotaInput').value); try{ markDirty(); }catch(eM){}
+    });
+    document.addEventListener('input', function(e){ if(e.target && e.target.id === 'bodNotaInput'){ try{ markDirty(); }catch(eM){} } });
+
+    /* ——— Los 3 pasos: 1 Pedidos → 2 Empacar → 3 Envío (rótulo, remisión y fecha de entrega) ——— */
+    var BOD = { paso:1, ref:'', sub1:'Cargando…' };
+    var BOD_PASOS = {
+      1: { t:'Pedidos por preparar', ic:'caja' },
+      2: { t:'Empaca los productos', ic:'lista', s:function(){ return (window.escanerActivo && window.escanerActivo() ? 'Escanea o toca' : 'Toca') + ' cada producto al meterlo a la caja. Si de alguno no alcanza, toca «Reportar faltante».'; } },
+      3: { t:'Rótulo, remisión y entrega', ic:'envio', s:'Copia los datos al rótulo, descarga la remisión para meterla en la caja y elige cuándo la recibe el cliente. Luego toca «Pedido listo».' }
+    };
+    function bodIrPaso(n){
+      var sc = $('screen-packing'); if(!sc) return;
+      if(!bodEsBodega()){ sc.removeAttribute('data-paso'); return; }
+      BOD.paso = n; sc.setAttribute('data-paso', String(n));
+      var d = BOD_PASOS[n];
+      if($('bodTit')) $('bodTit').textContent = d.t;
+      window.__bodPaso = n;
+      if($('bodSub')) $('bodSub').textContent = n === 1 ? BOD.sub1 : (typeof d.s === 'function' ? d.s() : d.s);
+      if($('bodTiIco')) $('bodTiIco').innerHTML = bodIco(d.ic);
+      Array.prototype.forEach.call(document.querySelectorAll('#bodPasos li'), function(li){
+        var p = +li.getAttribute('data-p'); li.classList.toggle('on', p === n); li.classList.toggle('hecho', p < n);
+        li.classList.toggle('bloq', (p === 2 && !PACK.pedido) || (p === 3 && !PACK.pedido));
+        var i = li.querySelector('i'); if(i) i.innerHTML = p < n ? bodIco('check') : String(p);
+      });
+      bodAvisoPedido();
+      if(n === 3){ bodResumen(); bodRevisionPintar(); }
+      try{ window.scrollTo(0, 0); sc.scrollTop = 0; }catch(e){}   // cada paso empieza desde arriba
+    }
+    window.bodIrPaso = bodIrPaso;
+    function bodAvisoPedido(){
+      var el = $('bodAviso'); if(!el) return;
+      var o = PACK.pedido, urg = !!(o && o.urgente), nota = String((o && o.notaBodega) || '').trim();
+      if(!bodEsBodega() || !o || (!urg && !nota)){ el.innerHTML = ''; el.style.display = 'none'; return; }
+      el.className = 'bod-aviso' + (urg ? ' urgente' : '');
+      el.innerHTML = '<span>' + bodIco(urg ? 'fuego' : 'nota') + '</span><div>' + (urg ? '<b>URGENTE</b>' : '<b>Instrucción para este pedido</b>') + (nota ? '<p>' + safe(nota) + '</p>' : '<p>Prepáralo de primero.</p>') + '</div>';
+      el.style.display = 'flex';
+    }
+    function bodResumen(){
+      var el = $('bodResumen'); if(!el) return;
+      var u = 0, p = 0; PACK.items.forEach(function(it){ u += it.cantidad_escaneada; p++; });
+      el.innerHTML = '<span>' + bodIco('check') + '</span><div><b>Pedido empacado</b><small>' + u + (u === 1 ? ' unidad' : ' unidades') + ' · ' + p + (p === 1 ? ' producto' : ' productos') + '</small></div>';
+    }
+    /* ——— Lista de revisión antes de «Pedido listo» (se enciende y edita en Ajustes) ——— */
+    var BOD_REV = { marcas:{} };
+    function bodRevisionPintar(){
+      var el = $('bodCheck'); if(!el) return;
+      var cfg = bodegaCfg().checklist;
+      if(!bodEsBodega() || !cfg.activo){ el.innerHTML = ''; el.style.display = 'none'; bodRevisionEstado(); return; }
+      BOD_REV.marcas = {};
+      el.innerHTML = '<p class="bod-check-t">' + bodIco('check') + '<b>Antes de cerrar, revisa</b></p>'
+        + cfg.items.map(function(txt, i){ return '<label class="bod-check-it"><input type="checkbox" data-ck="' + i + '"><span>' + safe(txt) + '</span></label>'; }).join('');
+      el.style.display = 'block'; bodRevisionEstado();
+    }
+    /** ¿Están todos los puntos marcados? (o la lista está apagada). Si falta alguno, avisa y la resalta. */
+    function bodRevisionLista(){
+      var cfg = bodegaCfg().checklist;
+      if(!cfg.activo) return true;
+      var boxes = document.querySelectorAll('#bodCheck input[type="checkbox"]'), falta = 0;
+      Array.prototype.forEach.call(boxes, function(c){ if(!c.checked) falta++; });
+      if(!falta) return true;
+      toast('Marca la lista de revisión antes de cerrar (' + falta + (falta === 1 ? ' punto pendiente' : ' puntos pendientes') + ').', 'info', 5000);
+      var el = $('bodCheck'); if(el){ el.classList.remove('sacude'); void el.offsetWidth; el.classList.add('sacude'); try{ el.scrollIntoView({ block:'center', behavior:'smooth' }); }catch(e){} }
+      return false;
+    }
+    window.bodRevisionLista = bodRevisionLista;
+    function bodRevisionEstado(){
+      var b = $('packFinishBtn'); if(!b) return;
+      var cfg = bodegaCfg().checklist, boxes = document.querySelectorAll('#bodCheck input[type="checkbox"]'), faltan = 0;
+      Array.prototype.forEach.call(boxes, function(c){ if(!c.checked) faltan++; });
+      b.classList.toggle('bod-espera', bodEsBodega() && cfg.activo && faltan > 0);
+    }
+    document.addEventListener('change', function(e){ if(e.target && e.target.closest && e.target.closest('#bodCheck')){ haptic(8); bodRevisionEstado(); } });
+
+    /* ——— Empacados hoy (paso 1) ——— */
+    BOD.hoy = [];
+    function bodCargarHoy(){
+      if(!bodEsBodega()) return;
+      google.script.run.withSuccessHandler(function(r){
+        if(!r || !r.ok) return;
+        BOD.hoy = r.orders || []; BOD.hoyUnidades = r.unidades || 0; bodPintarHoy();
+      }).withFailureHandler(function(){}).listarEmpacadosHoy();
+    }
+    function bodPintarHoy(){
+      var el = $('bodHoy'); if(!el) return;
+      if(!bodEsBodega()){ el.innerHTML = ''; return; }
+      var n = BOD.hoy.length, u = BOD.hoyUnidades || 0;
+      el.innerHTML = '<div class="bod-hoy-res"><span>' + bodIco('check') + '</span><div><b>' + (n ? 'Hoy empacaste ' + n + (n === 1 ? ' pedido' : ' pedidos') : 'Hoy no has empacado pedidos') + '</b><small>' + (n ? u + (u === 1 ? ' unidad' : ' unidades') + ' en total' : 'Cuando cierres uno, aparece aquí.') + '</small></div></div>'
+        + (n ? '<details class="bod-hoy-det"><summary>Ver lista y descargar remisiones</summary>' + BOD.hoy.map(function(o, i){
+            var c = o.cliente || {}, hora = String(o.packingFecha || '').slice(11, 16);
+            return '<div class="bod-hoy-it"><div><b>' + safe(c.nombre || 'Sin cliente') + '</b><small>' + safe(o.remision || o.id || '') + (hora ? ' · ' + hora : '') + '</small></div>'
+              + '<button type="button" data-hoy="' + i + '" aria-label="Descargar la remisión de ' + safe(o.remision || '') + '">' + bodIco('pdf') + '<span>Remisión</span></button></div>';
+          }).join('') + '</details>' : '');
+    }
+    window.bodCargarHoy = bodCargarHoy;
+    document.addEventListener('click', function(e){
+      var t = e.target && e.target.closest ? e.target.closest('#bodHoy [data-hoy]') : null; if(!t) return;
+      var o = BOD.hoy[+t.getAttribute('data-hoy')]; if(!o) return;
+      haptic(12); try{ pdfFor(o); }catch(eP){ toast('No se pudo preparar la remisión.', 'error'); }
+    });
+
+    window.bodAlSeleccionar = function(ref){ if(!bodEsBodega()) return; if(BOD.ref !== ref || BOD.paso === 1){ BOD.ref = ref; bodIrPaso(2); } };
+    window.bodAlLimpiar = function(){ if(!bodEsBodega()) return; BOD.ref = ''; bodIrPaso(1); bodCargarHoy(); };
+    /** ¿Ya está todo empacado? Si no, avisa y ofrece reportar el faltante en lugar de seguir. */
+    function bodPuedeSeguir(){
+      var r = packResumen();
+      if(r.completo) return true;
+      var falta = PACK.items.filter(function(it){ return it.cantidad_escaneada < it.cantidad_solicitada; }), u = 0;
+      falta.forEach(function(it){ u += it.cantidad_solicitada - it.cantidad_escaneada; });
+      packSonido('error'); packVibrar([160, 80, 160]);
+      toast('Faltan ' + u + (u === 1 ? ' unidad' : ' unidades') + ' por marcar. Si no alcanzan, repórtalo.', 'info', 6500, { accion:'Reportar faltante', fn:function(){ try{ window.ftAbrirReporte(falta[0] && falta[0].sku); }catch(e){} } });
+      return false;
+    }
+
+    /** Lista de pedidos por preparar en tarjetas. lista = [{ o, dias }] del más antiguo al más reciente. */
+    function bodPintarCola(lista, atrasados){
+      var el = $('bodQueue'); if(!el) return;
+      if(!bodEsBodega()){ el.innerHTML = ''; return; }
+      var actual = packRef(), n = lista.length;
+      if($('bodCount')) $('bodCount').textContent = String(n);
+      BOD.sub1 = n ? (atrasados ? atrasados + (atrasados === 1 ? ' lleva 2 días o más' : ' llevan 2 días o más') : 'Todos al día · primero los más antiguos') : 'No hay nada pendiente';
+      if(BOD.paso === 1 && $('bodSub')) $('bodSub').textContent = BOD.sub1;
+      if(!n){ el.innerHTML = '<div class="bod-vacio"><span>' + bodIco('check') + '</span><b>¡Todo al día!</b><small>No hay pedidos por preparar. Cuando llegue uno te avisamos.</small></div>'; return; }
+      lista = lista.slice().sort(function(a, b){ return ((b.o.urgente?1:0) - (a.o.urgente?1:0)); });   // urgentes de primero (el resto ya viene del más antiguo al más nuevo)
+      el.innerHTML = lista.map(function(x){
+        var o = x.o, ref = String(o.clientRef || o.remision || o.id || ''), c = o.cliente || {};
+        var unds = (o.items || []).reduce(function(a, it){ return a + (it.esProbador ? 0 : (Number(it.cantidad) || 0)); }, 0), prods = (o.items || []).filter(function(it){ return !it.esProbador; }).length;
+        var edad = x.dias == null ? '' : (x.dias === 0 ? 'Hoy' : (x.dias === 1 ? 'Ayer' : 'Hace ' + x.dias + ' días'));
+        var tarde = x.dias != null && x.dias >= 2, nivel = String(o.nivel || '').trim();
+        var urg = !!o.urgente, nota = String(o.notaBodega || '').trim();
+        return '<button type="button" class="bod-card' + (urg ? ' urgente' : '') + (tarde ? ' tarde' : '') + (ref === actual ? ' on' : '') + '" data-ref="' + safe(ref) + '">'
+          + '<span class="bod-card-ico">' + bodIco(urg ? 'fuego' : (tarde ? 'alerta' : 'caja')) + '</span>'
+          + '<span class="bod-card-main">' + (urg ? '<em class="bod-urg">URGENTE</em>' : '') + '<b>' + safe(c.nombre || 'Sin cliente') + '</b>'
+          +   '<small>' + safe(o.remision || o.id || '') + (c.ciudad ? ' · ' + safe(c.ciudad) : '') + '</small>'
+          +   '<span class="bod-card-meta"><i>' + bodIco('cubo') + unds + (unds === 1 ? ' unidad' : ' unidades') + (prods > 1 ? ' · ' + prods + ' productos' : '') + '</i>'
+          +   (edad ? '<i class="' + (tarde ? 'tarde' : '') + '">' + bodIco('reloj') + edad + '</i>' : '') + (nivel ? '<em>' + safe(nivel) + '</em>' : '') + '</span>'
+          +   (nota ? '<span class="bod-card-nota">' + bodIco('nota') + '<span>' + safe(nota) + '</span></span>' : '') + '</span>'
+          + '<span class="bod-card-go">' + bodIco('sigue') + '</span></button>';
+      }).join('');
+    }
+    window.bodPintarCola = bodPintarCola;
+
+    function bodIniciar(){
+      // iconos de los botones fijos (se pintan una vez)
+      var s;
+      if((s = document.querySelector('.bod-ti-ico'))) s.innerHTML = bodIco('caja');
+      if((s = $('bodRefresh'))) s.innerHTML = bodIco('refresh');
+      if((s = document.querySelector('#bodPrev .bod-ico-btn'))) s.innerHTML = bodIco('atras');
+      if((s = document.querySelector('#bodNext .bod-ico-btn'))) s.innerHTML = bodIco('sigue');
+      if((s = $('bodTiIco'))) s.innerHTML = bodIco('caja');
+      Array.prototype.forEach.call(document.querySelectorAll('#bodPasos li'), function(li){ var i = li.querySelector('i'); if(i) i.textContent = li.getAttribute('data-p'); });
+      if((s = $('bodBack'))) s.innerHTML = bodIco('atras') + '<span>Pedidos</span>';
+      if((s = document.querySelector('#bodFaltBtn .bod-ico-btn'))) s.innerHTML = bodIco('alerta');
+    }
+    bodIniciar();
+    if(bodEsBodega()){ bodIrPaso(1); setTimeout(bodCargarHoy, 2500); }   // arranca en el paso 1 (lista de pedidos)
+    document.addEventListener('click', function(e){
+      var t = e.target; if(!t || !t.closest) return;
+      var b;
+      if((b = t.closest('#bodQueue .bod-card'))){ haptic(10); packSeleccionar(b.getAttribute('data-ref')); try{ window.scrollTo(0, 0); var hud = $('packHud'); if(hud && hud.scrollIntoView) hud.scrollIntoView({ block:'start' }); }catch(eS){} return; }
+      if(t.closest('#bodBack')){ haptic(8); packLimpiar(); try{ window.scrollTo(0, 0); }catch(eS){} return; }
+      if(t.closest('#bodRefresh')){ haptic(8); packCargarPendientes(false); return; }
+      if(t.closest('#bodNext')){ haptic(10); if(bodPuedeSeguir()) bodIrPaso(3); return; }
+      if(t.closest('#bodPrev')){ haptic(8); bodIrPaso(2); return; }
+      if((b = t.closest('#bodPasos li'))){
+        var p = +b.getAttribute('data-p'); haptic(8);
+        if(p === 1) packLimpiar();
+        else if(!PACK.pedido) toast('Primero elige un pedido en el paso 1.', 'info');
+        else if(p === 2) bodIrPaso(2);
+        else if(p === 3 && bodPuedeSeguir()) bodIrPaso(3);
+        return;
+      }
+    });
     /* ═══════ SALUD DEL SISTEMA · se abre al tocar el estado (🟢 Al día · hora) ═══════ */
     var SAL = { t:null, prueba:'' };
     function saludFila(nivel, k, v){ return '<div class="sl-row '+nivel+(String(v).length>24?' ancho':'')+'"><i></i><div><small>'+safe(k)+'</small><b>'+safe(v)+'</b></div></div>'; }
@@ -17102,6 +17936,7 @@
     $('slInv').addEventListener('click', function(){ cerrarSalud(); $('cfgInvRevBtn').click(); });
     document.addEventListener('keydown', function(e){ if(e.key==='Escape' && $('saludModal').classList.contains('show')) cerrarSalud(); });
     window.KAEM.hub = { pintar:hubPintar, ir:hubIr, calc:hubCalc, salud:abrirSalud };
+    window.KAEM.orden = { lineas:lineasPorMarca, marcas:marcasEnOrden, remision:function(o){ return remDatos_(o).filas.map(function(f){ return f.nombre; }); } };   // pruebas: orden de presentación
     window.KAEM.escaner = { aplicar:function(codigo, destino){ scanTarget = destino || 'sku'; applyScan(cleanSku(codigo)); } };   // simula una lectura sin cámara (pruebas)
 
 
