@@ -9,6 +9,10 @@
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
   <script>
+    // Rol del equipo (Kevin/Camilo = completo · Bodega = solo empaque). El servidor es quien manda; esto solo esconde lo que no aplica.
+    try{ var __rol = localStorage.getItem('kaem_rol')==='bodega' ? 'bodega' : 'admin'; window.KAEM_ROL = __rol; if(__rol==='bodega') document.documentElement.setAttribute('data-rol','bodega'); }catch(e){ window.KAEM_ROL = 'admin'; }
+  </script>
+  <script>
     // Seguridad: la app arranca BLOQUEADA y oculta. Solo se muestra si esta sesión ya
     // entró con el PIN, o si este equipo ya confirmó con el servidor que no hay PIN.
     // Así, quien abra la dirección de la app sin PIN no alcanza a ver nada.
@@ -44,7 +48,7 @@
     // ——— Versión de la app. SUBE ESTE NÚMERO en cada publicación a GitHub Pages ———
     // El comprobador de abajo lo usa para detectar que hay una versión más nueva
     // y recargar solo, sin que nadie tenga que limpiar la caché del navegador.
-    const APP_VERSION = '2026-11-26-35';
+    const APP_VERSION = '2026-11-26-37';
 
     // ——— RED DE SEGURIDAD DEL ARRANQUE ———
     // Si un error corta el script antes de registrar los botones, la app queda
@@ -421,7 +425,7 @@
       // ——— Versión mínima del servidor que esta app necesita ———
       // La app y el servidor se publican por separado: si la app es nueva y el servidor sigue viejo,
       // algunas funciones fallarían con "Acción no reconocida". Se avisa una vez, con claridad.
-      var SRV_MINIMA = '2026.10.72', __avisoSrv = false;
+      var SRV_MINIMA = '2026.10.73', __avisoSrv = false;
       window.__kaemSrvMinima = SRV_MINIMA;
       function avisarServidorViejo(v) {
         window.__kaemSrvVersion = v;
@@ -490,10 +494,16 @@
         var hay = function (t) { return acciones.indexOf(t.action) >= 0 || (t.grupo && t.grupo.some(function (g) { return acciones.indexOf(g.action) >= 0; })); };
         return __cola.some(hay) || __enVuelo.some(hay);
       };
-      var PRIORITARIAS = { estadoPin: 1, verificarPin: 1, configurarPin: 1, quitarPin: 1, ping: 1 };
+      var PRIORITARIAS = { estadoPin: 1, verificarPin: 1, configurarPin: 1, quitarPin: 1, configurarPinBodega: 1, quitarPinBodega: 1, ping: 1 };
       // Cada petición responde UNA sola vez. Un error al MOSTRAR los datos (no de red) ya no
       // se confunde con una falla de conexión ni provoca reintentos al servidor.
+      // Lo que el perfil Bodega puede pedir (igual que en el servidor): lo demás ni sale del celular y se responde "sin acceso".
+      var BODEGA_OK = { ping:1, estadoPin:1, verificarPin:1, lote:1, getInitialData:1, obtenerAjustes:1, listarPedidosPendientes:1, finalizarPacking:1, actualizarFechaEntrega:1 };
       function callBackend(action, data, onSuccess, onFailure) {
+        if (window.KAEM_ROL === 'bodega' && !BODEGA_OK[action]) {
+          setTimeout(function () { if (onSuccess) { try { onSuccess({ ok: false, success: false, rolRestringido: true, message: 'Este perfil no tiene acceso a esa función.' }); } catch (e) {} } }, 0);
+          return;
+        }
         var esLect = !!SOLO_LECTURA[action] && !PRIORITARIAS[action];
         var hecho = false, tarea = null;
         var terminar = function () {
@@ -3993,6 +4003,28 @@
     .dm-nom b{font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .dm-nom small{font-size:12px;color:var(--texto-suave)}
     .dm-pct{width:56px;text-align:right}
+
+    /* Pagos en pantalla ancha (≥1100 px): «Por pagar», «Vencidos» y «Próximos 7 días» van en una fila y «Pagado este mes» ocupa su propia fila.
+       La regla de Cartera (sin salto de línea) aplastaba las 3 tarjetas de arriba cuando «Pagado este mes» tenía datos. */
+    @media (min-width:1100px){
+      #screen-pagos .car-kpis{flex-wrap:wrap !important}
+      #screen-pagos .car-kpis > .car-kpi.total{flex:1 1 0 !important;display:block;text-align:center}
+      #screen-pagos .car-kpis > .car-kpi:last-child{flex:1 1 100% !important}
+    }
+
+    /* ——— Perfil Bodega: solo Empaque. Se esconde todo lo demás (el servidor además lo rechaza). ——— */
+    html[data-rol="bodega"] .nav-item:not(#nav-packing){display:none !important}
+
+    /* ——— Tarjeta de Bodega en Empaque ——— */
+    .pk-bod{margin:10px 0 12px;padding:14px 16px;background:var(--blanco);border:1px solid var(--linea);border-radius:16px}
+    .pkb-t{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
+    .pkb-f{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--linea);font-size:14.5px}
+    .pkb-f span{color:var(--texto-suave);flex:none}
+    .pkb-f b{font-weight:600;text-align:right;word-break:break-word}
+    .pkb-notas{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--st-espera-bg);font-size:13.5px}
+    .pkb-notas span{display:block;color:var(--texto-suave);font-size:11.5px;margin-bottom:2px}
+    .pkb-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+    html[data-rol="bodega"] .ent-check{display:none !important}   /* Bodega no confirma entregas */
   </style>
 </head>
 <body>
@@ -4166,6 +4198,7 @@
             </div>
             <div class="pack-bar"><div class="pack-bar-fill" id="packBarFill"></div></div>
           </div>
+          <div class="pk-bod" id="packBodega" style="display:none"></div>
 
           <div class="pack-capture">
             <input id="packInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Escanea o toca la fila…">
@@ -4622,6 +4655,7 @@
         </div>
         <div class="order-actions" id="orderActionsRow" style="display:none">
           <button class="btn-ghost" id="orderPdfBtn" type="button" disabled>Descargar PDF</button>
+          <button class="btn-ghost" id="orderBodegaBtn" type="button" disabled>Avisar a Bodega</button>
           <button class="btn-solid wa" id="orderWaBtn" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enviar WhatsApp</span></button>
         </div>
         <button class="btn-ghost ped-hist" id="historyBtn" type="button">Ver pedidos guardados (Historial)</button>
@@ -5321,6 +5355,7 @@
       <div class="lock-perfiles" id="lockPerfiles">
         <button type="button" class="lock-perfil" data-op="Kevin"><span>K</span>Kevin</button>
         <button type="button" class="lock-perfil" data-op="Camilo"><span>C</span>Camilo</button>
+        <button type="button" class="lock-perfil" data-op="Bodega" id="lockPerfilBodega" style="display:none"><span>B</span>Bodega</button>
       </div>
       <p class="lock-titulo" id="lockTitulo">Ingresa el PIN</p>
       <div class="lock-dots" id="lockDots"><i></i><i></i><i></i><i></i></div>
@@ -5907,6 +5942,17 @@
         <button class="btn-ghost" id="cfgSesionesCerrar" type="button" style="width:100%">Cerrar sesión en los demás equipos</button>
         <p class="cfg-hint">Útil si se pierde un celular: los demás equipos tendrán que escribir el PIN otra vez. Cada equipo que entra con el PIN queda habilitado 30 días.</p>
       </div>
+      <p class="lbl" style="margin:18px 0 6px">Perfil Bodega (quien empaca)</p>
+      <p class="seg-estado" id="cfgBodegaEstado">—</p>
+      <div class="seg-btns">
+        <button class="btn-solid" id="cfgBodegaPin" type="button">Crear PIN de Bodega</button>
+        <button class="btn-ghost" id="cfgBodegaQuitar" type="button">Desactivar Bodega</button>
+      </div>
+      <div class="field"><label class="lbl" for="cfgWaKevin">WhatsApp de Kevin (Distribuidor)</label><input id="cfgWaKevin" type="tel" inputmode="numeric" autocomplete="off" placeholder="573112079880"></div>
+      <div class="field"><label class="lbl" for="cfgWaCamilo">WhatsApp de Camilo (Detal)</label><input id="cfgWaCamilo" type="tel" inputmode="numeric" autocomplete="off" placeholder="573181305060"></div>
+      <div class="field"><label class="lbl" for="cfgWaBodega">WhatsApp de Bodega</label><input id="cfgWaBodega" type="tel" inputmode="numeric" autocomplete="off" placeholder="573156506780"></div>
+      <p class="cfg-hint">Con indicativo y sin signos (Colombia: 57 + celular). Se usan en los botones de WhatsApp de Bodega y en «Avisar a Bodega». Se guardan con el botón Guardar de Ajustes.</p>
+      <p class="cfg-hint">Bodega entra con su propio PIN y solo ve Empaque: los pedidos por preparar, con los datos del cliente y la remisión. No ve costos, ganancia, cartera ni finanzas. Para crearlo o cambiarlo se pide el PIN del equipo.</p>
       <p class="lbl" style="margin:18px 0 6px">Respaldo de la base de datos</p>
       <p class="seg-estado" id="cfgRespEstado">Consultando…</p>
       <div class="seg-btns">
@@ -6375,6 +6421,7 @@
       $('nav-'+tab).addEventListener('click', function(){ switchTab(tab); haptic(10); });
     });
     function switchTab(tab){
+      if(window.KAEM_ROL==='bodega' && tab!=='packing') tab='packing';   // el perfil Bodega solo trabaja en Empaque
       // Ajustes y Estadísticas son pantallas completas que viven encima de los módulos: al pasar a otro módulo se cierran
       try{ hubCerrarPantallas(); }catch(e){}
       // Lo que este módulo necesita pasa al frente de la fila
@@ -6540,6 +6587,7 @@
       waEditarDesde(AJUSTES.waCampos, AJUSTES.waTextos); pintarWaMensajes();
       $('cfgVerCosto').checked   = VER_COSTO;
       $('cfgNotaPDF').value     = AJUSTES.notaPDF||'';
+      var bc = bodegaCfg(); $('cfgWaKevin').value = bc.waKevin; $('cfgWaCamilo').value = bc.waCamilo; $('cfgWaBodega').value = bc.waBodega;
       $('cfgShopDominio').value = AJUSTES.shopifyDominio||'';
       $('cfgShopWebhook').value = AJUSTES.shopifyWebhook||'';
       $('cfgDescuento').value   = AJUSTES.descuentoDefecto ? String(AJUSTES.descuentoDefecto) : '';
@@ -6643,6 +6691,7 @@
         waCampos:           waCanonico(WA_EDIT),
         waTextos:           waTextosCanonico(),
         notaPDF:            textoDe('cfgNotaPDF'),
+        bodegaCfg:          { waKevin:textoDe('cfgWaKevin'), waCamilo:textoDe('cfgWaCamilo'), waBodega:textoDe('cfgWaBodega') },
         sonidos:            segValor('cfgSonidosSeg','sonidos'),
         shopifyDominio:     textoDe('cfgShopDominio'),
         shopifyWebhook:     textoDe('cfgShopWebhook'),
@@ -8945,7 +8994,7 @@
     }
 
     // ——— Estado de acciones (PDF/WhatsApp bloqueados hasta guardar) ———
-    function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; }
+    function setActionsEnabled(on){ $('orderPdfBtn').disabled=!on; $('orderWaBtn').disabled=!on; if($('orderBodegaBtn')) $('orderBodegaBtn').disabled=!on; }
     function markDirty(){ if(orderCommitted){ orderCommitted=false; $('orderSaveBtn').disabled=false; $('orderSaveLabel').textContent=saveLabelText(); setActionsEnabled(false); } pedEstadoPintar(); }
     /* Qué se ve abajo del pedido según su estado: sin guardar → Guardar · guardado → aviso, PDF y WhatsApp · con cambios → Actualizar */
     var PED_ERA_EDICION=false;
@@ -11083,6 +11132,24 @@
       if(w){ try{ w.opener = null; }catch(e){} } else { try{ window.location.href = url; }catch(e){} }   // ventana bloqueada: se abre en esta misma
     }
 
+    /* ——— Bodega: números de WhatsApp y avisos ——— */
+    var BODEGA_CFG_DEF = { waKevin:'573112079880', waCamilo:'573181305060', waBodega:'573156506780' };
+    function bodegaCfg(){ var c = (AJUSTES && AJUSTES.bodegaCfg) || {}; return { waKevin:String(c.waKevin||BODEGA_CFG_DEF.waKevin), waCamilo:String(c.waCamilo||BODEGA_CFG_DEF.waCamilo), waBodega:String(c.waBodega||BODEGA_CFG_DEF.waBodega) }; }
+    function bodegaUnidades(o){ var n=0; ((o&&o.items)||[]).forEach(function(it){ if(!it.esProbador) n += Math.floor(Number(it.cantidad)||0); }); return n; }
+    /** Kevin / Camilo avisan a Bodega que hay un pedido para preparar (abre su chat con el mensaje listo). */
+    function avisarBodega(o){
+      o = o || {}; var rem = o.remision || o.id || '', cli = (o.cliente && o.cliente.nombre) || '', u = bodegaUnidades(o);
+      if(!rem && !cli){ toast('Guarda el pedido primero.','error'); return; }
+      var msg = 'Hola 👋 Hay un pedido nuevo para preparar:\n\n📦 ' + (rem||'Pedido') + (cli ? ' · ' + cli : '') + (u ? ' · ' + u + (u===1?' unidad':' unidades') : '') + '\n\nLo encuentras en la app, en Empaque. ¡Gracias!';
+      waAbrir(bodegaCfg().waBodega, msg);
+    }
+    window.avisarBodega = avisarBodega;
+    /** Número al que Bodega escribe según el tipo de pedido: Distribuidor/Mayorista → Kevin · Detal → Camilo. */
+    function bodegaDestinos(o){
+      var c = bodegaCfg(), n = String((o && o.nivel) || '').toLowerCase();
+      return /detal/.test(n) ? [{ quien:'Camilo', tel:c.waCamilo }] : [{ quien:'Kevin', tel:c.waKevin }];
+    }
+
     /* ——— Ajustes → Mensajes de WhatsApp ——— */
     var WA_EDIT = {}, WA_TXT = {}, WA_ABIERTO = '';
     function waEditarDesde(campos, textos){
@@ -11291,6 +11358,7 @@
     $('orderSaveBtn').addEventListener('click', function(){ haptic(15); submitOrder(); });
     $('orderPdfBtn').addEventListener('click', downloadOrderPDF);
     $('orderWaBtn').addEventListener('click', sendPDFClient);
+    $('orderBodegaBtn').addEventListener('click', function(){ avisarBodega(orderForOutput()); });
     $('orderNewBtn').addEventListener('click', function(){
       // Si hay una edición en curso o un carrito con productos sin guardar,
       // no se descarta en silencio — antes 'Nuevo Pedido' borraba todo sin
@@ -11524,10 +11592,29 @@
       $('packCliente').textContent = (o.cliente && o.cliente.nombre) ? o.cliente.nombre : '';
       if($('packEntregaConf')) $('packEntregaConf').checked=false; $('packEntregaFecha').value = isoOf(new Date()); $('packEntregaFecha').min = dmyToISO(o.fecha) || ''; $('packEntregaFecha').removeAttribute('max'); fbRefrescar('packEntregaFecha');
       entPintarHint('packEntregaHint', o, $('packEntregaFecha').value, 0);
+      packBodegaTarjeta(o);
       packRender();
       packEnfocar();
       haptic(12);
     }
+    /** Solo para el perfil Bodega: datos del cliente (para el rótulo a mano), la remisión en PDF y avisos por WhatsApp. */
+    function packBodegaTarjeta(o){
+      var el = $('packBodega'); if(!el) return;
+      if(window.KAEM_ROL !== 'bodega' || !o){ el.style.display = 'none'; el.innerHTML = ''; return; }
+      var c = o.cliente || {}, fila = function(et, v){ return v ? '<div class="pkb-f"><span>'+et+'</span><b>'+safe(v)+'</b></div>' : ''; };
+      var nit = String(c.nit||'').trim(); if(/^2+$/.test(nit)) nit = '';   // el NIT genérico no identifica a nadie
+      el.innerHTML = '<p class="pkb-t">Datos para el rótulo</p>'
+        + fila('Nombre', c.nombre) + fila('Teléfono', c.telefono) + fila('Dirección', c.direccion) + fila('Ciudad', c.ciudad) + fila('NIT / CC', nit)
+        + (o.notas ? '<div class="pkb-notas"><span>Notas del pedido</span><b>'+safe(o.notas)+'</b></div>' : '')
+        + '<div class="pkb-btns"><button type="button" class="btn-ghost" data-bod="pdf">Remisión PDF</button><button type="button" class="btn-ghost" data-bod="wa">Escribir por WhatsApp</button></div>';
+      el.style.display = 'block';
+    }
+    document.addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('#packBodega [data-bod]') : null; if(!b || !PACK.pedido) return;
+      var a = b.getAttribute('data-bod');
+      if(a === 'pdf'){ haptic(12); pdfFor(PACK.pedido); }
+      else if(a === 'wa'){ haptic(10); var d = bodegaDestinos(PACK.pedido), c = PACK.pedido.cliente || {}; waAbrir(d[0].tel, 'Hola 👋 Soy Bodega. Sobre el pedido ' + (PACK.pedido.remision||'') + ' de ' + (c.nombre||'') + ': '); }
+    });
     // resalta en la cola (escritorio) el pedido que se está empacando
     function packMarcarCola(ref){ Array.prototype.forEach.call(document.querySelectorAll('#packSugeridos .pack-sug-it'), function(b){ b.classList.toggle('on', !!ref && b.getAttribute('data-ref')===ref); }); }
     function packLimpiar(){
@@ -13867,6 +13954,18 @@
        app abre como siempre. Modos: 'entrar' (perfil + PIN), 'crear', 'cambiar', 'quitar'. */
     var LOCK = { modo:'entrar', paso:0, valor:'', temp:'', actual:'', perfil:'', abierto:false, desdeRechazo:false, configurado:false, ocupado:false };
     var LOCK_RELOCK_MIN = 10;   // vuelve a pedir el PIN si la app estuvo en segundo plano más de esto
+    function rolLocal(){ try{ return localStorage.getItem('kaem_rol')==='bodega' ? 'bodega' : 'admin'; }catch(e){ return 'admin'; } }
+    /** Aplica el rol de este equipo: Bodega ve solo Empaque. (El servidor además rechaza lo demás.) */
+    function aplicarRol(rol){
+      rol = rol==='bodega' ? 'bodega' : 'admin';
+      try{ if(rol==='bodega') localStorage.setItem('kaem_rol','bodega'); else localStorage.removeItem('kaem_rol'); }catch(e){}
+      window.KAEM_ROL = rol;
+      if(rol==='bodega') document.documentElement.setAttribute('data-rol','bodega'); else document.documentElement.removeAttribute('data-rol');
+      if(rol==='bodega'){ try{ switchTab('packing'); }catch(e){} }
+    }
+    window.aplicarRol = aplicarRol;
+    // Al abrir la app en un equipo de Bodega (ya con el rol guardado), cae directo en Empaque
+    if(window.KAEM_ROL==='bodega'){ var irEmpaque=function(){ try{ switchTab('packing'); }catch(e){} }; if(document.readyState==='complete') setTimeout(irEmpaque,300); else window.addEventListener('load', function(){ setTimeout(irEmpaque,400); }); }
     function lockToken(){ try{ return localStorage.getItem('kaem_pin_token')||''; }catch(e){ return ''; } }
     function lockPintar(){
       Array.prototype.forEach.call($('lockDots').children, function(d,i){ d.classList.toggle('on', i<LOCK.valor.length); });
@@ -13875,7 +13974,9 @@
       var t = { entrar:'Ingresa el PIN',
                 crear:  LOCK.paso===0 ? 'Crea un PIN de 4 números' : 'Confírmalo',
                 cambiar:LOCK.paso===0 ? 'PIN actual' : (LOCK.paso===1 ? 'Nuevo PIN' : 'Confirma el nuevo PIN'),
-                quitar: 'PIN actual para quitarlo' }[LOCK.modo];
+                quitar: 'PIN actual para quitarlo',
+                bodega: LOCK.paso===0 ? 'PIN del equipo' : (LOCK.paso===1 ? 'Nuevo PIN de Bodega' : 'Confirma el PIN de Bodega'),
+                bodegaQuitar: 'PIN del equipo para desactivar Bodega' }[LOCK.modo];
       if(LOCK.modo==='entrar' && LOCK.perfil) t='Hola, '+LOCK.perfil;
       $('lockTitulo').textContent=t;
     }
@@ -13928,7 +14029,8 @@
       lockHash(pin, sal).then(function(h){ try{ localStorage.setItem('kaem_pin_local', JSON.stringify({ sal:sal, h:h })); }catch(e){} });
     }
     function lockBorrarLocal(){ try{ localStorage.removeItem('kaem_pin_local'); }catch(e){} }
-    function lockEntrar(token){
+    function lockEntrar(token, rol){
+      if(rol) aplicarRol(rol);   // el servidor dice qué perfil es: queda en este equipo
       try{ if(token) localStorage.setItem('kaem_pin_token', token); localStorage.setItem('kaem_ultimo_perfil', LOCK.perfil);
            sessionStorage.setItem('kaem_desbloqueado','1'); }catch(e){}
       opFijar(LOCK.perfil); lockCerrar(); haptic(20);
@@ -13942,10 +14044,11 @@
       LOCK.ocupado=true; lockError('Verificando…');
       google.script.run.withSuccessHandler(function(r){
         LOCK.ocupado=false;
-        if(r && r.ok){ lockGuardarLocal(v); lockFallosFijar(0); lockEntrar(r.token||''); }
+        if(r && r.ok){ lockGuardarLocal(v); lockFallosFijar(0); lockEntrar(r.token||'', r.rol||'admin'); }
         else lockReiniciar((r&&r.message)||'PIN incorrecto');
       }).withFailureHandler(function(){ LOCK.ocupado=false; lockReiniciar(navigator.onLine===false ? 'Sin internet · conéctate e intenta de nuevo' : 'El servidor no respondió · intenta de nuevo en un momento'); })
-        .verificarPin({ pin:v, operador:String((AJUSTES&&AJUSTES.operador)||'').trim(),
+        .verificarPin({ pin:v, operador:String(LOCK.perfil||(AJUSTES&&AJUSTES.operador)||'').trim(),   // el perfil ELEGIDO en la pantalla de acceso (Bodega entra con su propio PIN)
+                       
                         pase:(function(){ try{ return localStorage.getItem('kaem_pin_token')||''; }catch(e){ return ''; } })() });
     }
     function lockProcesar(){
@@ -13954,7 +14057,9 @@
         // Verificación LOCAL e instantánea si este celular ya entró antes con un pase válido.
         // Si el servidor rechazó el pase (PIN cambiado en otro equipo), siempre va al servidor.
         var local=null; try{ local=JSON.parse(localStorage.getItem('kaem_pin_local')||'null'); }catch(e){}
-        if(local && local.h && lockToken() && !LOCK.desdeRechazo && lockFallosLeer()<5 && window.crypto && crypto.subtle){
+        // Si el perfil elegido es de otro rol que el guardado en este equipo (Bodega ↔ equipo), SIEMPRE se verifica en el servidor.
+        var mismoRol = (LOCK.perfil==='Bodega') === (rolLocal()==='bodega');
+        if(local && local.h && lockToken() && !LOCK.desdeRechazo && mismoRol && lockFallosLeer()<5 && window.crypto && crypto.subtle){
           lockHash(v, local.sal).then(function(h){
             if(h===local.h){ lockFallosFijar(0); lockEntrar(''); }
             else { lockFallosFijar(lockFallosLeer()+1); lockReiniciar('PIN incorrecto'); }
@@ -13962,6 +14067,29 @@
           return;
         }
         lockVerificarServidor(v);
+        return;
+      }
+      if(LOCK.modo==='bodega'){
+        if(LOCK.paso===0){ LOCK.actual=v; LOCK.paso=1; LOCK.valor=''; lockPintar(); lockTitulo(); return; }
+        if(LOCK.paso===1){ LOCK.temp=v; LOCK.paso=2; LOCK.valor=''; lockPintar(); lockTitulo(); return; }
+        if(v!==LOCK.temp){ LOCK.paso=1; LOCK.temp=''; lockTitulo(); lockReiniciar('No coincide — escríbelo de nuevo'); return; }
+        LOCK.ocupado=true; lockError('Guardando…');
+        google.script.run.withSuccessHandler(function(r){
+          LOCK.ocupado=false;
+          if(r && r.ok){ lockCerrar(); toast(r.message,'success'); beep('success'); pintarSeguridad(); }
+          else { LOCK.paso=0; LOCK.temp=''; LOCK.actual=''; lockTitulo(); lockReiniciar((r&&r.message)||'No se pudo guardar el PIN de Bodega'); }
+        }).withFailureHandler(function(){ LOCK.ocupado=false; lockReiniciar('Sin conexión · el PIN no se guardó'); })
+          .configurarPinBodega({ nuevo:v, actual:LOCK.actual, cambio:!!LOCK.bodegaOn, operador:op });
+        return;
+      }
+      if(LOCK.modo==='bodegaQuitar'){
+        LOCK.ocupado=true; lockError('Verificando…');
+        google.script.run.withSuccessHandler(function(r){
+          LOCK.ocupado=false;
+          if(r && r.ok){ lockCerrar(); toast(r.message,'success'); pintarSeguridad(); }
+          else lockReiniciar((r&&r.message)||'No se pudo desactivar Bodega');
+        }).withFailureHandler(function(){ LOCK.ocupado=false; lockReiniciar('Sin conexión · no se cambió nada'); })
+          .quitarPinBodega({ actual:v, operador:op });
         return;
       }
       if(LOCK.modo==='crear' || LOCK.modo==='cambiar'){
@@ -14046,6 +14174,7 @@
             return;
           }
           LOCK.configurado=true; try{ localStorage.setItem('kaem_pin_activo','1'); }catch(e){}
+          try{ var bB=$('lockPerfilBodega'); if(bB) bB.style.display = r.bodega ? '' : 'none'; }catch(e){}   // el perfil Bodega aparece solo si ya tiene PIN
           var desbloqueado=false; try{ desbloqueado = sessionStorage.getItem('kaem_desbloqueado')==='1'; }catch(e){}
           if(!desbloqueado || !lockToken()) lockAbrir('entrar', !lockToken());
         }).withFailureHandler(function(){
@@ -14233,6 +14362,15 @@
       $('cfgPinCambiar').style.display = on ? 'block' : 'none';
       $('cfgPinQuitar').style.display = on ? 'block' : 'none';
       $('cfgSesionesBox').style.display = 'none';
+      // Perfil Bodega: solo se puede crear si ya hay PIN del equipo
+      $('cfgBodegaPin').disabled = !on; $('cfgBodegaQuitar').disabled = !on;
+      google.script.run.withSuccessHandler(function(r){
+        var b = !!(r && r.ok && r.bodega); LOCK.bodegaOn = b;
+        $('cfgBodegaEstado').textContent = !on ? 'Primero activa el PIN del equipo.' : (b ? '👤 Perfil Bodega activo · entra con su propio PIN.' : 'Perfil Bodega sin crear.');
+        $('cfgBodegaPin').textContent = b ? 'Cambiar PIN de Bodega' : 'Crear PIN de Bodega';
+        $('cfgBodegaQuitar').style.display = b ? '' : 'none';
+        $('cfgBodegaPin').style.gridColumn = b ? '' : '1 / -1';
+      }).withFailureHandler(function(){}).estadoPin();
       if(on) google.script.run.withSuccessHandler(function(r){
         if(!r || !r.ok) return;
         $('cfgSesiones').innerHTML = '📱 Equipos con pase propio: <b>'+(r.equipos||0)+'</b> · vigencia '+(r.diasVigencia||30)+' días'
@@ -14262,6 +14400,8 @@
     }
     $('cfgPinCrear').addEventListener('click', function(){ lockAbrir('crear'); });
     $('cfgPinCambiar').addEventListener('click', function(){ lockAbrir('cambiar'); });
+    $('cfgBodegaPin').addEventListener('click', function(){ lockAbrir('bodega'); });
+    $('cfgBodegaQuitar').addEventListener('click', function(){ lockAbrir('bodegaQuitar'); });
     $('cfgPinQuitar').addEventListener('click', function(){ lockAbrir('quitar'); });
     $('cfgRespAhora').addEventListener('click', function(){
       var b=$('cfgRespAhora'); b.disabled=true; b.textContent='Respaldando…';
